@@ -1,0 +1,34 @@
+## Interface: 120007
+## Title: ZoidsTools
+## Notes: A personal WoW toolkit by Drockzoids.
+## Author: Drockzoids
+## Version: 0.1.0
+## SavedVariables: ZoidsToolsDB
+## IconTexture: Interface\AddOns\ZoidsTools\Media\ZoidToolsIcon.png
+
+Libs\LibStub\LibStub.lua
+Libs\LibCallbackHandler-1.0\CallbackHandler-1.0.lua
+Libs\LibDataBroker-1.1\LibDataBroker-1.1.lua
+Libs\LibDBIcon-1.0\LibDBIcon-1.0.lua
+
+Core.lua
+Modules\MovableWindows.lua
+Modules\FastLoot.lua
+Modules\VendorAutomation.lua
+Modules\Combat.lua
+Modules\KeybindText.lua
+Modules\PerformanceWidget.lua
+Modules\Coordinates.lua
+Modules\ItemOverlays.lua
+Modules\QuestAutomation.lua
+UI\Theme.lua
+UI\Controls.lua
+UI\Pages\General.lua
+UI\Pages\Windows.lua
+UI\Pages\Items.lua
+UI\Pages\Combat.lua
+UI\Pages\Loot.lua
+UI\Pages\Quests.lua
+UI\Pages\About.lua
+UI\MainWindow.lua
+UI\Minimap.lua

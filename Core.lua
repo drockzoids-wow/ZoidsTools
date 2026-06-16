@@ -1,0 +1,439 @@
+local ADDON_NAME, ns = ...
+
+ns.addonName = ADDON_NAME
+ns.title = "ZoidsTools"
+ns.version = "0.1.0"
+
+local defaults = {
+    migrationVersion = 1,
+    windows = {
+        enabled = true,
+        moveBags = true,
+        savePositions = true,
+        scaleEnabled = true,
+        scaleStep = 0.05,
+        minScale = 0.6,
+        maxScale = 1.8,
+        showBagHandles = true,
+        points = {},
+        scales = {},
+    },
+    loot = {
+        fastLoot = true,
+        carefulMode = false,
+        carefulDelay = 0.12,
+    },
+    vendor = {
+        autoSellGrey = false,
+        autoRepairMode = "disabled",
+    },
+    quests = {
+        autoAccept = false,
+        autoTurnIn = false,
+        autoGossip = false,
+        pauseModifier = "shift",
+        skipDaily = true,
+        skipWarbandCompleted = true,
+    },
+    combat = {
+        actionButtonRangeTint = true,
+        keybindText = {
+            enabled = true,
+            shorten = true,
+            font = "default",
+            fontSize = 12,
+            outline = "default",
+            bold = false,
+            useCustomColor = false,
+            color = {
+                r = 1,
+                g = 1,
+                b = 1,
+            },
+        },
+    },
+    items = {
+        enabled = true,
+        fontSize = 12,
+        useQualityColor = true,
+        character = {
+            itemLevel = true,
+            gems = true,
+            enchants = true,
+            missingEnchant = true,
+            gemTooltips = true,
+        },
+        bags = {
+            itemLevel = true,
+            bindType = true,
+        },
+        bank = {
+            itemLevel = true,
+            bindType = true,
+        },
+        warbandBank = {
+            itemLevel = true,
+            bindType = true,
+        },
+    },
+    performance = {
+        enabled = true,
+        updateInterval = 1,
+        point = "BOTTOM",
+        relativePoint = "BOTTOM",
+        x = 0,
+        y = 205,
+        locked = false,
+    },
+    coordinates = {
+        enabled = true,
+        mapEnabled = true,
+        updateInterval = 0.15,
+        point = "BOTTOM",
+        relativePoint = "BOTTOM",
+        x = 0,
+        y = 245,
+        scale = 1,
+    },
+    ui = {
+        minimap = {
+            show = true,
+            hide = false,
+            minimapPos = 225,
+        },
+        mainWindow = {
+            point = "CENTER",
+            relativePoint = "CENTER",
+            x = 0,
+            y = 0,
+        },
+    },
+}
+
+local function CopyDefaults(source, target)
+    for key, value in pairs(source) do
+        if type(value) == "table" then
+            if type(target[key]) ~= "table" then
+                target[key] = {}
+            end
+
+            CopyDefaults(value, target[key])
+        elseif target[key] == nil then
+            target[key] = value
+        end
+    end
+end
+
+local function Trim(value)
+    return (value or ""):match("^%s*(.-)%s*$")
+end
+
+function ns:Print(message)
+    DEFAULT_CHAT_FRAME:AddMessage("|cff33ccffZoidsTools|r: " .. tostring(message))
+end
+
+function ns:GetDB()
+    return self.db
+end
+
+function ns:OpenConfig(pageKey)
+    if self.UI and self.UI.Show then
+        self.UI.Show(pageKey)
+    else
+        self:Print("The control window is not ready yet.")
+    end
+end
+
+function ns:SetMinimapShown(value)
+    if not self.db then
+        return
+    end
+
+    self.db.ui.minimap.show = value == true
+    self.db.ui.minimap.hide = value ~= true
+
+    if self.UpdateMinimapButton then
+        self:UpdateMinimapButton()
+    end
+end
+
+local function PrintHelp()
+    ns:Print("/zt opens ZoidsTools.")
+    ns:Print("/zt windows on/off toggles movable Blizzard windows.")
+    ns:Print("/zt bags on/off toggles default bag movement.")
+    ns:Print("/zt combat opens combat options.")
+    ns:Print("/zt keydown on/off toggles action keybinds on key down.")
+    ns:Print("/zt rangetint on/off toggles full-button out-of-range tint.")
+    ns:Print("/zt perf on/off toggles the FPS and latency widget.")
+    ns:Print("/zt perf unlock unlocks the click-through performance widget.")
+    ns:Print("/zt coords on/off toggles the coordinates widget.")
+    ns:Print("/zt coords reset resets the coordinates widget position.")
+    ns:Print("/zt items opens item overlay options.")
+    ns:Print("/zt iteminfo on/off toggles item overlays.")
+    ns:Print("/zt loot opens loot options.")
+    ns:Print("/zt fastloot on/off toggles fast auto loot.")
+    ns:Print("/zt autosell on/off toggles auto-sell grey items at vendors.")
+    ns:Print("/zt autorepair off/personal/guild changes auto repair.")
+    ns:Print("/zt quests opens quest automation options.")
+    ns:Print("/zt autoquest on/off toggles auto accept and auto turn-in.")
+    ns:Print("/zt resetwindows clears saved window positions.")
+    ns:Print("/zt resetscales clears saved window scales.")
+    ns:Print("Hold Ctrl and mouse-wheel over a movable window to scale it.")
+end
+
+local function HandleSlash(input)
+    input = string.lower(Trim(input))
+
+    if input == "" or input == "config" or input == "options" or input == "open" then
+        ns:OpenConfig()
+    elseif input == "windows" then
+        ns:OpenConfig("windows")
+    elseif input == "loot" then
+        ns:OpenConfig("loot")
+    elseif input == "combat" then
+        ns:OpenConfig("combat")
+    elseif input == "items" or input == "item" or input == "gear" then
+        ns:OpenConfig("items")
+    elseif input == "quests" or input == "quest" then
+        ns:OpenConfig("quests")
+    elseif input == "windows on" then
+        ns.db.windows.enabled = true
+
+        if ns.InitializeMovableWindows then
+            ns:InitializeMovableWindows()
+        end
+
+        if ns.RefreshMovableWindows then
+            ns:RefreshMovableWindows()
+        end
+
+        ns:Print("Movable Blizzard windows enabled.")
+    elseif input == "windows off" then
+        ns.db.windows.enabled = false
+
+        if ns.RefreshMovableWindows then
+            ns:RefreshMovableWindows()
+        end
+
+        ns:Print("Movable Blizzard windows disabled.")
+    elseif input == "bags on" then
+        ns.db.windows.moveBags = true
+
+        if ns.RefreshBagMovement then
+            ns:RefreshBagMovement()
+        end
+
+        ns:Print("Default bag movement enabled.")
+    elseif input == "bags off" then
+        ns.db.windows.moveBags = false
+
+        if ns.RefreshBagMovement then
+            ns:RefreshBagMovement()
+        end
+
+        ns:Print("Default bag movement disabled.")
+    elseif input == "fastloot on" then
+        if ns.SetFastLootEnabled then
+            ns:SetFastLootEnabled(true)
+        else
+            ns.db.loot.fastLoot = true
+        end
+
+        ns:Print("Fast auto loot enabled.")
+    elseif input == "fastloot off" then
+        if ns.SetFastLootEnabled then
+            ns:SetFastLootEnabled(false)
+        else
+            ns.db.loot.fastLoot = false
+        end
+
+        ns:Print("Fast auto loot disabled.")
+    elseif input == "autosell on" or input == "sellgrey on" then
+        if ns.SetAutoSellGreyItems then
+            ns:SetAutoSellGreyItems(true)
+            ns:Print("Auto-sell grey items enabled.")
+        end
+    elseif input == "autosell off" or input == "sellgrey off" then
+        if ns.SetAutoSellGreyItems then
+            ns:SetAutoSellGreyItems(false)
+            ns:Print("Auto-sell grey items disabled.")
+        end
+    elseif input == "autorepair off" or input == "repair off" then
+        if ns.SetAutoRepairMode then
+            ns:SetAutoRepairMode("disabled")
+            ns:Print("Auto repair disabled.")
+        end
+    elseif input == "autorepair personal" or input == "repair personal" or input == "autorepair own" then
+        if ns.SetAutoRepairMode then
+            ns:SetAutoRepairMode("personal")
+            ns:Print("Auto repair will use your own gold.")
+        end
+    elseif input == "autorepair guild" or input == "repair guild" then
+        if ns.SetAutoRepairMode then
+            ns:SetAutoRepairMode("guild")
+            ns:Print("Auto repair will use guild bank funds when available.")
+        end
+    elseif input == "autoquest on" or input == "quests on" then
+        if ns.SetQuestAutomationOption then
+            ns:SetQuestAutomationOption("autoAccept", true)
+            ns:SetQuestAutomationOption("autoTurnIn", true)
+            ns:Print("Quest auto accept and turn-in enabled.")
+        end
+    elseif input == "autoquest off" or input == "quests off" then
+        if ns.SetQuestAutomationOption then
+            ns:SetQuestAutomationOption("autoAccept", false)
+            ns:SetQuestAutomationOption("autoTurnIn", false)
+            ns:Print("Quest auto accept and turn-in disabled.")
+        end
+    elseif input == "perf on" or input == "performance on" then
+        if ns.SetPerformanceWidgetShown then
+            ns:SetPerformanceWidgetShown(true)
+            ns:Print("Performance widget shown with FPS and latency.")
+        end
+    elseif input == "perf off" or input == "performance off" then
+        if ns.SetPerformanceWidgetShown then
+            ns:SetPerformanceWidgetShown(false)
+            ns:Print("Performance widget hidden.")
+        end
+    elseif input == "perf unlock" or input == "performance unlock" then
+        if ns.SetPerformanceWidgetLocked then
+            ns:SetPerformanceWidgetLocked(false)
+            ns:Print("Performance widget unlocked.")
+        end
+    elseif input == "coords on" or input == "coordinates on" then
+        if ns.SetCoordinatesWidgetShown then
+            ns:SetCoordinatesWidgetShown(true)
+            ns:Print("Coordinates widget shown.")
+        end
+    elseif input == "coords off" or input == "coordinates off" then
+        if ns.SetCoordinatesWidgetShown then
+            ns:SetCoordinatesWidgetShown(false)
+            ns:Print("Coordinates widget hidden.")
+        end
+    elseif input == "coords reset" or input == "coordinates reset" then
+        if ns.ResetCoordinatesWidgetPosition then
+            ns:ResetCoordinatesWidgetPosition()
+            ns:Print("Coordinates widget position reset.")
+        end
+    elseif input == "mapcoords on" or input == "map coordinates on" then
+        if ns.SetMapCoordinatesShown then
+            ns:SetMapCoordinatesShown(true)
+            ns:Print("Map coordinates shown.")
+        end
+    elseif input == "mapcoords off" or input == "map coordinates off" then
+        if ns.SetMapCoordinatesShown then
+            ns:SetMapCoordinatesShown(false)
+            ns:Print("Map coordinates hidden.")
+        end
+    elseif input == "iteminfo on" or input == "items on" then
+        if ns.SetItemOverlaysEnabled then
+            ns:SetItemOverlaysEnabled(true)
+            ns:Print("Item overlays enabled.")
+        end
+    elseif input == "iteminfo off" or input == "items off" then
+        if ns.SetItemOverlaysEnabled then
+            ns:SetItemOverlaysEnabled(false)
+            ns:Print("Item overlays disabled.")
+        end
+    elseif input == "keydown on" or input == "castkeydown on" then
+        if ns.SetCastOnKeyDown and ns:SetCastOnKeyDown(true) then
+            ns:Print("Action keybinds now cast on key down.")
+        else
+            ns:Print("Could not update the key-down cast setting.")
+        end
+    elseif input == "keydown off" or input == "castkeydown off" then
+        if ns.SetCastOnKeyDown and ns:SetCastOnKeyDown(false) then
+            ns:Print("Action keybinds now cast on key up.")
+        else
+            ns:Print("Could not update the key-down cast setting.")
+        end
+    elseif input == "rangetint on" or input == "range tint on" then
+        if ns.SetActionButtonRangeTintEnabled then
+            ns:SetActionButtonRangeTintEnabled(true)
+            ns:Print("Full-button out-of-range tint enabled.")
+        end
+    elseif input == "rangetint off" or input == "range tint off" then
+        if ns.SetActionButtonRangeTintEnabled then
+            ns:SetActionButtonRangeTintEnabled(false)
+            ns:Print("Full-button out-of-range tint disabled.")
+        end
+    elseif input == "reset" or input == "resetwindows" then
+        if ns.ResetMovableWindowPositions then
+            ns:ResetMovableWindowPositions()
+        end
+    elseif input == "resetscales" then
+        if ns.ResetMovableWindowScales then
+            ns:ResetMovableWindowScales()
+        end
+    elseif input == "minimap on" then
+        ns:SetMinimapShown(true)
+        ns:Print("Minimap button shown.")
+    elseif input == "minimap off" then
+        ns:SetMinimapShown(false)
+        ns:Print("Minimap button hidden.")
+    elseif input == "help" then
+        PrintHelp()
+    else
+        PrintHelp()
+    end
+end
+
+SLASH_ZOIDSTOOLS1 = "/zt"
+SLASH_ZOIDSTOOLS2 = "/zoids"
+SLASH_ZOIDSTOOLS3 = "/zoidstools"
+SlashCmdList.ZOIDSTOOLS = HandleSlash
+
+local eventFrame = CreateFrame("Frame")
+eventFrame:RegisterEvent("ADDON_LOADED")
+eventFrame:RegisterEvent("PLAYER_LOGIN")
+eventFrame:SetScript("OnEvent", function(_, event, addonName)
+    if event == "ADDON_LOADED" and addonName == ADDON_NAME then
+        ZoidsToolsDB = ZoidsToolsDB or {}
+        CopyDefaults(defaults, ZoidsToolsDB)
+        ns.db = ZoidsToolsDB
+    elseif event == "PLAYER_LOGIN" then
+        if ns.InitializeMovableWindows then
+            ns:InitializeMovableWindows()
+        end
+
+        if ns.InitializeFastLoot then
+            ns:InitializeFastLoot()
+        end
+
+        if ns.InitializeVendorAutomation then
+            ns:InitializeVendorAutomation()
+        end
+
+        if ns.InitializeCombatSettings then
+            ns:InitializeCombatSettings()
+        end
+
+        if ns.InitializeKeybindText then
+            ns:InitializeKeybindText()
+        end
+
+        if ns.InitializePerformanceWidget then
+            ns:InitializePerformanceWidget()
+        end
+
+        if ns.InitializeCoordinates then
+            ns:InitializeCoordinates()
+        end
+
+        if ns.InitializeItemOverlays then
+            ns:InitializeItemOverlays()
+        end
+
+        if ns.InitializeQuestAutomation then
+            ns:InitializeQuestAutomation()
+        end
+
+        if ns.UI and ns.UI.Initialize then
+            ns.UI.Initialize()
+        end
+
+        if ns.InitializeMinimapButton then
+            ns:InitializeMinimapButton()
+        end
+    end
+end)

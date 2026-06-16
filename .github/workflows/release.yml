@@ -18,8 +18,17 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Check CurseForge token
+        run: |
+          if [ -z "${{ secrets.CF_API_KEY }}" ]; then
+            echo "Missing required GitHub Actions secret: CF_API_KEY"
+            exit 1
+          fi
+
       - name: Package addon
         uses: BigWigsMods/packager@v2
+        with:
+          args: -p 1578016
         env:
           GITHUB_OAUTH: ${{ secrets.GITHUB_TOKEN }}
           CF_API_KEY: ${{ secrets.CF_API_KEY }}

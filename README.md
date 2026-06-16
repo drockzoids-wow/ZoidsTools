@@ -80,3 +80,12 @@ A personal World of Warcraft toolkit by Drockzoids.
 Copy or link the `ZoidsTools` folder into:
 
 `World of Warcraft/_retail_/Interface/AddOns/`
+
+## Release
+
+CurseForge uploads are handled by GitHub Actions when a version tag is pushed.
+
+1. Update `## Version` in `ZoidsTools.toc`.
+2. Update `CHANGELOG.md`.
+3. Commit and push the changes.
+4. Create and push a tag like `v0.1.0`.

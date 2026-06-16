@@ -1,0 +1,15 @@
+package-as: ZoidsTools
+
+manual-changelog: CHANGELOG.md
+
+enable-nolib-creation: no
+  
+ignore:
+  - .git
+  - .github
+  - README.md
+  - LICENSE
+  - .pkgmeta
+
+curseforge:
+  project-id: 1578016

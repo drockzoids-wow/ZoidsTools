@@ -493,9 +493,9 @@ local function ApplyInfoBar(enabled)
             rightAnchor = clockButton
         end
 
-        if addonButton and MoveMinimapCornerWidget("addon", addonButton) then
+        if addonButton and MoveHeaderWidget("addon", addonButton, bar) then
             addonButton:SetSize(22, 22)
-            addonButton:SetPoint("BOTTOMRIGHT", Minimap, "BOTTOMRIGHT", db and db.collectAddonButtons and -35 or -5, 5)
+            addonButton:SetPoint("LEFT", bar, "LEFT", 4, 0)
         end
 
         if calendarButton and MoveMinimapCornerWidget("calendar", calendarButton) then
@@ -760,7 +760,11 @@ end
 local LayoutCollectorButtons
 local CloseCollectorPanel
 
-local function CloseCollectorPanelAfterClick()
+local function CloseCollectorPanelAfterClick(_, mouseButton)
+    if mouseButton ~= "LeftButton" then
+        return
+    end
+
     if C_Timer and C_Timer.After then
         C_Timer.After(0, CloseCollectorPanel)
     elseif CloseCollectorPanel then

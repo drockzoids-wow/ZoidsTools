@@ -40,7 +40,7 @@ function ns.UI.Pages.CreateGeneralPage(parent)
     local minimapHeader = UI.CreateCheckbox(
         frame,
         "Move map title and time",
-        "Moves the minimap title and clock into a compact top bar, with tracking, calendar, and addon controls inside the map corners.",
+        "Moves the minimap title, clock, and Blizzard addon button into a compact top bar, with tracking and calendar inside the map corners.",
         function()
             return ns.IsMinimapHeaderBarEnabled and ns:IsMinimapHeaderBarEnabled()
         end,

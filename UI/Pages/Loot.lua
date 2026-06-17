@@ -63,6 +63,21 @@ function ns.UI.Pages.CreateLootPage(parent)
     )
     autoSellGrey:SetPoint("TOPLEFT", vendorSection, "BOTTOMLEFT", 18, -6)
 
+    local autoSellBoEGrey = UI.CreateCheckbox(
+        frame,
+        "Include BoE grey items",
+        "Includes bind-on-equip grey items when auto-selling junk. When off, unbound grey equipment is skipped.",
+        function()
+            return ns.GetAutoSellBoEGreyItems and ns:GetAutoSellBoEGreyItems()
+        end,
+        function(value)
+            if ns.SetAutoSellBoEGreyItems then
+                ns:SetAutoSellBoEGreyItems(value)
+            end
+        end
+    )
+    autoSellBoEGrey:SetPoint("TOPLEFT", autoSellGrey, "BOTTOMLEFT", 0, -8)
+
     local repairOptions = ns.GetAutoRepairModeOptions and ns:GetAutoRepairModeOptions() or {
         { value = "disabled", text = "Disabled" },
         { value = "personal", text = "Use My Gold" },
@@ -84,12 +99,13 @@ function ns.UI.Pages.CreateLootPage(parent)
         end,
         220
     )
-    autoRepair:SetPoint("TOPLEFT", autoSellGrey, "BOTTOMLEFT", 0, -12)
+    autoRepair:SetPoint("TOPLEFT", autoSellBoEGrey, "BOTTOMLEFT", 0, -12)
 
     function frame:Refresh()
         fastLoot:Refresh()
         carefulMode:Refresh()
         autoSellGrey:Refresh()
+        autoSellBoEGrey:Refresh()
         autoRepair:Refresh()
 
         if ns.GetFastLootEnabled and ns:GetFastLootEnabled() then

@@ -25,6 +25,7 @@ local defaults = {
     },
     vendor = {
         autoSellGrey = false,
+        autoSellBoEGrey = false,
         autoRepairMode = "disabled",
     },
     quests = {
@@ -173,6 +174,7 @@ local function PrintHelp()
     ns:Print("/zt loot opens loot options.")
     ns:Print("/zt fastloot on/off toggles fast auto loot.")
     ns:Print("/zt autosell on/off toggles auto-sell grey items at vendors.")
+    ns:Print("/zt sellboe on/off includes BoE grey items in auto-sell.")
     ns:Print("/zt autorepair off/personal/guild changes auto repair.")
     ns:Print("/zt quests opens quest automation options.")
     ns:Print("/zt autoquest on/off toggles auto accept and auto turn-in.")
@@ -257,6 +259,16 @@ local function HandleSlash(input)
         if ns.SetAutoSellGreyItems then
             ns:SetAutoSellGreyItems(false)
             ns:Print("Auto-sell grey items disabled.")
+        end
+    elseif input == "sellboe on" or input == "autosellboe on" or input == "boejunk on" then
+        if ns.SetAutoSellBoEGreyItems then
+            ns:SetAutoSellBoEGreyItems(true)
+            ns:Print("BoE grey items will be included in auto-sell.")
+        end
+    elseif input == "sellboe off" or input == "autosellboe off" or input == "boejunk off" then
+        if ns.SetAutoSellBoEGreyItems then
+            ns:SetAutoSellBoEGreyItems(false)
+            ns:Print("BoE grey items will be skipped by auto-sell.")
         end
     elseif input == "autorepair off" or input == "repair off" then
         if ns.SetAutoRepairMode then

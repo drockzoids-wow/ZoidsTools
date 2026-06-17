@@ -2,10 +2,14 @@ local _, ns = ...
 
 local frame
 local initialized = false
+local sellQueue
+local sellQueueIndex = 1
 
 local REPAIR_DISABLED = "disabled"
 local REPAIR_PERSONAL = "personal"
 local REPAIR_GUILD = "guild"
+local BIND_ON_EQUIP = 2
+local SELL_INTERVAL = 0.1
 
 local repairModes = {
     [REPAIR_DISABLED] = true,
@@ -22,6 +26,10 @@ local function EnsureVendorDB()
 
     if ns.db.vendor.autoSellGrey == nil then
         ns.db.vendor.autoSellGrey = false
+    end
+
+    if ns.db.vendor.autoSellBoEGrey == nil then
+        ns.db.vendor.autoSellBoEGrey = false
     end
 
     if not repairModes[ns.db.vendor.autoRepairMode] then
@@ -66,17 +74,25 @@ local function GetContainerNumSlotsSafe(bag)
     return 0
 end
 
+local function GetContainerItemLinkSafe(bag, slot)
+    if C_Container and C_Container.GetContainerItemLink then
+        return C_Container.GetContainerItemLink(bag, slot)
+    elseif GetContainerItemLink then
+        return GetContainerItemLink(bag, slot)
+    end
+end
+
 local function GetContainerItemInfoSafe(bag, slot)
     if C_Container and C_Container.GetContainerItemInfo then
         local info = C_Container.GetContainerItemInfo(bag, slot)
 
         if info then
-            return info.quality, info.isLocked, info.hasNoValue
+            return info.quality, info.isLocked, info.hasNoValue, info.hyperlink or GetContainerItemLinkSafe(bag, slot), info.isBound
         end
     elseif GetContainerItemInfo then
-        local _, _, locked, quality, _, _, _, _, noValue = GetContainerItemInfo(bag, slot)
+        local _, _, locked, quality, _, _, link, _, noValue, _, isBound = GetContainerItemInfo(bag, slot)
 
-        return quality, locked, noValue
+        return quality, locked, noValue, link, isBound
     end
 end
 
@@ -90,24 +106,138 @@ local function UseContainerItemSafe(bag, slot)
     return false
 end
 
-local function SellGreyItemsByBagScan()
-    local sold = 0
+local function GetItemBindType(link)
+    if not link then
+        return nil
+    end
+
+    if C_Item and C_Item.GetItemInfo then
+        local info = { C_Item.GetItemInfo(link) }
+
+        if info[14] then
+            return info[14]
+        end
+    elseif GetItemInfo then
+        local info = { GetItemInfo(link) }
+
+        if info[14] then
+            return info[14]
+        end
+    end
+
+    return nil
+end
+
+local function IsBindOnEquip(link)
+    return GetItemBindType(link) == BIND_ON_EQUIP
+end
+
+local function IsEquippableItemLink(link)
+    if not link then
+        return false
+    end
+
+    local equipLocation
+
+    if C_Item and C_Item.GetItemInfoInstant then
+        equipLocation = select(4, C_Item.GetItemInfoInstant(link))
+    elseif GetItemInfoInstant then
+        equipLocation = select(4, GetItemInfoInstant(link))
+    end
+
+    return type(equipLocation) == "string" and equipLocation ~= ""
+end
+
+local function ShouldSellGreyItem(includeBoE, link, isBound)
+    if includeBoE or isBound then
+        return true
+    end
+
+    if IsBindOnEquip(link) then
+        return false
+    end
+
+    if GetItemBindType(link) == nil and IsEquippableItemLink(link) then
+        return false
+    end
+
+    return true
+end
+
+local function ShouldSellGreySlot(bag, slot, includeBoE)
+    local quality, locked, noValue, link, isBound = GetContainerItemInfoSafe(bag, slot)
+
+    return quality == 0 and not locked and not noValue and ShouldSellGreyItem(includeBoE, link, isBound)
+end
+
+local function BuildGreySellQueue(includeBoE)
+    local items = {}
 
     for _, bag in ipairs(GetBagIds()) do
         local slots = GetContainerNumSlotsSafe(bag)
 
         for slot = 1, slots do
-            local quality, locked, noValue = GetContainerItemInfoSafe(bag, slot)
-
-            if quality == 0 and not locked and not noValue then
-                if UseContainerItemSafe(bag, slot) then
-                    sold = sold + 1
-                end
+            if ShouldSellGreySlot(bag, slot, includeBoE) then
+                items[#items + 1] = {
+                    bag = bag,
+                    slot = slot,
+                }
             end
         end
     end
 
-    return sold
+    return items
+end
+
+local function IsMerchantOpen()
+    return MerchantFrame and MerchantFrame:IsShown()
+end
+
+local function ProcessSellQueue()
+    if not sellQueue then
+        return
+    end
+
+    if not IsMerchantOpen() then
+        sellQueue = nil
+        sellQueueIndex = 1
+        return
+    end
+
+    while sellQueue and sellQueueIndex <= #sellQueue do
+        local item = sellQueue[sellQueueIndex]
+        sellQueueIndex = sellQueueIndex + 1
+
+        if item and ShouldSellGreySlot(item.bag, item.slot, sellQueue.includeBoE == true) then
+            UseContainerItemSafe(item.bag, item.slot)
+            break
+        end
+    end
+
+    if not sellQueue or sellQueueIndex > #sellQueue then
+        sellQueue = nil
+        sellQueueIndex = 1
+        return
+    end
+
+    if C_Timer and C_Timer.After then
+        C_Timer.After(SELL_INTERVAL, ProcessSellQueue)
+    else
+        ProcessSellQueue()
+    end
+end
+
+local function StartSellQueue(items, includeBoE)
+    if not items or #items == 0 then
+        return 0
+    end
+
+    sellQueue = items
+    sellQueue.includeBoE = includeBoE == true
+    sellQueueIndex = 1
+    ProcessSellQueue()
+
+    return #items
 end
 
 local function SellGreyItems()
@@ -117,12 +247,9 @@ local function SellGreyItems()
         return
     end
 
-    if C_MerchantFrame and type(C_MerchantFrame.SellAllJunkItems) == "function" then
-        pcall(C_MerchantFrame.SellAllJunkItems)
-        return
-    end
+    local includeBoE = db.autoSellBoEGrey == true
 
-    SellGreyItemsByBagScan()
+    return StartSellQueue(BuildGreySellQueue(includeBoE), includeBoE)
 end
 
 local function RepairWithPersonalGold(cost)
@@ -181,10 +308,11 @@ local function AutoRepair()
 end
 
 local function RunVendorAutomation()
-    SellGreyItems()
+    local sellCount = SellGreyItems() or 0
+    local repairDelay = sellCount > 0 and ((sellCount * SELL_INTERVAL) + 0.15) or 0.1
 
     if C_Timer and C_Timer.After then
-        C_Timer.After(0.1, AutoRepair)
+        C_Timer.After(repairDelay, AutoRepair)
     else
         AutoRepair()
     end
@@ -204,6 +332,22 @@ function ns:GetAutoSellGreyItems()
     local db = EnsureVendorDB()
 
     return db and db.autoSellGrey == true
+end
+
+function ns:SetAutoSellBoEGreyItems(value)
+    local db = EnsureVendorDB()
+
+    if not db then
+        return
+    end
+
+    db.autoSellBoEGrey = value == true
+end
+
+function ns:GetAutoSellBoEGreyItems()
+    local db = EnsureVendorDB()
+
+    return db and db.autoSellBoEGrey == true
 end
 
 function ns:SetAutoRepairMode(value)

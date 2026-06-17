@@ -61,13 +61,6 @@ local characterSlots = {
     { slot = 17, frameName = "CharacterSecondaryHandSlot", side = "bottom" },
 }
 
-local expectedSocketSlots = {
-    [1] = 1,
-    [2] = 2,
-    [6] = 1,
-    [9] = 1,
-}
-
 local function PackResults(...)
     return { n = select("#", ...), ... }
 end
@@ -513,7 +506,7 @@ local function EnsureGemFrames(button, count)
     end
 end
 
-local function PositionGemFrames(button, displayCount)
+local function PositionGemFrames(button, displayCount, side)
     if not button.ZTGemFrames then
         return
     end
@@ -527,7 +520,15 @@ local function PositionGemFrames(button, displayCount)
         frame:ClearAllPoints()
 
         if index <= displayCount then
-            frame:SetPoint("BOTTOM", button, "BOTTOM", startX + ((index - 1) * (gemSize + spacing)), 2)
+            local offset = startX + ((index - 1) * (gemSize + spacing))
+
+            if side == "left" then
+                frame:SetPoint("TOP", button, "RIGHT", 12 + offset, 0)
+            elseif side == "right" then
+                frame:SetPoint("TOP", button, "LEFT", -12 + offset, 0)
+            else
+                frame:SetPoint("TOP", button, "BOTTOM", offset, -13)
+            end
         end
     end
 end
@@ -548,10 +549,10 @@ local function PositionEnchantText(button, side)
     button.ZTEnchantText:ClearAllPoints()
 
     if side == "left" then
-        button.ZTEnchantText:SetPoint("LEFT", button, "RIGHT", 3, 0)
+        button.ZTEnchantText:SetPoint("LEFT", button, "RIGHT", 3, 8)
         button.ZTEnchantText:SetJustifyH("LEFT")
     elseif side == "right" then
-        button.ZTEnchantText:SetPoint("RIGHT", button, "LEFT", -3, 0)
+        button.ZTEnchantText:SetPoint("RIGHT", button, "LEFT", -3, 8)
         button.ZTEnchantText:SetJustifyH("RIGHT")
     else
         button.ZTEnchantText:SetPoint("TOP", button, "BOTTOM", 0, -1)
@@ -581,7 +582,7 @@ local function ClearCharacterButton(button)
     HideGemFrames(button)
 end
 
-local function UpdateCharacterGems(button, itemLink, slot)
+local function UpdateCharacterGems(button, itemLink, slot, side)
     local db = EnsureDB()
 
     if not db or not db.enabled or not db.character.gems then
@@ -590,8 +591,7 @@ local function UpdateCharacterGems(button, itemLink, slot)
     end
 
     local socketCount = CountSockets(itemLink)
-    local expectedCount = expectedSocketSlots[slot] or 0
-    local displayCount = math.max(socketCount, expectedCount)
+    local displayCount = socketCount
 
     if displayCount <= 0 then
         HideGemFrames(button)
@@ -599,7 +599,7 @@ local function UpdateCharacterGems(button, itemLink, slot)
     end
 
     EnsureGemFrames(button, displayCount)
-    PositionGemFrames(button, displayCount)
+    PositionGemFrames(button, displayCount, side)
 
     for index, frame in ipairs(button.ZTGemFrames) do
         if index <= displayCount then
@@ -612,8 +612,6 @@ local function UpdateCharacterGems(button, itemLink, slot)
 
             if gemLink then
                 frame.icon:SetVertexColor(1, 1, 1, 1)
-            elseif index > socketCount then
-                frame.icon:SetVertexColor(1, 0.12, 0.12, 1)
             else
                 frame.icon:SetVertexColor(0.85, 0.85, 0.85, 1)
             end
@@ -715,8 +713,8 @@ local function UpdateCharacterSlot(slotInfo)
             button.ZTItemLevelText:Hide()
         end
 
-        UpdateCharacterGems(button, itemLink, slotInfo.slot)
         UpdateCharacterEnchant(button, itemLink, slotInfo.slot, slotInfo.side)
+        UpdateCharacterGems(button, itemLink, slotInfo.slot, slotInfo.side)
     end
 
     if Item and Item.CreateFromEquipmentSlot then

@@ -523,11 +523,11 @@ local function PositionGemFrames(button, displayCount, side)
             local offset = startX + ((index - 1) * (gemSize + spacing))
 
             if side == "left" then
-                frame:SetPoint("TOP", button, "RIGHT", 12 + offset, 0)
+                frame:SetPoint("TOP", button, "RIGHT", 12 + offset, -2)
             elseif side == "right" then
-                frame:SetPoint("TOP", button, "LEFT", -12 + offset, 0)
+                frame:SetPoint("TOP", button, "LEFT", -12 + offset, -2)
             else
-                frame:SetPoint("TOP", button, "BOTTOM", offset, -13)
+                frame:SetPoint("TOP", button, "BOTTOM", offset, -15)
             end
         end
     end

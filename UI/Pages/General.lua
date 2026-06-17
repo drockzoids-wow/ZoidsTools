@@ -22,6 +22,66 @@ function ns.UI.Pages.CreateGeneralPage(parent)
     )
     minimap:SetPoint("TOPLEFT", interfaceSection, "BOTTOMLEFT", 18, -6)
 
+    local squareMinimap = UI.CreateCheckbox(
+        frame,
+        "Square minimap",
+        "Uses a simple square mask and thin border for the minimap.",
+        function()
+            return ns.IsSquareMinimapEnabled and ns:IsSquareMinimapEnabled()
+        end,
+        function(value)
+            if ns.SetSquareMinimapEnabled then
+                ns:SetSquareMinimapEnabled(value)
+            end
+        end
+    )
+    squareMinimap:SetPoint("TOPLEFT", minimap, "BOTTOMLEFT", 0, -6)
+
+    local minimapHeader = UI.CreateCheckbox(
+        frame,
+        "Move map title and time",
+        "Moves the minimap title and clock into a compact top bar, with tracking, calendar, and addon controls inside the map corners.",
+        function()
+            return ns.IsMinimapHeaderBarEnabled and ns:IsMinimapHeaderBarEnabled()
+        end,
+        function(value)
+            if ns.SetMinimapHeaderBarEnabled then
+                ns:SetMinimapHeaderBarEnabled(value)
+            end
+        end
+    )
+    minimapHeader:SetPoint("TOPLEFT", squareMinimap, "BOTTOMLEFT", 0, -6)
+
+    local mouseoverButtons = UI.CreateCheckbox(
+        frame,
+        "Hide addon buttons until mouseover",
+        "Hides addon minimap buttons until your mouse is over the minimap.",
+        function()
+            return ns.IsMinimapButtonsMouseoverEnabled and ns:IsMinimapButtonsMouseoverEnabled()
+        end,
+        function(value)
+            if ns.SetMinimapButtonsMouseoverEnabled then
+                ns:SetMinimapButtonsMouseoverEnabled(value)
+            end
+        end
+    )
+    mouseoverButtons:SetPoint("TOPLEFT", minimapHeader, "BOTTOMLEFT", 0, -6)
+
+    local collectButtons = UI.CreateCheckbox(
+        frame,
+        "Collect addon buttons",
+        "Stores addon minimap buttons inside one expandable ZoidsTools button.",
+        function()
+            return ns.IsMinimapButtonCollectorEnabled and ns:IsMinimapButtonCollectorEnabled()
+        end,
+        function(value)
+            if ns.SetMinimapButtonCollectorEnabled then
+                ns:SetMinimapButtonCollectorEnabled(value)
+            end
+        end
+    )
+    collectButtons:SetPoint("TOPLEFT", mouseoverButtons, "BOTTOMLEFT", 0, -6)
+
     local performanceDisplay = UI.CreateDropdown(
         frame,
         "Performance widget",
@@ -42,7 +102,7 @@ function ns.UI.Pages.CreateGeneralPage(parent)
         end,
         220
     )
-    performanceDisplay:SetPoint("TOPLEFT", minimap, "BOTTOMLEFT", 0, -12)
+    performanceDisplay:SetPoint("TOPLEFT", collectButtons, "BOTTOMLEFT", 0, -16)
 
     local performanceScale = UI.CreateSlider(
         frame,
@@ -148,6 +208,10 @@ function ns.UI.Pages.CreateGeneralPage(parent)
 
     function frame:Refresh()
         minimap:Refresh()
+        squareMinimap:Refresh()
+        minimapHeader:Refresh()
+        mouseoverButtons:Refresh()
+        collectButtons:Refresh()
         performanceDisplay:Refresh()
         performanceScale:Refresh()
         coordinatesWidget:Refresh()

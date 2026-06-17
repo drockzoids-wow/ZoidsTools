@@ -101,6 +101,10 @@ local defaults = {
             show = true,
             hide = false,
             minimapPos = 225,
+            square = false,
+            moveHeader = false,
+            hideAddonButtons = false,
+            collectAddonButtons = false,
         },
         mainWindow = {
             point = "CENTER",
@@ -446,6 +450,10 @@ eventFrame:SetScript("OnEvent", function(_, event, addonName)
 
         if ns.InitializeMinimapButton then
             ns:InitializeMinimapButton()
+        end
+
+        if ns.InitializeMinimapTools then
+            ns:InitializeMinimapTools()
         end
     end
 end)

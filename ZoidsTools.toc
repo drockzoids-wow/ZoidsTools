@@ -21,6 +21,7 @@ Modules\PerformanceWidget.lua
 Modules\Coordinates.lua
 Modules\ItemOverlays.lua
 Modules\QuestAutomation.lua
+Modules\MinimapTools.lua
 UI\Theme.lua
 UI\Controls.lua
 UI\Pages\General.lua

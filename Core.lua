@@ -53,6 +53,13 @@ local defaults = {
             },
         },
     },
+    macros = {
+        healthEnabled = false,
+        healthUseRecuperate = false,
+        healthCombatItems = true,
+        manaEnabled = false,
+        manaCombatPotion = true,
+    },
     items = {
         enabled = true,
         fontSize = 12,
@@ -167,6 +174,8 @@ local function PrintHelp()
     ns:Print("/zt windows on/off toggles movable Blizzard windows.")
     ns:Print("/zt bags on/off toggles default bag movement.")
     ns:Print("/zt combat opens combat options.")
+    ns:Print("/zt macros opens health and mana macro options.")
+    ns:Print("/zt refreshmacros updates the ZoidsTools consumable macros.")
     ns:Print("/zt keydown on/off toggles action keybinds on key down.")
     ns:Print("/zt rangetint on/off toggles full-button out-of-range tint.")
     ns:Print("/zt perf on/off toggles the FPS and latency widget.")
@@ -198,6 +207,8 @@ local function HandleSlash(input)
         ns:OpenConfig("loot")
     elseif input == "combat" then
         ns:OpenConfig("combat")
+    elseif input == "macros" or input == "macro" or input == "food" or input == "drink" then
+        ns:OpenConfig("macros")
     elseif input == "items" or input == "item" or input == "gear" then
         ns:OpenConfig("items")
     elseif input == "quests" or input == "quest" then
@@ -373,6 +384,10 @@ local function HandleSlash(input)
             ns:SetActionButtonRangeTintEnabled(false)
             ns:Print("Full-button out-of-range tint disabled.")
         end
+    elseif input == "refreshmacros" or input == "macros refresh" or input == "macro refresh" then
+        if ns.RefreshConsumableMacros then
+            ns:RefreshConsumableMacros()
+        end
     elseif input == "reset" or input == "resetwindows" then
         if ns.ResetMovableWindowPositions then
             ns:ResetMovableWindowPositions()
@@ -422,6 +437,10 @@ eventFrame:SetScript("OnEvent", function(_, event, addonName)
 
         if ns.InitializeCombatSettings then
             ns:InitializeCombatSettings()
+        end
+
+        if ns.InitializeConsumableMacros then
+            ns:InitializeConsumableMacros()
         end
 
         if ns.InitializeKeybindText then

@@ -16,6 +16,7 @@ Modules\MovableWindows.lua
 Modules\FastLoot.lua
 Modules\VendorAutomation.lua
 Modules\Combat.lua
+Modules\ConsumableMacros.lua
 Modules\KeybindText.lua
 Modules\PerformanceWidget.lua
 Modules\Coordinates.lua
@@ -28,6 +29,7 @@ UI\Pages\General.lua
 UI\Pages\Windows.lua
 UI\Pages\Items.lua
 UI\Pages\Combat.lua
+UI\Pages\Macros.lua
 UI\Pages\Loot.lua
 UI\Pages\Quests.lua
 UI\Pages\About.lua

@@ -436,6 +436,32 @@ local function AnchorHeaderRightWidget(frame, rightAnchor, bar)
     end
 end
 
+local function GetZoneTextRegion(zoneButton)
+    if not zoneButton then
+        return nil
+    end
+
+    if zoneButton.Text then
+        return zoneButton.Text
+    end
+
+    if zoneButton.text then
+        return zoneButton.text
+    end
+
+    if _G.MinimapZoneText then
+        return _G.MinimapZoneText
+    end
+
+    for _, region in ipairs({ zoneButton:GetRegions() }) do
+        if region and region.GetObjectType and region:GetObjectType() == "FontString" then
+            return region
+        end
+    end
+
+    return nil
+end
+
 local function EnsureInfoBar()
     if infoBar or not Minimap then
         return infoBar
@@ -490,12 +516,14 @@ local function ApplyInfoBar(enabled)
         if clockButton and MoveHeaderWidget("clock", clockButton, bar) then
             clockButton:SetSize(58, 20)
             clockButton:SetPoint("RIGHT", bar, "RIGHT", -6, 0)
+            clockButton:SetFrameLevel(bar:GetFrameLevel() + 3)
             rightAnchor = clockButton
         end
 
         if addonButton and MoveHeaderWidget("addon", addonButton, bar) then
             addonButton:SetSize(22, 22)
             addonButton:SetPoint("LEFT", bar, "LEFT", 4, 0)
+            addonButton:SetFrameLevel(bar:GetFrameLevel() + 3)
         end
 
         if calendarButton and MoveMinimapCornerWidget("calendar", calendarButton) then
@@ -505,14 +533,26 @@ local function ApplyInfoBar(enabled)
 
         if zoneButton then
             MoveHeaderWidget("zone", zoneButton, bar)
-            zoneButton:SetPoint("LEFT", bar, "LEFT", 72, 0)
-            zoneButton:SetPoint("RIGHT", bar, "RIGHT", -72, 0)
-            zoneButton:SetHeight(20)
+            zoneButton:SetPoint("LEFT", bar, "LEFT", 0, 0)
+            zoneButton:SetPoint("RIGHT", bar, "RIGHT", 0, 0)
+            zoneButton:SetHeight(bar:GetHeight() or 22)
+            zoneButton:SetFrameLevel(bar:GetFrameLevel() + 1)
 
-            local zoneText = _G.MinimapZoneText or zoneButton.Text or zoneButton.text
+            local zoneText = GetZoneTextRegion(zoneButton)
+
+            if zoneText then
+                zoneText:ClearAllPoints()
+                zoneText:SetPoint("LEFT", zoneButton, "LEFT", 58, 0)
+                zoneText:SetPoint("RIGHT", zoneButton, "RIGHT", -58, 0)
+                zoneText:SetHeight(bar:GetHeight() or 22)
+            end
 
             if zoneText and zoneText.SetJustifyH then
                 zoneText:SetJustifyH("CENTER")
+            end
+
+            if zoneText and zoneText.SetJustifyV then
+                zoneText:SetJustifyV("MIDDLE")
             end
         end
     else
@@ -1081,6 +1121,27 @@ local function EnsureMouseHooks()
     end)
 end
 
+local function ApplyMinimapUnclamp()
+    for _, frame in ipairs({ _G.MinimapCluster, _G.Minimap, _G.MinimapBackdrop }) do
+        if frame and frame.SetClampedToScreen then
+            frame:SetClampedToScreen(false)
+        end
+
+        if frame and frame.SetClampRectInsets then
+            frame:SetClampRectInsets(0, 0, 0, 0)
+        end
+    end
+end
+
+local function ScheduleMinimapUnclamp()
+    ApplyMinimapUnclamp()
+
+    if C_Timer and C_Timer.After then
+        C_Timer.After(0, ApplyMinimapUnclamp)
+        C_Timer.After(0.5, ApplyMinimapUnclamp)
+    end
+end
+
 local function ApplyMinimapTools()
     local db = EnsureMinimapDB()
 
@@ -1088,6 +1149,7 @@ local function ApplyMinimapTools()
         return
     end
 
+    ScheduleMinimapUnclamp()
     ApplySquareMinimap(db.square == true)
     ApplyInfoBar(db.moveHeader == true)
     ApplyAddonButtons()

@@ -6,9 +6,8 @@ ns.UI.Pages = ns.UI.Pages or {}
 function ns.UI.Pages.CreateMacrosPage(parent)
     local UI = ns.UI
     local frame = UI.CreatePageFrame(parent)
-    local checkboxX = 18
 
-    local healthSection = UI.CreateSection(frame, "Health Macro", nil, 0)
+    local healthSection = UI.PlaceSection(frame, "Health Macro")
 
     local healthEnabled = UI.CreateCheckbox(
         frame,
@@ -27,7 +26,7 @@ function ns.UI.Pages.CreateMacrosPage(parent)
             end
         end
     )
-    healthEnabled:SetPoint("TOPLEFT", healthSection, "BOTTOMLEFT", checkboxX, -6)
+    UI.PlaceFirst(healthEnabled, healthSection)
 
     local healthRecuperate = UI.CreateCheckbox(
         frame,
@@ -42,7 +41,7 @@ function ns.UI.Pages.CreateMacrosPage(parent)
             end
         end
     )
-    healthRecuperate:SetPoint("TOPLEFT", healthEnabled, "BOTTOMLEFT", 0, -8)
+    UI.PlaceBelow(healthRecuperate, healthEnabled)
 
     local healthCombat = UI.CreateCheckbox(
         frame,
@@ -57,12 +56,9 @@ function ns.UI.Pages.CreateMacrosPage(parent)
             end
         end
     )
-    healthCombat:SetPoint("TOPLEFT", healthRecuperate, "BOTTOMLEFT", 0, -8)
+    UI.PlaceBelow(healthCombat, healthRecuperate)
 
-    local manaSection = UI.CreateSection(frame, "Mana Macro", healthCombat, -28)
-    manaSection:ClearAllPoints()
-    manaSection:SetPoint("TOPLEFT", healthCombat, "BOTTOMLEFT", -checkboxX, -28)
-    manaSection:SetPoint("RIGHT", frame, "RIGHT", 0, 0)
+    local manaSection = UI.PlaceSection(frame, "Mana Macro", healthCombat)
 
     local manaEnabled = UI.CreateCheckbox(
         frame,
@@ -81,7 +77,7 @@ function ns.UI.Pages.CreateMacrosPage(parent)
             end
         end
     )
-    manaEnabled:SetPoint("TOPLEFT", manaSection, "BOTTOMLEFT", checkboxX, -6)
+    UI.PlaceFirst(manaEnabled, manaSection)
 
     local manaCombat = UI.CreateCheckbox(
         frame,
@@ -96,15 +92,12 @@ function ns.UI.Pages.CreateMacrosPage(parent)
             end
         end
     )
-    manaCombat:SetPoint("TOPLEFT", manaEnabled, "BOTTOMLEFT", 0, -8)
+    UI.PlaceBelow(manaCombat, manaEnabled)
 
-    local actionsSection = UI.CreateSection(frame, "Actions", manaCombat, -28)
-    actionsSection:ClearAllPoints()
-    actionsSection:SetPoint("TOPLEFT", manaCombat, "BOTTOMLEFT", -checkboxX, -28)
-    actionsSection:SetPoint("RIGHT", frame, "RIGHT", 0, 0)
+    local actionsSection = UI.PlaceSection(frame, "Actions", manaCombat)
 
     local refreshButton = UI.CreateButton(frame, "Refresh Macros", 140)
-    refreshButton:SetPoint("TOPLEFT", actionsSection, "BOTTOMLEFT", checkboxX, -6)
+    UI.PlaceFirst(refreshButton, actionsSection)
     refreshButton:SetScript("OnClick", function()
         if ns.RefreshConsumableMacros then
             ns:RefreshConsumableMacros()
@@ -115,10 +108,8 @@ function ns.UI.Pages.CreateMacrosPage(parent)
         end
     end)
 
-    local status = frame:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
-    status:SetPoint("TOPLEFT", refreshButton, "BOTTOMLEFT", 0, -18)
-    status:SetWidth(600)
-    status:SetJustifyH("LEFT")
+    local status = UI.CreateStatusText(frame, 600)
+    UI.PlaceBelow(status, refreshButton, 0, 18)
 
     function frame:Refresh()
         healthEnabled:Refresh()

@@ -6,8 +6,12 @@ ns.UI.Pages = ns.UI.Pages or {}
 function ns.UI.Pages.CreateGeneralPage(parent)
     local UI = ns.UI
     local frame = UI.CreatePageFrame(parent)
+    local leftWidth = 295
+    local rightX = 300
+    local rightWidth = 240
+    local controlWidth = 205
 
-    local interfaceSection = UI.CreateSection(frame, "Interface", nil, 0)
+    local interfaceSection = UI.PlaceSection(frame, "Interface", nil, leftWidth)
 
     local minimap = UI.CreateCheckbox(
         frame,
@@ -20,7 +24,7 @@ function ns.UI.Pages.CreateGeneralPage(parent)
             ns:SetMinimapShown(value)
         end
     )
-    minimap:SetPoint("TOPLEFT", interfaceSection, "BOTTOMLEFT", 18, -6)
+    UI.PlaceFirst(minimap, interfaceSection)
 
     local squareMinimap = UI.CreateCheckbox(
         frame,
@@ -35,7 +39,7 @@ function ns.UI.Pages.CreateGeneralPage(parent)
             end
         end
     )
-    squareMinimap:SetPoint("TOPLEFT", minimap, "BOTTOMLEFT", 0, -6)
+    UI.PlaceBelow(squareMinimap, minimap)
 
     local minimapHeader = UI.CreateCheckbox(
         frame,
@@ -50,7 +54,7 @@ function ns.UI.Pages.CreateGeneralPage(parent)
             end
         end
     )
-    minimapHeader:SetPoint("TOPLEFT", squareMinimap, "BOTTOMLEFT", 0, -6)
+    UI.PlaceBelow(minimapHeader, squareMinimap)
 
     local mouseoverButtons = UI.CreateCheckbox(
         frame,
@@ -65,7 +69,7 @@ function ns.UI.Pages.CreateGeneralPage(parent)
             end
         end
     )
-    mouseoverButtons:SetPoint("TOPLEFT", minimapHeader, "BOTTOMLEFT", 0, -6)
+    UI.PlaceBelow(mouseoverButtons, minimapHeader)
 
     local collectButtons = UI.CreateCheckbox(
         frame,
@@ -80,7 +84,9 @@ function ns.UI.Pages.CreateGeneralPage(parent)
             end
         end
     )
-    collectButtons:SetPoint("TOPLEFT", mouseoverButtons, "BOTTOMLEFT", 0, -6)
+    UI.PlaceBelow(collectButtons, mouseoverButtons)
+
+    local performanceSection = UI.PlaceSection(frame, "Performance", collectButtons, leftWidth)
 
     local performanceDisplay = UI.CreateDropdown(
         frame,
@@ -100,9 +106,9 @@ function ns.UI.Pages.CreateGeneralPage(parent)
                 ns:SetPerformanceWidgetDisplayMode(value)
             end
         end,
-        220
+        controlWidth
     )
-    performanceDisplay:SetPoint("TOPLEFT", collectButtons, "BOTTOMLEFT", 0, -16)
+    UI.PlaceFirst(performanceDisplay, performanceSection)
 
     local performanceScale = UI.CreateSlider(
         frame,
@@ -119,17 +125,16 @@ function ns.UI.Pages.CreateGeneralPage(parent)
                 ns:SetPerformanceWidgetScale(value)
             end
         end,
-        220,
+        controlWidth,
         function(value)
             return string.format("%d%%", (value or 1) * 100)
         end
     )
-    performanceScale:SetPoint("TOPLEFT", performanceDisplay, "BOTTOMLEFT", 16, -18)
+    UI.PlaceSlider(performanceScale, performanceDisplay)
 
-    local coordinatesSection = UI.CreateSection(frame, "Coordinates", performanceScale, -42)
+    local coordinatesSection = UI.PlaceSection(frame, "Coordinates", nil, rightWidth)
     coordinatesSection:ClearAllPoints()
-    coordinatesSection:SetPoint("TOPLEFT", performanceDisplay, "TOPRIGHT", 48, 0)
-    coordinatesSection:SetPoint("RIGHT", frame, "RIGHT", -12, 0)
+    coordinatesSection:SetPoint("TOPLEFT", frame, "TOPLEFT", rightX, 0)
 
     local coordinatesWidget = UI.CreateCheckbox(
         frame,
@@ -144,7 +149,7 @@ function ns.UI.Pages.CreateGeneralPage(parent)
             end
         end
     )
-    coordinatesWidget:SetPoint("TOPLEFT", coordinatesSection, "BOTTOMLEFT", 18, -6)
+    UI.PlaceFirst(coordinatesWidget, coordinatesSection)
 
     local mapCoordinates = UI.CreateCheckbox(
         frame,
@@ -159,7 +164,7 @@ function ns.UI.Pages.CreateGeneralPage(parent)
             end
         end
     )
-    mapCoordinates:SetPoint("TOPLEFT", coordinatesWidget, "BOTTOMLEFT", 0, -6)
+    UI.PlaceBelow(mapCoordinates, coordinatesWidget)
 
     local coordinatesScale = UI.CreateSlider(
         frame,
@@ -176,12 +181,12 @@ function ns.UI.Pages.CreateGeneralPage(parent)
                 ns:SetCoordinatesWidgetScale(value)
             end
         end,
-        220,
+        controlWidth,
         function(value)
             return string.format("%d%%", (value or 1) * 100)
         end
     )
-    coordinatesScale:SetPoint("TOPLEFT", mapCoordinates, "BOTTOMLEFT", 16, -18)
+    UI.PlaceSlider(coordinatesScale, mapCoordinates)
 
     local resetCoordinates = UI.CreateButton(frame, "Reset Coords", 132)
     resetCoordinates:SetScript("OnClick", function()
@@ -201,11 +206,6 @@ function ns.UI.Pages.CreateGeneralPage(parent)
         end
     end)
 
-    local openWindows = UI.CreateButton(frame, "Window Tools", 132)
-    openWindows:SetScript("OnClick", function()
-        UI.Show("windows")
-    end)
-
     function frame:Refresh()
         minimap:Refresh()
         squareMinimap:Refresh()
@@ -220,17 +220,14 @@ function ns.UI.Pages.CreateGeneralPage(parent)
 
         resetCoordinates:ClearAllPoints()
         unlockPerformance:ClearAllPoints()
-        openWindows:ClearAllPoints()
 
-        resetCoordinates:SetPoint("TOPLEFT", coordinatesScale, "BOTTOMLEFT", -16, -24)
+        resetCoordinates:SetPoint("TOPLEFT", coordinatesScale, "BOTTOMLEFT", -UI.Layout.sliderIndent, -24)
 
         if ns.IsPerformanceWidgetLocked and ns:IsPerformanceWidgetLocked() then
             unlockPerformance:Show()
-            unlockPerformance:SetPoint("TOPLEFT", performanceScale, "BOTTOMLEFT", -16, -24)
-            openWindows:SetPoint("TOPLEFT", unlockPerformance, "BOTTOMLEFT", 0, -12)
+            unlockPerformance:SetPoint("TOPLEFT", performanceScale, "BOTTOMLEFT", -UI.Layout.sliderIndent, -24)
         else
             unlockPerformance:Hide()
-            openWindows:SetPoint("TOPLEFT", performanceScale, "BOTTOMLEFT", -16, -24)
         end
     end
 

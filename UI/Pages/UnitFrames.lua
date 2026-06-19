@@ -14,7 +14,7 @@ function ns.UI.Pages.CreateUnitFramesPage(parent)
     local frame = UI.CreatePageFrame(parent)
     local controls = {}
 
-    local healthSection = UI.CreateSection(frame, "Health Bars", nil, 0)
+    local healthSection = UI.PlaceSection(frame, "Health Bars")
 
     local classColorHealth = UI.CreateCheckbox(
         frame,
@@ -29,61 +29,21 @@ function ns.UI.Pages.CreateUnitFramesPage(parent)
             end
         end
     )
-    classColorHealth:SetPoint("TOPLEFT", healthSection, "BOTTOMLEFT", 18, -6)
+    UI.PlaceFirst(classColorHealth, healthSection)
     controls[#controls + 1] = classColorHealth
 
-    local frameSection = UI.CreateSection(frame, "Frame Controls", classColorHealth, -30)
-    local columnWidth = 176
-    local columnGap = 18
+    local frameSection = UI.PlaceSection(frame, "Frame Controls", classColorHealth)
+    local columnWidth = 150
+    local columnGap = 34
 
     for index, info in ipairs(frameColumns) do
-        local x = 18 + ((index - 1) * (columnWidth + columnGap))
+        local x = UI.Layout.indent + ((index - 1) * (columnWidth + columnGap))
 
         local title = frame:CreateFontString(nil, "ARTWORK", "GameFontNormal")
-        title:SetPoint("TOPLEFT", frameSection, "BOTTOMLEFT", x, -8)
+        title:SetPoint("TOPLEFT", frameSection, "BOTTOMLEFT", x, -UI.Layout.firstRowGap)
         title:SetText(info.label)
         title:SetTextColor(1, 0.82, 0)
         title:SetJustifyH("LEFT")
-
-        local controlAnchor = title
-        local controlOffset = -8
-
-        if info.key ~= "player" then
-            local hideBuffs = UI.CreateCheckbox(
-                frame,
-                "Hide buffs",
-                "Hides helpful aura icons for this frame.",
-                function()
-                    return ns.GetUnitFrameAuraHidden and ns:GetUnitFrameAuraHidden(info.key, "buffs")
-                end,
-                function(value)
-                    if ns.SetUnitFrameAuraHidden then
-                        ns:SetUnitFrameAuraHidden(info.key, "buffs", value)
-                    end
-                end
-            )
-            hideBuffs:SetPoint("TOPLEFT", title, "BOTTOMLEFT", 0, -8)
-            controls[#controls + 1] = hideBuffs
-
-            local hideDebuffs = UI.CreateCheckbox(
-                frame,
-                "Hide debuffs",
-                "Hides harmful aura icons for this frame.",
-                function()
-                    return ns.GetUnitFrameAuraHidden and ns:GetUnitFrameAuraHidden(info.key, "debuffs")
-                end,
-                function(value)
-                    if ns.SetUnitFrameAuraHidden then
-                        ns:SetUnitFrameAuraHidden(info.key, "debuffs", value)
-                    end
-                end
-            )
-            hideDebuffs:SetPoint("TOPLEFT", hideBuffs, "BOTTOMLEFT", 0, -8)
-            controls[#controls + 1] = hideDebuffs
-
-            controlAnchor = hideDebuffs
-            controlOffset = -12
-        end
 
         local resizeCastbar = UI.CreateCheckbox(
             frame,
@@ -102,7 +62,7 @@ function ns.UI.Pages.CreateUnitFramesPage(parent)
                 end
             end
         )
-        resizeCastbar:SetPoint("TOPLEFT", controlAnchor, "BOTTOMLEFT", 0, controlOffset)
+        UI.PlaceBelow(resizeCastbar, title)
         controls[#controls + 1] = resizeCastbar
 
         local castbarWidth = UI.CreateSlider(
@@ -125,7 +85,7 @@ function ns.UI.Pages.CreateUnitFramesPage(parent)
                 return tostring(math.floor((value or 195) + 0.5))
             end
         )
-        castbarWidth:SetPoint("TOPLEFT", resizeCastbar, "BOTTOMLEFT", 14, -18)
+        UI.PlaceSlider(castbarWidth, resizeCastbar, 14)
         controls[#controls + 1] = castbarWidth
 
         local castbarHeight = UI.CreateSlider(
@@ -148,12 +108,46 @@ function ns.UI.Pages.CreateUnitFramesPage(parent)
                 return tostring(math.floor((value or 16) + 0.5))
             end
         )
-        castbarHeight:SetPoint("TOPLEFT", castbarWidth, "BOTTOMLEFT", 0, -26)
+        UI.PlaceBelow(castbarHeight, castbarWidth, 0, 26)
         controls[#controls + 1] = castbarHeight
+
+        if info.key ~= "player" then
+            local hideBuffs = UI.CreateCheckbox(
+                frame,
+                "Hide buffs",
+                "Hides helpful aura icons for this frame.",
+                function()
+                    return ns.GetUnitFrameAuraHidden and ns:GetUnitFrameAuraHidden(info.key, "buffs")
+                end,
+                function(value)
+                    if ns.SetUnitFrameAuraHidden then
+                        ns:SetUnitFrameAuraHidden(info.key, "buffs", value)
+                    end
+                end
+            )
+            hideBuffs:SetPoint("TOPLEFT", castbarHeight, "BOTTOMLEFT", -14, -24)
+            controls[#controls + 1] = hideBuffs
+
+            local hideDebuffs = UI.CreateCheckbox(
+                frame,
+                "Hide debuffs",
+                "Hides harmful aura icons for this frame.",
+                function()
+                    return ns.GetUnitFrameAuraHidden and ns:GetUnitFrameAuraHidden(info.key, "debuffs")
+                end,
+                function(value)
+                    if ns.SetUnitFrameAuraHidden then
+                        ns:SetUnitFrameAuraHidden(info.key, "debuffs", value)
+                    end
+                end
+            )
+            UI.PlaceBelow(hideDebuffs, hideBuffs)
+            controls[#controls + 1] = hideDebuffs
+        end
     end
 
     local refreshButton = UI.CreateButton(frame, "Refresh Unit Frames", 160)
-    refreshButton:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT", 18, 0)
+    refreshButton:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT", UI.Layout.indent, 0)
     refreshButton:SetScript("OnClick", function()
         if ns.RefreshUnitFrames then
             ns:RefreshUnitFrames()

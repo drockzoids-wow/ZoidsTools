@@ -7,7 +7,7 @@ function ns.UI.Pages.CreateMetersPage(parent)
     local UI = ns.UI
     local frame = UI.CreatePageFrame(parent)
 
-    local generalSection = UI.CreateSection(frame, "General", nil, 0)
+    local generalSection = UI.PlaceSection(frame, "General")
 
     local enabled = UI.CreateCheckbox(
         frame,
@@ -26,17 +26,15 @@ function ns.UI.Pages.CreateMetersPage(parent)
             end
         end
     )
-    enabled:SetPoint("TOPLEFT", generalSection, "BOTTOMLEFT", 18, -6)
+    UI.PlaceFirst(enabled, generalSection)
 
-    local status = frame:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
-    status:SetPoint("TOPLEFT", enabled, "BOTTOMLEFT", 0, -18)
+    local status = UI.CreateStatusText(frame)
+    UI.PlaceBelow(status, enabled, 0, 18)
     status:SetPoint("RIGHT", frame, "RIGHT", -16, 0)
-    status:SetJustifyH("LEFT")
 
-    local note = frame:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
-    note:SetPoint("TOPLEFT", status, "BOTTOMLEFT", 0, -14)
+    local note = UI.CreateStatusText(frame)
+    UI.PlaceBelow(note, status, 0, 14)
     note:SetPoint("RIGHT", frame, "RIGHT", -16, 0)
-    note:SetJustifyH("LEFT")
     note:SetText("Meter window headers contain display, reset, style, and sizing controls.")
 
     function frame:Refresh()

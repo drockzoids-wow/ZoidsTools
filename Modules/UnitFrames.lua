@@ -12,7 +12,6 @@ local pendingProtectedRefresh = false
 
 local DEFAULT_CASTBAR_WIDTH = 195
 local DEFAULT_CASTBAR_HEIGHT = 16
-local CLASS_HEALTH_TEXTURE = "Interface\\TargetingFrame\\UI-StatusBar"
 
 local frameOrder = { "player", "target", "focus" }
 local auraFrameOrder = { "target", "focus" }
@@ -325,19 +324,23 @@ local function ReadColor(color)
 end
 
 local function GetClassColor(unit)
-    if not UnitExists(unit) then
+    if not UnitExists(unit) or (UnitIsPlayer and not UnitIsPlayer(unit)) then
         return nil
     end
 
     local _, classFile = UnitClass(unit)
+    local color = classFile and fallbackClassColors[classFile]
+    local r, g, b = ReadColor(color)
+
+    if r and g and b then
+        return r, g, b
+    end
 
     if classFile and C_ClassColor and type(C_ClassColor.GetClassColor) == "function" then
-        local ok, color = pcall(C_ClassColor.GetClassColor, classFile)
-
-        local r, g, b
+        local ok, apiColor = pcall(C_ClassColor.GetClassColor, classFile)
 
         if ok then
-            r, g, b = ReadColor(color)
+            r, g, b = ReadColor(apiColor)
         end
 
         if r and g and b then
@@ -345,97 +348,124 @@ local function GetClassColor(unit)
         end
     end
 
-    local color = classFile
+    color = classFile
         and ((CUSTOM_CLASS_COLORS and CUSTOM_CLASS_COLORS[classFile]) or (RAID_CLASS_COLORS and RAID_CLASS_COLORS[classFile]))
-    local r, g, b = ReadColor(color)
-
-    if r and g and b then
-        return r, g, b
-    end
-
-    color = classFile and fallbackClassColors[classFile]
     r, g, b = ReadColor(color)
 
     if r and g and b then
         return r, g, b
     end
 
-    if UnitSelectionColor then
-        return UnitSelectionColor(unit)
-    end
-
-    return 0, 1, 0
+    return nil
 end
 
-local function GetHealthFillTexture(bar)
+local function ReadHealthDesaturation(bar)
     if not bar then
         return nil
     end
 
-    if bar.GetStatusBarTexture then
-        local texture = bar:GetStatusBarTexture()
+    local texture = bar.GetStatusBarTexture and bar:GetStatusBarTexture()
 
-        if texture then
-            return texture
-        end
+    if texture and texture.IsDesaturated then
+        return texture:IsDesaturated() == true
+    elseif texture and texture.GetDesaturated then
+        return texture:GetDesaturated() == true
     end
 
-    return bar.HealthBarTexture or bar.StatusBarTexture or bar.Texture or bar.texture or bar.Fill or bar.FillTexture
+    return nil
+end
+
+local function ColorsMatch(aR, aG, aB, bR, bG, bB)
+    if not aR or not aG or not aB or not bR or not bG or not bB then
+        return false
+    end
+
+    return math.abs(aR - bR) < 0.01 and math.abs(aG - bG) < 0.01 and math.abs(aB - bB) < 0.01
 end
 
 local function SaveHealthColor(bar)
-    if not bar or originalHealthColors[bar] then
+    if not bar then
         return
     end
 
-    local state = {}
+    local r, g, b, a
 
     if bar.GetStatusBarColor then
-        local r, g, b, a = bar:GetStatusBarColor()
-
-        state.r = r
-        state.g = g
-        state.b = b
-        state.a = a
+        r, g, b, a = bar:GetStatusBarColor()
     end
 
-    local texture = GetHealthFillTexture(bar)
-
-    if bar.GetStatusBarTexture then
-        local statusbarTexture = bar:GetStatusBarTexture()
-
-        if statusbarTexture and statusbarTexture.GetTexture then
-            state.statusbarTexture = statusbarTexture:GetTexture()
-        end
+    if originalHealthColors[bar] and ColorsMatch(r, g, b, bar.ZTClassColorR, bar.ZTClassColorG, bar.ZTClassColorB) then
+        return
     end
 
-    if texture and texture.GetVertexColor then
-        local r, g, b, a = texture:GetVertexColor()
+    originalHealthColors[bar] = {
+        r = r,
+        g = g,
+        b = b,
+        a = a,
+        desaturated = ReadHealthDesaturation(bar),
+    }
+end
 
-        state.textureR = r
-        state.textureG = g
-        state.textureB = b
-        state.textureA = a
+local function ClearHealthColorState(bar)
+    if not bar then
+        return
     end
 
-    originalHealthColors[bar] = state
+    bar.ZTClassColorHealth = nil
+    bar.ZTClassColorR = nil
+    bar.ZTClassColorG = nil
+    bar.ZTClassColorB = nil
+    originalHealthColors[bar] = nil
+end
+
+local function SetHealthDesaturated(bar, value)
+    if bar and bar.SetStatusBarDesaturated then
+        bar:SetStatusBarDesaturated(value == true)
+    end
 end
 
 local function RestoreHealthColor(bar)
-    local color = bar and originalHealthColors[bar]
-
-    if color and color.statusbarTexture and bar.SetStatusBarTexture then
-        bar:SetStatusBarTexture(color.statusbarTexture)
+    if not bar or not bar.SetStatusBarColor then
+        return
     end
 
-    if color and bar.SetStatusBarColor and color.r and color.g and color.b then
-        bar:SetStatusBarColor(color.r or 0, color.g or 1, color.b or 0, color.a or 1)
+    local state = originalHealthColors[bar]
+
+    if not state then
+        return
     end
 
-    local texture = GetHealthFillTexture(bar)
+    if state.desaturated ~= nil then
+        SetHealthDesaturated(bar, state.desaturated)
+    else
+        SetHealthDesaturated(bar, false)
+    end
 
-    if color and texture and texture.SetVertexColor and color.textureR and color.textureG and color.textureB then
-        texture:SetVertexColor(color.textureR, color.textureG, color.textureB, color.textureA or 1)
+    if state.r and state.g and state.b then
+        bar:SetStatusBarColor(state.r, state.g, state.b, state.a or 1)
+    else
+        bar:SetStatusBarColor(1, 1, 1, 1)
+    end
+
+    ClearHealthColorState(bar)
+end
+
+local function ReleaseHealthColor(bar)
+    if not bar then
+        return
+    end
+
+    local r, g, b
+
+    if bar.GetStatusBarColor then
+        r, g, b = bar:GetStatusBarColor()
+    end
+
+    if bar.ZTClassColorHealth and ColorsMatch(r, g, b, bar.ZTClassColorR, bar.ZTClassColorG, bar.ZTClassColorB) then
+        RestoreHealthColor(bar)
+    else
+        ClearHealthColorState(bar)
     end
 end
 
@@ -444,19 +474,16 @@ local function ApplyHealthColor(bar, r, g, b)
         return
     end
 
-    if bar.SetStatusBarTexture then
-        bar:SetStatusBarTexture(CLASS_HEALTH_TEXTURE)
-    end
-
     if bar.SetStatusBarColor then
+        SaveHealthColor(bar)
+        SetHealthDesaturated(bar, true)
         bar:SetStatusBarColor(r, g, b, 1)
     end
 
-    local texture = GetHealthFillTexture(bar)
-
-    if texture and texture.SetVertexColor then
-        texture:SetVertexColor(r, g, b, 1)
-    end
+    bar.ZTClassColorHealth = true
+    bar.ZTClassColorR = r
+    bar.ZTClassColorG = g
+    bar.ZTClassColorB = b
 end
 
 local function GetHealthBarFrames(info)
@@ -466,7 +493,7 @@ local function GetHealthBarFrames(info)
     for _, path in ipairs(info and info.paths or {}) do
         local bar = ResolvePath(path)
 
-        if bar and (bar.SetStatusBarColor or GetHealthFillTexture(bar)) then
+        if bar and bar.SetStatusBarColor then
             AddUniqueFrame(frames, seen, bar)
         end
     end
@@ -485,15 +512,15 @@ local function ApplyHealthBar(info)
         local r, g, b = GetClassColor(info.unit)
 
         for _, bar in ipairs(GetHealthBarFrames(info)) do
-            SaveHealthColor(bar)
-
             if r and g and b then
                 ApplyHealthColor(bar, r, g, b)
+            elseif bar.ZTClassColorHealth then
+                ReleaseHealthColor(bar)
             end
         end
     else
         for _, bar in ipairs(GetHealthBarFrames(info)) do
-            RestoreHealthColor(bar)
+            ReleaseHealthColor(bar)
         end
     end
 end

@@ -6,6 +6,7 @@ ns.UI.Pages = ns.UI.Pages or {}
 function ns.UI.Pages.CreateItemsPage(parent)
     local UI = ns.UI
     local frame = UI.CreatePageFrame(parent)
+    local dropdownWidth = 250
 
     local function CreateItemOption(sectionName, key, text, shortText)
         return {
@@ -26,7 +27,7 @@ function ns.UI.Pages.CreateItemsPage(parent)
         }
     end
 
-    local mainSection = UI.CreateSection(frame, "General", nil, 0)
+    local mainSection = UI.PlaceSection(frame, "General")
 
     local enabled = UI.CreateCheckbox(
         frame,
@@ -45,9 +46,9 @@ function ns.UI.Pages.CreateItemsPage(parent)
             end
         end
     )
-    enabled:SetPoint("TOPLEFT", mainSection, "BOTTOMLEFT", 18, -6)
+    UI.PlaceFirst(enabled, mainSection)
 
-    local displaySection = UI.CreateSection(frame, "Display", enabled, -26)
+    local displaySection = UI.PlaceSection(frame, "Display", enabled)
 
     local characterOptions = UI.CreateMultiSelectDropdown(
         frame,
@@ -60,9 +61,9 @@ function ns.UI.Pages.CreateItemsPage(parent)
             CreateItemOption("character", "enchants", "Enchant status", "Enchants"),
             CreateItemOption("character", "missingEnchant", "Missing enchant highlight", "Missing"),
         },
-        300
+        dropdownWidth
     )
-    characterOptions:SetPoint("TOPLEFT", displaySection, "BOTTOMLEFT", 2, -10)
+    UI.PlaceFirst(characterOptions, displaySection)
 
     local bagBankOptions = UI.CreateMultiSelectDropdown(
         frame,
@@ -76,11 +77,11 @@ function ns.UI.Pages.CreateItemsPage(parent)
             CreateItemOption("warbandBank", "itemLevel", "Warband bank item levels", "Warband ilvl"),
             CreateItemOption("warbandBank", "bindType", "Warband bank bind type", "Warband binds"),
         },
-        300
+        dropdownWidth
     )
-    bagBankOptions:SetPoint("TOPLEFT", characterOptions, "BOTTOMLEFT", 0, -14)
+    bagBankOptions:SetPoint("TOPLEFT", characterOptions, "TOPRIGHT", UI.Layout.columnGap, 0)
 
-    local styleSection = UI.CreateSection(frame, "Style", bagBankOptions, -28)
+    local styleSection = UI.PlaceSection(frame, "Style", characterOptions)
 
     local fontSize = UI.CreateSlider(
         frame,
@@ -102,7 +103,7 @@ function ns.UI.Pages.CreateItemsPage(parent)
             return tostring(math.floor((value or 12) + 0.5))
         end
     )
-    fontSize:SetPoint("TOPLEFT", styleSection, "BOTTOMLEFT", 16, -18)
+    UI.PlaceSlider(fontSize, styleSection, UI.Layout.indent)
 
     local qualityColor = UI.CreateCheckbox(
         frame,
@@ -117,10 +118,10 @@ function ns.UI.Pages.CreateItemsPage(parent)
             end
         end
     )
-    qualityColor:SetPoint("TOPLEFT", fontSize, "BOTTOMLEFT", -16, -16)
+    qualityColor:SetPoint("TOPLEFT", fontSize, "BOTTOMLEFT", -UI.Layout.sliderIndent, -18)
 
     local refreshButton = UI.CreateButton(frame, "Refresh Item Info", 150)
-    refreshButton:SetPoint("LEFT", qualityColor.Text, "RIGHT", 24, 0)
+    refreshButton:SetPoint("LEFT", qualityColor.Text, "RIGHT", 30, 0)
     refreshButton:SetScript("OnClick", function()
         if ns.RefreshItemOverlays then
             ns:RefreshItemOverlays()

@@ -6,6 +6,18 @@ local UI = ns.UI
 local Theme = UI.Theme
 local controlCounter = 0
 
+UI.Layout = UI.Layout or {
+    indent = 18,
+    rowGap = 8,
+    firstRowGap = 8,
+    controlGap = 14,
+    sectionGap = 30,
+    sliderIndent = 16,
+    sliderGap = 20,
+    buttonGap = 10,
+    columnGap = 30,
+}
+
 function UI.CreateCheckbox(parent, label, tooltip, getter, setter)
     local checkbox = CreateFrame("CheckButton", nil, parent, "ChatConfigCheckButtonTemplate")
     checkbox.Text:SetText(label)
@@ -212,6 +224,44 @@ function UI.CreateBodyText(parent, text, width)
     body:SetJustifyH("LEFT")
     body:SetText(text)
     return body
+end
+
+function UI.CreateStatusText(parent, width)
+    local status = parent:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
+    status:SetWidth(width or 540)
+    status:SetJustifyH("LEFT")
+    return status
+end
+
+function UI.PlaceFirst(control, section, xOffset)
+    control:SetPoint("TOPLEFT", section, "BOTTOMLEFT", xOffset or UI.Layout.indent, -UI.Layout.firstRowGap)
+end
+
+function UI.PlaceBelow(control, anchor, xOffset, gap)
+    control:SetPoint("TOPLEFT", anchor, "BOTTOMLEFT", xOffset or 0, -(gap or UI.Layout.rowGap))
+end
+
+function UI.PlaceDropdown(control, anchor, xOffset)
+    UI.PlaceBelow(control, anchor, xOffset or 0, UI.Layout.controlGap)
+end
+
+function UI.PlaceSlider(control, anchor, xOffset)
+    UI.PlaceBelow(control, anchor, xOffset or UI.Layout.sliderIndent, UI.Layout.sliderGap)
+end
+
+function UI.PlaceSection(parent, text, anchor, width)
+    local section = UI.CreateSection(parent, text, nil, 0, width)
+
+    if anchor then
+        section:ClearAllPoints()
+        section:SetPoint("TOPLEFT", anchor, "BOTTOMLEFT", -UI.Layout.indent, -UI.Layout.sectionGap)
+
+        if not width then
+            section:SetPoint("RIGHT", parent, "RIGHT", 0, 0)
+        end
+    end
+
+    return section
 end
 
 function UI.CreateDropdown(parent, label, tooltip, options, getter, setter, width)

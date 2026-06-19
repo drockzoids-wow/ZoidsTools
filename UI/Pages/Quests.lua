@@ -7,7 +7,7 @@ function ns.UI.Pages.CreateQuestsPage(parent)
     local UI = ns.UI
     local frame = UI.CreatePageFrame(parent)
 
-    local automationSection = UI.CreateSection(frame, "Automation", nil, 0)
+    local automationSection = UI.PlaceSection(frame, "Automation")
 
     local autoAccept = UI.CreateCheckbox(
         frame,
@@ -22,7 +22,7 @@ function ns.UI.Pages.CreateQuestsPage(parent)
             end
         end
     )
-    autoAccept:SetPoint("TOPLEFT", automationSection, "BOTTOMLEFT", 18, -6)
+    UI.PlaceFirst(autoAccept, automationSection)
 
     local autoTurnIn = UI.CreateCheckbox(
         frame,
@@ -37,7 +37,7 @@ function ns.UI.Pages.CreateQuestsPage(parent)
             end
         end
     )
-    autoTurnIn:SetPoint("TOPLEFT", autoAccept, "BOTTOMLEFT", 0, -8)
+    UI.PlaceBelow(autoTurnIn, autoAccept)
 
     local autoGossip = UI.CreateCheckbox(
         frame,
@@ -52,7 +52,7 @@ function ns.UI.Pages.CreateQuestsPage(parent)
             end
         end
     )
-    autoGossip:SetPoint("TOPLEFT", autoTurnIn, "BOTTOMLEFT", 0, -8)
+    UI.PlaceBelow(autoGossip, autoTurnIn)
 
     local pauseModifier = UI.CreateDropdown(
         frame,
@@ -74,9 +74,9 @@ function ns.UI.Pages.CreateQuestsPage(parent)
         end,
         220
     )
-    pauseModifier:SetPoint("TOPLEFT", autoGossip, "BOTTOMLEFT", 0, -14)
+    UI.PlaceDropdown(pauseModifier, autoGossip)
 
-    local filtersSection = UI.CreateSection(frame, "Filters", pauseModifier, -30)
+    local filtersSection = UI.PlaceSection(frame, "Filters", pauseModifier)
 
     local skipDaily = UI.CreateCheckbox(
         frame,
@@ -91,7 +91,7 @@ function ns.UI.Pages.CreateQuestsPage(parent)
             end
         end
     )
-    skipDaily:SetPoint("TOPLEFT", filtersSection, "BOTTOMLEFT", 18, -6)
+    UI.PlaceFirst(skipDaily, filtersSection)
 
     local skipWarband = UI.CreateCheckbox(
         frame,
@@ -106,12 +106,10 @@ function ns.UI.Pages.CreateQuestsPage(parent)
             end
         end
     )
-    skipWarband:SetPoint("TOPLEFT", skipDaily, "BOTTOMLEFT", 0, -8)
+    UI.PlaceBelow(skipWarband, skipDaily)
 
-    local status = frame:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
-    status:SetPoint("TOPLEFT", skipWarband, "BOTTOMLEFT", 0, -20)
-    status:SetWidth(540)
-    status:SetJustifyH("LEFT")
+    local status = UI.CreateStatusText(frame)
+    UI.PlaceBelow(status, skipWarband, 0, 20)
     status:SetText("Quest rewards with multiple choices are never selected automatically.")
 
     function frame:Refresh()

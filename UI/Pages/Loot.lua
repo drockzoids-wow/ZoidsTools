@@ -7,7 +7,7 @@ function ns.UI.Pages.CreateLootPage(parent)
     local UI = ns.UI
     local frame = UI.CreatePageFrame(parent)
 
-    local behaviorSection = UI.CreateSection(frame, "Behavior", nil, 0)
+    local behaviorSection = UI.PlaceSection(frame, "Behavior")
 
     local fastLoot = UI.CreateCheckbox(
         frame,
@@ -26,7 +26,7 @@ function ns.UI.Pages.CreateLootPage(parent)
             end
         end
     )
-    fastLoot:SetPoint("TOPLEFT", behaviorSection, "BOTTOMLEFT", 18, -6)
+    UI.PlaceFirst(fastLoot, behaviorSection)
 
     local carefulMode = UI.CreateCheckbox(
         frame,
@@ -39,14 +39,12 @@ function ns.UI.Pages.CreateLootPage(parent)
             ns.db.loot.carefulMode = value
         end
     )
-    carefulMode:SetPoint("TOPLEFT", fastLoot, "BOTTOMLEFT", 0, -8)
+    UI.PlaceBelow(carefulMode, fastLoot)
 
-    local status = frame:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
-    status:SetPoint("TOPLEFT", carefulMode, "BOTTOMLEFT", 0, -18)
-    status:SetWidth(520)
-    status:SetJustifyH("LEFT")
+    local status = UI.CreateStatusText(frame)
+    UI.PlaceBelow(status, carefulMode, 0, 18)
 
-    local vendorSection = UI.CreateSection(frame, "Vendor", status, -34)
+    local vendorSection = UI.PlaceSection(frame, "Vendor", status)
 
     local autoSellGrey = UI.CreateCheckbox(
         frame,
@@ -61,7 +59,7 @@ function ns.UI.Pages.CreateLootPage(parent)
             end
         end
     )
-    autoSellGrey:SetPoint("TOPLEFT", vendorSection, "BOTTOMLEFT", 18, -6)
+    UI.PlaceFirst(autoSellGrey, vendorSection)
 
     local autoSellBoEGrey = UI.CreateCheckbox(
         frame,
@@ -76,7 +74,7 @@ function ns.UI.Pages.CreateLootPage(parent)
             end
         end
     )
-    autoSellBoEGrey:SetPoint("TOPLEFT", autoSellGrey, "BOTTOMLEFT", 0, -8)
+    UI.PlaceBelow(autoSellBoEGrey, autoSellGrey)
 
     local repairOptions = ns.GetAutoRepairModeOptions and ns:GetAutoRepairModeOptions() or {
         { value = "disabled", text = "Disabled" },
@@ -99,7 +97,7 @@ function ns.UI.Pages.CreateLootPage(parent)
         end,
         220
     )
-    autoRepair:SetPoint("TOPLEFT", autoSellBoEGrey, "BOTTOMLEFT", 0, -12)
+    UI.PlaceDropdown(autoRepair, autoSellBoEGrey)
 
     function frame:Refresh()
         fastLoot:Refresh()

@@ -28,7 +28,7 @@ function ns.UI.Pages.CreateWindowsPage(parent)
     local UI = ns.UI
     local frame = UI.CreatePageFrame(parent)
 
-    local movementSection = UI.CreateSection(frame, "Movement", nil, 0)
+    local movementSection = UI.PlaceSection(frame, "Movement")
 
     local windowsEnabled = UI.CreateCheckbox(
         frame,
@@ -49,7 +49,7 @@ function ns.UI.Pages.CreateWindowsPage(parent)
             end
         end
     )
-    windowsEnabled:SetPoint("TOPLEFT", movementSection, "BOTTOMLEFT", 18, -6)
+    UI.PlaceFirst(windowsEnabled, movementSection)
 
     local bagsEnabled = UI.CreateCheckbox(
         frame,
@@ -66,7 +66,7 @@ function ns.UI.Pages.CreateWindowsPage(parent)
             end
         end
     )
-    bagsEnabled:SetPoint("TOPLEFT", windowsEnabled, "BOTTOMLEFT", 0, -8)
+    UI.PlaceBelow(bagsEnabled, windowsEnabled)
 
     local bagHandles = UI.CreateCheckbox(
         frame,
@@ -83,7 +83,7 @@ function ns.UI.Pages.CreateWindowsPage(parent)
             end
         end
     )
-    bagHandles:SetPoint("TOPLEFT", bagsEnabled, "BOTTOMLEFT", 0, -8)
+    UI.PlaceBelow(bagHandles, bagsEnabled)
 
     local savePositions = UI.CreateCheckbox(
         frame,
@@ -96,7 +96,7 @@ function ns.UI.Pages.CreateWindowsPage(parent)
             ns.db.windows.savePositions = value
         end
     )
-    savePositions:SetPoint("TOPLEFT", bagHandles, "BOTTOMLEFT", 0, -8)
+    UI.PlaceBelow(savePositions, bagHandles)
 
     local scaleEnabled = UI.CreateCheckbox(
         frame,
@@ -109,12 +109,12 @@ function ns.UI.Pages.CreateWindowsPage(parent)
             ns.db.windows.scaleEnabled = value
         end
     )
-    scaleEnabled:SetPoint("TOPLEFT", savePositions, "BOTTOMLEFT", 0, -8)
+    UI.PlaceBelow(scaleEnabled, savePositions)
 
-    local actionsSection = UI.CreateSection(frame, "Actions", scaleEnabled, -24)
+    local actionsSection = UI.PlaceSection(frame, "Actions", scaleEnabled)
 
     local refreshButton = UI.CreateButton(frame, "Refresh", 108)
-    refreshButton:SetPoint("TOPLEFT", actionsSection, "BOTTOMLEFT", 0, -8)
+    UI.PlaceFirst(refreshButton, actionsSection)
     refreshButton:SetScript("OnClick", function()
         if ns.RefreshMovableWindows then
             ns:RefreshMovableWindows()
@@ -124,13 +124,13 @@ function ns.UI.Pages.CreateWindowsPage(parent)
     end)
 
     local resetButton = UI.CreateButton(frame, "Reset Positions", 144)
-    resetButton:SetPoint("LEFT", refreshButton, "RIGHT", 8, 0)
+    resetButton:SetPoint("LEFT", refreshButton, "RIGHT", UI.Layout.buttonGap, 0)
     resetButton:SetScript("OnClick", function()
         StaticPopup_Show(popupKey)
     end)
 
     local resetScalesButton = UI.CreateButton(frame, "Reset Scales", 132)
-    resetScalesButton:SetPoint("LEFT", resetButton, "RIGHT", 8, 0)
+    resetScalesButton:SetPoint("LEFT", resetButton, "RIGHT", UI.Layout.buttonGap, 0)
     resetScalesButton:SetScript("OnClick", function()
         if ns.ResetMovableWindowScales then
             ns:ResetMovableWindowScales()
@@ -139,10 +139,8 @@ function ns.UI.Pages.CreateWindowsPage(parent)
         frame:Refresh()
     end)
 
-    local status = frame:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
-    status:SetPoint("TOPLEFT", refreshButton, "BOTTOMLEFT", 0, -18)
-    status:SetWidth(520)
-    status:SetJustifyH("LEFT")
+    local status = UI.CreateStatusText(frame)
+    UI.PlaceBelow(status, refreshButton, 0, 18)
 
     function frame:Refresh()
         windowsEnabled:Refresh()

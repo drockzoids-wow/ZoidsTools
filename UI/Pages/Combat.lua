@@ -6,8 +6,9 @@ ns.UI.Pages = ns.UI.Pages or {}
 function ns.UI.Pages.CreateCombatPage(parent)
     local UI = ns.UI
     local frame = UI.CreatePageFrame(parent)
+    local rightX = 300
 
-    local inputSection = UI.CreateSection(frame, "Input", nil, 0)
+    local inputSection = UI.PlaceSection(frame, "Input")
 
     local castOnKeyDown = UI.CreateCheckbox(
         frame,
@@ -26,7 +27,7 @@ function ns.UI.Pages.CreateCombatPage(parent)
             end
         end
     )
-    castOnKeyDown:SetPoint("TOPLEFT", inputSection, "BOTTOMLEFT", 18, -6)
+    UI.PlaceFirst(castOnKeyDown, inputSection)
 
     local rangeTint = UI.CreateCheckbox(
         frame,
@@ -41,14 +42,12 @@ function ns.UI.Pages.CreateCombatPage(parent)
             end
         end
     )
-    rangeTint:SetPoint("TOPLEFT", inputSection, "BOTTOMLEFT", 300, -6)
+    rangeTint:SetPoint("TOPLEFT", inputSection, "BOTTOMLEFT", rightX, -UI.Layout.firstRowGap)
 
-    local status = frame:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
-    status:SetPoint("TOPLEFT", castOnKeyDown, "BOTTOMLEFT", 0, -18)
-    status:SetWidth(520)
-    status:SetJustifyH("LEFT")
+    local status = UI.CreateStatusText(frame)
+    UI.PlaceBelow(status, castOnKeyDown, 0, 18)
 
-    local keybindSection = UI.CreateSection(frame, "Action Keybind Text", status, -30)
+    local keybindSection = UI.PlaceSection(frame, "Action Keybind Text", status)
 
     local keybindTextEnabled = UI.CreateCheckbox(
         frame,
@@ -67,7 +66,7 @@ function ns.UI.Pages.CreateCombatPage(parent)
             end
         end
     )
-    keybindTextEnabled:SetPoint("TOPLEFT", keybindSection, "BOTTOMLEFT", 18, -6)
+    UI.PlaceFirst(keybindTextEnabled, keybindSection)
 
     local shortenKeybindText = UI.CreateCheckbox(
         frame,
@@ -82,7 +81,7 @@ function ns.UI.Pages.CreateCombatPage(parent)
             end
         end
     )
-    shortenKeybindText:SetPoint("TOPLEFT", keybindTextEnabled, "BOTTOMLEFT", 0, -8)
+    UI.PlaceBelow(shortenKeybindText, keybindTextEnabled)
 
     local fontOptions = ns.GetKeybindTextFontOptions and ns:GetKeybindTextFontOptions() or {
         { value = "default", text = "Default" },
@@ -103,7 +102,7 @@ function ns.UI.Pages.CreateCombatPage(parent)
         end,
         220
     )
-    keybindFont:SetPoint("TOPLEFT", shortenKeybindText, "BOTTOMLEFT", 0, -12)
+    UI.PlaceDropdown(keybindFont, shortenKeybindText)
 
     local keybindFontSize = UI.CreateSlider(
         frame,
@@ -125,7 +124,7 @@ function ns.UI.Pages.CreateCombatPage(parent)
             return tostring(math.floor((value or 12) + 0.5))
         end
     )
-    keybindFontSize:SetPoint("TOPLEFT", keybindFont, "BOTTOMLEFT", 16, -18)
+    UI.PlaceSlider(keybindFontSize, keybindFont)
 
     local useCustomColor = UI.CreateCheckbox(
         frame,
@@ -144,7 +143,7 @@ function ns.UI.Pages.CreateCombatPage(parent)
             end
         end
     )
-    useCustomColor:SetPoint("TOPLEFT", keybindSection, "BOTTOMLEFT", 270, -6)
+    useCustomColor:SetPoint("TOPLEFT", keybindSection, "BOTTOMLEFT", rightX, -UI.Layout.firstRowGap)
 
     local keybindColor = UI.CreateColorPicker(
         frame,
@@ -175,7 +174,7 @@ function ns.UI.Pages.CreateCombatPage(parent)
         end,
         200
     )
-    keybindColor:SetPoint("TOPLEFT", useCustomColor, "BOTTOMLEFT", 0, -10)
+    UI.PlaceBelow(keybindColor, useCustomColor, 0, 12)
 
     local boldKeybindText = UI.CreateCheckbox(
         frame,
@@ -190,7 +189,7 @@ function ns.UI.Pages.CreateCombatPage(parent)
             end
         end
     )
-    boldKeybindText:SetPoint("TOPLEFT", keybindColor, "BOTTOMLEFT", 0, -12)
+    UI.PlaceDropdown(boldKeybindText, keybindColor, 0)
 
     local outlineOptions = ns.GetKeybindTextOutlineOptions and ns:GetKeybindTextOutlineOptions() or {
         { value = "default", text = "Default" },
@@ -214,7 +213,7 @@ function ns.UI.Pages.CreateCombatPage(parent)
         end,
         200
     )
-    keybindOutline:SetPoint("TOPLEFT", boldKeybindText, "BOTTOMLEFT", 0, -12)
+    UI.PlaceDropdown(keybindOutline, boldKeybindText)
 
     function frame:Refresh()
         castOnKeyDown:Refresh()

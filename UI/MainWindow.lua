@@ -9,7 +9,7 @@ local pages = {}
 local buttons = {}
 
 local WINDOW_WIDTH = 820
-local WINDOW_HEIGHT = 550
+local WINDOW_HEIGHT = 620
 local OUTER_MARGIN = 14
 local SIDEBAR_WIDTH = 184
 local SIDEBAR_TOP = -112
@@ -28,6 +28,7 @@ local pageOrder = {
     { key = "combat", label = "Combat", description = "Combat quality-of-life settings." },
     { key = "unitframes", label = "Unit Frames", description = "Blizzard unit frame health, castbar, and aura settings." },
     { key = "macros", label = "Macros", description = "Health, mana, and consumable macro settings." },
+    { key = "mounts", label = "Mounts", description = "Smart random mount and service mount settings." },
     { key = "loot", label = "Loot", description = "Looting quality-of-life settings." },
     { key = "quests", label = "Quests", description = "Quest and gossip automation settings." },
     { key = "about", label = "About", description = "Version and command information." },
@@ -86,6 +87,8 @@ local function CreatePage(parent, key)
         return UI.Pages.CreateUnitFramesPage(parent)
     elseif key == "macros" and UI.Pages.CreateMacrosPage then
         return UI.Pages.CreateMacrosPage(parent)
+    elseif key == "mounts" and UI.Pages.CreateMountsPage then
+        return UI.Pages.CreateMountsPage(parent)
     elseif key == "loot" and UI.Pages.CreateLootPage then
         return UI.Pages.CreateLootPage(parent)
     elseif key == "quests" and UI.Pages.CreateQuestsPage then

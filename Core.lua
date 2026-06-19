@@ -92,6 +92,29 @@ local defaults = {
             },
         },
     },
+    mounts = {
+        enabled = true,
+        preferGroundWhenNotFlyable = true,
+        useWaterMountsOnSurface = true,
+        excludeServiceMountsFromRandom = true,
+        useDruidTravelForm = true,
+        useDruidCatForm = true,
+        useDracthyrSoar = true,
+        useFallingRescue = true,
+        targetMatchEnabled = true,
+        targetMatchButton = {
+            shown = true,
+            point = "CENTER",
+            relativePoint = "CENTER",
+            x = 220,
+            y = 0,
+        },
+        recentAvoidCount = 3,
+        preferredMount = nil,
+        preferredServiceMounts = {},
+        recentMounts = {},
+        mountUsage = {},
+    },
     items = {
         enabled = true,
         fontSize = 12,
@@ -209,6 +232,10 @@ local function PrintHelp()
     ns:Print("/zt unitframes opens unit frame options.")
     ns:Print("/zt macros opens health and mana macro options.")
     ns:Print("/zt refreshmacros updates the ZoidsTools consumable macros.")
+    ns:Print("/zt mounts opens smart mount options.")
+    ns:Print("/zt smartmount on/off toggles the smart mount keybind.")
+    ns:Print("/zt matchmount matches your target's mount when possible.")
+    ns:Print("/zt mountrecent reset clears recent smart mount history.")
     ns:Print("/zt keydown on/off toggles action keybinds on key down.")
     ns:Print("/zt rangetint on/off toggles full-button out-of-range tint.")
     ns:Print("/zt perf on/off toggles the FPS and latency widget.")
@@ -244,6 +271,8 @@ local function HandleSlash(input)
         ns:OpenConfig("unitframes")
     elseif input == "macros" or input == "macro" or input == "food" or input == "drink" then
         ns:OpenConfig("macros")
+    elseif input == "mounts" or input == "mount" or input == "smartmount" then
+        ns:OpenConfig("mounts")
     elseif input == "items" or input == "item" or input == "gear" then
         ns:OpenConfig("items")
     elseif input == "quests" or input == "quest" then
@@ -423,6 +452,24 @@ local function HandleSlash(input)
         if ns.RefreshConsumableMacros then
             ns:RefreshConsumableMacros()
         end
+    elseif input == "smartmount on" or input == "mounts on" then
+        if ns.SetMountsEnabled then
+            ns:SetMountsEnabled(true)
+            ns:Print("Smart mount keybind enabled.")
+        end
+    elseif input == "smartmount off" or input == "mounts off" then
+        if ns.SetMountsEnabled then
+            ns:SetMountsEnabled(false)
+            ns:Print("Smart mount keybind disabled.")
+        end
+    elseif input == "matchmount" or input == "mountmatch" or input == "targetmount" then
+        if ZoidsToolsMounts and ZoidsToolsMounts.MatchTargetMount then
+            ZoidsToolsMounts.MatchTargetMount()
+        end
+    elseif input == "mountrecent reset" or input == "mounts resetrecent" or input == "smartmount resetrecent" then
+        if ns.ClearMountRecentHistory then
+            ns:ClearMountRecentHistory()
+        end
     elseif input == "reset" or input == "resetwindows" then
         if ns.ResetMovableWindowPositions then
             ns:ResetMovableWindowPositions()
@@ -480,6 +527,10 @@ eventFrame:SetScript("OnEvent", function(_, event, addonName)
 
         if ns.InitializeConsumableMacros then
             ns:InitializeConsumableMacros()
+        end
+
+        if ns.InitializeMounts then
+            ns:InitializeMounts()
         end
 
         if ns.InitializeKeybindText then

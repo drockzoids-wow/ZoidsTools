@@ -1,0 +1,8 @@
+BINDING_HEADER_ZOIDSTOOLS = "ZoidsTools"
+BINDING_CATEGORY_ZOIDSTOOLS = "ZoidsTools"
+
+_G["BINDING_NAME_CLICK ZoidsToolsSmartMountButton:LeftButton"] = "Summon Smart Mount"
+_G["BINDING_NAME_CLICK ZoidsToolsRepairMountButton:LeftButton"] = "Summon Repair Mount"
+_G["BINDING_NAME_CLICK ZoidsToolsAuctionHouseMountButton:LeftButton"] = "Summon Auction House Mount"
+_G["BINDING_NAME_CLICK ZoidsToolsRideAlongMountButton:LeftButton"] = "Summon Ride-Along Mount"
+_G["BINDING_NAME_ZOIDSTOOLS_MATCH_TARGET_MOUNT"] = "Match Target Mount"

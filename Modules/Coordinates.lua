@@ -9,8 +9,11 @@ local RefreshCoordinates
 
 local DEFAULT_POINT = "BOTTOM"
 local DEFAULT_RELATIVE_POINT = "BOTTOM"
+local DEFAULT_RELATIVE_TO = "Minimap"
+local UI_PARENT_RELATIVE_TO = "UIParent"
 local DEFAULT_X = 0
-local DEFAULT_Y = 245
+local DEFAULT_Y = 0
+local OLD_DEFAULT_Y = 245
 local DEFAULT_SCALE = 1
 local DEFAULT_UPDATE_INTERVAL = 0.15
 
@@ -24,6 +27,37 @@ local function ClampScale(value)
     end
 
     return value
+end
+
+local function GetRelativeFrame(key)
+    if key == DEFAULT_RELATIVE_TO and Minimap then
+        return Minimap
+    end
+
+    return UIParent
+end
+
+local function GetRelativeFrameKey(frame)
+    if frame == Minimap then
+        return DEFAULT_RELATIVE_TO
+    end
+
+    return UI_PARENT_RELATIVE_TO
+end
+
+local function IsDefaultPosition(db, y)
+    return (db.point or DEFAULT_POINT) == DEFAULT_POINT
+        and (db.relativePoint or DEFAULT_RELATIVE_POINT) == DEFAULT_RELATIVE_POINT
+        and math.abs((db.x or DEFAULT_X) - DEFAULT_X) < 0.01
+        and math.abs((db.y or DEFAULT_Y) - y) < 0.01
+end
+
+local function SetDefaultPosition(db)
+    db.point = DEFAULT_POINT
+    db.relativePoint = DEFAULT_RELATIVE_POINT
+    db.relativeTo = DEFAULT_RELATIVE_TO
+    db.x = DEFAULT_X
+    db.y = DEFAULT_Y
 end
 
 local function EnsureDB()
@@ -49,6 +83,16 @@ local function EnsureDB()
 
     if db.scale == nil then
         db.scale = DEFAULT_SCALE
+    end
+
+    if db.relativeTo == nil then
+        if IsDefaultPosition(db, DEFAULT_Y) or IsDefaultPosition(db, OLD_DEFAULT_Y) then
+            SetDefaultPosition(db)
+        else
+            db.relativeTo = UI_PARENT_RELATIVE_TO
+        end
+    elseif db.relativeTo ~= DEFAULT_RELATIVE_TO then
+        db.relativeTo = UI_PARENT_RELATIVE_TO
     end
 
     return db
@@ -164,9 +208,10 @@ local function SavePosition()
         return
     end
 
-    local point, _, relativePoint, x, y = widget:GetPoint(1)
+    local point, relativeFrame, relativePoint, x, y = widget:GetPoint(1)
 
     db.point = point or DEFAULT_POINT
+    db.relativeTo = GetRelativeFrameKey(relativeFrame)
     db.relativePoint = relativePoint or DEFAULT_RELATIVE_POINT
     db.x = x or DEFAULT_X
     db.y = y or DEFAULT_Y
@@ -182,7 +227,7 @@ local function RestorePosition()
     widget:ClearAllPoints()
     widget:SetPoint(
         db.point or DEFAULT_POINT,
-        UIParent,
+        GetRelativeFrame(db.relativeTo),
         db.relativePoint or DEFAULT_RELATIVE_POINT,
         db.x or DEFAULT_X,
         db.y or DEFAULT_Y
@@ -196,10 +241,7 @@ local function ResetPosition()
         return
     end
 
-    db.point = DEFAULT_POINT
-    db.relativePoint = DEFAULT_RELATIVE_POINT
-    db.x = DEFAULT_X
-    db.y = DEFAULT_Y
+    SetDefaultPosition(db)
 
     RestorePosition()
 end

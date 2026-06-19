@@ -1,7 +1,5 @@
 package-as: ZoidsTools
 
-manual-changelog: CHANGELOG.md
-
 enable-nolib-creation: no
   
 ignore:

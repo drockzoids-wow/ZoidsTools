@@ -26,6 +26,7 @@ local pageOrder = {
     { key = "windows", label = "Windows", description = "Move Blizzard UI windows and default bags." },
     { key = "items", label = "Items", description = "Item level, gem, enchant, and binding overlays." },
     { key = "combat", label = "Combat", description = "Combat quality-of-life settings." },
+    { key = "unitframes", label = "Unit Frames", description = "Blizzard unit frame health, castbar, and aura settings." },
     { key = "macros", label = "Macros", description = "Health, mana, and consumable macro settings." },
     { key = "loot", label = "Loot", description = "Looting quality-of-life settings." },
     { key = "quests", label = "Quests", description = "Quest and gossip automation settings." },
@@ -81,6 +82,8 @@ local function CreatePage(parent, key)
         return UI.Pages.CreateItemsPage(parent)
     elseif key == "combat" and UI.Pages.CreateCombatPage then
         return UI.Pages.CreateCombatPage(parent)
+    elseif key == "unitframes" and UI.Pages.CreateUnitFramesPage then
+        return UI.Pages.CreateUnitFramesPage(parent)
     elseif key == "macros" and UI.Pages.CreateMacrosPage then
         return UI.Pages.CreateMacrosPage(parent)
     elseif key == "loot" and UI.Pages.CreateLootPage then

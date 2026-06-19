@@ -13,6 +13,7 @@ local mouseHooksInstalled = false
 local originalGetMinimapShape = GetMinimapShape
 local shapeOverrideApplied = false
 local squareApplied = false
+local mouseoverHideToken = 0
 
 local trackedButtons = {}
 local originalButtonPoints = {}
@@ -20,9 +21,11 @@ local collectionRestorePoints = {}
 local originalWidgetPoints = {}
 local originalShown = {}
 local collectedButtonClickHooks = {}
+local addonButtonMouseHooks = {}
 
 local SQUARE_MASK = "Interface\\BUTTONS\\WHITE8X8"
 local DEFAULT_MASK = "Textures\\MinimapMask"
+local ADDON_BUTTON_MOUSEOUT_DELAY = 4
 local COLLECTOR_SIZE = 22
 local COLLECTED_BUTTON_SIZE = 30
 local COLLECTED_BUTTON_GAP = 6
@@ -1019,9 +1022,15 @@ function LayoutCollectorButtons()
     end
 end
 
-local function ApplyMouseoverButtonVisibility()
+local function ApplyMouseoverButtonVisibility(forceShow)
     local db = EnsureMinimapDB()
-    local show = db and (not db.hideAddonButtons or (Minimap and Minimap:IsMouseOver()))
+    local show = db
+        and (
+            forceShow
+            or not db.hideAddonButtons
+            or (Minimap and Minimap:IsMouseOver())
+            or IsMouseOverCollectedButton()
+        )
 
     for _, button in pairs(trackedButtons) do
         if button and button:GetName() and originalButtonPoints[button:GetName()] then
@@ -1031,6 +1040,55 @@ local function ApplyMouseoverButtonVisibility()
             SetShown(button, show and store.shown ~= false)
         end
     end
+end
+
+local function ShowMouseoverButtons()
+    mouseoverHideToken = mouseoverHideToken + 1
+    ApplyMouseoverButtonVisibility(true)
+end
+
+local function ScheduleMouseoverButtonHide()
+    mouseoverHideToken = mouseoverHideToken + 1
+
+    local token = mouseoverHideToken
+
+    local function HideIfStillOutside()
+        if token ~= mouseoverHideToken then
+            return
+        end
+
+        ApplyMouseoverButtonVisibility()
+    end
+
+    if C_Timer and C_Timer.After then
+        C_Timer.After(ADDON_BUTTON_MOUSEOUT_DELAY, HideIfStillOutside)
+    else
+        HideIfStillOutside()
+    end
+end
+
+local function EnsureAddonButtonMouseHooks(button)
+    if not button or addonButtonMouseHooks[button] or not button.HookScript then
+        return
+    end
+
+    addonButtonMouseHooks[button] = true
+
+    button:HookScript("OnEnter", function()
+        local db = EnsureMinimapDB()
+
+        if db and db.hideAddonButtons and not db.collectAddonButtons then
+            ShowMouseoverButtons()
+        end
+    end)
+
+    button:HookScript("OnLeave", function()
+        local db = EnsureMinimapDB()
+
+        if db and db.hideAddonButtons and not db.collectAddonButtons then
+            ScheduleMouseoverButtonHide()
+        end
+    end)
 end
 
 local function RestoreCollectedButtons()
@@ -1059,6 +1117,10 @@ local function ApplyAddonButtons()
 
     GatherAddonButtons()
     EnsureCollectorFrames()
+
+    for _, button in pairs(trackedButtons) do
+        EnsureAddonButtonMouseHooks(button)
+    end
 
     if db.collectAddonButtons then
         CaptureCollectionRestorePositions()
@@ -1102,7 +1164,7 @@ local function EnsureMouseHooks()
         local db = EnsureMinimapDB()
 
         if db and db.hideAddonButtons and not db.collectAddonButtons then
-            ApplyMouseoverButtonVisibility()
+            ShowMouseoverButtons()
         end
     end)
 
@@ -1113,11 +1175,7 @@ local function EnsureMouseHooks()
             return
         end
 
-        if C_Timer and C_Timer.After then
-            C_Timer.After(0.18, ApplyMouseoverButtonVisibility)
-        else
-            ApplyMouseoverButtonVisibility()
-        end
+        ScheduleMouseoverButtonHide()
     end)
 end
 

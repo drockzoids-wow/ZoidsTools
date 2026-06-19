@@ -60,6 +60,38 @@ local defaults = {
         manaEnabled = false,
         manaCombatPotion = true,
     },
+    unitFrames = {
+        classColorHealth = false,
+        frames = {
+            player = {
+                hideBuffs = false,
+                hideDebuffs = false,
+                castbar = {
+                    enabled = false,
+                    width = 195,
+                    height = 16,
+                },
+            },
+            target = {
+                hideBuffs = false,
+                hideDebuffs = false,
+                castbar = {
+                    enabled = false,
+                    width = 195,
+                    height = 16,
+                },
+            },
+            focus = {
+                hideBuffs = false,
+                hideDebuffs = false,
+                castbar = {
+                    enabled = false,
+                    width = 195,
+                    height = 16,
+                },
+            },
+        },
+    },
     items = {
         enabled = true,
         fontSize = 12,
@@ -89,7 +121,7 @@ local defaults = {
         updateInterval = 1,
         point = "BOTTOM",
         relativePoint = "BOTTOM",
-        x = 0,
+        x = -15,
         y = 205,
         locked = false,
     },
@@ -100,7 +132,7 @@ local defaults = {
         point = "BOTTOM",
         relativePoint = "BOTTOM",
         x = 0,
-        y = 245,
+        y = 8,
         scale = 1,
     },
     ui = {
@@ -174,6 +206,7 @@ local function PrintHelp()
     ns:Print("/zt windows on/off toggles movable Blizzard windows.")
     ns:Print("/zt bags on/off toggles default bag movement.")
     ns:Print("/zt combat opens combat options.")
+    ns:Print("/zt unitframes opens unit frame options.")
     ns:Print("/zt macros opens health and mana macro options.")
     ns:Print("/zt refreshmacros updates the ZoidsTools consumable macros.")
     ns:Print("/zt keydown on/off toggles action keybinds on key down.")
@@ -207,6 +240,8 @@ local function HandleSlash(input)
         ns:OpenConfig("loot")
     elseif input == "combat" then
         ns:OpenConfig("combat")
+    elseif input == "unitframes" or input == "unitframe" or input == "frames" then
+        ns:OpenConfig("unitframes")
     elseif input == "macros" or input == "macro" or input == "food" or input == "drink" then
         ns:OpenConfig("macros")
     elseif input == "items" or input == "item" or input == "gear" then
@@ -437,6 +472,10 @@ eventFrame:SetScript("OnEvent", function(_, event, addonName)
 
         if ns.InitializeCombatSettings then
             ns:InitializeCombatSettings()
+        end
+
+        if ns.InitializeUnitFrames then
+            ns:InitializeUnitFrames()
         end
 
         if ns.InitializeConsumableMacros then

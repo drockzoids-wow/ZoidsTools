@@ -44,7 +44,7 @@ function ns.UI.Pages.CreateGeneralPage(parent)
     local minimapHeader = UI.CreateCheckbox(
         frame,
         "Move map title and time",
-        "Moves the minimap title, clock, and Blizzard addon button into a compact top bar, with tracking and calendar inside the map corners.",
+        "Moves the minimap title, subzone, tracking, addon button, and clock into a larger top banner. Right-click the clock to open the calendar.",
         function()
             return ns.IsMinimapHeaderBarEnabled and ns:IsMinimapHeaderBarEnabled()
         end,
@@ -189,11 +189,48 @@ function ns.UI.Pages.CreateGeneralPage(parent)
     UI.PlaceSlider(coordinatesScale, mapCoordinates)
 
     local resetCoordinates = UI.CreateButton(frame, "Reset Coords", 132)
+    resetCoordinates:SetPoint("TOPLEFT", coordinatesScale, "BOTTOMLEFT", -UI.Layout.sliderIndent, -24)
     resetCoordinates:SetScript("OnClick", function()
         if ns.ResetCoordinatesWidgetPosition then
             ns:ResetCoordinatesWidgetPosition()
         end
     end)
+
+    local cinematicsSection = UI.PlaceSection(frame, "Cinematics", resetCoordinates, rightWidth)
+
+    local cinematicFastSkip = UI.CreateCheckbox(
+        frame,
+        "Skip confirm with Escape",
+        "Pressing Escape during a cinematic or movie skips it immediately without clicking a confirmation popup.",
+        function()
+            return ns.IsCinematicFastSkipEnabled and ns:IsCinematicFastSkipEnabled()
+        end,
+        function(value)
+            if ns.SetCinematicFastSkipEnabled then
+                ns:SetCinematicFastSkipEnabled(value)
+            end
+        end
+    )
+    UI.PlaceFirst(cinematicFastSkip, cinematicsSection)
+
+    local cinematicAutoSkip = UI.CreateCheckbox(
+        frame,
+        "Auto skip cinematics",
+        "Automatically skips cinematics and movies as soon as they start.",
+        function()
+            return ns.IsCinematicAutoSkipEnabled and ns:IsCinematicAutoSkipEnabled()
+        end,
+        function(value)
+            if ns.SetCinematicAutoSkipEnabled then
+                ns:SetCinematicAutoSkipEnabled(value)
+            end
+
+            if frame.Refresh then
+                frame:Refresh()
+            end
+        end
+    )
+    UI.PlaceBelow(cinematicAutoSkip, cinematicFastSkip)
 
     local unlockPerformance = UI.CreateButton(frame, "Unlock Widget", 132)
     unlockPerformance:SetScript("OnClick", function()
@@ -212,6 +249,8 @@ function ns.UI.Pages.CreateGeneralPage(parent)
         minimapHeader:Refresh()
         mouseoverButtons:Refresh()
         collectButtons:Refresh()
+        cinematicFastSkip:Refresh()
+        cinematicAutoSkip:Refresh()
         performanceDisplay:Refresh()
         performanceScale:Refresh()
         coordinatesWidget:Refresh()

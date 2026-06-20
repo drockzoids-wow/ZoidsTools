@@ -44,10 +44,76 @@ function ns.UI.Pages.CreateCombatPage(parent)
     )
     rangeTint:SetPoint("TOPLEFT", inputSection, "BOTTOMLEFT", rightX, -UI.Layout.firstRowGap)
 
-    local status = UI.CreateStatusText(frame)
+    local status = UI.CreateStatusText(frame, 280)
     UI.PlaceBelow(status, castOnKeyDown, 0, 18)
 
-    local keybindSection = UI.PlaceSection(frame, "Action Keybind Text", status)
+    local alertsSection = UI.PlaceSection(frame, "Alerts", status)
+
+    local buffWarnings = UI.CreateCheckbox(
+        frame,
+        "Warn missing group buffs",
+        "While grouped and out of combat, shows a movable popup when a group-provided buff is missing.",
+        function()
+            return ns.GetBuffWarningsEnabled and ns:GetBuffWarningsEnabled()
+        end,
+        function(value)
+            if ns.SetBuffWarningsEnabled then
+                ns:SetBuffWarningsEnabled(value)
+            end
+        end
+    )
+    UI.PlaceFirst(buffWarnings, alertsSection)
+
+    local combatBanner = UI.CreateCheckbox(
+        frame,
+        "Show in-combat banner",
+        "Shows a movable IN COMBAT banner briefly when combat starts. Drag the banner to move it, or Ctrl-right-click it to reset position.",
+        function()
+            return ns.GetCombatBannerEnabled and ns:GetCombatBannerEnabled()
+        end,
+        function(value)
+            if ns.SetCombatBannerEnabled then
+                ns:SetCombatBannerEnabled(value)
+            end
+        end
+    )
+    combatBanner:SetPoint("TOPLEFT", alertsSection, "BOTTOMLEFT", rightX, -UI.Layout.firstRowGap)
+
+    local combatBannerPersistent = UI.CreateCheckbox(
+        frame,
+        "Keep banner visible in combat",
+        "Keeps the IN COMBAT banner visible until combat ends instead of hiding after a few seconds.",
+        function()
+            return ns.GetCombatBannerPersistent and ns:GetCombatBannerPersistent()
+        end,
+        function(value)
+            if ns.SetCombatBannerPersistent then
+                ns:SetCombatBannerPersistent(value)
+            end
+        end
+    )
+    UI.PlaceBelow(combatBannerPersistent, combatBanner)
+
+    local combatBannerLocked = UI.CreateCheckbox(
+        frame,
+        "Lock banner click-through",
+        "Prevents the IN COMBAT banner from catching clicks. Turn this off when you want to move it.",
+        function()
+            return ns.GetCombatBannerLocked and ns:GetCombatBannerLocked()
+        end,
+        function(value)
+            if ns.SetCombatBannerLocked then
+                ns:SetCombatBannerLocked(value)
+            end
+        end
+    )
+    UI.PlaceBelow(combatBannerLocked, combatBannerPersistent)
+
+    local alertsBottom = CreateFrame("Frame", nil, frame)
+    alertsBottom:SetSize(1, 1)
+    alertsBottom:SetPoint("TOPLEFT", alertsSection, "BOTTOMLEFT", UI.Layout.indent, -92)
+
+    local keybindSection = UI.PlaceSection(frame, "Action Keybind Text", alertsBottom)
 
     local keybindTextEnabled = UI.CreateCheckbox(
         frame,
@@ -218,6 +284,10 @@ function ns.UI.Pages.CreateCombatPage(parent)
     function frame:Refresh()
         castOnKeyDown:Refresh()
         rangeTint:Refresh()
+        buffWarnings:Refresh()
+        combatBanner:Refresh()
+        combatBannerPersistent:Refresh()
+        combatBannerLocked:Refresh()
         keybindTextEnabled:Refresh()
         shortenKeybindText:Refresh()
         keybindFont:Refresh()
@@ -228,9 +298,9 @@ function ns.UI.Pages.CreateCombatPage(parent)
         keybindOutline:Refresh()
 
         if ns.GetCurrentCastOnKeyDownCVar and ns:GetCurrentCastOnKeyDownCVar() then
-            status:SetText("Current WoW setting: action keybinds fire on key down.")
+            status:SetText("Current WoW setting: key down.")
         else
-            status:SetText("Current WoW setting: action keybinds fire on key up.")
+            status:SetText("Current WoW setting: key up.")
         end
     end
 

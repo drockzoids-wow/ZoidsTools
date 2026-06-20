@@ -36,8 +36,30 @@ local defaults = {
         skipDaily = true,
         skipWarbandCompleted = true,
     },
+    cinematics = {
+        fastSkip = false,
+        autoSkip = false,
+    },
     combat = {
         actionButtonRangeTint = true,
+        combatBanner = {
+            enabled = false,
+            persistent = false,
+            locked = false,
+            point = "CENTER",
+            relativePoint = "CENTER",
+            x = 0,
+            y = 220,
+        },
+        buffWarnings = {
+            enabled = true,
+            popup = {
+                point = "CENTER",
+                relativePoint = "CENTER",
+                x = 0,
+                y = 150,
+            },
+        },
         keybindText = {
             enabled = true,
             shorten = true,
@@ -519,6 +541,18 @@ eventFrame:SetScript("OnEvent", function(_, event, addonName)
 
         if ns.InitializeCombatSettings then
             ns:InitializeCombatSettings()
+        end
+
+        if ns.InitializeCinematicSkip then
+            ns:InitializeCinematicSkip()
+        end
+
+        if ns.InitializeCombatBanner then
+            ns:InitializeCombatBanner()
+        end
+
+        if ns.InitializeBuffWarnings then
+            ns:InitializeBuffWarnings()
         end
 
         if ns.InitializeUnitFrames then

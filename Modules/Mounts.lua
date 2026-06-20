@@ -6,7 +6,7 @@ _G.ZoidsToolsMounts = API
 local eventFrame
 local initialized = false
 local mountTypeIDByMountID = {}
-local mountIDBySpellID
+local mountIDByAuraName
 local targetMatchButton
 
 local TARGET_MATCH_BUTTON_NAME = "ZoidsToolsTargetMountMatchButton"
@@ -193,19 +193,77 @@ local function EnsureMountJournalLoaded()
 end
 
 local function NormalizeMountName(name)
-    if not name then
-        return ""
+    local ok, normalized = pcall(function()
+        if not name then
+            return ""
+        end
+
+        local text = string.lower(tostring(name))
+        text = text:gsub("\226\128\153", "'")
+        text = text:gsub("reins of the ", "")
+        text = text:gsub("reins of ", "")
+
+        return text
+    end)
+
+    if ok and normalized then
+        return normalized
     end
 
-    name = string.lower(tostring(name))
-    name = name:gsub("\226\128\153", "'")
-    name = name:gsub("reins of the ", "")
-    name = name:gsub("reins of ", "")
+    return ""
+end
 
-    return name
+local function IsPlayerInCombat()
+    if InCombatLockdown and InCombatLockdown() then
+        return true
+    end
+
+    return UnitAffectingCombat and UnitAffectingCombat("player") == true
+end
+
+local function GetTargetMatchBlockReason()
+    if IsPlayerInCombat() then
+        return "Target matching pauses in combat."
+    end
+
+    if not UnitExists or not UnitExists("target") then
+        return "No target selected."
+    end
+
+    if UnitCanAttack and UnitCanAttack("player", "target") then
+        return "Target matching ignores hostile targets."
+    end
+
+    if UnitIsPlayer and not UnitIsPlayer("target") then
+        return "Target matching only checks player targets."
+    end
+
+    return nil
+end
+
+local function BlockedTargetMatch(status)
+    return {
+        available = false,
+        status = status or "Target has no matchable mount.",
+    }
+end
+
+local function HideTargetMatchButtonForCombat()
+    if not targetMatchButton then
+        return
+    end
+
+    targetMatchButton.match = BlockedTargetMatch("Target matching pauses in combat.")
+    targetMatchButton:Hide()
 end
 
 local function GetSpellName(spellID)
+    spellID = tonumber(spellID)
+
+    if not spellID then
+        return nil
+    end
+
     if C_Spell and C_Spell.GetSpellInfo then
         local info = C_Spell.GetSpellInfo(spellID)
         return info and info.name
@@ -312,58 +370,70 @@ local function GetMountDetails(mountID)
     }
 end
 
-local function GetMountIDBySpellID(spellID)
-    spellID = tonumber(spellID)
+local function StoreMountNameLookup(name, mountID)
+    local key = NormalizeMountName(name)
 
-    if not spellID then
+    if key == "" or not mountID then
+        return
+    end
+
+    if not mountIDByAuraName[key] then
+        mountIDByAuraName[key] = mountID
+    end
+end
+
+local function GetMountIDByAuraName(name)
+    local key = NormalizeMountName(name)
+
+    if key == "" then
         return nil
     end
 
     EnsureMountJournalLoaded()
 
-    if C_MountJournal and C_MountJournal.GetMountFromSpell then
-        local ok, mountID = pcall(C_MountJournal.GetMountFromSpell, spellID)
-
-        if ok and mountID then
-            return tonumber(mountID)
-        end
+    if mountIDByAuraName then
+        return mountIDByAuraName[key]
     end
 
-    if mountIDBySpellID then
-        return mountIDBySpellID[spellID]
-    end
-
-    mountIDBySpellID = {}
+    mountIDByAuraName = {}
 
     if not C_MountJournal or not C_MountJournal.GetMountIDs or not C_MountJournal.GetMountInfoByID then
         return nil
     end
 
     for _, mountID in ipairs(C_MountJournal.GetMountIDs()) do
-        local _, mountSpellID = C_MountJournal.GetMountInfoByID(mountID)
-        mountSpellID = tonumber(mountSpellID)
+        local plainMountID = tonumber(mountID)
 
-        if mountSpellID then
-            mountIDBySpellID[mountSpellID] = mountID
+        if plainMountID then
+            local mountName, mountSpellID = C_MountJournal.GetMountInfoByID(plainMountID)
+
+            StoreMountNameLookup(mountName, plainMountID)
+            StoreMountNameLookup(GetSpellName(mountSpellID), plainMountID)
         end
     end
 
-    return mountIDBySpellID[spellID]
+    return mountIDByAuraName[key]
 end
 
 local function GetHelpfulAura(unit, index)
     if C_UnitAuras and C_UnitAuras.GetAuraDataByIndex then
-        local aura = C_UnitAuras.GetAuraDataByIndex(unit, index, "HELPFUL")
+        local ok, aura = pcall(C_UnitAuras.GetAuraDataByIndex, unit, index, "HELPFUL")
 
-        if aura then
-            return aura.name, aura.icon, aura.spellId or aura.spellID
+        if ok and aura then
+            local readOk, name, icon, spellID = pcall(function()
+                return aura.name, aura.icon, aura.spellId or aura.spellID
+            end)
+
+            if readOk then
+                return name, icon, spellID
+            end
         end
     end
 
     if UnitAura then
-        local name, icon, _, _, _, _, _, _, _, spellID = UnitAura(unit, index, "HELPFUL")
+        local ok, name, icon, _, _, _, _, _, _, _, spellID = pcall(UnitAura, unit, index, "HELPFUL")
 
-        if name then
+        if ok and name then
             return name, icon, spellID
         end
     end
@@ -416,30 +486,26 @@ local function GetTargetMountMatch()
     local db = EnsureDB()
 
     if not db or db.targetMatchEnabled == false then
-        return {
-            available = false,
-            status = "Target matching is disabled.",
-        }
+        return BlockedTargetMatch("Target matching is disabled.")
     end
 
-    if not UnitExists or not UnitExists("target") then
-        return {
-            available = false,
-            status = "No target selected.",
-        }
+    local blockedReason = GetTargetMatchBlockReason()
+
+    if blockedReason then
+        return BlockedTargetMatch(blockedReason)
     end
 
     local foundMountName
     local foundUnavailableStatus
 
     for index = 1, 40 do
-        local auraName, auraIcon, auraSpellID = GetHelpfulAura("target", index)
+        local auraName, auraIcon = GetHelpfulAura("target", index)
 
         if not auraName then
             break
         end
 
-        local mountID = GetMountIDBySpellID(auraSpellID)
+        local mountID = GetMountIDByAuraName(auraName)
 
         if mountID then
             local details = GetMountDetails(mountID)
@@ -522,6 +588,11 @@ local function UpdateTargetMatchButton()
         return
     end
 
+    if IsPlayerInCombat() then
+        HideTargetMatchButtonForCombat()
+        return
+    end
+
     local match = GetTargetMountMatch()
 
     button.match = match
@@ -579,7 +650,11 @@ local function CreateTargetMatchButton()
     end)
 
     button:SetScript("OnEnter", function(self)
-        local match = self.match or GetTargetMountMatch()
+        local match = self.match
+
+        if not match and not IsPlayerInCombat() then
+            match = GetTargetMountMatch()
+        end
 
         GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
         GameTooltip:SetText("Match Target Mount")
@@ -598,6 +673,11 @@ local function CreateTargetMatchButton()
             return
         end
 
+        if event ~= "PLAYER_REGEN_ENABLED" and IsPlayerInCombat() then
+            HideTargetMatchButtonForCombat()
+            return
+        end
+
         UpdateTargetMatchButton()
     end)
 
@@ -607,6 +687,7 @@ local function CreateTargetMatchButton()
     button:RegisterEvent("ZONE_CHANGED")
     button:RegisterEvent("ZONE_CHANGED_INDOORS")
     button:RegisterEvent("ZONE_CHANGED_NEW_AREA")
+    button:RegisterEvent("PLAYER_REGEN_DISABLED")
     button:RegisterEvent("PLAYER_REGEN_ENABLED")
 
     RestoreTargetMatchButtonPosition(button)
@@ -1095,16 +1176,24 @@ local function BuildRandomMountPools()
         return pools
     end
 
-    for _, mountID in ipairs(C_MountJournal.GetMountIDs()) do
-        local name, _, _, _, isUsable, _, _, _, _, _, isCollected =
-            C_MountJournal.GetMountInfoByID(mountID)
+    local function AddCollectedMounts(requireUsable)
+        for _, mountID in ipairs(C_MountJournal.GetMountIDs()) do
+            local details = GetMountDetails(mountID)
 
-        if name
-            and isCollected
-            and isUsable
-            and (db.excludeServiceMountsFromRandom ~= true or not IsServiceMountName(name)) then
-            AddMountToPools(pools, mountID)
+            if details
+                and details.name
+                and details.isCollected
+                and (not requireUsable or details.isUsable)
+                and (db.excludeServiceMountsFromRandom ~= true or not IsServiceMountName(details.name)) then
+                AddMountToPools(pools, details.mountID)
+            end
         end
+    end
+
+    AddCollectedMounts(true)
+
+    if #pools.all == 0 then
+        AddCollectedMounts(false)
     end
 
     return pools
@@ -1583,7 +1672,7 @@ function API.MatchTargetMount()
         return false
     end
 
-    if UnitAffectingCombat and UnitAffectingCombat("player") then
+    if IsPlayerInCombat() then
         Print("Cannot match target mount while in combat.")
         return false
     end

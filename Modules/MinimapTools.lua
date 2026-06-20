@@ -14,6 +14,8 @@ local originalGetMinimapShape = GetMinimapShape
 local shapeOverrideApplied = false
 local squareApplied = false
 local mouseoverHideToken = 0
+local clockCalendarHooked = false
+local clockFontStore
 
 local trackedButtons = {}
 local originalButtonPoints = {}
@@ -31,6 +33,7 @@ local COLLECTED_BUTTON_SIZE = 30
 local COLLECTED_BUTTON_GAP = 6
 local DEFAULT_COLLECTOR_ANGLE = -45
 local COLLECTOR_RADIUS = COLLECTOR_SIZE / 2
+local INFO_BAR_HEIGHT = 42
 
 local minimapShapes = {
     ROUND = { true, true, true, true },
@@ -360,6 +363,161 @@ local function GetAddonCompartmentButton()
     return _G.AddonCompartmentFrame or (MinimapCluster and MinimapCluster.AddonCompartmentFrame)
 end
 
+local function GetFirstFontString(frame)
+    if not frame or not frame.GetRegions then
+        return nil
+    end
+
+    for _, region in ipairs({ frame:GetRegions() }) do
+        if region and region.GetObjectType and region:GetObjectType() == "FontString" then
+            return region
+        end
+    end
+
+    return nil
+end
+
+local function OpenCalendarFromClock()
+    if C_AddOns and C_AddOns.LoadAddOn and C_AddOns.IsAddOnLoaded and not C_AddOns.IsAddOnLoaded("Blizzard_Calendar") then
+        pcall(C_AddOns.LoadAddOn, "Blizzard_Calendar")
+    elseif LoadAddOn and (not IsAddOnLoaded or not IsAddOnLoaded("Blizzard_Calendar")) then
+        pcall(LoadAddOn, "Blizzard_Calendar")
+    end
+
+    if Calendar_Toggle then
+        Calendar_Toggle()
+    elseif ToggleCalendar then
+        ToggleCalendar()
+    elseif _G.GameTimeFrame and _G.GameTimeFrame:GetScript("OnClick") then
+        _G.GameTimeFrame:GetScript("OnClick")(_G.GameTimeFrame, "LeftButton")
+    elseif _G.CalendarFrame and ShowUIPanel then
+        ShowUIPanel(_G.CalendarFrame)
+    end
+end
+
+local function EnsureClockCalendarClick(clockButton)
+    if clockCalendarHooked or not clockButton then
+        return
+    end
+
+    if clockButton.RegisterForClicks then
+        clockButton:RegisterForClicks("LeftButtonUp", "RightButtonUp")
+    end
+
+    if clockButton.HookScript then
+        clockButton:HookScript("OnMouseUp", function(_, button)
+            if button == "RightButton" then
+                OpenCalendarFromClock()
+            end
+        end)
+    end
+
+    clockCalendarHooked = true
+end
+
+local function StyleClockButton(clockButton, enabled)
+    if not clockButton then
+        return
+    end
+
+    local text = GetFirstFontString(clockButton)
+
+    if enabled then
+        if text and not clockFontStore then
+            local font, size, flags = text:GetFont()
+
+            clockFontStore = {
+                font = font,
+                size = size,
+                flags = flags,
+            }
+        end
+
+        if text and text.SetFont then
+            local font = clockFontStore and clockFontStore.font or STANDARD_TEXT_FONT or "Fonts\\FRIZQT__.TTF"
+
+            text:SetFont(font, 13, clockFontStore and clockFontStore.flags or "OUTLINE")
+        end
+    elseif text and clockFontStore and text.SetFont then
+        text:SetFont(clockFontStore.font, clockFontStore.size, clockFontStore.flags)
+    end
+end
+
+local function GetMinimapLocationText()
+    local zone = GetRealZoneText and GetRealZoneText() or nil
+    local subZone = GetSubZoneText and GetSubZoneText() or nil
+
+    if (not zone or zone == "") and GetZoneText then
+        zone = GetZoneText()
+    end
+
+    if (not subZone or subZone == "") and GetMinimapZoneText then
+        subZone = GetMinimapZoneText()
+    end
+
+    zone = zone or ""
+    subZone = subZone or ""
+
+    if subZone == zone then
+        subZone = ""
+    end
+
+    return zone, subZone
+end
+
+local function EnsureInfoBarText(bar)
+    if not bar or bar.zoneText then
+        return
+    end
+
+    bar.zoneText = bar:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    bar.zoneText:SetPoint("TOPLEFT", bar, "TOPLEFT", 58, -8)
+    bar.zoneText:SetPoint("TOPRIGHT", bar, "TOPRIGHT", -72, -8)
+    bar.zoneText:SetJustifyH("CENTER")
+    bar.zoneText:SetJustifyV("MIDDLE")
+
+    bar.subZoneText = bar:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    bar.subZoneText:SetPoint("TOPLEFT", bar.zoneText, "BOTTOMLEFT", 0, -1)
+    bar.subZoneText:SetPoint("TOPRIGHT", bar.zoneText, "BOTTOMRIGHT", 0, -1)
+    bar.subZoneText:SetJustifyH("CENTER")
+    bar.subZoneText:SetJustifyV("MIDDLE")
+    bar.subZoneText:SetTextColor(0.78, 0.90, 1)
+end
+
+local function UpdateInfoBarText()
+    if not infoBar then
+        return
+    end
+
+    EnsureInfoBarText(infoBar)
+
+    local zone, subZone = GetMinimapLocationText()
+
+    if infoBar.zoneText then
+        infoBar.zoneText:ClearAllPoints()
+
+        if subZone and subZone ~= "" then
+            infoBar.zoneText:SetPoint("TOPLEFT", infoBar, "TOPLEFT", 58, -8)
+            infoBar.zoneText:SetPoint("TOPRIGHT", infoBar, "TOPRIGHT", -72, -8)
+            infoBar.zoneText:SetText(zone)
+        else
+            infoBar.zoneText:SetPoint("LEFT", infoBar, "LEFT", 58, 0)
+            infoBar.zoneText:SetPoint("RIGHT", infoBar, "RIGHT", -72, 0)
+            infoBar.zoneText:SetText(zone)
+        end
+    end
+
+    if infoBar.subZoneText then
+        if subZone and subZone ~= "" then
+            infoBar.subZoneText:SetText(subZone)
+            infoBar.subZoneText:Show()
+        else
+            infoBar.subZoneText:SetText("")
+            infoBar.subZoneText:Hide()
+        end
+    end
+end
+
 local function StyleInfoBar(bar)
     if not bar then
         return
@@ -471,7 +629,7 @@ local function EnsureInfoBar()
     end
 
     infoBar = CreateFrame("Frame", "ZoidsToolsMinimapInfoBar", MinimapCluster or UIParent, "BackdropTemplate")
-    infoBar:SetHeight(22)
+    infoBar:SetHeight(INFO_BAR_HEIGHT)
     infoBar:SetPoint("BOTTOMLEFT", Minimap, "TOPLEFT", 0, 2)
     infoBar:SetPoint("BOTTOMRIGHT", Minimap, "TOPRIGHT", 0, 2)
     infoBar:SetFrameStrata("MEDIUM")
@@ -479,9 +637,10 @@ local function EnsureInfoBar()
     infoBar:SetBackdrop({
         bgFile = SQUARE_MASK,
         edgeFile = SQUARE_MASK,
-        edgeSize = 1,
+        edgeSize = 2,
     })
     StyleInfoBar(infoBar)
+    EnsureInfoBarText(infoBar)
     infoBar:Hide()
 
     return infoBar
@@ -503,68 +662,67 @@ local function ApplyInfoBar(enabled)
 
     if enabled then
         bar:ClearAllPoints()
+        bar:SetHeight(INFO_BAR_HEIGHT)
         bar:SetPoint("BOTTOMLEFT", Minimap, "TOPLEFT", 0, 2)
         bar:SetPoint("BOTTOMRIGHT", Minimap, "TOPRIGHT", 0, 2)
         StyleInfoBar(bar)
+        UpdateInfoBarText()
         bar:Show()
         SetHeaderDecorShown(false)
 
-        local rightAnchor = bar
-
-        if trackingButton and MoveMinimapCornerWidget("tracking", trackingButton) then
-            trackingButton:SetSize(22, 22)
-            trackingButton:SetPoint("TOPLEFT", Minimap, "TOPLEFT", 5, -5)
+        if trackingButton and MoveHeaderWidget("tracking", trackingButton, bar) then
+            trackingButton:SetSize(20, 20)
+            trackingButton:SetPoint("TOPLEFT", bar, "TOPLEFT", 5, -3)
+            trackingButton:SetFrameLevel(bar:GetFrameLevel() + 3)
         end
 
         if clockButton and MoveHeaderWidget("clock", clockButton, bar) then
-            clockButton:SetSize(58, 20)
-            clockButton:SetPoint("RIGHT", bar, "RIGHT", -6, 0)
+            clockButton:SetSize(64, 22)
+            clockButton:SetPoint("RIGHT", bar, "RIGHT", -5, 0)
             clockButton:SetFrameLevel(bar:GetFrameLevel() + 3)
-            rightAnchor = clockButton
+            EnsureClockCalendarClick(clockButton)
+            StyleClockButton(clockButton, true)
         end
 
         if addonButton and MoveHeaderWidget("addon", addonButton, bar) then
-            addonButton:SetSize(22, 22)
-            addonButton:SetPoint("LEFT", bar, "LEFT", 4, 0)
+            addonButton:SetSize(20, 20)
+            addonButton:SetPoint("BOTTOMLEFT", bar, "BOTTOMLEFT", 5, 3)
             addonButton:SetFrameLevel(bar:GetFrameLevel() + 3)
         end
 
-        if calendarButton and MoveMinimapCornerWidget("calendar", calendarButton) then
-            calendarButton:SetSize(22, 22)
-            calendarButton:SetPoint("TOPRIGHT", Minimap, "TOPRIGHT", -5, -5)
+        if calendarButton then
+            originalWidgetPoints.calendar = originalWidgetPoints.calendar or {}
+            SaveFramePoints(calendarButton, originalWidgetPoints.calendar)
+            SaveOriginalShown(calendarButton)
+            calendarButton:Hide()
         end
 
         if zoneButton then
-            MoveHeaderWidget("zone", zoneButton, bar)
-            zoneButton:SetPoint("LEFT", bar, "LEFT", 0, 0)
-            zoneButton:SetPoint("RIGHT", bar, "RIGHT", 0, 0)
-            zoneButton:SetHeight(bar:GetHeight() or 22)
-            zoneButton:SetFrameLevel(bar:GetFrameLevel() + 1)
+            if MoveHeaderWidget("zone", zoneButton, bar) then
+                SaveOriginalShown(zoneButton)
+                zoneButton:SetPoint("LEFT", bar, "LEFT", 0, 0)
+                zoneButton:SetPoint("RIGHT", bar, "RIGHT", 0, 0)
+                zoneButton:SetHeight(bar:GetHeight() or INFO_BAR_HEIGHT)
+                zoneButton:SetFrameLevel(bar:GetFrameLevel() + 1)
+                zoneButton:Hide()
+            end
 
             local zoneText = GetZoneTextRegion(zoneButton)
 
             if zoneText then
-                zoneText:ClearAllPoints()
-                zoneText:SetPoint("LEFT", zoneButton, "LEFT", 58, 0)
-                zoneText:SetPoint("RIGHT", zoneButton, "RIGHT", -58, 0)
-                zoneText:SetHeight(bar:GetHeight() or 22)
-            end
-
-            if zoneText and zoneText.SetJustifyH then
-                zoneText:SetJustifyH("CENTER")
-            end
-
-            if zoneText and zoneText.SetJustifyV then
-                zoneText:SetJustifyV("MIDDLE")
+                zoneText:SetText("")
             end
         end
     else
         bar:Hide()
+        StyleClockButton(clockButton, false)
         RestoreFramePoints(zoneButton, originalWidgetPoints.zone)
         RestoreFramePoints(clockButton, originalWidgetPoints.clock)
         RestoreFramePoints(trackingButton, originalWidgetPoints.tracking)
         RestoreFramePoints(calendarButton, originalWidgetPoints.calendar)
         RestoreFramePoints(addonButton, originalWidgetPoints.addon)
+        RestoreOriginalShown(zoneButton)
+        RestoreOriginalShown(calendarButton)
 
         if not db or not db.square then
             SetHeaderDecorShown(true)
@@ -1317,6 +1475,9 @@ function ns:InitializeMinimapTools()
     eventFrame = CreateFrame("Frame")
     eventFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
     eventFrame:RegisterEvent("ADDON_LOADED")
+    eventFrame:RegisterEvent("ZONE_CHANGED")
+    eventFrame:RegisterEvent("ZONE_CHANGED_INDOORS")
+    eventFrame:RegisterEvent("ZONE_CHANGED_NEW_AREA")
     eventFrame:SetScript("OnEvent", function()
         ScheduleRefresh(0.35)
     end)

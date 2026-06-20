@@ -5,6 +5,8 @@ local characterHooksInstalled = false
 local bankHooksInstalled = false
 local hookedContainerFrames = {}
 local pendingCharacterRefresh = false
+local pendingCharacterForceRefresh = false
+local pendingCharacterSettleRefresh = false
 local pendingBagRefresh = false
 local pendingBankRefresh = false
 local pendingBagForceClear = false
@@ -15,6 +17,8 @@ local tableUnpack = unpack or table.unpack
 local DEFAULT_FONT_SIZE = 12
 local CHARACTER_GEM_SIZE = 13
 local CHARACTER_GEM_SPACING = 1
+local CHARACTER_REFRESH_DELAY = 0.05
+local CHARACTER_SETTLE_REFRESH_DELAY = 0.45
 local EMPTY_SOCKET_TEXTURE = "Interface\\ItemSocketingFrame\\UI-EmptySocket-Prismatic"
 
 local equippableLocations = {
@@ -738,6 +742,18 @@ local function RefreshCharacterSlots()
     end
 end
 
+local function IsCharacterFrameVisible()
+    if CharacterFrame and type(CharacterFrame.IsShown) == "function" and CharacterFrame:IsShown() then
+        return true
+    end
+
+    if PaperDollFrame and type(PaperDollFrame.IsShown) == "function" and PaperDollFrame:IsShown() then
+        return true
+    end
+
+    return false
+end
+
 local function EnsureBagOverlays(button)
     if not button.ZTBagItemLevelText then
         button.ZTBagItemLevelText = button:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
@@ -1091,7 +1107,13 @@ local function RefreshBankFrames(forceClear)
     end
 end
 
-local function QueueCharacterRefresh()
+local function QueueCharacterRefresh(delay, force)
+    if type(delay) ~= "number" then
+        delay = CHARACTER_REFRESH_DELAY
+    end
+
+    pendingCharacterForceRefresh = pendingCharacterForceRefresh or force == true
+
     if pendingCharacterRefresh then
         return
     end
@@ -1099,12 +1121,39 @@ local function QueueCharacterRefresh()
     pendingCharacterRefresh = true
 
     local function Run()
+        local shouldForce = pendingCharacterForceRefresh
+
         pendingCharacterRefresh = false
-        RefreshCharacterSlots()
+        pendingCharacterForceRefresh = false
+
+        if shouldForce or IsCharacterFrameVisible() then
+            RefreshCharacterSlots()
+        end
     end
 
     if C_Timer and C_Timer.After then
-        C_Timer.After(0.05, Run)
+        C_Timer.After(delay, Run)
+    else
+        Run()
+    end
+end
+
+local function QueueCharacterSettleRefresh()
+    QueueCharacterRefresh(0.08)
+
+    if pendingCharacterSettleRefresh then
+        return
+    end
+
+    pendingCharacterSettleRefresh = true
+
+    local function Run()
+        pendingCharacterSettleRefresh = false
+        QueueCharacterRefresh(0.02)
+    end
+
+    if C_Timer and C_Timer.After then
+        C_Timer.After(CHARACTER_SETTLE_REFRESH_DELAY, Run)
     else
         Run()
     end
@@ -1230,6 +1279,12 @@ local function InstallHooks()
     HookBankPanel()
 end
 
+local function RegisterEventSafe(frame, event)
+    if frame and event then
+        SafeCall(frame.RegisterEvent, frame, event)
+    end
+end
+
 function ns:SetItemOverlaysEnabled(value)
     local db = EnsureDB()
 
@@ -1317,25 +1372,38 @@ function ns:InitializeItemOverlays()
     end
 
     eventFrame = CreateFrame("Frame")
-    eventFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
-    eventFrame:RegisterEvent("PLAYER_EQUIPMENT_CHANGED")
-    eventFrame:RegisterEvent("BAG_UPDATE_DELAYED")
-    eventFrame:RegisterEvent("PLAYERBANKSLOTS_CHANGED")
-    eventFrame:RegisterEvent("BANKFRAME_OPENED")
-    eventFrame:RegisterEvent("PLAYER_INTERACTION_MANAGER_FRAME_SHOW")
-    eventFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
+    RegisterEventSafe(eventFrame, "PLAYER_ENTERING_WORLD")
+    RegisterEventSafe(eventFrame, "PLAYER_EQUIPMENT_CHANGED")
+    RegisterEventSafe(eventFrame, "UNIT_INVENTORY_CHANGED")
+    RegisterEventSafe(eventFrame, "BAG_UPDATE_DELAYED")
+    RegisterEventSafe(eventFrame, "PLAYERBANKSLOTS_CHANGED")
+    RegisterEventSafe(eventFrame, "BANKFRAME_OPENED")
+    RegisterEventSafe(eventFrame, "PLAYER_INTERACTION_MANAGER_FRAME_SHOW")
+    RegisterEventSafe(eventFrame, "PLAYER_REGEN_ENABLED")
+    RegisterEventSafe(eventFrame, "SOCKET_INFO_UPDATE")
+    RegisterEventSafe(eventFrame, "SOCKET_INFO_SUCCESS")
+    RegisterEventSafe(eventFrame, "SOCKET_INFO_CLOSE")
 
-    eventFrame:SetScript("OnEvent", function(_, event)
+    eventFrame:SetScript("OnEvent", function(_, event, ...)
         if event == "PLAYER_ENTERING_WORLD" then
             InstallHooks()
             QueueCharacterRefresh()
             QueueBagRefresh()
             QueueBankRefresh()
         elseif event == "PLAYER_EQUIPMENT_CHANGED" or event == "PLAYER_REGEN_ENABLED" then
-            QueueCharacterRefresh()
+            QueueCharacterSettleRefresh()
+        elseif event == "UNIT_INVENTORY_CHANGED" then
+            local unit = ...
+
+            if unit == "player" then
+                QueueCharacterSettleRefresh()
+            end
+        elseif event == "SOCKET_INFO_UPDATE" or event == "SOCKET_INFO_SUCCESS" or event == "SOCKET_INFO_CLOSE" then
+            QueueCharacterSettleRefresh()
         elseif event == "BAG_UPDATE_DELAYED" then
             HookContainerFrames()
             QueueBagRefresh()
+            QueueCharacterSettleRefresh()
         elseif event == "PLAYERBANKSLOTS_CHANGED" or event == "BANKFRAME_OPENED" or event == "PLAYER_INTERACTION_MANAGER_FRAME_SHOW" then
             HookBankPanel()
             QueueBankRefresh()

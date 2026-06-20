@@ -9,6 +9,8 @@ local originalHealthColors = {}
 local originalCastbarState = {}
 local originalAuraState = {}
 local pendingProtectedRefresh = false
+local refreshQueued = false
+local auraVisibilityQueued = false
 
 local DEFAULT_CASTBAR_WIDTH = 195
 local DEFAULT_CASTBAR_HEIGHT = 16
@@ -796,7 +798,11 @@ local function GetAuraKindFromAuraData(unit, auraInstanceID)
         return nil
     end
 
-    local auraData = C_UnitAuras.GetAuraDataByAuraInstanceID(unit, auraInstanceID)
+    local ok, auraData = pcall(C_UnitAuras.GetAuraDataByAuraInstanceID, unit, auraInstanceID)
+
+    if not ok then
+        return nil
+    end
 
     if auraData and auraData.isHelpful == true then
         return "buffs"
@@ -1026,10 +1032,35 @@ local function ApplyAuraVisibility()
     end
 end
 
+local function ScheduleAuraVisibility(delay)
+    if auraVisibilityQueued then
+        return
+    end
+
+    auraVisibilityQueued = true
+    delay = tonumber(delay) or 0.05
+
+    local function Run()
+        auraVisibilityQueued = false
+        ApplyAuraVisibility()
+    end
+
+    if C_Timer and C_Timer.After then
+        C_Timer.After(delay, Run)
+    else
+        Run()
+    end
+end
+
 local function HookAuraFramesFor(key, auraType)
     local info = auraTargets[key]
 
     if not info then
+        return
+    end
+
+    if InCombatLockdown and InCombatLockdown() then
+        pendingProtectedRefresh = true
         return
     end
 
@@ -1063,10 +1094,22 @@ local function RefreshUnitFrames()
 end
 
 local function ScheduleRefresh(delay)
-    if C_Timer and C_Timer.After then
-        C_Timer.After(delay or 0, RefreshUnitFrames)
-    else
+    if refreshQueued then
+        return
+    end
+
+    refreshQueued = true
+    delay = tonumber(delay) or 0.05
+
+    local function Run()
+        refreshQueued = false
         RefreshUnitFrames()
+    end
+
+    if C_Timer and C_Timer.After then
+        C_Timer.After(delay, Run)
+    else
+        Run()
     end
 end
 
@@ -1219,7 +1262,7 @@ function ns:InitializeUnitFrames()
     end
 
     if type(TargetFrame_UpdateAuras) == "function" then
-        hooksecurefunc("TargetFrame_UpdateAuras", ApplyAuraVisibility)
+        hooksecurefunc("TargetFrame_UpdateAuras", ScheduleAuraVisibility)
     end
 
     eventFrame = CreateFrame("Frame")
@@ -1238,7 +1281,7 @@ function ns:InitializeUnitFrames()
         if event == "PLAYER_REGEN_ENABLED" then
             if pendingProtectedRefresh then
                 pendingProtectedRefresh = false
-                RefreshUnitFrames()
+                ScheduleRefresh(0.05)
             end
 
             return
@@ -1252,6 +1295,6 @@ function ns:InitializeUnitFrames()
             return
         end
 
-        RefreshUnitFrames()
+        ScheduleRefresh(0.05)
     end)
 end

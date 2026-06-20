@@ -3,19 +3,19 @@
         ZoidsToolsSmartMountButton:Click("LeftButton")
     </Binding>
 
-    <Binding name="CLICK ZoidsToolsRepairMountButton:LeftButton" category="ZoidsTools" header="ZOIDSTOOLS">
+    <Binding name="CLICK ZoidsToolsRepairMountButton:LeftButton" category="ZoidsTools">
         ZoidsToolsRepairMountButton:Click("LeftButton")
     </Binding>
 
-    <Binding name="CLICK ZoidsToolsAuctionHouseMountButton:LeftButton" category="ZoidsTools" header="ZOIDSTOOLS">
+    <Binding name="CLICK ZoidsToolsAuctionHouseMountButton:LeftButton" category="ZoidsTools">
         ZoidsToolsAuctionHouseMountButton:Click("LeftButton")
     </Binding>
 
-    <Binding name="CLICK ZoidsToolsRideAlongMountButton:LeftButton" category="ZoidsTools" header="ZOIDSTOOLS">
+    <Binding name="CLICK ZoidsToolsRideAlongMountButton:LeftButton" category="ZoidsTools">
         ZoidsToolsRideAlongMountButton:Click("LeftButton")
     </Binding>
 
-    <Binding name="ZOIDSTOOLS_MATCH_TARGET_MOUNT" category="ZoidsTools" header="ZOIDSTOOLS">
+    <Binding name="ZOIDSTOOLS_MATCH_TARGET_MOUNT" category="ZoidsTools">
         if ZoidsToolsMounts and ZoidsToolsMounts.MatchTargetMount then
             ZoidsToolsMounts.MatchTargetMount()
         end

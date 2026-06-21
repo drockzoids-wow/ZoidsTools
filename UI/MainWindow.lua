@@ -9,7 +9,7 @@ local pages = {}
 local buttons = {}
 
 local WINDOW_WIDTH = 820
-local WINDOW_HEIGHT = 620
+local WINDOW_HEIGHT = 660
 local OUTER_MARGIN = 14
 local SIDEBAR_WIDTH = 184
 local SIDEBAR_TOP = -112

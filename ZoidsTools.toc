@@ -30,6 +30,7 @@ Modules\Coordinates.lua
 Modules\ItemOverlays.lua
 Modules\QuestAutomation.lua
 Modules\MinimapTools.lua
+Modules\Tooltips.lua
 UI\Theme.lua
 UI\Controls.lua
 UI\Pages\General.lua

@@ -40,6 +40,14 @@ local defaults = {
         fastSkip = false,
         autoSkip = false,
     },
+    tooltips = {
+        factionBackground = true,
+        classColoredNames = true,
+        showMythicScore = true,
+        colorMythicScore = true,
+        showMythicPercentile = true,
+        showItemLevel = true,
+    },
     combat = {
         actionButtonRangeTint = true,
         combatBanner = {
@@ -597,6 +605,10 @@ eventFrame:SetScript("OnEvent", function(_, event, addonName)
 
         if ns.InitializeMinimapTools then
             ns:InitializeMinimapTools()
+        end
+
+        if ns.InitializeTooltips then
+            ns:InitializeTooltips()
         end
     end
 end)

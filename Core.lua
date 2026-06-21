@@ -257,6 +257,7 @@ end
 local function PrintHelp()
     ns:Print("/zt opens ZoidsTools.")
     ns:Print("/zt windows on/off toggles movable Blizzard windows.")
+    ns:Print("/zt tooltips opens tooltip options.")
     ns:Print("/zt bags on/off toggles default bag movement.")
     ns:Print("/zt combat opens combat options.")
     ns:Print("/zt unitframes opens unit frame options.")
@@ -293,6 +294,8 @@ local function HandleSlash(input)
         ns:OpenConfig()
     elseif input == "windows" then
         ns:OpenConfig("windows")
+    elseif input == "tooltips" or input == "tooltip" then
+        ns:OpenConfig("tooltips")
     elseif input == "loot" then
         ns:OpenConfig("loot")
     elseif input == "combat" then

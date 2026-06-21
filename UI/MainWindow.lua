@@ -23,6 +23,7 @@ local TITLE_BADGE_ICON_SIZE = 54
 
 local pageOrder = {
     { key = "general", label = "General", description = "Core ZoidsTools settings." },
+    { key = "tooltips", label = "Tooltips", description = "Unit tooltip appearance and player detail settings." },
     { key = "windows", label = "Windows", description = "Move Blizzard UI windows and default bags." },
     { key = "items", label = "Items", description = "Item level, gem, enchant, and binding overlays." },
     { key = "combat", label = "Combat", description = "Combat quality-of-life settings." },
@@ -77,6 +78,8 @@ end
 local function CreatePage(parent, key)
     if key == "general" and UI.Pages.CreateGeneralPage then
         return UI.Pages.CreateGeneralPage(parent)
+    elseif key == "tooltips" and UI.Pages.CreateTooltipsPage then
+        return UI.Pages.CreateTooltipsPage(parent)
     elseif key == "windows" and UI.Pages.CreateWindowsPage then
         return UI.Pages.CreateWindowsPage(parent)
     elseif key == "items" and UI.Pages.CreateItemsPage then

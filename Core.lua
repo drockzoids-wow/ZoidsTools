@@ -149,12 +149,14 @@ local defaults = {
         enabled = true,
         fontSize = 12,
         useQualityColor = true,
+        statTargetContext = "mythicplus",
         character = {
             itemLevel = true,
             gems = true,
             enchants = true,
             missingEnchant = true,
             gemTooltips = true,
+            statTargets = true,
         },
         bags = {
             itemLevel = true,
@@ -592,6 +594,10 @@ eventFrame:SetScript("OnEvent", function(_, event, addonName)
 
         if ns.InitializeItemOverlays then
             ns:InitializeItemOverlays()
+        end
+
+        if ns.InitializeStatTargets then
+            ns:InitializeStatTargets()
         end
 
         if ns.InitializeQuestAutomation then

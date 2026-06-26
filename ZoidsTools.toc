@@ -28,6 +28,8 @@ Modules\KeybindText.lua
 Modules\PerformanceWidget.lua
 Modules\Coordinates.lua
 Modules\ItemOverlays.lua
+Data\StatGoals.lua
+Modules\StatTargets.lua
 Modules\QuestAutomation.lua
 Modules\MinimapTools.lua
 Modules\Tooltips.lua

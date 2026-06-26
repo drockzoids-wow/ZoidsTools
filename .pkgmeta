@@ -8,6 +8,8 @@ ignore:
   - README.md
   - LICENSE
   - .pkgmeta
+  - .gitignore
+  - Tools
 
 curseforge:
   project-id: 1578016

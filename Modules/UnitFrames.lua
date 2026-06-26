@@ -296,6 +296,34 @@ local function AddUniqueFrame(list, seen, frame)
     list[#list + 1] = frame
 end
 
+local function IsNameplateFrame(frame)
+    local current = frame
+
+    for _ = 1, 10 do
+        if not current then
+            return false
+        end
+
+        if WorldFrame and current == WorldFrame then
+            return true
+        end
+
+        local name = current.GetName and current:GetName()
+
+        if type(name) == "string" then
+            local lowerName = string.lower(name)
+
+            if lowerName:find("nameplate", 1, true) or lowerName:find("compactnameplate", 1, true) then
+                return true
+            end
+        end
+
+        current = current.GetParent and current:GetParent()
+    end
+
+    return false
+end
+
 local function CanChangeFrame(frame)
     if InCombatLockdown and InCombatLockdown() and frame and frame.IsProtected and frame:IsProtected() then
         pendingProtectedRefresh = true
@@ -740,6 +768,10 @@ local function HideAuraFrame(frame)
         return
     end
 
+    if IsNameplateFrame(frame) then
+        return
+    end
+
     if not CanChangeFrame(frame) then
         return
     end
@@ -760,6 +792,10 @@ local function RestoreAuraFrame(frame)
     local state = frame and originalAuraState[frame]
 
     if not frame or not state then
+        return
+    end
+
+    if IsNameplateFrame(frame) then
         return
     end
 
@@ -890,6 +926,10 @@ local function LooksLikeAuraButton(child)
         return false
     end
 
+    if IsNameplateFrame(child) then
+        return false
+    end
+
     local name = child.GetName and child:GetName()
 
     if GetAuraKindFromName(name) then
@@ -952,6 +992,10 @@ end
 
 local function ScanChildrenForAuraFrames(root, list, seen, patterns, auraType, unit, depth)
     if not root or not root.GetChildren or depth <= 0 then
+        return
+    end
+
+    if IsNameplateFrame(root) then
         return
     end
 

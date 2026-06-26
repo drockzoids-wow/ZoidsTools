@@ -1,0 +1,3 @@
+Tools/
+Data/*.test.lua
+*.tmp

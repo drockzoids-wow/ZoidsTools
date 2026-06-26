@@ -60,6 +60,7 @@ function ns.UI.Pages.CreateItemsPage(parent)
             CreateItemOption("character", "gemTooltips", "Gem tooltips", "Tips"),
             CreateItemOption("character", "enchants", "Enchant status", "Enchants"),
             CreateItemOption("character", "missingEnchant", "Missing enchant highlight", "Missing"),
+            CreateItemOption("character", "statTargets", "Recommended stat comparison", "Stats"),
         },
         dropdownWidth
     )
@@ -81,7 +82,35 @@ function ns.UI.Pages.CreateItemsPage(parent)
     )
     bagBankOptions:SetPoint("TOPLEFT", characterOptions, "TOPRIGHT", UI.Layout.columnGap, 0)
 
-    local styleSection = UI.PlaceSection(frame, "Style", characterOptions)
+    local statTargetContext = UI.CreateDropdown(
+        frame,
+        "Stat goal source",
+        "Chooses which available per-spec recommended stat goal set to compare against.",
+        {
+            { value = "mythicplus", text = "Mythic+" },
+            { value = "raid", text = "Raid" },
+            { value = "pvp", text = "PvP" },
+        },
+        function()
+            return ns.GetStatTargetContext and ns:GetStatTargetContext() or "mythicplus"
+        end,
+        function(value)
+            if ns.SetStatTargetContext then
+                ns:SetStatTargetContext(value)
+            end
+
+            if frame.Refresh then
+                frame:Refresh()
+            end
+        end,
+        dropdownWidth
+    )
+    UI.PlaceDropdown(statTargetContext, characterOptions)
+
+    local status = UI.CreateStatusText(frame, 540)
+    UI.PlaceBelow(status, statTargetContext, 0, 16)
+
+    local styleSection = UI.PlaceSection(frame, "Style", status)
 
     local fontSize = UI.CreateSlider(
         frame,
@@ -132,8 +161,15 @@ function ns.UI.Pages.CreateItemsPage(parent)
         enabled:Refresh()
         characterOptions:Refresh()
         bagBankOptions:Refresh()
+        statTargetContext:Refresh()
         fontSize:Refresh()
         qualityColor:Refresh()
+
+        if ns.GetStatTargetStatusText then
+            status:SetText(ns:GetStatTargetStatusText())
+        else
+            status:SetText("")
+        end
     end
 
     frame:SetScript("OnShow", frame.Refresh)

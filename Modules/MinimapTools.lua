@@ -16,6 +16,7 @@ local squareApplied = false
 local mouseoverHideToken = 0
 local clockCalendarHooked = false
 local clockFontStore
+local difficultyHooks = {}
 
 local trackedButtons = {}
 local originalButtonPoints = {}
@@ -363,6 +364,28 @@ local function GetAddonCompartmentButton()
     return _G.AddonCompartmentFrame or (MinimapCluster and MinimapCluster.AddonCompartmentFrame)
 end
 
+local function AddUniqueWidget(list, seen, frame)
+    if frame and not seen[frame] then
+        seen[frame] = true
+        list[#list + 1] = frame
+    end
+end
+
+local function GetDifficultyFrames()
+    local frames = {}
+    local seen = {}
+    local cluster = _G.MinimapCluster
+
+    AddUniqueWidget(frames, seen, _G.MiniMapInstanceDifficulty)
+    AddUniqueWidget(frames, seen, _G.GuildInstanceDifficulty)
+    AddUniqueWidget(frames, seen, _G.InstanceDifficultyFrame)
+    AddUniqueWidget(frames, seen, cluster and cluster.InstanceDifficulty)
+    AddUniqueWidget(frames, seen, cluster and cluster.GuildInstanceDifficulty)
+    AddUniqueWidget(frames, seen, cluster and cluster.DifficultyFrame)
+
+    return frames
+end
+
 local function GetFirstFontString(frame)
     if not frame or not frame.GetRegions then
         return nil
@@ -589,6 +612,51 @@ local function MoveMinimapCornerWidget(key, frame)
     return true
 end
 
+local function PositionDifficultyFrames()
+    if not Minimap then
+        return
+    end
+
+    local db = EnsureMinimapDB()
+
+    if not db or db.moveHeader ~= true then
+        return
+    end
+
+    local visibleIndex = 0
+
+    for _, frame in ipairs(GetDifficultyFrames()) do
+        local key = "difficulty_" .. (frame.GetName and frame:GetName() or tostring(frame))
+        originalWidgetPoints[key] = originalWidgetPoints[key] or {}
+        SaveFramePoints(frame, originalWidgetPoints[key])
+
+        if not difficultyHooks[frame] and frame.HookScript then
+            difficultyHooks[frame] = true
+            frame:HookScript("OnShow", PositionDifficultyFrames)
+            frame:HookScript("OnHide", PositionDifficultyFrames)
+        end
+
+        frame:SetParent(Minimap)
+        frame:ClearAllPoints()
+        frame:SetFrameLevel((Minimap:GetFrameLevel() or 0) + 13)
+
+        if frame.IsShown and frame:IsShown() then
+            visibleIndex = visibleIndex + 1
+            frame:SetPoint("TOPRIGHT", Minimap, "TOPRIGHT", -5 - ((visibleIndex - 1) * 24), -5)
+        else
+            frame:SetPoint("TOPRIGHT", Minimap, "TOPRIGHT", -5, -5)
+        end
+    end
+end
+
+local function RestoreDifficultyFrames()
+    for _, frame in ipairs(GetDifficultyFrames()) do
+        local key = "difficulty_" .. (frame.GetName and frame:GetName() or tostring(frame))
+
+        RestoreFramePoints(frame, originalWidgetPoints[key])
+    end
+end
+
 local function AnchorHeaderRightWidget(frame, rightAnchor, bar)
     if rightAnchor == bar then
         frame:SetPoint("RIGHT", bar, "RIGHT", -6, 0)
@@ -690,6 +758,8 @@ local function ApplyInfoBar(enabled)
             addonButton:SetFrameLevel(bar:GetFrameLevel() + 3)
         end
 
+        PositionDifficultyFrames()
+
         if calendarButton then
             originalWidgetPoints.calendar = originalWidgetPoints.calendar or {}
             SaveFramePoints(calendarButton, originalWidgetPoints.calendar)
@@ -721,6 +791,7 @@ local function ApplyInfoBar(enabled)
         RestoreFramePoints(trackingButton, originalWidgetPoints.tracking)
         RestoreFramePoints(calendarButton, originalWidgetPoints.calendar)
         RestoreFramePoints(addonButton, originalWidgetPoints.addon)
+        RestoreDifficultyFrames()
         RestoreOriginalShown(zoneButton)
         RestoreOriginalShown(calendarButton)
 

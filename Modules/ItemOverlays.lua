@@ -1294,6 +1294,10 @@ function ns:SetItemOverlaysEnabled(value)
 
     db.enabled = value == true
     ns:RefreshItemOverlays()
+
+    if ns.RefreshStatTargets then
+        ns:RefreshStatTargets()
+    end
 end
 
 function ns:GetItemOverlaysEnabled()
@@ -1312,6 +1316,10 @@ function ns:SetItemOverlaySetting(sectionName, key, value)
 
     section[key] = value == true
     ns:RefreshItemOverlays()
+
+    if ns.RefreshStatTargets then
+        ns:RefreshStatTargets()
+    end
 end
 
 function ns:GetItemOverlaySetting(sectionName, key)

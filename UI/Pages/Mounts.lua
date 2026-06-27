@@ -225,9 +225,9 @@ function ns.UI.Pages.CreateMountsPage(parent)
     local Theme = UI.Theme
     local frame = UI.CreatePageFrame(parent)
     local controls = {}
-    local leftWidth = 270
-    local rightX = 326
-    local rightWidth = 220
+    local leftWidth = 286
+    local rightX = 342
+    local rightWidth = 236
 
     local smartSection = UI.PlaceSection(frame, "Smart Mount", nil, leftWidth)
 
@@ -252,7 +252,7 @@ function ns.UI.Pages.CreateMountsPage(parent)
     currentPreferred:SetWidth(leftWidth - 20)
     currentPreferred:SetJustifyH("LEFT")
 
-    local searchBox = CreateSearchBox(frame, 190)
+    local searchBox = CreateSearchBox(frame, 202)
     searchBox:SetPoint("TOPLEFT", currentPreferred, "BOTTOMLEFT", 4, -8)
     AddPlaceholder(searchBox, "Type a mount name...")
 
@@ -261,7 +261,7 @@ function ns.UI.Pages.CreateMountsPage(parent)
 
     local results = CreateFrame("Frame", nil, frame, "BackdropTemplate")
     results:SetPoint("TOPLEFT", searchBox, "BOTTOMLEFT", -4, -8)
-    results:SetSize(278, 40)
+    results:SetSize(leftWidth, 40)
     results:SetFrameStrata("DIALOG")
     results:SetToplevel(true)
     results:SetBackdrop({
@@ -278,7 +278,7 @@ function ns.UI.Pages.CreateMountsPage(parent)
 
     results.emptyText = results:CreateFontString(nil, "ARTWORK", "GameFontDisableSmall")
     results.emptyText:SetPoint("TOPLEFT", results, "TOPLEFT", 10, -10)
-    results.emptyText:SetWidth(250)
+    results.emptyText:SetWidth(leftWidth - 28)
     results.emptyText:SetJustifyH("LEFT")
     results.emptyText:SetText("No collected mounts match.")
     results.emptyText:Hide()
@@ -436,7 +436,7 @@ function ns.UI.Pages.CreateMountsPage(parent)
         end
     end)
 
-    local historyStatus = UI.CreateStatusText(frame, 190)
+    local historyStatus = UI.CreateStatusText(frame, rightX - 18 - 128 - 18)
     historyStatus:SetPoint("LEFT", resetRecent, "RIGHT", 14, 0)
 
     local serviceSection = UI.PlaceSection(frame, "Service Mounts", nil, rightWidth)

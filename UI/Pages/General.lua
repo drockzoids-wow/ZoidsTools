@@ -6,10 +6,10 @@ ns.UI.Pages = ns.UI.Pages or {}
 function ns.UI.Pages.CreateGeneralPage(parent)
     local UI = ns.UI
     local frame = UI.CreatePageFrame(parent)
-    local leftWidth = 295
-    local rightX = 300
-    local rightWidth = 240
-    local controlWidth = 205
+    local leftWidth = 300
+    local rightX = 332
+    local rightWidth = 258
+    local controlWidth = 218
 
     local interfaceSection = UI.PlaceSection(frame, "Interface", nil, leftWidth)
 

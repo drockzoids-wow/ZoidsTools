@@ -11,7 +11,7 @@ function ns.UI.Pages.CreateAboutPage(parent)
 
     local body = UI.CreateBodyText(
         frame,
-        "ZoidsTools\nBy Drockzoids\n\nSlash commands: /zt, /zoids, /zoidstools\n\nQuick pages: /zt tooltips, /zt items, /zt combat, /zt unitframes, /zt macros, /zt mounts, /zt loot, /zt quests\n\nUtility commands: /zt coords on/off, /zt mapcoords on/off, /zt refreshmacros",
+        "ZoidsTools\nBy Drockzoids\n\nSlash commands: \n    /zt \n    /zoids \n    /zoidstools\n\nQuick pages: \n    /zt tooltips \n    /zt items \n    /zt combat \n    /zt unitframes \n    /zt macros \n    /zt mounts \n    /zt loot \n    /zt quests\n\nUtility commands: \n    /zt coords on/off \n    /zt mapcoords on/off \n    /zt refreshmacros",
         500
     )
     UI.PlaceFirst(body, infoSection)

@@ -27,6 +27,7 @@ local defaults = {
         autoSellGrey = false,
         autoSellBoEGrey = false,
         autoRepairMode = "disabled",
+        knownItemOverlay = false,
     },
     quests = {
         autoAccept = false,

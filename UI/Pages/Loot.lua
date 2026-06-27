@@ -76,6 +76,21 @@ function ns.UI.Pages.CreateLootPage(parent)
     )
     UI.PlaceBelow(autoSellBoEGrey, autoSellGrey)
 
+    local knownMerchantOverlay = UI.CreateCheckbox(
+        frame,
+        "Mark already-known vendor items",
+        "Marks merchant items and patterns you already know with a subtle green row tint and a small item checkmark.",
+        function()
+            return ns.GetKnownMerchantItemOverlay and ns:GetKnownMerchantItemOverlay()
+        end,
+        function(value)
+            if ns.SetKnownMerchantItemOverlay then
+                ns:SetKnownMerchantItemOverlay(value)
+            end
+        end
+    )
+    UI.PlaceBelow(knownMerchantOverlay, autoSellBoEGrey)
+
     local repairOptions = ns.GetAutoRepairModeOptions and ns:GetAutoRepairModeOptions() or {
         { value = "disabled", text = "Disabled" },
         { value = "personal", text = "Use My Gold" },
@@ -97,13 +112,14 @@ function ns.UI.Pages.CreateLootPage(parent)
         end,
         220
     )
-    UI.PlaceDropdown(autoRepair, autoSellBoEGrey)
+    UI.PlaceDropdown(autoRepair, knownMerchantOverlay)
 
     function frame:Refresh()
         fastLoot:Refresh()
         carefulMode:Refresh()
         autoSellGrey:Refresh()
         autoSellBoEGrey:Refresh()
+        knownMerchantOverlay:Refresh()
         autoRepair:Refresh()
 
         if ns.GetFastLootEnabled and ns:GetFastLootEnabled() then

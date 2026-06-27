@@ -103,13 +103,21 @@ local function SafeNumber(value)
 end
 
 local function NormalizeText(text)
-    text = tostring(text or "")
-    text = text:gsub("|c%x%x%x%x%x%x%x%x", "")
-    text = text:gsub("|r", "")
-    text = text:gsub(":", "")
-    text = text:gsub("^%s+", "")
-    text = text:gsub("%s+$", "")
-    return string.lower(text)
+    local ok, normalized = pcall(function()
+        text = tostring(text or "")
+        text = text:gsub("|c%x%x%x%x%x%x%x%x", "")
+        text = text:gsub("|r", "")
+        text = text:gsub(":", "")
+        text = text:gsub("^%s+", "")
+        text = text:gsub("%s+$", "")
+        return string.lower(text)
+    end)
+
+    if ok and type(normalized) == "string" then
+        return normalized
+    end
+
+    return nil
 end
 
 local LABEL_TO_KEY = {}
@@ -307,6 +315,10 @@ end
 
 local function LooksLikeStatValue(text)
     text = NormalizeText(text)
+
+    if not text then
+        return false
+    end
 
     return text == ""
         or text:find("%%", 1, true) ~= nil
@@ -754,11 +766,7 @@ local function SetRowValueText(row, statKey, defaultText)
         return false
     end
 
-    if defaultText and defaultText ~= "" then
-        row.ZTStatTargetDefaultText = defaultText
-    elseif not row.ZTStatTargetDefaultText then
-        row.ZTStatTargetDefaultText = valueFont:GetText()
-    end
+    row.ZTStatTargetDefaultText = FormatDefaultPercent(statKey) or ""
 
     if not IsEnabled() then
         RestoreRow(row)
@@ -1163,15 +1171,8 @@ local function TrackStatRow(row)
         return
     end
 
-    local valueFont = FindValueFont(row)
-    local currentText = valueFont and valueFont:GetText()
-
-    if row.ZTStatTargetKey ~= statKey
-        or (currentText and currentText ~= "" and currentText ~= row.ZTStatTargetRenderedText) then
-        row.ZTStatTargetDefaultText = currentText
-    end
-
     row.ZTStatTargetKey = statKey
+    row.ZTStatTargetDefaultText = FormatDefaultPercent(statKey) or ""
     trackedRows[row] = true
     UpdateStatRow(row)
 end
@@ -1243,7 +1244,7 @@ local function OnSetLabelAndText(row, label, text)
     end
 
     row.ZTStatTargetKey = statKey
-    row.ZTStatTargetDefaultText = text or FormatDefaultPercent(statKey)
+    row.ZTStatTargetDefaultText = FormatDefaultPercent(statKey) or ""
     trackedRows[row] = true
 
     SetRowValueText(row, statKey, row.ZTStatTargetDefaultText)

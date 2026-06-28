@@ -8,6 +8,7 @@ local initialized = false
 local mountTypeIDByMountID = {}
 local mountIDByAuraName
 local targetMatchButton
+local lastDryTime = 0
 
 local TARGET_MATCH_BUTTON_NAME = "ZoidsToolsTargetMountMatchButton"
 local TARGET_MATCH_BUTTON_SIZE = 56
@@ -55,6 +56,9 @@ local FLYING_MOUNT_TYPES = {
 
 local WATER_MOUNT_TYPES = {
     [231] = true,
+    [232] = true,
+    [254] = true,
+    [407] = true,
 }
 
 local RIDE_ALONG_MOUNT_POOLS = {
@@ -725,21 +729,43 @@ local function HasActiveUnderwaterBreathTimer()
     return scale ~= nil and scale < 0
 end
 
+local function UpdateWaterSurfaceState()
+    if not IsSubmerged or not GetTime then
+        return
+    end
+
+    if not IsSubmerged() then
+        lastDryTime = GetTime()
+    end
+end
+
+local function IsPlayerFloatingAtSurface()
+    if not IsSubmerged or not GetTime or not IsSubmerged() then
+        return false
+    end
+
+    return not HasActiveUnderwaterBreathTimer() and GetTime() - (lastDryTime or 0) < 1.0
+end
+
 local function IsPlayerSwimmingAtSurface()
     if not IsSwimming or not IsSwimming() then
         return false
+    end
+
+    if IsSubmerged then
+        return IsSubmerged() ~= true or IsPlayerFloatingAtSurface()
     end
 
     return not HasActiveUnderwaterBreathTimer()
 end
 
 local function IsPlayerSubmergedForMounts()
-    if HasActiveUnderwaterBreathTimer() then
-        return true
+    if IsSubmerged then
+        return IsSubmerged() == true and not IsPlayerFloatingAtSurface()
     end
 
-    if IsSubmerged then
-        return IsSubmerged() == true and not IsPlayerSwimmingAtSurface()
+    if HasActiveUnderwaterBreathTimer() then
+        return true
     end
 
     return false
@@ -1138,18 +1164,20 @@ local function AddMountToPools(pools, mountID)
 
     if isWater then
         pools.water[#pools.water + 1] = mountID
-    else
+    end
+
+    if not isWater then
         pools.nonWater[#pools.nonWater + 1] = mountID
+    end
 
-        if isFlying then
-            pools.flying[#pools.flying + 1] = mountID
+    if isFlying then
+        pools.flying[#pools.flying + 1] = mountID
 
-            if pools.canFly and (pools.isSurface or pools.isFlyableWater) then
-                pools.surfaceFlying[#pools.surfaceFlying + 1] = mountID
-            end
-        else
-            pools.ground[#pools.ground + 1] = mountID
+        if pools.canFly and (pools.isSurface or pools.isFlyableWater) then
+            pools.surfaceFlying[#pools.surfaceFlying + 1] = mountID
         end
+    elseif not isWater then
+        pools.ground[#pools.ground + 1] = mountID
     end
 end
 
@@ -1157,6 +1185,7 @@ local function BuildRandomMountPools()
     local db = EnsureDB()
 
     EnsureMountJournalLoaded()
+    UpdateWaterSurfaceState()
 
     local pools = {
         all = {},
@@ -1180,10 +1209,12 @@ local function BuildRandomMountPools()
         for _, mountID in ipairs(C_MountJournal.GetMountIDs()) do
             local details = GetMountDetails(mountID)
 
+            local allowUnusableWaterMount = pools.isUnderwater and IsWaterMount(details and details.mountID)
+
             if details
                 and details.name
                 and details.isCollected
-                and (not requireUsable or details.isUsable)
+                and (not requireUsable or details.isUsable or allowUnusableWaterMount)
                 and (db.excludeServiceMountsFromRandom ~= true or not IsServiceMountName(details.name)) then
                 AddMountToPools(pools, details.mountID)
             end
@@ -1202,12 +1233,12 @@ end
 local function GetPreferredRandomPool(pools)
     local db = EnsureDB()
 
-    if pools.isUnderwater and #pools.water > 0 then
-        return pools.water
-    end
-
     if pools.isFlyableWater and pools.canFly and #pools.surfaceFlying > 0 then
         return pools.surfaceFlying
+    end
+
+    if pools.isUnderwater and #pools.water > 0 then
+        return pools.water
     end
 
     if pools.isSurface and pools.canFly and #pools.surfaceFlying > 0 then
@@ -1248,6 +1279,10 @@ local function PickSmartMountID()
 
     if pools.unavailable then
         return nil, "Mount journal is unavailable."
+    end
+
+    if pools.isFlyableWater and pools.canFly and #pools.surfaceFlying > 0 then
+        return PickMountFromPool(pools.surfaceFlying)
     end
 
     if pools.isUnderwater and #pools.water > 0 then
@@ -1723,9 +1758,13 @@ function ns:InitializeMounts()
     eventFrame:RegisterEvent("ZONE_CHANGED")
     eventFrame:RegisterEvent("ZONE_CHANGED_INDOORS")
     eventFrame:RegisterEvent("ZONE_CHANGED_NEW_AREA")
+    eventFrame:RegisterEvent("MOUNT_JOURNAL_USABILITY_CHANGED")
+    eventFrame:RegisterEvent("PLAYER_STARTED_MOVING")
+    eventFrame:RegisterEvent("PLAYER_STOPPED_MOVING")
     eventFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
     eventFrame:SetScript("OnEvent", function()
         EnsureDB()
+        UpdateWaterSurfaceState()
         UpdateSmartButton()
     end)
 end

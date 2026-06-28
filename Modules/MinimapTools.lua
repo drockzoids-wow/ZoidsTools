@@ -17,6 +17,7 @@ local mouseoverHideToken = 0
 local clockCalendarHooked = false
 local clockFontStore
 local difficultyHooks = {}
+local mailHooked = false
 
 local trackedButtons = {}
 local originalButtonPoints = {}
@@ -364,6 +365,10 @@ local function GetAddonCompartmentButton()
     return _G.AddonCompartmentFrame or (MinimapCluster and MinimapCluster.AddonCompartmentFrame)
 end
 
+local function GetMailFrame()
+    return _G.MiniMapMailFrame or (MinimapCluster and (MinimapCluster.MailFrame or MinimapCluster.MailButton))
+end
+
 local function AddUniqueWidget(list, seen, frame)
     if frame and not seen[frame] then
         seen[frame] = true
@@ -657,6 +662,37 @@ local function RestoreDifficultyFrames()
     end
 end
 
+local function PositionMailFrame()
+    if not Minimap then
+        return
+    end
+
+    local db = EnsureMinimapDB()
+    local mailFrame = GetMailFrame()
+
+    if not mailFrame or not db or db.moveHeader ~= true then
+        return
+    end
+
+    originalWidgetPoints.mail = originalWidgetPoints.mail or {}
+    SaveFramePoints(mailFrame, originalWidgetPoints.mail)
+
+    if not mailHooked and mailFrame.HookScript then
+        mailHooked = true
+        mailFrame:HookScript("OnShow", PositionMailFrame)
+    end
+
+    mailFrame:SetParent(Minimap)
+    mailFrame:ClearAllPoints()
+    mailFrame:SetSize(28, 28)
+    mailFrame:SetPoint("TOPLEFT", Minimap, "TOPLEFT", 5, -5)
+    mailFrame:SetFrameLevel((Minimap:GetFrameLevel() or 0) + 14)
+end
+
+local function RestoreMailFrame()
+    RestoreFramePoints(GetMailFrame(), originalWidgetPoints.mail)
+end
+
 local function AnchorHeaderRightWidget(frame, rightAnchor, bar)
     if rightAnchor == bar then
         frame:SetPoint("RIGHT", bar, "RIGHT", -6, 0)
@@ -759,6 +795,7 @@ local function ApplyInfoBar(enabled)
         end
 
         PositionDifficultyFrames()
+        PositionMailFrame()
 
         if calendarButton then
             originalWidgetPoints.calendar = originalWidgetPoints.calendar or {}
@@ -792,6 +829,7 @@ local function ApplyInfoBar(enabled)
         RestoreFramePoints(calendarButton, originalWidgetPoints.calendar)
         RestoreFramePoints(addonButton, originalWidgetPoints.addon)
         RestoreDifficultyFrames()
+        RestoreMailFrame()
         RestoreOriginalShown(zoneButton)
         RestoreOriginalShown(calendarButton)
 

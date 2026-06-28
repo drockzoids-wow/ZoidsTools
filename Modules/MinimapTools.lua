@@ -17,7 +17,8 @@ local mouseoverHideToken = 0
 local clockCalendarHooked = false
 local clockFontStore
 local difficultyHooks = {}
-local mailHooked = false
+local mailHooks = {}
+local mailPositioningDeferred = false
 
 local trackedButtons = {}
 local originalButtonPoints = {}
@@ -36,6 +37,7 @@ local COLLECTED_BUTTON_GAP = 6
 local DEFAULT_COLLECTOR_ANGLE = -45
 local COLLECTOR_RADIUS = COLLECTOR_SIZE / 2
 local INFO_BAR_HEIGHT = 42
+local MAIL_ICON_SIZE = 32
 
 local minimapShapes = {
     ROUND = { true, true, true, true },
@@ -366,7 +368,12 @@ local function GetAddonCompartmentButton()
 end
 
 local function GetMailFrame()
-    return _G.MiniMapMailFrame or (MinimapCluster and (MinimapCluster.MailFrame or MinimapCluster.MailButton))
+    local cluster = _G.MinimapCluster
+    local indicator = cluster and cluster.IndicatorFrame
+
+    return (indicator and indicator.MailFrame)
+        or _G.MiniMapMailFrame
+        or (cluster and (cluster.MailFrame or cluster.MailButton))
 end
 
 local function AddUniqueWidget(list, seen, frame)
@@ -374,6 +381,20 @@ local function AddUniqueWidget(list, seen, frame)
         seen[frame] = true
         list[#list + 1] = frame
     end
+end
+
+local function GetMailFrames()
+    local frames = {}
+    local seen = {}
+    local cluster = _G.MinimapCluster
+    local indicator = cluster and cluster.IndicatorFrame
+
+    AddUniqueWidget(frames, seen, indicator and indicator.MailFrame)
+    AddUniqueWidget(frames, seen, _G.MiniMapMailFrame)
+    AddUniqueWidget(frames, seen, cluster and cluster.MailFrame)
+    AddUniqueWidget(frames, seen, cluster and cluster.MailButton)
+
+    return frames
 end
 
 local function GetDifficultyFrames()
@@ -662,35 +683,63 @@ local function RestoreDifficultyFrames()
     end
 end
 
-local function PositionMailFrame()
+local PositionMailFrame
+
+local function SchedulePositionMailFrame()
+    if mailPositioningDeferred or not C_Timer or not C_Timer.After then
+        return
+    end
+
+    mailPositioningDeferred = true
+    C_Timer.After(0.05, function()
+        mailPositioningDeferred = false
+
+        if PositionMailFrame then
+            PositionMailFrame()
+        end
+    end)
+end
+
+PositionMailFrame = function()
     if not Minimap then
         return
     end
 
     local db = EnsureMinimapDB()
-    local mailFrame = GetMailFrame()
+    local mailFrames = GetMailFrames()
 
-    if not mailFrame or not db or db.moveHeader ~= true then
+    if #mailFrames == 0 or not db or db.moveHeader ~= true then
         return
     end
 
     originalWidgetPoints.mail = originalWidgetPoints.mail or {}
-    SaveFramePoints(mailFrame, originalWidgetPoints.mail)
 
-    if not mailHooked and mailFrame.HookScript then
-        mailHooked = true
-        mailFrame:HookScript("OnShow", PositionMailFrame)
+    for _, mailFrame in ipairs(mailFrames) do
+        originalWidgetPoints.mail[mailFrame] = originalWidgetPoints.mail[mailFrame] or {}
+        SaveFramePoints(mailFrame, originalWidgetPoints.mail[mailFrame])
+
+        if not mailHooks[mailFrame] and mailFrame.HookScript then
+            mailHooks[mailFrame] = true
+            mailFrame:HookScript("OnShow", SchedulePositionMailFrame)
+        end
+
+        local anchorFrame = squareBorder or Minimap
+
+        mailFrame:ClearAllPoints()
+        mailFrame:SetSize(MAIL_ICON_SIZE, MAIL_ICON_SIZE)
+        mailFrame:SetPoint("TOPLEFT", anchorFrame, "TOPLEFT", 5, -5)
+        mailFrame:SetFrameLevel((Minimap:GetFrameLevel() or 0) + 14)
     end
-
-    mailFrame:SetParent(Minimap)
-    mailFrame:ClearAllPoints()
-    mailFrame:SetSize(28, 28)
-    mailFrame:SetPoint("TOPLEFT", Minimap, "TOPLEFT", 5, -5)
-    mailFrame:SetFrameLevel((Minimap:GetFrameLevel() or 0) + 14)
 end
 
 local function RestoreMailFrame()
-    RestoreFramePoints(GetMailFrame(), originalWidgetPoints.mail)
+    if not originalWidgetPoints.mail then
+        return
+    end
+
+    for _, mailFrame in ipairs(GetMailFrames()) do
+        RestoreFramePoints(mailFrame, originalWidgetPoints.mail[mailFrame])
+    end
 end
 
 local function AnchorHeaderRightWidget(frame, rightAnchor, bar)
@@ -796,6 +845,7 @@ local function ApplyInfoBar(enabled)
 
         PositionDifficultyFrames()
         PositionMailFrame()
+        SchedulePositionMailFrame()
 
         if calendarButton then
             originalWidgetPoints.calendar = originalWidgetPoints.calendar or {}

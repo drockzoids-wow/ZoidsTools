@@ -8,16 +8,19 @@ local Theme = UI.Theme
 local pages = {}
 local buttons = {}
 
-local WINDOW_WIDTH = 860
-local WINDOW_HEIGHT = 660
-local OUTER_MARGIN = 14
-local SIDEBAR_WIDTH = 194
-local SIDEBAR_TOP = -112
-local CONTENT_LEFT = OUTER_MARGIN + SIDEBAR_WIDTH + 16
-local HEADER_TOP = -56
+local WINDOW_WIDTH = 1020
+local WINDOW_HEIGHT = 720
+local OUTER_MARGIN = 16
+local SIDEBAR_WIDTH = 206
+local SIDEBAR_TOP = -104
+local SIDEBAR_BUTTON_HEIGHT = 31
+local SIDEBAR_BUTTON_SPACING = 34
+local SIDEBAR_BUTTON_TOP = -42
+local CONTENT_LEFT = OUTER_MARGIN + SIDEBAR_WIDTH + 18
+local HEADER_TOP = -52
 local CONTENT_TOP = SIDEBAR_TOP
-local CONTENT_RIGHT = -14
-local CONTENT_BOTTOM = 22
+local CONTENT_RIGHT = -16
+local CONTENT_BOTTOM = 24
 local TITLE_BADGE_SIZE = 68
 local TITLE_BADGE_ICON_SIZE = 54
 
@@ -26,6 +29,8 @@ local pageOrder = {
     { key = "tooltips", label = "Tooltips", description = "Unit tooltip appearance and player detail settings." },
     { key = "windows", label = "Windows", description = "Move Blizzard UI windows and default bags." },
     { key = "items", label = "Items", description = "Item level, gem, enchant, and binding overlays." },
+    { key = "professions", label = "Professions", description = "Molinari-style profession actions for hovered bag items." },
+    { key = "builds", label = "Grimoire", description = "Talent build suggestions from generated local data." },
     { key = "combat", label = "Combat", description = "Combat quality-of-life settings." },
     { key = "unitframes", label = "Unit Frames", description = "Blizzard unit frame health, castbar, and aura settings." },
     { key = "macros", label = "Macros", description = "Health, mana, and consumable macro settings." },
@@ -42,8 +47,8 @@ end
 
 function UI.CreatePageFrame(parent)
     local frame = CreateFrame("Frame", nil, parent)
-    frame:SetPoint("TOPLEFT", parent.contentPanel, "TOPLEFT", 16, -16)
-    frame:SetPoint("BOTTOMRIGHT", parent.contentPanel, "BOTTOMRIGHT", -16, 16)
+    frame:SetPoint("TOPLEFT", parent.contentPanel, "TOPLEFT", 20, -18)
+    frame:SetPoint("BOTTOMRIGHT", parent.contentPanel, "BOTTOMRIGHT", -20, 18)
     frame:Hide()
     return frame
 end
@@ -84,6 +89,10 @@ local function CreatePage(parent, key)
         return UI.Pages.CreateWindowsPage(parent)
     elseif key == "items" and UI.Pages.CreateItemsPage then
         return UI.Pages.CreateItemsPage(parent)
+    elseif key == "professions" and UI.Pages.CreateProfessionsPage then
+        return UI.Pages.CreateProfessionsPage(parent)
+    elseif key == "builds" and UI.Pages.CreateBuildsPage then
+        return UI.Pages.CreateBuildsPage(parent)
     elseif key == "combat" and UI.Pages.CreateCombatPage then
         return UI.Pages.CreateCombatPage(parent)
     elseif key == "unitframes" and UI.Pages.CreateUnitFramesPage then
@@ -141,8 +150,8 @@ function UI.RefreshVisiblePage()
 end
 
 local function CreateSidebarButton(parent, label, key, index)
-    local button = UI.CreateButton(parent.sidebar, label, SIDEBAR_WIDTH - 32, 34)
-    button:SetPoint("TOPLEFT", parent.sidebar, "TOPLEFT", 16, -48 - ((index - 1) * 38))
+    local button = UI.CreateButton(parent.sidebar, label, SIDEBAR_WIDTH - 28, SIDEBAR_BUTTON_HEIGHT)
+    button:SetPoint("TOPLEFT", parent.sidebar, "TOPLEFT", 14, SIDEBAR_BUTTON_TOP - ((index - 1) * SIDEBAR_BUTTON_SPACING))
     button:SetStyledTextAlign("LEFT")
 
     button:SetScript("OnClick", function()
@@ -321,6 +330,7 @@ local function CreateMainWindow()
     frame.pageDescription:SetPoint("TOPLEFT", frame.pageTitle, "BOTTOMLEFT", 0, -8)
     frame.pageDescription:SetPoint("RIGHT", frame.pageHeader, "RIGHT", 0, 0)
     frame.pageDescription:SetJustifyH("LEFT")
+    frame.pageDescription:SetTextColor(0.86, 0.82, 0.72)
 
     frame.contentPanel = CreateFrame("Frame", nil, frame, "BackdropTemplate")
     frame.contentPanel:SetPoint("TOPLEFT", frame, "TOPLEFT", CONTENT_LEFT, CONTENT_TOP)

@@ -108,7 +108,7 @@ function ns.UI.Pages.CreateMacrosPage(parent)
         end
     end)
 
-    local status = UI.CreateStatusText(frame, 600)
+    local status = UI.CreateStatusText(frame, 680)
     UI.PlaceBelow(status, refreshButton, 0, 18)
 
     function frame:Refresh()

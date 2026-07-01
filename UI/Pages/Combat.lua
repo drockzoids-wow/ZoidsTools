@@ -6,7 +6,7 @@ ns.UI.Pages = ns.UI.Pages or {}
 function ns.UI.Pages.CreateCombatPage(parent)
     local UI = ns.UI
     local frame = UI.CreatePageFrame(parent)
-    local rightX = 300
+    local rightX = 370
 
     local inputSection = UI.PlaceSection(frame, "Input")
 
@@ -44,7 +44,7 @@ function ns.UI.Pages.CreateCombatPage(parent)
     )
     rangeTint:SetPoint("TOPLEFT", inputSection, "BOTTOMLEFT", rightX, -UI.Layout.firstRowGap)
 
-    local status = UI.CreateStatusText(frame, 280)
+    local status = UI.CreateStatusText(frame, 340)
     UI.PlaceBelow(status, castOnKeyDown, 0, 18)
 
     local alertsSection = UI.PlaceSection(frame, "Alerts", status)
@@ -166,7 +166,7 @@ function ns.UI.Pages.CreateCombatPage(parent)
                 ns:SetKeybindTextFont(value)
             end
         end,
-        220
+        260
     )
     UI.PlaceDropdown(keybindFont, shortenKeybindText)
 
@@ -185,7 +185,7 @@ function ns.UI.Pages.CreateCombatPage(parent)
                 ns:SetKeybindTextFontSize(value)
             end
         end,
-        220,
+        260,
         function(value)
             return tostring(math.floor((value or 12) + 0.5))
         end
@@ -238,7 +238,7 @@ function ns.UI.Pages.CreateCombatPage(parent)
                 frame:Refresh()
             end
         end,
-        200
+        240
     )
     UI.PlaceBelow(keybindColor, useCustomColor, 0, 12)
 
@@ -277,7 +277,7 @@ function ns.UI.Pages.CreateCombatPage(parent)
                 ns:SetKeybindTextOutline(value)
             end
         end,
-        200
+        240
     )
     UI.PlaceDropdown(keybindOutline, boldKeybindText)
 

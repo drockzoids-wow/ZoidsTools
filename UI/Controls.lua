@@ -8,14 +8,14 @@ local controlCounter = 0
 
 UI.Layout = UI.Layout or {
     indent = 18,
-    rowGap = 8,
-    firstRowGap = 8,
-    controlGap = 14,
-    sectionGap = 30,
+    rowGap = 10,
+    firstRowGap = 10,
+    controlGap = 16,
+    sectionGap = 34,
     sliderIndent = 16,
-    sliderGap = 20,
-    buttonGap = 10,
-    columnGap = 30,
+    sliderGap = 22,
+    buttonGap = 12,
+    columnGap = 36,
 }
 
 function UI.CreateCheckbox(parent, label, tooltip, getter, setter)
@@ -78,8 +78,12 @@ local function SetStyledButtonState(button)
 
     if button.ZTTextAlign == "LEFT" then
         button.text:SetPoint("LEFT", button, "LEFT", 16 + (pushed and 1 or 0), pushed and -1 or 0)
+        button.text:SetPoint("RIGHT", button, "RIGHT", -12 + (pushed and 1 or 0), pushed and -1 or 0)
+        button.text:SetJustifyH("LEFT")
     else
-        button.text:SetPoint("CENTER", button, "CENTER", pushed and 1 or 0, pushed and -1 or 0)
+        button.text:SetPoint("LEFT", button, "LEFT", 12 + (pushed and 1 or 0), pushed and -1 or 0)
+        button.text:SetPoint("RIGHT", button, "RIGHT", -12 + (pushed and 1 or 0), pushed and -1 or 0)
+        button.text:SetJustifyH("CENTER")
     end
 
     if selected or hovered or pushed then
@@ -96,8 +100,9 @@ local function SetStyledButtonState(button)
 end
 
 function UI.CreateButton(parent, text, width, height)
+    local buttonHeight = height or 30
     local button = CreateFrame("Button", nil, parent, "BackdropTemplate")
-    button:SetSize(width or 120, height or 28)
+    button:SetSize(width or 132, buttonHeight)
     button:RegisterForClicks("AnyUp")
     button:SetBackdrop({
         bgFile = Theme and Theme.panelBg or "Interface\\DialogFrame\\UI-DialogBox-Background",
@@ -131,17 +136,21 @@ function UI.CreateButton(parent, text, width, height)
 
     button.leftCap = button:CreateTexture(nil, "ARTWORK")
     button.leftCap:SetPoint("LEFT", 6, 0)
-    button.leftCap:SetSize(2, height and math.max(height - 12, 8) or 16)
+    button.leftCap:SetSize(2, math.max(buttonHeight - 12, 8))
     button.leftCap:SetColorTexture(1, 0.82, 0.25, 0.26)
 
     button.rightCap = button:CreateTexture(nil, "ARTWORK")
     button.rightCap:SetPoint("RIGHT", -6, 0)
-    button.rightCap:SetSize(2, height and math.max(height - 12, 8) or 16)
+    button.rightCap:SetSize(2, math.max(buttonHeight - 12, 8))
     button.rightCap:SetColorTexture(1, 0.82, 0.25, 0.26)
 
     button.text = button:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     button.text:SetPoint("CENTER")
     button.text:SetText(text)
+
+    if button.text.SetWordWrap then
+        button.text:SetWordWrap(false)
+    end
 
     function button:SetText(value)
         self.text:SetText(value)
@@ -220,7 +229,7 @@ end
 
 function UI.CreateBodyText(parent, text, width)
     local body = parent:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
-    body:SetWidth(width or 500)
+    body:SetWidth(width or 650)
     body:SetJustifyH("LEFT")
     body:SetText(text)
     return body
@@ -228,7 +237,7 @@ end
 
 function UI.CreateStatusText(parent, width)
     local status = parent:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
-    status:SetWidth(width or 540)
+    status:SetWidth(width or 660)
     status:SetJustifyH("LEFT")
     return status
 end
@@ -266,10 +275,10 @@ end
 
 function UI.CreateDropdown(parent, label, tooltip, options, getter, setter, width)
     local control = CreateFrame("Frame", nil, parent)
-    local dropdownWidth = width or 220
-    local rowHeight = 24
+    local dropdownWidth = width or 240
+    local rowHeight = 26
 
-    control:SetSize(dropdownWidth, 52)
+    control:SetSize(dropdownWidth, 54)
 
     control.label = control:CreateFontString(nil, "ARTWORK", "GameFontNormal")
     control.label:SetPoint("TOPLEFT", 0, 0)
@@ -277,7 +286,7 @@ function UI.CreateDropdown(parent, label, tooltip, options, getter, setter, widt
 
     control.button = CreateFrame("Button", nil, control, "BackdropTemplate")
     control.button:SetPoint("TOPLEFT", control.label, "BOTTOMLEFT", 0, -6)
-    control.button:SetSize(dropdownWidth, 28)
+    control.button:SetSize(dropdownWidth, 30)
     control.button:RegisterForClicks("LeftButtonUp")
     control.button:SetBackdrop({
         bgFile = Theme and Theme.panelBg or "Interface\\DialogFrame\\UI-DialogBox-Background",
@@ -294,6 +303,10 @@ function UI.CreateDropdown(parent, label, tooltip, options, getter, setter, widt
     control.button.text:SetPoint("LEFT", control.button, "LEFT", 10, 0)
     control.button.text:SetPoint("RIGHT", control.button, "RIGHT", -30, 0)
     control.button.text:SetJustifyH("LEFT")
+
+    if control.button.text.SetWordWrap then
+        control.button.text:SetWordWrap(false)
+    end
 
     control.button.arrow = control.button:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     control.button.arrow:SetPoint("RIGHT", control.button, "RIGHT", -10, 0)
@@ -443,10 +456,10 @@ end
 
 function UI.CreateMultiSelectDropdown(parent, label, tooltip, options, width)
     local control = CreateFrame("Frame", nil, parent)
-    local dropdownWidth = width or 300
-    local rowHeight = 24
+    local dropdownWidth = width or 320
+    local rowHeight = 26
 
-    control:SetSize(dropdownWidth, 52)
+    control:SetSize(dropdownWidth, 54)
 
     control.label = control:CreateFontString(nil, "ARTWORK", "GameFontNormal")
     control.label:SetPoint("TOPLEFT", 0, 0)
@@ -454,7 +467,7 @@ function UI.CreateMultiSelectDropdown(parent, label, tooltip, options, width)
 
     control.button = CreateFrame("Button", nil, control, "BackdropTemplate")
     control.button:SetPoint("TOPLEFT", control.label, "BOTTOMLEFT", 0, -6)
-    control.button:SetSize(dropdownWidth, 28)
+    control.button:SetSize(dropdownWidth, 30)
     control.button:RegisterForClicks("LeftButtonUp")
     control.button:SetBackdrop({
         bgFile = Theme and Theme.panelBg or "Interface\\DialogFrame\\UI-DialogBox-Background",
@@ -471,6 +484,10 @@ function UI.CreateMultiSelectDropdown(parent, label, tooltip, options, width)
     control.button.text:SetPoint("LEFT", control.button, "LEFT", 10, 0)
     control.button.text:SetPoint("RIGHT", control.button, "RIGHT", -30, 0)
     control.button.text:SetJustifyH("LEFT")
+
+    if control.button.text.SetWordWrap then
+        control.button.text:SetWordWrap(false)
+    end
 
     control.button.arrow = control.button:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     control.button.arrow:SetPoint("RIGHT", control.button, "RIGHT", -10, 0)

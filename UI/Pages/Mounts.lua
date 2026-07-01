@@ -45,10 +45,10 @@ local function CreateDynamicDropdown(parent, label, tooltip, width, getOptions, 
     local UI = ns.UI
     local Theme = UI.Theme
     local control = CreateFrame("Frame", nil, parent)
-    local rowHeight = 24
+    local rowHeight = 26
     local dropdownWidth = width or 240
 
-    control:SetSize(dropdownWidth, 52)
+    control:SetSize(dropdownWidth, 54)
 
     control.label = control:CreateFontString(nil, "ARTWORK", "GameFontNormal")
     control.label:SetPoint("TOPLEFT", 0, 0)
@@ -56,7 +56,7 @@ local function CreateDynamicDropdown(parent, label, tooltip, width, getOptions, 
 
     control.button = CreateFrame("Button", nil, control, "BackdropTemplate")
     control.button:SetPoint("TOPLEFT", control.label, "BOTTOMLEFT", 0, -6)
-    control.button:SetSize(dropdownWidth, 28)
+    control.button:SetSize(dropdownWidth, 30)
     control.button:RegisterForClicks("LeftButtonUp")
     control.button:SetBackdrop({
         bgFile = Theme and Theme.panelBg or "Interface\\DialogFrame\\UI-DialogBox-Background",
@@ -73,6 +73,10 @@ local function CreateDynamicDropdown(parent, label, tooltip, width, getOptions, 
     control.button.text:SetPoint("LEFT", control.button, "LEFT", 10, 0)
     control.button.text:SetPoint("RIGHT", control.button, "RIGHT", -30, 0)
     control.button.text:SetJustifyH("LEFT")
+
+    if control.button.text.SetWordWrap then
+        control.button.text:SetWordWrap(false)
+    end
 
     control.button.arrow = control.button:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     control.button.arrow:SetPoint("RIGHT", control.button, "RIGHT", -10, 0)
@@ -225,9 +229,9 @@ function ns.UI.Pages.CreateMountsPage(parent)
     local Theme = UI.Theme
     local frame = UI.CreatePageFrame(parent)
     local controls = {}
-    local leftWidth = 286
-    local rightX = 342
-    local rightWidth = 236
+    local leftWidth = 340
+    local rightX = 410
+    local rightWidth = 300
 
     local smartSection = UI.PlaceSection(frame, "Smart Mount", nil, leftWidth)
 
@@ -252,7 +256,7 @@ function ns.UI.Pages.CreateMountsPage(parent)
     currentPreferred:SetWidth(leftWidth - 20)
     currentPreferred:SetJustifyH("LEFT")
 
-    local searchBox = CreateSearchBox(frame, 202)
+    local searchBox = CreateSearchBox(frame, 244)
     searchBox:SetPoint("TOPLEFT", currentPreferred, "BOTTOMLEFT", 4, -8)
     AddPlaceholder(searchBox, "Type a mount name...")
 
@@ -300,7 +304,7 @@ function ns.UI.Pages.CreateMountsPage(parent)
                 ns:SetMountRecentAvoidCount(value)
             end
         end,
-        230,
+        280,
         function(value)
             return tostring(math.floor((value or 0) + 0.5))
         end
@@ -584,11 +588,11 @@ function ns.UI.Pages.CreateMountsPage(parent)
 
             if not row then
                 row = CreateFrame("Frame", nil, results)
-                row:SetSize(260, 26)
+                row:SetSize(leftWidth - 20, 26)
 
                 row.text = row:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
                 row.text:SetPoint("LEFT", row, "LEFT", 0, 0)
-                row.text:SetWidth(188)
+                row.text:SetWidth(leftWidth - 92)
                 row.text:SetJustifyH("LEFT")
 
                 row.use = UI.CreateButton(row, "Use", 58, 24)

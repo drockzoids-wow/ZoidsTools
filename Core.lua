@@ -172,6 +172,25 @@ local defaults = {
             bindType = true,
         },
     },
+    talentGrimoire = {
+        enabled = true,
+        contentType = "mythicplus",
+        mythicPlusTarget = "all-dungeons",
+        raidTarget = "all-bosses",
+        pvpTarget = "3v3",
+        pvpMode = "popular",
+        mode = "popular",
+    },
+    professions = {
+        enabled = true,
+        activation = "alt",
+        actions = {
+            disenchant = true,
+            mill = true,
+            prospect = true,
+            open = true,
+        },
+    },
     performance = {
         enabled = true,
         updateInterval = 1,
@@ -278,6 +297,8 @@ local function PrintHelp()
     ns:Print("/zt coords reset resets the coordinates widget position.")
     ns:Print("/zt items opens item overlay options.")
     ns:Print("/zt iteminfo on/off toggles item overlays.")
+    ns:Print("/zt grimoire opens Talent Grimoire build options.")
+    ns:Print("/zt professions opens profession helper options.")
     ns:Print("/zt loot opens loot options.")
     ns:Print("/zt fastloot on/off toggles fast auto loot.")
     ns:Print("/zt autosell on/off toggles auto-sell grey items at vendors.")
@@ -311,6 +332,10 @@ local function HandleSlash(input)
         ns:OpenConfig("mounts")
     elseif input == "items" or input == "item" or input == "gear" then
         ns:OpenConfig("items")
+    elseif input == "grimoire" or input == "tome" or input == "builds" or input == "build" or input == "talents" then
+        ns:OpenConfig("builds")
+    elseif input == "professions" or input == "profession" or input == "molinari" then
+        ns:OpenConfig("professions")
     elseif input == "quests" or input == "quest" then
         ns:OpenConfig("quests")
     elseif input == "windows on" then
@@ -462,6 +487,16 @@ local function HandleSlash(input)
             ns:SetItemOverlaysEnabled(false)
             ns:Print("Item overlays disabled.")
         end
+    elseif input == "grimoire on" or input == "builds on" then
+        if ns.SetTalentGrimoireEnabled then
+            ns:SetTalentGrimoireEnabled(true)
+            ns:Print("Talent Grimoire panel enabled.")
+        end
+    elseif input == "grimoire off" or input == "builds off" then
+        if ns.SetTalentGrimoireEnabled then
+            ns:SetTalentGrimoireEnabled(false)
+            ns:Print("Talent Grimoire panel disabled.")
+        end
     elseif input == "keydown on" or input == "castkeydown on" then
         if ns.SetCastOnKeyDown and ns:SetCastOnKeyDown(true) then
             ns:Print("Action keybinds now cast on key down.")
@@ -599,6 +634,14 @@ eventFrame:SetScript("OnEvent", function(_, event, addonName)
 
         if ns.InitializeStatTargets then
             ns:InitializeStatTargets()
+        end
+
+        if ns.InitializeTalentGrimoire then
+            ns:InitializeTalentGrimoire()
+        end
+
+        if ns.InitializeProfessionHelper then
+            ns:InitializeProfessionHelper()
         end
 
         if ns.InitializeQuestAutomation then

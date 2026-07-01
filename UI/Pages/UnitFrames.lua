@@ -33,8 +33,8 @@ function ns.UI.Pages.CreateUnitFramesPage(parent)
     controls[#controls + 1] = classColorHealth
 
     local frameSection = UI.PlaceSection(frame, "Frame Controls", classColorHealth)
-    local columnWidth = 150
-    local columnGap = 34
+    local columnWidth = 188
+    local columnGap = 42
 
     for index, info in ipairs(frameColumns) do
         local x = UI.Layout.indent + ((index - 1) * (columnWidth + columnGap))
@@ -80,7 +80,7 @@ function ns.UI.Pages.CreateUnitFramesPage(parent)
                     ns:SetUnitFrameCastbarWidth(info.key, value)
                 end
             end,
-            138,
+            176,
             function(value)
                 return tostring(math.floor((value or 195) + 0.5))
             end
@@ -103,7 +103,7 @@ function ns.UI.Pages.CreateUnitFramesPage(parent)
                     ns:SetUnitFrameCastbarHeight(info.key, value)
                 end
             end,
-            138,
+            176,
             function(value)
                 return tostring(math.floor((value or 16) + 0.5))
             end

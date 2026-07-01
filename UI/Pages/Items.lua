@@ -6,7 +6,7 @@ ns.UI.Pages = ns.UI.Pages or {}
 function ns.UI.Pages.CreateItemsPage(parent)
     local UI = ns.UI
     local frame = UI.CreatePageFrame(parent)
-    local dropdownWidth = 250
+    local dropdownWidth = 300
 
     local function CreateItemOption(sectionName, key, text, shortText)
         return {
@@ -107,7 +107,7 @@ function ns.UI.Pages.CreateItemsPage(parent)
     )
     UI.PlaceDropdown(statTargetContext, characterOptions)
 
-    local status = UI.CreateStatusText(frame, 540)
+    local status = UI.CreateStatusText(frame, 680)
     UI.PlaceBelow(status, statTargetContext, 0, 16)
 
     local styleSection = UI.PlaceSection(frame, "Style", status)
@@ -127,7 +127,7 @@ function ns.UI.Pages.CreateItemsPage(parent)
                 ns:SetItemOverlayFontSize(value)
             end
         end,
-        220,
+        260,
         function(value)
             return tostring(math.floor((value or 12) + 0.5))
         end

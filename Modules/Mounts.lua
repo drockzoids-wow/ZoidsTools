@@ -9,11 +9,13 @@ local mountTypeIDByMountID = {}
 local mountIDByAuraName
 local targetMatchButton
 local lastDryTime = 0
+local lastCombatEndedAt = 0
 
 local TARGET_MATCH_BUTTON_NAME = "ZoidsToolsTargetMountMatchButton"
 local TARGET_MATCH_BUTTON_SIZE = 56
 local TARGET_MATCH_ICON_INSET = 4
 local TARGET_MATCH_DEFAULT_ICON = "Interface\\AddOns\\ZoidsTools\\Media\\ZoidToolsIcon.png"
+local POST_COMBAT_MOUNT_USABILITY_GRACE = 5
 
 local DRUID_TRAVEL_FORM_SPELL_ID = 783
 local DRUID_CAT_FORM_SPELL_ID = 768
@@ -225,6 +227,14 @@ local function IsPlayerInCombat()
     return UnitAffectingCombat and UnitAffectingCombat("player") == true
 end
 
+local function IsRecentlyOutOfCombat()
+    if not GetTime or lastCombatEndedAt <= 0 then
+        return false
+    end
+
+    return (GetTime() - lastCombatEndedAt) <= POST_COMBAT_MOUNT_USABILITY_GRACE
+end
+
 local function GetTargetMatchBlockReason()
     if IsPlayerInCombat() then
         return "Target matching pauses in combat."
@@ -372,6 +382,16 @@ local function GetMountDetails(mountID)
         isUsable = isUsable,
         isCollected = isCollected,
     }
+end
+
+local function GetMountSpellName(mountID)
+    local details = GetMountDetails(mountID)
+
+    if not details then
+        return nil
+    end
+
+    return GetSpellName(details.spellID) or details.name
 end
 
 local function StoreMountNameLookup(name, mountID)
@@ -908,6 +928,19 @@ local function RecordRecentMount(mountID)
     end
 end
 
+local function TrackSelectedMount(mountID)
+    local db = EnsureDB()
+    mountID = tonumber(mountID)
+
+    if not db or not mountID then
+        return
+    end
+
+    db.lastMountID = mountID
+    RecordMountUsage(mountID)
+    RecordRecentMount(mountID)
+end
+
 local function BuildRecentMountSet()
     local db = EnsureDB()
     local recentSet = {}
@@ -1023,16 +1056,13 @@ local function GetFallingRescueAction()
 end
 
 local function SummonTrackedMount(mountID)
-    local db = EnsureDB()
     mountID = tonumber(mountID)
 
-    if not db or not mountID then
+    if not mountID then
         return
     end
 
-    db.lastMountID = mountID
-    RecordMountUsage(mountID)
-    RecordRecentMount(mountID)
+    TrackSelectedMount(mountID)
 
     if C_MountJournal and C_MountJournal.SummonByID then
         C_MountJournal.SummonByID(mountID)
@@ -1058,7 +1088,7 @@ local function FindUsableMountByName(wantedName)
 
         if name
             and isCollected
-            and isUsable
+            and (isUsable or IsRecentlyOutOfCombat())
             and NormalizeMountName(name) == normalizedWanted then
             return mountID, name
         end
@@ -1210,11 +1240,12 @@ local function BuildRandomMountPools()
             local details = GetMountDetails(mountID)
 
             local allowUnusableWaterMount = pools.isUnderwater and IsWaterMount(details and details.mountID)
+            local allowRecentCombatMount = IsRecentlyOutOfCombat()
 
             if details
                 and details.name
                 and details.isCollected
-                and (not requireUsable or details.isUsable or allowUnusableWaterMount)
+                and (not requireUsable or details.isUsable or allowUnusableWaterMount or allowRecentCombatMount)
                 and (db.excludeServiceMountsFromRandom ~= true or not IsServiceMountName(details.name)) then
                 AddMountToPools(pools, details.mountID)
             end
@@ -1308,6 +1339,7 @@ end
 
 local SMART_MOUNT_MACRO_PREFIX = "/dismount [mounted]\n/stopmacro [mounted]\n/stopmacro [combat]\n"
 local DISMOUNT_MACRO = "/dismount [mounted]\n/stopmacro [mounted]"
+local smartButton
 
 local function BuildChatMessageMacro(message)
     return SMART_MOUNT_MACRO_PREFIX
@@ -1316,19 +1348,42 @@ local function BuildChatMessageMacro(message)
         .. ") end"
 end
 
-local function BuildSummonMountMacro(mountID)
-    return SMART_MOUNT_MACRO_PREFIX .. "/run ZoidsToolsMounts.SummonMount(" .. tostring(mountID) .. ")"
+local function ClearSmartButtonAction()
+    smartButton._ztSmartMountID = nil
+    smartButton:SetAttribute("type", nil)
+    smartButton:SetAttribute("spell", nil)
+    smartButton:SetAttribute("unit", nil)
+    smartButton:SetAttribute("macrotext", nil)
 end
 
-local function BuildSmartMountMacro()
+local function SetSmartButtonMacro(macroText)
+    smartButton._ztSmartMountID = nil
+    smartButton:SetAttribute("type", "macro")
+    smartButton:SetAttribute("macrotext", macroText)
+end
+
+local function SetSmartButtonSpell(spellName, unit, mountID)
+    smartButton._ztSmartMountID = mountID and tonumber(mountID) or nil
+    smartButton:SetAttribute("type", "spell")
+    smartButton:SetAttribute("spell", spellName)
+
+    if unit then
+        smartButton:SetAttribute("unit", unit)
+    end
+end
+
+local function ApplySmartMountAction()
     local db = EnsureDB()
+    ClearSmartButtonAction()
 
     if IsMounted and IsMounted() then
-        return DISMOUNT_MACRO
+        SetSmartButtonMacro(DISMOUNT_MACRO)
+        return
     end
 
     if not db or db.enabled == false then
-        return BuildChatMessageMacro("Smart mounting is disabled.")
+        SetSmartButtonMacro(BuildChatMessageMacro("Smart mounting is disabled."))
+        return
     end
 
     local class = PlayerClass()
@@ -1338,18 +1393,21 @@ local function BuildSmartMountMacro()
             local catFormName = GetSpellName(DRUID_CAT_FORM_SPELL_ID)
 
             if catFormName and IsSpellKnownByPlayer(DRUID_CAT_FORM_SPELL_ID) and SpellUsable(DRUID_CAT_FORM_SPELL_ID) then
-                return SMART_MOUNT_MACRO_PREFIX .. "/cast " .. catFormName
+                SetSmartButtonSpell(catFormName)
+                return
             end
         end
 
-        return BuildChatMessageMacro("You are indoors.")
+        SetSmartButtonMacro(BuildChatMessageMacro("You are indoors."))
+        return
     end
 
     if db.useDruidTravelForm and class == "DRUID" and not IsPlayerUnderwaterForMounts() then
         local travelFormName = GetSpellName(DRUID_TRAVEL_FORM_SPELL_ID)
 
         if travelFormName and IsSpellKnownByPlayer(DRUID_TRAVEL_FORM_SPELL_ID) and SpellUsable(DRUID_TRAVEL_FORM_SPELL_ID) then
-            return SMART_MOUNT_MACRO_PREFIX .. "/cast " .. travelFormName
+            SetSmartButtonSpell(travelFormName)
+            return
         end
     end
 
@@ -1357,20 +1415,26 @@ local function BuildSmartMountMacro()
         local soarName = GetSpellName(DRACTHYR_SOAR_SPELL_ID)
 
         if CanFlyHere() and soarName and IsSpellKnownByPlayer(DRACTHYR_SOAR_SPELL_ID) and SpellUsable(DRACTHYR_SOAR_SPELL_ID) then
-            return SMART_MOUNT_MACRO_PREFIX .. "/cast " .. soarName
+            SetSmartButtonSpell(soarName)
+            return
         end
     end
 
     local mountID, message = PickSmartMountID()
 
     if mountID then
-        return BuildSummonMountMacro(mountID)
+        local mountSpellName = GetMountSpellName(mountID)
+
+        if mountSpellName then
+            SetSmartButtonSpell(mountSpellName, nil, mountID)
+            return
+        end
     end
 
-    return BuildChatMessageMacro(message or "No usable mount found.")
+    SetSmartButtonMacro(BuildChatMessageMacro(message or "No usable mount found."))
 end
 
-local smartButton = CreateFrame("Button", "ZoidsToolsSmartMountButton", UIParent, "SecureActionButtonTemplate")
+smartButton = CreateFrame("Button", "ZoidsToolsSmartMountButton", UIParent, "SecureActionButtonTemplate")
 smartButton:RegisterForClicks("AnyDown", "AnyUp")
 smartButton:SetAttribute("type", nil)
 
@@ -1379,30 +1443,37 @@ local function UpdateSmartButton()
         return
     end
 
-    smartButton:SetAttribute("type", nil)
-    smartButton:SetAttribute("spell", nil)
-    smartButton:SetAttribute("unit", nil)
-    smartButton:SetAttribute("macrotext", nil)
-
     local fallingAction = GetFallingRescueAction()
 
     if fallingAction then
-        smartButton:SetAttribute("type", fallingAction.type)
-        smartButton:SetAttribute("spell", fallingAction.spell)
-
-        if fallingAction.unit then
-            smartButton:SetAttribute("unit", fallingAction.unit)
-        end
-
+        ClearSmartButtonAction()
+        SetSmartButtonSpell(fallingAction.spell, fallingAction.unit)
         return
     end
 
-    smartButton:SetAttribute("type", "macro")
-    smartButton:SetAttribute("macrotext", BuildSmartMountMacro())
+    ApplySmartMountAction()
+end
+
+local function QueueSmartButtonUpdate(delay)
+    if C_Timer and C_Timer.After then
+        C_Timer.After(delay or 0, UpdateSmartButton)
+    else
+        UpdateSmartButton()
+    end
 end
 
 smartButton:SetScript("PreClick", function()
-    UpdateSmartButton()
+    if IsFalling and IsFalling() then
+        UpdateSmartButton()
+    end
+end)
+
+smartButton:SetScript("PostClick", function(self)
+    if self._ztSmartMountID then
+        TrackSelectedMount(self._ztSmartMountID)
+    end
+
+    QueueSmartButtonUpdate(0.1)
 end)
 
 local function SummonServiceMount(serviceType)
@@ -1759,12 +1830,26 @@ function ns:InitializeMounts()
     eventFrame:RegisterEvent("ZONE_CHANGED_INDOORS")
     eventFrame:RegisterEvent("ZONE_CHANGED_NEW_AREA")
     eventFrame:RegisterEvent("MOUNT_JOURNAL_USABILITY_CHANGED")
+    eventFrame:RegisterEvent("PLAYER_MOUNT_DISPLAY_CHANGED")
     eventFrame:RegisterEvent("PLAYER_STARTED_MOVING")
     eventFrame:RegisterEvent("PLAYER_STOPPED_MOVING")
+    eventFrame:RegisterEvent("PLAYER_REGEN_DISABLED")
     eventFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
-    eventFrame:SetScript("OnEvent", function()
+    eventFrame:SetScript("OnEvent", function(_, event)
         EnsureDB()
         UpdateWaterSurfaceState()
+
+        if event == "PLAYER_REGEN_DISABLED" then
+            lastCombatEndedAt = 0
+        elseif event == "PLAYER_REGEN_ENABLED" then
+            lastCombatEndedAt = GetTime and GetTime() or 0
+            QueueSmartButtonUpdate(0.05)
+            QueueSmartButtonUpdate(0.25)
+            QueueSmartButtonUpdate(0.75)
+        elseif event == "PLAYER_MOUNT_DISPLAY_CHANGED" then
+            QueueSmartButtonUpdate(0.05)
+        end
+
         UpdateSmartButton()
     end)
 end

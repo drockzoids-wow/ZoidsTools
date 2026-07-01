@@ -62,9 +62,25 @@ local DEFAULT_MODE_BY_CONTENT = {
     pvp = "popular",
 }
 
+local DEFAULT_TARGET_BY_CONTENT = {
+    mythicplus = "all-dungeons",
+    raid = "all-bosses",
+    pvp = "icy-veins",
+}
+
+local PVP_MODE_SORT_ORDER = {
+    ["3v3"] = 10,
+    ["2v2"] = 20,
+    solo = 30,
+    blitz = 40,
+    battleground = 40,
+    rbg = 50,
+}
+
 local TARGET_SORT_ORDER = {
     ["all-dungeons"] = 0,
     ["all-bosses"] = 0,
+    ["icy-veins"] = 0,
     solo = 10,
     ["2v2"] = 20,
     ["3v3"] = 30,
@@ -212,9 +228,9 @@ local function EnsureDB()
 
     db.contentType = NormalizeContentType(db.contentType)
 
-    db.mythicPlusTarget = db.mythicPlusTarget or "all-dungeons"
-    db.raidTarget = db.raidTarget or "all-bosses"
-    db.pvpTarget = db.pvpTarget or "3v3"
+    db.mythicPlusTarget = db.mythicPlusTarget or DEFAULT_TARGET_BY_CONTENT.mythicplus
+    db.raidTarget = db.raidTarget or DEFAULT_TARGET_BY_CONTENT.raid
+    db.pvpTarget = db.pvpTarget or DEFAULT_TARGET_BY_CONTENT.pvp
     db.mythicPlusMode = db.mythicPlusMode or (db.mode == "lowkey" and "lowkey" or "highkey")
     db.raidMode = db.raidMode or ((db.mode == "normal" or db.mode == "heroic" or db.mode == "mythic") and db.mode or "mythic")
     db.pvpMode = db.pvpMode or "popular"
@@ -260,8 +276,103 @@ local function GetCurrentSpecData()
         specKey
 end
 
-local function GetModeOptions(contentType)
+local function GetPvpModeSortValue(option)
+    local value = string.lower(tostring(option and option.value or ""))
+    local text = string.lower(tostring(option and option.text or ""))
+
+    for key, order in pairs(PVP_MODE_SORT_ORDER) do
+        if string.find(value, key, 1, true) or string.find(text, key, 1, true) then
+            return order
+        end
+    end
+
+    return 100
+end
+
+local function FormatPvpModeLabel(label)
+    local text = tostring(label or "")
+
+    text = text:gsub("^Best%s+", "")
+    text = text:gsub("%s+Talents$", "")
+
+    if text == "" then
+        return tostring(label or "")
+    end
+
+    return text
+end
+
+local function GetFirstBuildKey(builds)
+    local firstKey
+
+    if type(builds) ~= "table" then
+        return nil
+    end
+
+    for buildKey in pairs(builds) do
+        if not firstKey or tostring(buildKey) < tostring(firstKey) then
+            firstKey = buildKey
+        end
+    end
+
+    return firstKey
+end
+
+local function GetPvpBuildsForTarget(targetKey)
+    local specData = GetCurrentSpecData()
+    local pvpData = specData and specData.pvp
+    local targetData = pvpData and pvpData[targetKey or ""]
+
+    if not targetData and pvpData then
+        for fallbackTargetKey, fallbackTargetData in pairs(pvpData) do
+            targetKey = fallbackTargetKey
+            targetData = fallbackTargetData
+            break
+        end
+    end
+
+    return targetData and targetData.builds, targetKey, targetData
+end
+
+local function GetModeOptions(contentType, targetKey)
     contentType = NormalizeContentType(contentType)
+
+    if contentType == "pvp" then
+        if not targetKey then
+            local db = ns.db and ns.db.talentGrimoire
+            targetKey = db and db.pvpTarget or DEFAULT_TARGET_BY_CONTENT.pvp
+        end
+
+        local builds = GetPvpBuildsForTarget(targetKey)
+        local options = {}
+
+        if type(builds) == "table" then
+            for buildKey, entry in pairs(builds) do
+                local label = type(entry) == "table" and (entry.modeLabel or entry.title) or TitleCase(buildKey)
+
+                options[#options + 1] = {
+                    value = buildKey,
+                    text = FormatPvpModeLabel(label),
+                }
+            end
+        end
+
+        table.sort(options, function(left, right)
+            local leftOrder = GetPvpModeSortValue(left)
+            local rightOrder = GetPvpModeSortValue(right)
+
+            if leftOrder ~= rightOrder then
+                return leftOrder < rightOrder
+            end
+
+            return tostring(left.text) < tostring(right.text)
+        end)
+
+        if #options > 0 then
+            return options
+        end
+    end
+
     return MODE_OPTIONS_BY_CONTENT[contentType] or MODE_OPTIONS_BY_CONTENT.mythicplus
 end
 
@@ -281,13 +392,15 @@ local function GetModeKey(contentType)
         value = db.pvpMode
     end
 
-    for _, option in ipairs(GetModeOptions(contentType)) do
+    local options = GetModeOptions(contentType)
+
+    for _, option in ipairs(options) do
         if option.value == value then
             return value
         end
     end
 
-    return DEFAULT_MODE_BY_CONTENT[contentType]
+    return options[1] and options[1].value or DEFAULT_MODE_BY_CONTENT[contentType]
 end
 
 local function SetModeKey(contentType, value)
@@ -321,21 +434,21 @@ local function GetTargetKey(contentType)
 
     if not db then
         if contentType == "raid" then
-            return "all-bosses"
+            return DEFAULT_TARGET_BY_CONTENT.raid
         elseif contentType == "pvp" then
-            return "3v3"
+            return DEFAULT_TARGET_BY_CONTENT.pvp
         end
 
-        return "all-dungeons"
+        return DEFAULT_TARGET_BY_CONTENT.mythicplus
     end
 
     if contentType == "raid" then
-        return db.raidTarget or "all-bosses"
+        return db.raidTarget or DEFAULT_TARGET_BY_CONTENT.raid
     elseif contentType == "pvp" then
-        return db.pvpTarget or "3v3"
+        return db.pvpTarget or DEFAULT_TARGET_BY_CONTENT.pvp
     end
 
-    return db.mythicPlusTarget or "all-dungeons"
+    return db.mythicPlusTarget or DEFAULT_TARGET_BY_CONTENT.mythicplus
 end
 
 local function SetTargetKey(contentType, value)
@@ -348,11 +461,11 @@ local function SetTargetKey(contentType, value)
     contentType = NormalizeContentType(contentType)
 
     if contentType == "raid" then
-        db.raidTarget = value or "all-bosses"
+        db.raidTarget = value or DEFAULT_TARGET_BY_CONTENT.raid
     elseif contentType == "pvp" then
-        db.pvpTarget = value or "3v3"
+        db.pvpTarget = value or DEFAULT_TARGET_BY_CONTENT.pvp
     else
-        db.mythicPlusTarget = value or "all-dungeons"
+        db.mythicPlusTarget = value or DEFAULT_TARGET_BY_CONTENT.mythicplus
     end
 end
 
@@ -379,7 +492,7 @@ local function GetTargetOptions(contentType)
     if contentType == "raid" then
         labels["all-bosses"] = labels["all-bosses"] or "All Bosses"
     elseif contentType == "pvp" then
-        labels["3v3"] = labels["3v3"] or "3v3 Arena"
+        labels[DEFAULT_TARGET_BY_CONTENT.pvp] = labels[DEFAULT_TARGET_BY_CONTENT.pvp] or "Icy Veins"
     else
         labels["all-dungeons"] = labels["all-dungeons"] or "All Dungeons"
     end
@@ -427,8 +540,20 @@ local function GetBuildEntryForTarget(contentType, targetKey, mode)
     mode = mode or GetModeKey(contentType)
 
     local targetData = specData and specData[contentType] and specData[contentType][targetKey]
+    if not targetData and specData and specData[contentType] then
+        for fallbackTargetKey, fallbackTargetData in pairs(specData[contentType]) do
+            targetKey = fallbackTargetKey
+            targetData = fallbackTargetData
+            break
+        end
+    end
+
     local builds = targetData and targetData.builds
-    local entry = builds and (builds[mode] or builds.popular)
+    local fallbackMode = GetFirstBuildKey(builds)
+    local entry = builds and (builds[mode] or builds.popular or (fallbackMode and builds[fallbackMode]))
+    if entry and (not builds or not builds[mode]) then
+        mode = fallbackMode or mode
+    end
 
     return entry, {
         classToken = classToken,
@@ -437,7 +562,7 @@ local function GetBuildEntryForTarget(contentType, targetKey, mode)
         targetKey = targetKey,
         targetLabel = GetTargetLabel(contentType, targetKey),
         mode = mode,
-        modeLabel = GetOptionText(GetModeOptions(contentType), mode),
+        modeLabel = GetOptionText(GetModeOptions(contentType, targetKey), mode),
         generatedAt = GetRoot() and GetRoot().generatedAt,
         source = (entry and entry.source) or (GetRoot() and GetRoot().source),
     }
@@ -1056,6 +1181,22 @@ local function ResetAndPurchaseDeferred(configID, treeID, entryInfo, onComplete)
     local index = 1
     local passProgress = 0
 
+    local function EntryStateMatches(nodeInfo, entry)
+        if not nodeInfo or not entry then
+            return false
+        end
+
+        if entry.isChoiceNode and entry.selectionEntryID then
+            local activeEntryID = nodeInfo.activeEntry and nodeInfo.activeEntry.entryID
+
+            if activeEntryID ~= entry.selectionEntryID then
+                return false
+            end
+        end
+
+        return ((nodeInfo.ranksPurchased or 0) >= (entry.ranksPurchased or 0))
+    end
+
     local function Step()
         if token ~= applyToken then
             return
@@ -1068,33 +1209,40 @@ local function ResetAndPurchaseDeferred(configID, treeID, entryInfo, onComplete)
             local entry = entryInfo[nodeID]
 
             if entry then
-                local success = false
+                local madeProgress = false
+                local nodeInfo = C_Traits.GetNodeInfo(configID, nodeID)
 
-                if entry.isChoiceNode then
-                    if entry.selectionEntryID then
-                        success = C_Traits.SetSelection(configID, entry.nodeID, entry.selectionEntryID)
+                if entry.isChoiceNode and entry.selectionEntryID then
+                    local activeEntryID = nodeInfo and nodeInfo.activeEntry and nodeInfo.activeEntry.entryID
+
+                    if activeEntryID ~= entry.selectionEntryID then
+                        madeProgress = C_Traits.SetSelection(configID, entry.nodeID, entry.selectionEntryID) or madeProgress
+                        nodeInfo = C_Traits.GetNodeInfo(configID, nodeID)
                     end
-                elseif entry.ranksPurchased then
-                    local nodeInfo = C_Traits.GetNodeInfo(configID, nodeID)
+                end
+
+                if entry.ranksPurchased then
                     local currentRanks = (nodeInfo and nodeInfo.ranksPurchased) or 0
                     local neededRanks = math.max(0, entry.ranksPurchased - currentRanks)
 
-                    if neededRanks == 0 then
-                        success = true
-                    else
+                    if neededRanks > 0 then
                         for _ = 1, neededRanks do
                             local rankOK = C_Traits.PurchaseRank(configID, entry.nodeID)
-                            success = rankOK or success
+                            madeProgress = rankOK or madeProgress
 
                             if not rankOK then
                                 break
                             end
                         end
+
+                        nodeInfo = C_Traits.GetNodeInfo(configID, nodeID)
                     end
                 end
 
-                if success then
+                if EntryStateMatches(nodeInfo, entry) then
                     entryInfo[nodeID] = nil
+                    passProgress = passProgress + 1
+                elseif madeProgress then
                     passProgress = passProgress + 1
                 end
             end
@@ -2050,7 +2198,7 @@ local function RefreshPanel()
     panel.contentDropdown:SetOptions(CONTENT_OPTIONS, contentType, function(value)
         ns:SetTalentGrimoireContentType(value)
     end)
-    panel.modeDropdown:SetOptions(GetModeOptions(contentType), mode, function(value)
+    panel.modeDropdown:SetOptions(GetModeOptions(contentType, targetKey), mode, function(value)
         ns:SetTalentGrimoireMode(value)
     end)
     panel.targetDropdown:SetOptions(targetOptions, targetKey, function(value)
@@ -2323,7 +2471,7 @@ end
 
 function ns:GetTalentGrimoireModeLabel()
     local contentType = ns:GetTalentGrimoireContentType()
-    return GetOptionText(GetModeOptions(contentType), GetModeKey(contentType))
+    return GetOptionText(GetModeOptions(contentType, GetTargetKey(contentType)), GetModeKey(contentType))
 end
 
 function ns:CycleTalentGrimoireContent()
@@ -2343,7 +2491,7 @@ end
 
 function ns:CycleTalentGrimoireMode()
     local contentType = ns:GetTalentGrimoireContentType()
-    ns:SetTalentGrimoireMode(SelectNextOption(GetModeOptions(contentType), GetModeKey(contentType)))
+    ns:SetTalentGrimoireMode(SelectNextOption(GetModeOptions(contentType, GetTargetKey(contentType)), GetModeKey(contentType)))
 end
 
 function ns:GetTalentGrimoireCurrentBuild()

@@ -7,6 +7,7 @@ local lastActionText = ""
 local lastTooltipOwner
 local lastTooltipBagID
 local lastTooltipSlotID
+local clickRegistrationPending = false
 
 local BUTTON_NAME = "ZoidsToolsProfessionActionButton"
 local ACTION_BUTTON_USE_KEY_DOWN_CVAR = "ActionButtonUseKeyDown"
@@ -534,11 +535,20 @@ local function RegisterButtonForPreferredClickDirection(button)
         return
     end
 
+    if InCombatLockdown and InCombatLockdown() then
+        clickRegistrationPending = true
+        return false
+    end
+
+    clickRegistrationPending = false
+
     if C_CVar and C_CVar.GetCVarBool and C_CVar.GetCVarBool(ACTION_BUTTON_USE_KEY_DOWN_CVAR) then
         button:RegisterForClicks("AnyDown")
     else
         button:RegisterForClicks("AnyUp")
     end
+
+    return true
 end
 
 local function ConfigureButtonForAction(button, action)
@@ -963,11 +973,13 @@ function ns:InitializeProfessionHelper()
         eventFrame:RegisterEvent("CVAR_UPDATE")
         eventFrame:RegisterEvent("MODIFIER_STATE_CHANGED")
         eventFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
-        eventFrame:SetScript("OnEvent", function(_, event)
+        eventFrame:SetScript("OnEvent", function(_, event, arg1)
             if event == "BAG_UPDATE_DELAYED" then
                 HideButton()
             elseif event == "CVAR_UPDATE" then
-                RegisterButtonForPreferredClickDirection(helperButton)
+                if arg1 == ACTION_BUTTON_USE_KEY_DOWN_CVAR then
+                    RegisterButtonForPreferredClickDirection(helperButton)
+                end
             elseif event == "MODIFIER_STATE_CHANGED" then
                 if not IsActivationModifierHeld() then
                     HideButton()
@@ -975,6 +987,10 @@ function ns:InitializeProfessionHelper()
 
                 RecheckCurrentTooltip()
             elseif event == "PLAYER_REGEN_ENABLED" then
+                if clickRegistrationPending then
+                    RegisterButtonForPreferredClickDirection(helperButton)
+                end
+
                 UpdateAttributeDriver()
                 RecheckCurrentTooltip()
             end

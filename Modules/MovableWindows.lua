@@ -16,6 +16,7 @@ local blockedFrames = {
     ChatFrame1 = true,
     CompactRaidFrameManager = true,
     ContainerFrameCombinedBags = true,
+    HouseEditorFrame = true,
     LossOfControlFrame = true,
     MainMenuBar = true,
     MinimapCluster = true,
@@ -120,12 +121,46 @@ local function SetManagedPlacement(frame, value)
     end
 end
 
+local function GetFrameName(frame)
+    return frame and frame.GetName and frame:GetName()
+end
+
+local function IsBlockedFrameName(name, isBagWindow)
+    return name and blockedFrames[name] == true and not (isBagWindow and bagHandleAllowedFrames[name])
+end
+
+local function IsBlockedFrame(frame, isBagWindow)
+    return IsBlockedFrameName(GetFrameName(frame), isBagWindow)
+end
+
+local function ClearSavedWindowState(name)
+    if not name or not ns.db or not ns.db.windows then
+        return
+    end
+
+    if ns.db.windows.points then
+        ns.db.windows.points[name] = nil
+    end
+
+    if ns.db.windows.scales then
+        ns.db.windows.scales[name] = nil
+    end
+end
+
+local function ClearBlockedWindowState()
+    for name in pairs(blockedFrames) do
+        if not bagHandleAllowedFrames[name] then
+            ClearSavedWindowState(name)
+        end
+    end
+end
+
 local function IsUsableFrame(frame)
-    local name = frame and frame.GetName and frame:GetName()
+    local name = GetFrameName(frame)
 
     return frame
         and name
-        and not blockedFrames[name]
+        and not IsBlockedFrameName(name)
         and frame.SetMovable
         and frame.SetClampedToScreen
         and frame.EnableMouse
@@ -135,7 +170,11 @@ local function IsUsableFrame(frame)
         and frame.GetPoint
 end
 
-local function CaptureOriginalPoints(frame)
+local function CaptureOriginalPoints(frame, isBagWindow)
+    if IsBlockedFrame(frame, isBagWindow) then
+        return
+    end
+
     if not frame.ZTOriginalScale and frame.GetScale then
         frame.ZTOriginalScale = frame:GetScale() or 1
     end
@@ -164,15 +203,23 @@ local function CaptureOriginalPoints(frame)
     end
 end
 
-local function SavePoint(frame)
+local function SavePoint(frame, isBagWindow)
     if not ns.db or not ns.db.windows.savePositions or InCombatLockdown() then
         return
     end
 
-    local name = frame and frame.GetName and frame:GetName()
-    local point, relativeTo, relativePoint, x, y = frame:GetPoint(1)
+    local name = GetFrameName(frame)
+    if not name then
+        return
+    end
 
-    if not name or not point then
+    if IsBlockedFrameName(name, isBagWindow) then
+        ClearSavedWindowState(name)
+        return
+    end
+
+    local point, relativeTo, relativePoint, x, y = frame:GetPoint(1)
+    if not point then
         return
     end
 
@@ -185,8 +232,13 @@ local function SavePoint(frame)
     }
 end
 
-local function HasSavedPoint(frame)
-    local name = frame and frame.GetName and frame:GetName()
+local function HasSavedPoint(frame, isBagWindow)
+    local name = GetFrameName(frame)
+
+    if IsBlockedFrameName(name, isBagWindow) then
+        ClearSavedWindowState(name)
+        return false
+    end
 
     return ns.db
         and ns.db.windows.savePositions
@@ -222,14 +274,19 @@ local function GetOriginalScale(frame)
     return frame and frame.ZTOriginalScale or 1
 end
 
-local function ApplyScale(frame, scale, save)
+local function ApplyScale(frame, scale, save, isBagWindow)
     if not frame or not frame.SetScale or InCombatLockdown() then
         return false
     end
 
-    local name = frame.GetName and frame:GetName()
+    local name = GetFrameName(frame)
 
     if not name then
+        return false
+    end
+
+    if IsBlockedFrameName(name, isBagWindow) then
+        ClearSavedWindowState(name)
         return false
     end
 
@@ -251,21 +308,26 @@ local function ApplyScale(frame, scale, save)
     return true
 end
 
-local function ApplySavedScale(frame)
-    if not ns.db or not frame then
+local function ApplySavedScale(frame, isBagWindow)
+    if not ns.db or not frame or IsBlockedFrame(frame, isBagWindow) then
         return
     end
 
-    local name = frame.GetName and frame:GetName()
+    local name = GetFrameName(frame)
     local saved = name and ns.db.windows.scales and ns.db.windows.scales[name]
 
     if saved then
-        ApplyScale(frame, saved, false)
+        ApplyScale(frame, saved, false, isBagWindow)
     end
 end
 
-local function HasSavedScale(frame)
-    local name = frame and frame.GetName and frame:GetName()
+local function HasSavedScale(frame, isBagWindow)
+    local name = GetFrameName(frame)
+
+    if IsBlockedFrameName(name, isBagWindow) then
+        ClearSavedWindowState(name)
+        return false
+    end
 
     return ns.db
         and ns.db.windows.scales
@@ -273,16 +335,16 @@ local function HasSavedScale(frame)
         and ns.db.windows.scales[name] ~= nil
 end
 
-local function ApplySavedScaleSoon(frame)
-    if not frame then
+local function ApplySavedScaleSoon(frame, isBagWindow)
+    if not frame or IsBlockedFrame(frame, isBagWindow) then
         return
     end
 
-    if not HasSavedScale(frame) then
+    if not HasSavedScale(frame, isBagWindow) then
         return
     end
 
-    ApplySavedScale(frame)
+    ApplySavedScale(frame, isBagWindow)
 
     if not C_Timer or not C_Timer.After or frame.ZTScaleRestoreQueued then
         return
@@ -292,20 +354,20 @@ local function ApplySavedScaleSoon(frame)
 
     C_Timer.After(0, function()
         frame.ZTScaleRestoreQueued = nil
-        ApplySavedScale(frame)
+        ApplySavedScale(frame, isBagWindow)
     end)
 
     C_Timer.After(0.05, function()
-        ApplySavedScale(frame)
+        ApplySavedScale(frame, isBagWindow)
     end)
 
     C_Timer.After(0.2, function()
-        ApplySavedScale(frame)
+        ApplySavedScale(frame, isBagWindow)
     end)
 end
 
-local function HookFrameSetScale(frame)
-    if frame.ZTSetScaleHooked or not frame.SetScale then
+local function HookFrameSetScale(frame, isBagWindow)
+    if IsBlockedFrame(frame, isBagWindow) or frame.ZTSetScaleHooked or not frame.SetScale then
         return
     end
 
@@ -314,11 +376,15 @@ local function HookFrameSetScale(frame)
             return
         end
 
-        local name = self.GetName and self:GetName()
+        if IsBlockedFrame(self, isBagWindow) then
+            return
+        end
+
+        local name = GetFrameName(self)
         local saved = name and ns.db and ns.db.windows.scales and ns.db.windows.scales[name]
 
         if saved then
-            ApplySavedScaleSoon(self)
+            ApplySavedScaleSoon(self, isBagWindow)
         end
     end)
 
@@ -327,14 +393,19 @@ local function HookFrameSetScale(frame)
     end
 end
 
-local function ResetFrameScale(frame, notify)
+local function ResetFrameScale(frame, notify, isBagWindow)
     if not ns.db or not frame then
         return
     end
 
-    local name = frame.GetName and frame:GetName()
+    local name = GetFrameName(frame)
 
     if not name then
+        return
+    end
+
+    if IsBlockedFrameName(name, isBagWindow) then
+        ClearSavedWindowState(name)
         return
     end
 
@@ -343,7 +414,7 @@ local function ResetFrameScale(frame, notify)
     end
 
     frame.ZTApplyingScale = true
-    local didReset = ApplyScale(frame, GetOriginalScale(frame), false)
+    local didReset = ApplyScale(frame, GetOriginalScale(frame), false, isBagWindow)
     frame.ZTApplyingScale = nil
 
     if didReset and notify then
@@ -351,11 +422,12 @@ local function ResetFrameScale(frame, notify)
     end
 end
 
-local function AdjustFrameScale(frame, delta)
+local function AdjustFrameScale(frame, delta, isBagWindow)
     if not ns.db
         or not ns.db.windows.enabled
         or not ns.db.windows.scaleEnabled
         or not frame
+        or IsBlockedFrame(frame, isBagWindow)
         or InCombatLockdown()
     then
         return
@@ -364,8 +436,8 @@ local function AdjustFrameScale(frame, delta)
     local step = ns.db.windows.scaleStep or 0.05
     local scale = GetFrameScale(frame) + ((delta or 0) > 0 and step or -step)
 
-    if ApplyScale(frame, scale, true) then
-        SavePoint(frame)
+    if ApplyScale(frame, scale, true, isBagWindow) then
+        SavePoint(frame, isBagWindow)
     end
 end
 
@@ -468,9 +540,15 @@ local function ResetFramePosition(frame, notify, useOriginalPoint)
         return
     end
 
-    local name = frame.GetName and frame:GetName()
+    local name = GetFrameName(frame)
+    local isBagWindow = useOriginalPoint == "bag"
 
     if not name then
+        return
+    end
+
+    if IsBlockedFrameName(name, isBagWindow) then
+        ClearSavedWindowState(name)
         return
     end
 
@@ -523,8 +601,8 @@ local function EnableMouseWheel(frame)
     end
 end
 
-local function AddScaleScripts(inputFrame, targetFrame, allowPositionReset, resetToOriginalPoint)
-    if not inputFrame or inputFrame.ZTScaleScriptsHooked then
+local function AddScaleScripts(inputFrame, targetFrame, allowPositionReset, resetToOriginalPoint, isBagWindow)
+    if not inputFrame or inputFrame.ZTScaleScriptsHooked or IsBlockedFrame(targetFrame, isBagWindow) then
         return
     end
 
@@ -533,7 +611,7 @@ local function AddScaleScripts(inputFrame, targetFrame, allowPositionReset, rese
 
     inputFrame:HookScript("OnMouseWheel", function(_, delta)
         if IsControlKeyDown and IsControlKeyDown() then
-            AdjustFrameScale(targetFrame, delta)
+            AdjustFrameScale(targetFrame, delta, isBagWindow)
         end
     end)
 
@@ -549,12 +627,13 @@ local function RestoreSavedPoint(frame, isBagWindow)
         or not ns.db.windows.enabled
         or not ns.db.windows.savePositions
         or (isBagWindow and not ns.db.windows.moveBags)
+        or IsBlockedFrame(frame, isBagWindow)
         or InCombatLockdown()
     then
         return
     end
 
-    local name = frame and frame.GetName and frame:GetName()
+    local name = GetFrameName(frame)
     local saved = name and ns.db.windows.points[name]
 
     if not saved then
@@ -573,11 +652,11 @@ local function RestoreSavedPoint(frame, isBagWindow)
 end
 
 local function RestoreSavedPointSoon(frame, isBagWindow)
-    if not frame then
+    if not frame or IsBlockedFrame(frame, isBagWindow) then
         return
     end
 
-    if not HasSavedPoint(frame) then
+    if not HasSavedPoint(frame, isBagWindow) then
         return
     end
 
@@ -600,7 +679,7 @@ local function RestoreSavedPointSoon(frame, isBagWindow)
 end
 
 function RestoreOriginalPoint(frame, keepManaged)
-    if not frame or not frame.ZTOriginalPoints or #frame.ZTOriginalPoints == 0 or InCombatLockdown() then
+    if not frame or IsBlockedFrame(frame) or not frame.ZTOriginalPoints or #frame.ZTOriginalPoints == 0 or InCombatLockdown() then
         return false
     end
 
@@ -618,12 +697,12 @@ function RestoreOriginalPoint(frame, keepManaged)
 end
 
 local function HookFrameSetPoint(frame, isBagWindow)
-    if frame.ZTSetPointHooked or not frame.SetPoint then
+    if IsBlockedFrame(frame, isBagWindow) or frame.ZTSetPointHooked or not frame.SetPoint then
         return
     end
 
     local ok = pcall(hooksecurefunc, frame, "SetPoint", function(self)
-        if self.ZTRestoringPoint or self.ZTMoving then
+        if IsBlockedFrame(self, isBagWindow) or self.ZTRestoringPoint or self.ZTMoving then
             return
         end
 
@@ -767,7 +846,7 @@ local function MakeMovable(frame)
     SafeCall(frame.EnableMouse, frame, true)
     SafeCall(frame.RegisterForDrag, frame, "LeftButton")
     SetManagedPlacement(frame, HasSavedPoint(frame))
-    HookFrameSetScale(frame)
+    HookFrameSetScale(frame, false)
     ApplySavedScaleSoon(frame)
     AddScaleScripts(frame, frame, false)
     CreateWindowHandle(frame)
@@ -786,7 +865,7 @@ local function MakeMovable(frame)
         SafeCall(self.StopMovingOrSizing, self)
         self.ZTMoving = nil
         SetManagedPlacement(self, true)
-        SavePoint(self)
+        SavePoint(self, false)
         UpdateWindowHandle(self)
     end)
 
@@ -862,7 +941,7 @@ local function CreateBagHandle(frame)
         SafeCall(frame.StopMovingOrSizing, frame)
         frame.ZTMoving = nil
         SetManagedPlacement(frame, true)
-        SavePoint(frame)
+        SavePoint(frame, true)
         UpdateBagHandle(frame)
     end)
 
@@ -885,7 +964,7 @@ local function CreateBagHandle(frame)
     end)
 
     PositionBagHandle(frame, handle)
-    AddScaleScripts(handle, frame, true, "bag")
+    AddScaleScripts(handle, frame, true, "bag", true)
     handle:Hide()
 
     return handle
@@ -899,7 +978,7 @@ local function MakeBagMovable(frame)
     local name = frame.GetName and frame:GetName()
 
     if not name
-        or (blockedFrames[name] and not bagHandleAllowedFrames[name])
+        or IsBlockedFrameName(name, true)
         or not frame.SetMovable
         or not frame.SetClampedToScreen
         or not frame.HookScript
@@ -913,13 +992,13 @@ local function MakeBagMovable(frame)
         end
 
         bagFrames[frame] = true
-        CaptureOriginalPoints(frame)
+        CaptureOriginalPoints(frame, true)
 
         SafeCall(frame.SetClampedToScreen, frame, true)
-        SetManagedPlacement(frame, HasSavedPoint(frame))
-        HookFrameSetScale(frame)
-        ApplySavedScaleSoon(frame)
-        AddScaleScripts(frame, frame, false)
+        SetManagedPlacement(frame, HasSavedPoint(frame, true))
+        HookFrameSetScale(frame, true)
+        ApplySavedScaleSoon(frame, true)
+        AddScaleScripts(frame, frame, false, nil, true)
         HookFrameSetPoint(frame, true)
 
         local handle = CreateBagHandle(frame)
@@ -927,15 +1006,15 @@ local function MakeBagMovable(frame)
         bagHandles[frame] = handle
 
         frame:HookScript("OnShow", function(self)
-            CaptureOriginalPoints(self)
-            ApplySavedScaleSoon(self)
+            CaptureOriginalPoints(self, true)
+            ApplySavedScaleSoon(self, true)
             RestoreSavedPointSoon(self, true)
             PositionBagHandle(self, bagHandles[self])
             UpdateBagHandle(self)
         end)
 
         frame:HookScript("OnHide", function(self)
-            ApplySavedScaleSoon(self)
+            ApplySavedScaleSoon(self, true)
 
             if ns.db and not ns.db.windows.savePositions then
                 SetManagedPlacement(self, false)
@@ -1135,6 +1214,7 @@ function ns:InitializeMovableWindows()
         return
     end
 
+    ClearBlockedWindowState()
     InstallHooks()
 
     if self.db.windows.enabled then
@@ -1147,6 +1227,7 @@ function ns:InitializeMovableWindows()
 end
 
 function ns:RefreshMovableWindows()
+    ClearBlockedWindowState()
     RegisterUIPanelWindows()
     RegisterBagWindows()
 
@@ -1197,7 +1278,7 @@ function ns:ResetMovableWindowScales()
     end
 
     for frame in pairs(bagFrames) do
-        ResetFrameScale(frame, false)
+        ResetFrameScale(frame, false, true)
         UpdateBagHandle(frame)
     end
 

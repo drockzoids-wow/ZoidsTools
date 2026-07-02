@@ -14,7 +14,8 @@ local originalGetMinimapShape = GetMinimapShape
 local shapeOverrideApplied = false
 local squareApplied = false
 local mouseoverHideToken = 0
-local clockCalendarHooked = false
+local clockCalendarHooked
+local clockCalendarScripts = {}
 local clockFontStore
 local difficultyHooks = {}
 local mailHooks = {}
@@ -444,8 +445,14 @@ local function OpenCalendarFromClock()
     end
 end
 
+local function RunClockScript(script, frame, ...)
+    if type(script) == "function" then
+        pcall(script, frame, ...)
+    end
+end
+
 local function EnsureClockCalendarClick(clockButton)
-    if clockCalendarHooked or not clockButton then
+    if not clockButton or clockCalendarHooked == clockButton or clockButton.ZoidsToolsClockCalendarClickWrapped then
         return
     end
 
@@ -453,15 +460,47 @@ local function EnsureClockCalendarClick(clockButton)
         clockButton:RegisterForClicks("LeftButtonUp", "RightButtonUp")
     end
 
-    if clockButton.HookScript then
-        clockButton:HookScript("OnMouseUp", function(_, button)
-            if button == "RightButton" then
-                OpenCalendarFromClock()
-            end
-        end)
+    if not clockButton.GetScript or not clockButton.SetScript then
+        return
     end
 
-    clockCalendarHooked = true
+    clockCalendarScripts[clockButton] = {
+        OnClick = clockButton:GetScript("OnClick"),
+        OnMouseDown = clockButton:GetScript("OnMouseDown"),
+        OnMouseUp = clockButton:GetScript("OnMouseUp"),
+    }
+
+    clockButton.ZoidsToolsClockCalendarClickWrapped = true
+
+    clockButton:SetScript("OnMouseDown", function(self, button, ...)
+        if button == "RightButton" then
+            return
+        end
+
+        local scripts = clockCalendarScripts[self]
+        RunClockScript(scripts and scripts.OnMouseDown, self, button, ...)
+    end)
+
+    clockButton:SetScript("OnMouseUp", function(self, button, ...)
+        if button == "RightButton" then
+            return
+        end
+
+        local scripts = clockCalendarScripts[self]
+        RunClockScript(scripts and scripts.OnMouseUp, self, button, ...)
+    end)
+
+    clockButton:SetScript("OnClick", function(self, button, ...)
+        if button == "RightButton" then
+            OpenCalendarFromClock()
+            return
+        end
+
+        local scripts = clockCalendarScripts[self]
+        RunClockScript(scripts and scripts.OnClick, self, button, ...)
+    end)
+
+    clockCalendarHooked = clockButton
 end
 
 local function StyleClockButton(clockButton, enabled)

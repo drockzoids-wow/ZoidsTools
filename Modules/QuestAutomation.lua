@@ -4,6 +4,8 @@ local eventFrame
 local pendingAcceptQuests = {}
 local clickedGossipOptions = {}
 local tableUnpack = table.unpack or unpack
+local QUEST_ACTION_ACCEPT = "accept"
+local QUEST_ACTION_TURN_IN = "turnIn"
 
 local pauseModifiers = {
     none = true,
@@ -118,18 +120,22 @@ local function IsWarbandCompletedQuest(questID)
     return SafeCall(C_QuestLog.IsQuestFlaggedCompletedOnAccount, questID) == true
 end
 
-local function ShouldSkipQuest(questID, frequency)
+local function ShouldSkipQuest(questID, frequency, action)
     local db = EnsureDB()
 
     if not db then
         return true
     end
 
+    if action == QUEST_ACTION_TURN_IN and IsWarbandCompletedQuest(questID) then
+        return false
+    end
+
     if db.skipDaily and IsRepeatableQuest(questID, frequency) then
         return true
     end
 
-    if db.skipWarbandCompleted and IsWarbandCompletedQuest(questID) then
+    if action ~= QUEST_ACTION_TURN_IN and db.skipWarbandCompleted and IsWarbandCompletedQuest(questID) then
         return true
     end
 
@@ -196,7 +202,7 @@ local function HandleGossipQuests()
 
         if type(activeQuests) == "table" then
             for _, quest in ipairs(activeQuests) do
-                if quest and quest.isComplete and not ShouldSkipQuest(quest.questID, quest.frequency) and type(C_GossipInfo.SelectActiveQuest) == "function" then
+                if quest and quest.isComplete and not ShouldSkipQuest(quest.questID, quest.frequency, QUEST_ACTION_TURN_IN) and type(C_GossipInfo.SelectActiveQuest) == "function" then
                     SafeCall(C_GossipInfo.SelectActiveQuest, quest.questID)
                     return true
                 end
@@ -209,7 +215,7 @@ local function HandleGossipQuests()
 
         if type(availableQuests) == "table" then
             for _, quest in ipairs(availableQuests) do
-                if quest and not ShouldSkipQuest(quest.questID, quest.frequency) and type(C_GossipInfo.SelectAvailableQuest) == "function" then
+                if quest and not ShouldSkipQuest(quest.questID, quest.frequency, QUEST_ACTION_ACCEPT) and type(C_GossipInfo.SelectAvailableQuest) == "function" then
                     SafeCall(C_GossipInfo.SelectAvailableQuest, quest.questID)
                     return true
                 end
@@ -268,7 +274,7 @@ local function HandleQuestDetail()
     local questID = GetQuestID and GetQuestID() or nil
 
     if not questID then
-        if not ShouldSkipQuest(nil) then
+        if not ShouldSkipQuest(nil, nil, QUEST_ACTION_ACCEPT) then
             SafeCall(AcceptQuest)
         end
 
@@ -280,7 +286,7 @@ local function HandleQuestDetail()
     if C_QuestLog and type(C_QuestLog.RequestLoadQuestByID) == "function" then
         C_QuestLog.RequestLoadQuestByID(questID)
     else
-        if not ShouldSkipQuest(questID) then
+        if not ShouldSkipQuest(questID, nil, QUEST_ACTION_ACCEPT) then
             SafeCall(AcceptQuest)
         end
 
@@ -295,7 +301,7 @@ local function HandleQuestDataLoadResult(questID)
 
     pendingAcceptQuests[questID] = nil
 
-    if CanAutoAccept() and not ShouldSkipQuest(questID) then
+    if CanAutoAccept() and not ShouldSkipQuest(questID, nil, QUEST_ACTION_ACCEPT) then
         SafeCall(AcceptQuest)
     end
 end

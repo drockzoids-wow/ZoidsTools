@@ -271,15 +271,28 @@ local function GetMissingBuffChatType()
     return nil
 end
 
-local function AnnounceMissingBuff(buffName)
+local function GetMissingBuffChatPrefix(chatType)
+    if chatType == "INSTANCE_CHAT" then
+        return "/i "
+    elseif chatType == "RAID" then
+        return "/ra "
+    elseif chatType == "PARTY" then
+        return "/p "
+    end
+
+    return nil
+end
+
+local function BuildMissingBuffAnnouncementMacro(buffName)
     local message = "Missing group buff: " .. tostring(buffName or "group buff")
     local chatType = GetMissingBuffChatType()
+    local prefix = GetMissingBuffChatPrefix(chatType)
 
-    if chatType and SendChatMessage then
-        SendChatMessage(message, chatType)
-    elseif ns.Print then
-        ns:Print(message)
+    if prefix then
+        return prefix .. message
     end
+
+    return nil
 end
 
 local function SafeEquals(left, right)
@@ -474,11 +487,6 @@ local function GetWarningIconButton(frame, index)
     button:SetScript("OnLeave", function()
         GameTooltip:Hide()
     end)
-    button:SetScript("OnClick", function(self, mouseButton)
-        if mouseButton == "RightButton" or not self.canCastBuff then
-            AnnounceMissingBuff(self.buffName)
-        end
-    end)
 
     frame.buffIcons[index] = button
 
@@ -508,19 +516,24 @@ local function UpdateWarningIcons(frame, missing)
         button.canCastBuff = buff.canCast == true
         button.icon:SetTexture(buff.icon or MISSING_ICON_FALLBACK)
 
+        local announcementMacro = BuildMissingBuffAnnouncementMacro(buff.name)
+
         if button.canCastBuff then
             button:SetAttribute("type1", "spell")
             button:SetAttribute("spell1", buff.name or buff.spellID)
             button:SetAttribute("unit1", "player")
+            button:SetAttribute("macrotext1", nil)
         else
-            button:SetAttribute("type1", nil)
+            button:SetAttribute("type1", announcementMacro and "macro" or nil)
             button:SetAttribute("spell1", nil)
             button:SetAttribute("unit1", nil)
+            button:SetAttribute("macrotext1", announcementMacro)
         end
 
-        button:SetAttribute("type2", nil)
+        button:SetAttribute("type2", announcementMacro and "macro" or nil)
         button:SetAttribute("spell2", nil)
         button:SetAttribute("unit2", nil)
+        button:SetAttribute("macrotext2", announcementMacro)
         button:Show()
     end
 

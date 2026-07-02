@@ -33,6 +33,7 @@ Data\StatGoals.lua
 Data\TalentGrimoire.lua
 Modules\StatTargets.lua
 Modules\TalentGrimoire.lua
+Modules\BlizzardDamageMeterProfiles.lua
 Modules\QuestAutomation.lua
 Modules\MinimapTools.lua
 Modules\Tooltips.lua
@@ -44,6 +45,7 @@ UI\Pages\Windows.lua
 UI\Pages\Items.lua
 UI\Pages\Professions.lua
 UI\Pages\Builds.lua
+UI\Pages\Meters.lua
 UI\Pages\Combat.lua
 UI\Pages\UnitFrames.lua
 UI\Pages\Macros.lua

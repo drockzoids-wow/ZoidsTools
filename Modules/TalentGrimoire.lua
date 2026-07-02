@@ -833,6 +833,50 @@ local function FailTalentApply(message)
     return nil, message
 end
 
+local function ConfigHasStagedChanges(configID)
+    return configID
+        and C_Traits
+        and C_Traits.ConfigHasStagedChanges
+        and C_Traits.ConfigHasStagedChanges(configID)
+end
+
+local function RollbackTalentConfig(configID)
+    if not ConfigHasStagedChanges(configID) then
+        return true
+    end
+
+    if not C_Traits or not C_Traits.RollbackConfig then
+        return false
+    end
+
+    local ok, result = pcall(C_Traits.RollbackConfig, configID)
+
+    return ok and result ~= false
+end
+
+local function IsZoidsTalentConfig(configID, specID)
+    if not configID then
+        return false
+    end
+
+    local storedConfigID = specID and GetStoredConfigID(specID) or nil
+
+    if storedConfigID and tonumber(storedConfigID) == tonumber(configID) then
+        return true
+    end
+
+    if C_Traits and C_Traits.GetConfigInfo then
+        local ok, info = pcall(C_Traits.GetConfigInfo, configID)
+        local name = ok and info and info.name
+
+        if name == ZOIDS_LOADOUT_NAME or (type(name) == "string" and string.find(name, ZOIDS_LOADOUT_NAME .. ":", 1, true) == 1) then
+            return true
+        end
+    end
+
+    return false
+end
+
 local function ReadLoadoutHeader(importStream)
     local headerBitWidth = BIT_WIDTH_HEADER_VERSION + BIT_WIDTH_SPEC_ID + 128
 
@@ -904,8 +948,9 @@ local function ConvertLoadoutToEntryInfo(configID, treeID, loadoutContent)
             local nodeInfo = C_Traits.GetNodeInfo(configID, treeNodeID)
 
             if nodeInfo and nodeInfo.ID ~= 0 then
-                local isChoice = nodeInfo.type == Enum.TraitNodeType.Selection
-                    or nodeInfo.type == Enum.TraitNodeType.SubTreeSelection
+                local isSelectionNode = nodeInfo.type == Enum.TraitNodeType.Selection
+                local isSubTreeSelection = nodeInfo.type == Enum.TraitNodeType.SubTreeSelection
+                local isChoice = isSelectionNode or isSubTreeSelection
                 local choiceIndex = indexInfo.isChoiceNode and indexInfo.choiceNodeSelection or nil
 
                 if isChoice ~= indexInfo.isChoiceNode then
@@ -931,6 +976,7 @@ local function ConvertLoadoutToEntryInfo(configID, treeID, loadoutContent)
                     ranksPurchased = ranks,
                     selectionEntryID = selectionEntryID,
                     isChoiceNode = isChoice,
+                    isSubTreeSelection = isSubTreeSelection,
                 }
             end
         end
@@ -1192,6 +1238,12 @@ local function ResetAndPurchaseDeferred(configID, treeID, entryInfo, onComplete)
             if activeEntryID ~= entry.selectionEntryID then
                 return false
             end
+
+            if entry.isSubTreeSelection then
+                return true
+            end
+
+            return ((nodeInfo.ranksPurchased or 0) >= (entry.ranksPurchased or 1))
         end
 
         return ((nodeInfo.ranksPurchased or 0) >= (entry.ranksPurchased or 0))
@@ -1214,14 +1266,16 @@ local function ResetAndPurchaseDeferred(configID, treeID, entryInfo, onComplete)
 
                 if entry.isChoiceNode and entry.selectionEntryID then
                     local activeEntryID = nodeInfo and nodeInfo.activeEntry and nodeInfo.activeEntry.entryID
+                    local hasNeededRanks = entry.isSubTreeSelection
+                        or ((nodeInfo and nodeInfo.ranksPurchased) or 0) >= (entry.ranksPurchased or 1)
 
-                    if activeEntryID ~= entry.selectionEntryID then
+                    if activeEntryID ~= entry.selectionEntryID or not hasNeededRanks then
                         madeProgress = C_Traits.SetSelection(configID, entry.nodeID, entry.selectionEntryID) or madeProgress
                         nodeInfo = C_Traits.GetNodeInfo(configID, nodeID)
                     end
                 end
 
-                if entry.ranksPurchased then
+                if not entry.isChoiceNode and entry.ranksPurchased then
                     local currentRanks = (nodeInfo and nodeInfo.ranksPurchased) or 0
                     local neededRanks = math.max(0, entry.ranksPurchased - currentRanks)
 
@@ -1262,7 +1316,7 @@ local function ResetAndPurchaseDeferred(configID, treeID, entryInfo, onComplete)
         end
     end
 
-    Step()
+    RunNextFrame(Step)
 end
 
 local function EnsureApplyFrame()
@@ -1365,17 +1419,25 @@ function ns:ApplyTalentImportString(importString, buildLabel, isContinuation)
         return FailTalentApply("Cannot change talents in combat.")
     end
 
-    if not isContinuation
-        and C_Traits.ConfigHasStagedChanges
-        and C_Traits.ConfigHasStagedChanges(activeConfigID)
-    then
-        return FailTalentApply("You have unsaved talent changes. Apply or discard them first, then try again.")
-    end
-
     local specID = GetCurrentSpecID()
 
     if not specID then
         return FailTalentApply("Could not determine your active specialization.")
+    end
+
+    local zoidsConfigID = GetStoredConfigID(specID)
+
+    if not zoidsConfigID and IsZoidsTalentConfig(activeConfigID, specID) then
+        StoreConfigID(specID, activeConfigID)
+        zoidsConfigID = activeConfigID
+    end
+
+    if not isContinuation and ConfigHasStagedChanges(activeConfigID) then
+        if IsZoidsTalentConfig(activeConfigID, specID) and RollbackTalentConfig(activeConfigID) then
+            PrintTalentMessage("Discarded pending ZoidsTools talent changes.")
+        else
+            return FailTalentApply("You have unsaved talent changes. Apply or discard them first, then try again.")
+        end
     end
 
     local treeID = GetConfigTreeID(activeConfigID)
@@ -1389,8 +1451,6 @@ function ns:ApplyTalentImportString(importString, buildLabel, isContinuation)
     if not entryInfo then
         return FailTalentApply(parseError)
     end
-
-    local zoidsConfigID = GetStoredConfigID(specID)
 
     if not zoidsConfigID then
         if C_ClassTalents.CanCreateNewConfig and not C_ClassTalents.CanCreateNewConfig() then
@@ -1482,9 +1542,11 @@ function ns:ApplyTalentImportString(importString, buildLabel, isContinuation)
         end
 
         if not C_ClassTalents.CommitConfig or not C_ClassTalents.CommitConfig(zoidsConfigID) then
+            RollbackTalentConfig(activeConfigID)
             ns._talentApplyInProgress = false
             ClearPendingApply()
-            PrintTalentMessage("Commit failed. Open the talents pane and click Apply Changes.")
+            PrintTalentMessage("Commit failed. Discarded partial talent changes.")
+            QueueRefresh(0)
             return
         end
 

@@ -181,6 +181,19 @@ local defaults = {
         pvpMode = "popular",
         mode = "popular",
     },
+    damageMeterProfiles = {
+        activeProfile = "profile1",
+        profiles = {
+            profile1 = {
+                name = "Profile 1",
+                windows = {},
+            },
+            profile2 = {
+                name = "Profile 2",
+                windows = {},
+            },
+        },
+    },
     professions = {
         enabled = true,
         activation = "alt",
@@ -298,6 +311,7 @@ local function PrintHelp()
     ns:Print("/zt items opens item overlay options.")
     ns:Print("/zt iteminfo on/off toggles item overlays.")
     ns:Print("/zt grimoire opens Talent Grimoire build options.")
+    ns:Print("/zt meters opens Blizzard damage meter profile options.")
     ns:Print("/zt professions opens profession helper options.")
     ns:Print("/zt loot opens loot options.")
     ns:Print("/zt fastloot on/off toggles fast auto loot.")
@@ -334,6 +348,8 @@ local function HandleSlash(input)
         ns:OpenConfig("items")
     elseif input == "grimoire" or input == "tome" or input == "builds" or input == "build" or input == "talents" then
         ns:OpenConfig("builds")
+    elseif input == "meters" or input == "meter" or input == "damagemeter" or input == "damage meters" then
+        ns:OpenConfig("meters")
     elseif input == "professions" or input == "profession" or input == "molinari" then
         ns:OpenConfig("professions")
     elseif input == "quests" or input == "quest" then
@@ -638,6 +654,10 @@ eventFrame:SetScript("OnEvent", function(_, event, addonName)
 
         if ns.InitializeTalentGrimoire then
             ns:InitializeTalentGrimoire()
+        end
+
+        if ns.InitializeBlizzardDamageMeterProfiles then
+            ns:InitializeBlizzardDamageMeterProfiles()
         end
 
         if ns.InitializeProfessionHelper then

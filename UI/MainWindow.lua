@@ -31,6 +31,7 @@ local pageOrder = {
     { key = "items", label = "Items", description = "Item level, gem, enchant, and binding overlays." },
     { key = "professions", label = "Professions", description = "Molinari-style profession actions for hovered bag items." },
     { key = "builds", label = "Grimoire", description = "Talent build suggestions from generated local data." },
+    { key = "meters", label = "Meters", description = "Profiles for Blizzard's built-in damage meter windows." },
     { key = "combat", label = "Combat", description = "Combat quality-of-life settings." },
     { key = "unitframes", label = "Unit Frames", description = "Blizzard unit frame health, castbar, and aura settings." },
     { key = "macros", label = "Macros", description = "Health, mana, and consumable macro settings." },
@@ -93,6 +94,8 @@ local function CreatePage(parent, key)
         return UI.Pages.CreateProfessionsPage(parent)
     elseif key == "builds" and UI.Pages.CreateBuildsPage then
         return UI.Pages.CreateBuildsPage(parent)
+    elseif key == "meters" and UI.Pages.CreateMetersPage then
+        return UI.Pages.CreateMetersPage(parent)
     elseif key == "combat" and UI.Pages.CreateCombatPage then
         return UI.Pages.CreateCombatPage(parent)
     elseif key == "unitframes" and UI.Pages.CreateUnitFramesPage then

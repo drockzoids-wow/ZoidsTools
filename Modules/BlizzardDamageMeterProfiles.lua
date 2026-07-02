@@ -1,12 +1,10 @@
 local _, ns = ...
 
 local MAX_PROFILE_WINDOWS = 2
+local RESET_BUTTON_MAX_WINDOWS = 3
+local RESET_BUTTON_SIZE = 18
 local DEFAULT_PROFILE_KEY = "profile1"
-local DEFAULT_WINDOW_TYPE = "DamageDone"
-local DEFAULT_SECOND_WINDOW_TYPE = "HealingDone"
-local DEFAULT_SESSION_TYPE = "Overall"
-local eventFrame
-
+local resetButtonTicker
 local PROFILE_OPTIONS = {
     { value = "profile1", text = "Profile 1" },
     { value = "profile2", text = "Profile 2" },
@@ -89,34 +87,12 @@ local function GetProfile(key)
 end
 
 local function TryLoadBlizzardDamageMeter()
-    if DamageMeter then
-        return true
-    end
-
-    if C_AddOns and C_AddOns.LoadAddOn then
-        SafeCall(C_AddOns.LoadAddOn, "Blizzard_DamageMeter")
-    elseif UIParentLoadAddOn then
-        SafeCall(UIParentLoadAddOn, "Blizzard_DamageMeter")
-    elseif LoadAddOn then
-        SafeCall(LoadAddOn, "Blizzard_DamageMeter")
-    end
-
     return DamageMeter ~= nil
 end
 
 local function IsBlizzardDamageMeterAvailable()
-    TryLoadBlizzardDamageMeter()
-
-    if not DamageMeter or not C_DamageMeter then
-        return false, "Blizzard's built-in damage meter is not loaded by this client."
-    end
-
-    if C_DamageMeter.IsDamageMeterAvailable then
-        local isAvailable, failureReason = SafeCall(C_DamageMeter.IsDamageMeterAvailable)
-
-        if isAvailable == false then
-            return false, failureReason or "Blizzard's built-in damage meter is not available."
-        end
+    if not TryLoadBlizzardDamageMeter() then
+        return false, "Open Blizzard's damage meter first, then save or apply positions."
     end
 
     return true
@@ -134,50 +110,6 @@ local function GetEnumName(enumTable, value)
     end
 
     return nil
-end
-
-local function GetEnumValue(enumTable, name)
-    if type(enumTable) ~= "table" or type(name) ~= "string" then
-        return nil
-    end
-
-    return enumTable[name]
-end
-
-local function GetDefaultDamageMeterTypeName(index)
-    if index == 2 then
-        return DEFAULT_SECOND_WINDOW_TYPE
-    end
-
-    return DEFAULT_WINDOW_TYPE
-end
-
-local function WindowStateHasSavedData(state)
-    return type(state) == "table"
-        and (
-            state.shown == true
-            or state.geometry ~= nil
-            or state.damageMeterType ~= nil
-            or state.sessionType ~= nil
-            or state.locked == true
-            or state.nonInteractive == true
-        )
-end
-
-local function CopyWindowStateWithDefaults(index, state)
-    local copy = {}
-
-    if type(state) == "table" then
-        for key, value in pairs(state) do
-            copy[key] = value
-        end
-    end
-
-    copy.shown = copy.shown ~= false
-    copy.damageMeterType = copy.damageMeterType or GetDefaultDamageMeterTypeName(index)
-    copy.sessionType = copy.sessionType or DEFAULT_SESSION_TYPE
-
-    return copy
 end
 
 local function SaveFrameGeometry(frame)
@@ -198,17 +130,6 @@ local function SaveFrameGeometry(frame)
     }
 end
 
-local function CanSetUserPlaced(frame)
-    if not frame or not frame.SetUserPlaced then
-        return false
-    end
-
-    local isMovable = frame.IsMovable and SafeCall(frame.IsMovable, frame) == true
-    local isResizable = frame.IsResizable and SafeCall(frame.IsResizable, frame) == true
-
-    return isMovable or isResizable
-end
-
 local function ApplyFrameGeometry(frame, geometry)
     if not frame or type(geometry) ~= "table" then
         return
@@ -227,10 +148,21 @@ local function ApplyFrameGeometry(frame, geometry)
     if geometry.width and geometry.height and frame.SetSize then
         frame:SetSize(geometry.width, geometry.height)
     end
+end
 
-    if CanSetUserPlaced(frame) then
-        SafeCall(frame.SetUserPlaced, frame, false)
+local function PersistSecondaryWindowPosition(frame)
+    if not frame or not frame.SetUserPlaced then
+        return
     end
+
+    local isMovable = frame.IsMovable and SafeCall(frame.IsMovable, frame) == true
+    local isResizable = frame.IsResizable and SafeCall(frame.IsResizable, frame) == true
+
+    if not isMovable and not isResizable then
+        return
+    end
+
+    SafeCall(frame.SetUserPlaced, frame, true)
 end
 
 local function GetDamageMeterWindow(index)
@@ -238,142 +170,15 @@ local function GetDamageMeterWindow(index)
         return nil
     end
 
-    if index == 1 then
-        return DamageMeter and DamageMeter.GetSessionWindow and DamageMeter:GetSessionWindow(1)
-    end
-
     return DamageMeter and DamageMeter.GetSessionWindow and DamageMeter:GetSessionWindow(index)
 end
 
-local function GetDamageMeterOwner()
-    local primaryWindow = GetDamageMeterWindow(1)
-
-    if primaryWindow and primaryWindow.GetDamageMeterOwner then
-        return primaryWindow:GetDamageMeterOwner()
+local function GetFrameForWindow(index, window)
+    if index == 1 then
+        return DamageMeter
     end
 
-    return DamageMeter
-end
-
-local function GetMaxDamageMeterWindowCount(owner)
-    owner = owner or GetDamageMeterOwner()
-
-    if owner and owner.GetMaxSessionWindowCount then
-        return SafeCall(owner.GetMaxSessionWindowCount, owner) or MAX_PROFILE_WINDOWS
-    end
-
-    return MAX_PROFILE_WINDOWS
-end
-
-local function GetWindowDataList(owner)
-    owner = owner or GetDamageMeterOwner()
-
-    if owner and owner.GetWindowDataList then
-        return SafeCall(owner.GetWindowDataList, owner)
-    end
-
-    return owner and owner.windowDataList or nil
-end
-
-local function GetStateTypeValue(index, state)
-    local stateType = type(state) == "table" and state.damageMeterType or nil
-
-    return GetEnumValue(Enum and Enum.DamageMeterType, stateType)
-        or GetEnumValue(Enum and Enum.DamageMeterType, GetDefaultDamageMeterTypeName(index))
-end
-
-local function GetStateSessionTypeValue(state)
-    local stateSession = type(state) == "table" and state.sessionType or nil
-
-    return GetEnumValue(Enum and Enum.DamageMeterSessionType, stateSession)
-        or GetEnumValue(Enum and Enum.DamageMeterSessionType, DEFAULT_SESSION_TYPE)
-end
-
-local function SeedBlizzardSavedWindowData(index, state)
-    if index <= 1 then
-        return
-    end
-
-    DamageMeterPerCharacterSettings = DamageMeterPerCharacterSettings or {}
-    DamageMeterPerCharacterSettings.windowDataList = DamageMeterPerCharacterSettings.windowDataList or {}
-    DamageMeterPerCharacterSettings.windowDataList[index] = DamageMeterPerCharacterSettings.windowDataList[index] or {}
-
-    local savedWindowData = DamageMeterPerCharacterSettings.windowDataList[index]
-    savedWindowData.damageMeterType = GetStateTypeValue(index, state)
-    savedWindowData.sessionType = GetStateSessionTypeValue(state)
-    savedWindowData.shown = true
-
-    if type(state) == "table" then
-        savedWindowData.locked = state.locked == true
-        savedWindowData.nonInteractive = state.nonInteractive == true
-    end
-end
-
-local function CreateDamageMeterWindowAtIndex(index, state)
-    local owner = GetDamageMeterOwner()
-
-    if not owner or not owner.SetupSessionWindow or index <= 1 or index > GetMaxDamageMeterWindowCount(owner) then
-        return nil
-    end
-
-    local windowDataList = GetWindowDataList(owner)
-
-    if type(windowDataList) ~= "table" then
-        return nil
-    end
-
-    local windowData = windowDataList[index]
-
-    if type(windowData) ~= "table" then
-        windowData = owner.GetDefaultWindowData and SafeCall(owner.GetDefaultWindowData, owner) or {}
-        windowDataList[index] = windowData
-    end
-
-    windowData.damageMeterType = GetStateTypeValue(index, state)
-    windowData.sessionType = GetStateSessionTypeValue(state)
-    windowData.locked = type(state) == "table" and state.locked == true or windowData.locked
-    windowData.nonInteractive = type(state) == "table" and state.nonInteractive == true or windowData.nonInteractive
-
-    SafeCall(owner.SetupSessionWindow, owner, windowData, index)
-
-    return GetDamageMeterWindow(index)
-end
-
-local function EnsureDamageMeterWindow(index, state)
-    local window = GetDamageMeterWindow(index)
-
-    if window or not DamageMeter or index <= 1 then
-        return window
-    end
-
-    local owner = GetDamageMeterOwner()
-    local maxAttempts = GetMaxDamageMeterWindowCount(owner)
-
-    SeedBlizzardSavedWindowData(index, state)
-
-    if owner and owner.LoadSavedWindowDataList then
-        SafeCall(owner.LoadSavedWindowDataList, owner)
-        window = GetDamageMeterWindow(index)
-
-        if window then
-            return window
-        end
-    end
-
-    for _ = 1, maxAttempts do
-        if not owner or not owner.CanShowNewSessionWindow or SafeCall(owner.CanShowNewSessionWindow, owner) ~= true then
-            break
-        end
-
-        SafeCall(owner.ShowNewSessionWindow, owner)
-        window = GetDamageMeterWindow(index)
-
-        if window then
-            break
-        end
-    end
-
-    return window or CreateDamageMeterWindowAtIndex(index, state)
+    return window
 end
 
 local function SaveWindowState(index)
@@ -385,166 +190,140 @@ local function SaveWindowState(index)
         }
     end
 
-    local damageMeterType = window.GetDamageMeterType and window:GetDamageMeterType() or nil
-    local sessionType = window.GetSessionType and window:GetSessionType() or nil
-
     return {
         shown = window:IsShown() == true,
-        geometry = SaveFrameGeometry(index == 1 and DamageMeter or window),
-        damageMeterType = GetEnumName(Enum and Enum.DamageMeterType, damageMeterType),
-        sessionType = GetEnumName(Enum and Enum.DamageMeterSessionType, sessionType or Enum.DamageMeterSessionType.Overall),
-        locked = window.IsLocked and window:IsLocked() == true or false,
-        nonInteractive = window.IsNonInteractive and window:IsNonInteractive() == true or false,
+        geometry = SaveFrameGeometry(GetFrameForWindow(index, window)),
     }
 end
 
 local function ApplyWindowState(index, state)
-    if type(state) ~= "table" then
+    if type(state) ~= "table" or type(state.geometry) ~= "table" then
         return
     end
 
-    if index > 1 and not WindowStateHasSavedData(state) then
+    if InCombatLockdown and InCombatLockdown() then
         return
     end
 
-    state = CopyWindowStateWithDefaults(index, state)
-
-    local window = EnsureDamageMeterWindow(index, state)
+    local window = GetDamageMeterWindow(index)
 
     if not window then
         return
     end
 
-    local owner = window.GetDamageMeterOwner and window:GetDamageMeterOwner() or DamageMeter
-    local damageMeterType = GetEnumValue(Enum and Enum.DamageMeterType, state.damageMeterType)
-    local sessionType = GetEnumValue(Enum and Enum.DamageMeterSessionType, state.sessionType)
+    local frame = GetFrameForWindow(index, window)
 
-    if owner and owner.SetSessionWindowDamageMeterType and damageMeterType ~= nil then
-        SafeCall(owner.SetSessionWindowDamageMeterType, owner, window, damageMeterType)
-    end
+    ApplyFrameGeometry(frame, state.geometry)
 
-    if owner and owner.SetSessionWindowSessionID and sessionType ~= nil then
-        SafeCall(owner.SetSessionWindowSessionID, owner, window, sessionType, nil)
-    end
-
-    if owner and owner.SetSessionWindowLocked then
-        SafeCall(owner.SetSessionWindowLocked, owner, window, state.locked == true)
-    end
-
-    if owner and owner.SetSessionWindowNonInteractive then
-        SafeCall(owner.SetSessionWindowNonInteractive, owner, window, state.nonInteractive == true)
-    end
-
-    ApplyFrameGeometry(index == 1 and DamageMeter or window, state.geometry)
-
-    if state.shown == false and index > 1 and owner and owner.HideSessionWindow then
-        SafeCall(owner.HideSessionWindow, owner, window)
-    elseif window.Show then
-        window:Show()
+    if index > 1 then
+        PersistSecondaryWindowPosition(frame)
     end
 end
 
-local function SaveSharedSettings()
-    if not DamageMeter then
-        return nil
-    end
-
-    return {
-        style = GetEnumName(Enum and Enum.DamageMeterStyle, DamageMeter.GetStyle and DamageMeter:GetStyle()),
-        numberDisplayType = GetEnumName(Enum and Enum.DamageMeterNumbers, DamageMeter.GetNumberDisplayType and DamageMeter:GetNumberDisplayType()),
-        visibility = GetEnumName(Enum and Enum.DamageMeterVisibility, DamageMeter.visibility),
-        barHeight = DamageMeter.GetBarHeight and DamageMeter:GetBarHeight() or nil,
-        barSpacing = DamageMeter.GetBarSpacing and DamageMeter:GetBarSpacing() or nil,
-        textSize = DamageMeter.GetTextSize and DamageMeter:GetTextSize() or nil,
-        windowTransparency = DamageMeter.GetWindowTransparency and DamageMeter:GetWindowTransparency() or nil,
-        backgroundTransparency = DamageMeter.GetBackgroundTransparency and DamageMeter:GetBackgroundTransparency() or nil,
-        showBarIcons = DamageMeter.ShouldShowBarIcons and DamageMeter:ShouldShowBarIcons() == true or false,
-        useClassColor = DamageMeter.ShouldUseClassColor and DamageMeter:ShouldUseClassColor() == true or false,
-    }
-end
-
-local function ApplySharedSettings(settings)
-    if not DamageMeter or type(settings) ~= "table" then
+local function ResetBlizzardDamageMeterData()
+    if InCombatLockdown and InCombatLockdown() then
+        ns:Print("Damage meter data can be reset after combat.")
         return
     end
 
-    local style = GetEnumValue(Enum and Enum.DamageMeterStyle, settings.style)
-    local numberDisplayType = GetEnumValue(Enum and Enum.DamageMeterNumbers, settings.numberDisplayType)
-    local visibility = GetEnumValue(Enum and Enum.DamageMeterVisibility, settings.visibility)
-
-    if style ~= nil and DamageMeter.SetStyle then
-        SafeCall(DamageMeter.SetStyle, DamageMeter, style)
+    if not C_DamageMeter or not C_DamageMeter.ResetAllCombatSessions then
+        ns:Print("Blizzard damage meter reset is not available.")
+        return
     end
 
-    if numberDisplayType ~= nil and DamageMeter.SetNumberDisplayType then
-        SafeCall(DamageMeter.SetNumberDisplayType, DamageMeter, numberDisplayType)
+    if not securecallfunction then
+        ns:Print("Blizzard damage meter reset is not available.")
+        return
     end
 
-    if visibility ~= nil then
-        DamageMeter.visibility = visibility
+    securecallfunction(C_DamageMeter.ResetAllCombatSessions)
+end
 
-        if DamageMeter.UpdateShownState then
-            SafeCall(DamageMeter.UpdateShownState, DamageMeter)
+local function SetResetButtonTooltip(button)
+    if not GameTooltip then
+        return
+    end
+
+    GameTooltip:SetOwner(button, "ANCHOR_RIGHT")
+    GameTooltip:SetText("Reset Meter Data")
+    GameTooltip:AddLine("Clears Blizzard's damage meter sessions.", 0.8, 0.8, 0.8, true)
+    GameTooltip:AddLine("Available outside combat.", 0.8, 0.8, 0.8, true)
+    GameTooltip:Show()
+end
+
+local function PositionResetButton(window, button)
+    if not window or not button then
+        return
+    end
+
+    button:ClearAllPoints()
+
+    local sessionDropdown = window.SessionDropdown
+
+    if sessionDropdown then
+        button:SetPoint("RIGHT", sessionDropdown, "LEFT", -6, 0)
+    else
+        button:SetPoint("TOPRIGHT", window, "TOPRIGHT", -78, -6)
+    end
+end
+
+local function AttachResetButton(window)
+    if not window or window.ZoidsToolsResetButton then
+        return
+    end
+
+    local button = CreateFrame("Button", nil, window)
+    button:SetSize(RESET_BUTTON_SIZE, RESET_BUTTON_SIZE)
+    button:SetFrameLevel((window:GetFrameLevel() or 1) + 8)
+    button:RegisterForClicks("LeftButtonUp")
+
+    local icon = button:CreateTexture(nil, "ARTWORK")
+    icon:SetPoint("CENTER")
+    icon:SetSize(14, 14)
+
+    if icon.SetAtlas then
+        icon:SetAtlas("common-icon-undo")
+    else
+        icon:SetTexture("Interface\\Buttons\\UI-RefreshButton")
+    end
+
+    button.icon = icon
+
+    local highlight = button:CreateTexture(nil, "HIGHLIGHT")
+    highlight:SetColorTexture(1, 0.82, 0, 0.18)
+    highlight:SetAllPoints(button)
+
+    button:SetScript("OnClick", ResetBlizzardDamageMeterData)
+    button:SetScript("OnEnter", SetResetButtonTooltip)
+    button:SetScript("OnLeave", function()
+        if GameTooltip then
+            GameTooltip:Hide()
         end
-    end
+    end)
 
-    if settings.barHeight and DamageMeter.SetBarHeight then
-        SafeCall(DamageMeter.SetBarHeight, DamageMeter, settings.barHeight)
-    end
-
-    if settings.barSpacing and DamageMeter.SetBarSpacing then
-        SafeCall(DamageMeter.SetBarSpacing, DamageMeter, settings.barSpacing)
-    end
-
-    if settings.textSize and DamageMeter.SetTextSize then
-        SafeCall(DamageMeter.SetTextSize, DamageMeter, settings.textSize)
-    end
-
-    if settings.windowTransparency and DamageMeter.SetWindowTransparency then
-        SafeCall(DamageMeter.SetWindowTransparency, DamageMeter, settings.windowTransparency)
-    end
-
-    if settings.backgroundTransparency and DamageMeter.SetBackgroundTransparency then
-        SafeCall(DamageMeter.SetBackgroundTransparency, DamageMeter, settings.backgroundTransparency)
-    end
-
-    if settings.showBarIcons ~= nil and DamageMeter.SetShowBarIcons then
-        SafeCall(DamageMeter.SetShowBarIcons, DamageMeter, settings.showBarIcons == true)
-    end
-
-    if settings.useClassColor ~= nil and DamageMeter.SetUseClassColor then
-        SafeCall(DamageMeter.SetUseClassColor, DamageMeter, settings.useClassColor == true)
-    end
+    window.ZoidsToolsResetButton = button
+    PositionResetButton(window, button)
+    button:Show()
 end
 
-local function SetDamageMeterEnabled(enabled)
-    if SetCVar then
-        SafeCall(SetCVar, "damageMeterEnabled", enabled and "1" or "0")
-    end
-
-    if DamageMeter and DamageMeter.UpdateShownState then
-        SafeCall(DamageMeter.UpdateShownState, DamageMeter)
-    end
-end
-
-local function HookDamageMeterWindows()
-    if not DamageMeter or DamageMeter.ZTProfileHooked then
+local function AttachResetButtonsToDamageMeters()
+    if InCombatLockdown and InCombatLockdown() then
         return
     end
 
-    DamageMeter.ZTProfileHooked = true
-
-    if hooksecurefunc and DamageMeter.SetupSessionWindow then
-        hooksecurefunc(DamageMeter, "SetupSessionWindow", function()
-            if C_Timer and C_Timer.After then
-                C_Timer.After(0, function()
-                    if ns.ApplyActiveDamageMeterProfile then
-                        ns:ApplyActiveDamageMeterProfile(true)
-                    end
-                end)
-            end
-        end)
+    for index = 1, RESET_BUTTON_MAX_WINDOWS do
+        AttachResetButton(_G["DamageMeterSessionWindow" .. index])
     end
+end
+
+local function StartResetButtonWatcher()
+    AttachResetButtonsToDamageMeters()
+
+    if resetButtonTicker or not C_Timer or not C_Timer.NewTicker then
+        return
+    end
+
+    resetButtonTicker = C_Timer.NewTicker(2, AttachResetButtonsToDamageMeters)
 end
 
 function ns:GetDamageMeterProfileOptions()
@@ -583,12 +362,12 @@ function ns:GetDamageMeterProfileSummary(key)
     local windowCount = 0
 
     for index = 1, MAX_PROFILE_WINDOWS do
-        if profile.windows and profile.windows[index] and profile.windows[index].shown ~= false then
+        if profile.windows and profile.windows[index] and profile.windows[index].geometry then
             windowCount = windowCount + 1
         end
     end
 
-    return string.format("%d saved window%s. Shared across all characters.", windowCount, windowCount == 1 and "" or "s")
+    return string.format("%d saved window position%s. Shared across all characters.", windowCount, windowCount == 1 and "" or "s")
 end
 
 function ns:GetBlizzardDamageMeterStatusText()
@@ -608,8 +387,9 @@ function ns:GetBlizzardDamageMeterStatusText()
 end
 
 function ns:SetBlizzardDamageMeterEnabled(value)
-    TryLoadBlizzardDamageMeter()
-    SetDamageMeterEnabled(value == true)
+    if value == true then
+        ns:Print("Enable Blizzard's damage meter from Blizzard's Options. ZoidsTools only saves positions.")
+    end
 end
 
 function ns:GetBlizzardDamageMeterEnabled()
@@ -623,13 +403,17 @@ function ns:SaveDamageMeterProfile(key)
         return false, reason
     end
 
+    if InCombatLockdown and InCombatLockdown() then
+        return false, "Damage meter profiles cannot be saved during combat."
+    end
+
     local profile, resolvedKey = GetProfile(key)
 
     if not profile then
         return false, "Could not access the selected profile."
     end
 
-    profile.sharedSettings = SaveSharedSettings()
+    profile.sharedSettings = nil
     profile.windows = {}
 
     for index = 1, MAX_PROFILE_WINDOWS do
@@ -658,15 +442,19 @@ function ns:ApplyDamageMeterProfile(key, silent)
         return false, reason
     end
 
+    if InCombatLockdown and InCombatLockdown() then
+        if not silent then
+            ns:Print("Damage meter profiles cannot be applied during combat.")
+        end
+
+        return false, "Damage meter profiles cannot be applied during combat."
+    end
+
     local profile, resolvedKey = GetProfile(key)
 
     if not profile or not profile.windows or not profile.windows[1] then
         return false, "This profile does not have a saved layout yet."
     end
-
-    SetDamageMeterEnabled(true)
-    HookDamageMeterWindows()
-    ApplySharedSettings(profile.sharedSettings)
 
     for index = 1, MAX_PROFILE_WINDOWS do
         ApplyWindowState(index, profile.windows[index])
@@ -676,10 +464,6 @@ function ns:ApplyDamageMeterProfile(key, silent)
 
     if db then
         db.activeProfile = resolvedKey
-    end
-
-    if DamageMeter and DamageMeter.RefreshLayout then
-        SafeCall(DamageMeter.RefreshLayout, DamageMeter)
     end
 
     return true
@@ -702,33 +486,7 @@ function ns:ApplyActiveDamageMeterProfile(silent)
 end
 
 function ns:ShowSecondBlizzardDamageMeterWindow()
-    local isAvailable, reason = IsBlizzardDamageMeterAvailable()
-
-    if not isAvailable then
-        return false, reason
-    end
-
-    SetDamageMeterEnabled(true)
-    HookDamageMeterWindows()
-
-    local profile = GetProfile()
-    local state = profile and profile.windows and profile.windows[2]
-    local stateToApply = WindowStateHasSavedData(state) and CopyWindowStateWithDefaults(2, state) or {
-        shown = true,
-        damageMeterType = DEFAULT_SECOND_WINDOW_TYPE,
-        sessionType = DEFAULT_SESSION_TYPE,
-    }
-
-    stateToApply.shown = true
-
-    local window = EnsureDamageMeterWindow(2, stateToApply)
-
-    if window then
-        ApplyWindowState(2, stateToApply)
-        return true
-    end
-
-    return false, "Could not create the second Blizzard damage meter window."
+    return false, "Use Blizzard's damage meter cog menu to create the second window. ZoidsTools only saves positions."
 end
 
 function ns:GetBlizzardDamageMeterWindowSummary(index)
@@ -746,40 +504,13 @@ function ns:GetBlizzardDamageMeterWindowSummary(index)
     return string.format(
         "Window %d: %s, %s, %s.",
         index,
-        TYPE_LABELS[typeName] or typeName or "Unknown type",
-        SESSION_LABELS[sessionName] or sessionName or "Saved session",
+        TYPE_LABELS[typeName] or typeName or "Blizzard type",
+        SESSION_LABELS[sessionName] or sessionName or "Blizzard session",
         window:IsShown() and "shown" or "hidden"
     )
 end
 
 function ns:InitializeBlizzardDamageMeterProfiles()
     EnsureDB()
-    TryLoadBlizzardDamageMeter()
-    HookDamageMeterWindows()
-
-    if not eventFrame then
-        eventFrame = CreateFrame("Frame")
-        eventFrame:RegisterEvent("ADDON_LOADED")
-        eventFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
-        eventFrame:SetScript("OnEvent", function(_, event, addonName)
-            if event == "ADDON_LOADED" and addonName ~= "Blizzard_DamageMeter" then
-                return
-            end
-
-            TryLoadBlizzardDamageMeter()
-            HookDamageMeterWindows()
-
-            if C_Timer and C_Timer.After then
-                C_Timer.After(0.5, function()
-                    ns:ApplyActiveDamageMeterProfile(true)
-                end)
-            end
-        end)
-    end
-
-    if C_Timer and C_Timer.After then
-        C_Timer.After(1, function()
-            ns:ApplyActiveDamageMeterProfile(true)
-        end)
-    end
+    StartResetButtonWatcher()
 end

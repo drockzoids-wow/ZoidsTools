@@ -9,27 +9,8 @@ function ns.UI.Pages.CreateMetersPage(parent)
 
     local generalSection = UI.PlaceSection(frame, "Blizzard Damage Meter")
 
-    local enabled = UI.CreateCheckbox(
-        frame,
-        "Enable Blizzard damage meter",
-        "Uses Blizzard's built-in damage meter instead of the old ZoidsTools combat-log experiment.",
-        function()
-            return ns.GetBlizzardDamageMeterEnabled and ns:GetBlizzardDamageMeterEnabled()
-        end,
-        function(value)
-            if ns.SetBlizzardDamageMeterEnabled then
-                ns:SetBlizzardDamageMeterEnabled(value)
-            end
-
-            if frame.Refresh then
-                frame:Refresh()
-            end
-        end
-    )
-    UI.PlaceFirst(enabled, generalSection)
-
     local status = UI.CreateStatusText(frame)
-    UI.PlaceBelow(status, enabled, 0, 16)
+    UI.PlaceFirst(status, generalSection)
     status:SetPoint("RIGHT", frame, "RIGHT", -16, 0)
 
     local profileSection = UI.PlaceSection(frame, "Profiles", status)
@@ -95,24 +76,6 @@ function ns.UI.Pages.CreateMetersPage(parent)
         end
     end)
 
-    local secondWindowButton = UI.CreateButton(frame, "Show Second Window", 170)
-    secondWindowButton:SetPoint("LEFT", saveButton, "RIGHT", UI.Layout.buttonGap, 0)
-    secondWindowButton:SetScript("OnClick", function()
-        local ok, message
-
-        if ns.ShowSecondBlizzardDamageMeterWindow then
-            ok, message = ns:ShowSecondBlizzardDamageMeterWindow()
-        end
-
-        if not ok and message then
-            ns:Print(message)
-        end
-
-        if frame.Refresh then
-            frame:Refresh()
-        end
-    end)
-
     local profileStatus = UI.CreateStatusText(frame)
     UI.PlaceBelow(profileStatus, applyButton, 0, 16)
     profileStatus:SetPoint("RIGHT", frame, "RIGHT", -16, 0)
@@ -130,10 +93,9 @@ function ns.UI.Pages.CreateMetersPage(parent)
     local note = UI.CreateStatusText(frame)
     UI.PlaceBelow(note, currentWindow2, 0, 18)
     note:SetPoint("RIGHT", frame, "RIGHT", -16, 0)
-    note:SetText("Use Blizzard's meter dropdowns and Edit Mode for style/type changes, then save them into the selected account-wide profile.")
+    note:SetText("Use Blizzard's damage meter controls for meter setup. ZoidsTools only saves and applies window positions outside combat.")
 
     function frame:Refresh()
-        enabled:Refresh()
         profileDropdown:Refresh()
 
         if ns.GetBlizzardDamageMeterStatusText then

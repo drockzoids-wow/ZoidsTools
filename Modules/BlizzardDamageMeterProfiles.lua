@@ -4,7 +4,10 @@ local MAX_PROFILE_WINDOWS = 2
 local RESET_BUTTON_MAX_WINDOWS = 3
 local RESET_BUTTON_SIZE = 18
 local DEFAULT_PROFILE_KEY = "profile1"
+local AUTO_APPLY_DELAYS = { 0.4, 1.2, 2.5 }
 local resetButtonTicker
+local autoApplyEventFrame
+local pendingAutoApply
 local PROFILE_OPTIONS = {
     { value = "profile1", text = "Profile 1" },
     { value = "profile2", text = "Profile 2" },
@@ -54,6 +57,7 @@ local function EnsureDB()
     local db = ns.db.damageMeterProfiles
 
     db.activeProfile = db.activeProfile or DEFAULT_PROFILE_KEY
+    db.lastAppliedProfile = db.lastAppliedProfile or db.activeProfile or DEFAULT_PROFILE_KEY
     db.profiles = db.profiles or {}
 
     for _, option in ipairs(PROFILE_OPTIONS) do
@@ -84,6 +88,23 @@ local function GetProfile(key)
     db.profiles[key].windows = db.profiles[key].windows or {}
 
     return db.profiles[key], key
+end
+
+local function ProfileHasSavedLayout(profile)
+    return type(profile) == "table"
+        and type(profile.windows) == "table"
+        and type(profile.windows[1]) == "table"
+        and type(profile.windows[1].geometry) == "table"
+end
+
+local function GetLastAppliedProfileKey()
+    local db = EnsureDB()
+
+    if not db then
+        return DEFAULT_PROFILE_KEY
+    end
+
+    return db.lastAppliedProfile or db.activeProfile or DEFAULT_PROFILE_KEY
 end
 
 local function TryLoadBlizzardDamageMeter()
@@ -326,6 +347,60 @@ local function StartResetButtonWatcher()
     resetButtonTicker = C_Timer.NewTicker(2, AttachResetButtonsToDamageMeters)
 end
 
+local function TryAutoApplyLastProfile()
+    if InCombatLockdown and InCombatLockdown() then
+        pendingAutoApply = true
+        return false
+    end
+
+    if not TryLoadBlizzardDamageMeter() then
+        pendingAutoApply = true
+        return false
+    end
+
+    local ok = ns.ApplyLastDamageMeterProfile and ns:ApplyLastDamageMeterProfile(true)
+
+    if ok then
+        pendingAutoApply = nil
+    end
+
+    return ok
+end
+
+local function QueueDamageMeterProfileAutoApply()
+    pendingAutoApply = true
+
+    if not C_Timer or not C_Timer.After then
+        TryAutoApplyLastProfile()
+        return
+    end
+
+    for _, delay in ipairs(AUTO_APPLY_DELAYS) do
+        C_Timer.After(delay, TryAutoApplyLastProfile)
+    end
+end
+
+local function StartProfileAutoApplyWatcher()
+    QueueDamageMeterProfileAutoApply()
+
+    if autoApplyEventFrame then
+        return
+    end
+
+    autoApplyEventFrame = CreateFrame("Frame")
+    autoApplyEventFrame:RegisterEvent("ADDON_LOADED")
+    autoApplyEventFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
+    autoApplyEventFrame:SetScript("OnEvent", function(_, event, addonName)
+        if event == "ADDON_LOADED" then
+            if addonName == "Blizzard_DamageMeter" then
+                QueueDamageMeterProfileAutoApply()
+            end
+        elseif event == "PLAYER_REGEN_ENABLED" and pendingAutoApply then
+            QueueDamageMeterProfileAutoApply()
+        end
+    end)
+end
+
 function ns:GetDamageMeterProfileOptions()
     return PROFILE_OPTIONS
 end
@@ -452,7 +527,7 @@ function ns:ApplyDamageMeterProfile(key, silent)
 
     local profile, resolvedKey = GetProfile(key)
 
-    if not profile or not profile.windows or not profile.windows[1] then
+    if not ProfileHasSavedLayout(profile) then
         return false, "This profile does not have a saved layout yet."
     end
 
@@ -464,6 +539,7 @@ function ns:ApplyDamageMeterProfile(key, silent)
 
     if db then
         db.activeProfile = resolvedKey
+        db.lastAppliedProfile = resolvedKey
     end
 
     return true
@@ -478,11 +554,22 @@ function ns:ApplyActiveDamageMeterProfile(silent)
 
     local profile = GetProfile(db.activeProfile)
 
-    if not profile or not profile.windows or not profile.windows[1] then
+    if not ProfileHasSavedLayout(profile) then
         return false
     end
 
     return ns:ApplyDamageMeterProfile(db.activeProfile, silent)
+end
+
+function ns:ApplyLastDamageMeterProfile(silent)
+    local key = GetLastAppliedProfileKey()
+    local profile = GetProfile(key)
+
+    if not ProfileHasSavedLayout(profile) then
+        return false
+    end
+
+    return ns:ApplyDamageMeterProfile(key, silent)
 end
 
 function ns:ShowSecondBlizzardDamageMeterWindow()
@@ -513,4 +600,5 @@ end
 function ns:InitializeBlizzardDamageMeterProfiles()
     EnsureDB()
     StartResetButtonWatcher()
+    StartProfileAutoApplyWatcher()
 end

@@ -333,6 +333,22 @@ local function CanChangeFrame(frame)
     return true
 end
 
+local function IsTalentCastbarOverlayActive()
+    if ns._talentApplyInProgress then
+        return true
+    end
+
+    local overlay = _G.OverlayPlayerCastingBarFrame
+
+    if overlay and overlay.IsShown then
+        local ok, shown = pcall(overlay.IsShown, overlay)
+
+        return ok and shown == true
+    end
+
+    return false
+end
+
 local function ReadColor(color)
     if not color then
         return nil
@@ -710,6 +726,10 @@ local function ApplyCastbar(key)
     local bar = info and ResolveFirst(info.paths)
 
     if not db or not bar or not bar.SetSize then
+        return
+    end
+
+    if key == "player" and IsTalentCastbarOverlayActive() then
         return
     end
 

@@ -663,6 +663,18 @@ local function RunNextFrame(callback)
     end
 end
 
+local function SecureTalentCall(func, ...)
+    if type(func) ~= "function" then
+        return nil
+    end
+
+    if securecallfunction then
+        return securecallfunction(func, ...)
+    end
+
+    return func(...)
+end
+
 local function PrintTalentMessage(message)
     if ns.Print then
         ns:Print(message)
@@ -849,7 +861,7 @@ local function RollbackTalentConfig(configID)
         return false
     end
 
-    local ok, result = pcall(C_Traits.RollbackConfig, configID)
+    local ok, result = pcall(SecureTalentCall, C_Traits.RollbackConfig, configID)
 
     return ok and result ~= false
 end
@@ -1203,7 +1215,7 @@ local function ResetAndPurchaseDeferred(configID, treeID, entryInfo, onComplete)
     applyToken = applyToken + 1
     local token = applyToken
 
-    C_Traits.ResetTree(configID, treeID)
+    SecureTalentCall(C_Traits.ResetTree, configID, treeID)
 
     local orderedNodes = {}
 
@@ -1270,7 +1282,7 @@ local function ResetAndPurchaseDeferred(configID, treeID, entryInfo, onComplete)
                         or ((nodeInfo and nodeInfo.ranksPurchased) or 0) >= (entry.ranksPurchased or 1)
 
                     if activeEntryID ~= entry.selectionEntryID or not hasNeededRanks then
-                        madeProgress = C_Traits.SetSelection(configID, entry.nodeID, entry.selectionEntryID) or madeProgress
+                        madeProgress = SecureTalentCall(C_Traits.SetSelection, configID, entry.nodeID, entry.selectionEntryID) or madeProgress
                         nodeInfo = C_Traits.GetNodeInfo(configID, nodeID)
                     end
                 end
@@ -1281,7 +1293,7 @@ local function ResetAndPurchaseDeferred(configID, treeID, entryInfo, onComplete)
 
                     if neededRanks > 0 then
                         for _ = 1, neededRanks do
-                            local rankOK = C_Traits.PurchaseRank(configID, entry.nodeID)
+                            local rankOK = SecureTalentCall(C_Traits.PurchaseRank, configID, entry.nodeID)
                             madeProgress = rankOK or madeProgress
 
                             if not rankOK then
@@ -1377,7 +1389,7 @@ local function EnsureApplyFrame()
                 local configID = GetStoredConfigID(GetCurrentSpecID())
 
                 if configID and C_ClassTalents and C_ClassTalents.RenameConfig then
-                    C_ClassTalents.RenameConfig(configID, BuildLoadoutName(applyState.buildLabel))
+                    SecureTalentCall(C_ClassTalents.RenameConfig, configID, BuildLoadoutName(applyState.buildLabel))
                 end
 
                 PrintTalentMessage("Talents applied: " .. tostring(applyState.buildLabel or "Build"))
@@ -1464,7 +1476,7 @@ function ns:ApplyTalentImportString(importString, buildLabel, isContinuation)
         EnsureApplyFrame()
         SetPendingApply({ importString = importString, buildLabel = buildLabel })
         applyFrame:RegisterEvent("TRAIT_CONFIG_CREATED")
-        C_ClassTalents.RequestNewConfig(ZOIDS_LOADOUT_NAME)
+        SecureTalentCall(C_ClassTalents.RequestNewConfig, ZOIDS_LOADOUT_NAME)
         PrintTalentMessage("Creating ZoidsTools talent loadout...")
         return true
     end
@@ -1478,7 +1490,7 @@ function ns:ApplyTalentImportString(importString, buildLabel, isContinuation)
     currentLoadoutID = currentLoadoutID or activeConfigID
 
     if currentLoadoutID ~= zoidsConfigID then
-        local result = C_ClassTalents.LoadConfig(zoidsConfigID, true)
+        local result = SecureTalentCall(C_ClassTalents.LoadConfig, zoidsConfigID, true)
 
         if Enum and Enum.LoadConfigResult and result == Enum.LoadConfigResult.LoadInProgress then
             EnsureApplyFrame()
@@ -1516,7 +1528,7 @@ function ns:ApplyTalentImportString(importString, buildLabel, isContinuation)
     ResetAndPurchaseDeferred(activeConfigID, treeID, entryInfo, function()
         if not C_Traits.ConfigHasStagedChanges(activeConfigID) then
             if C_ClassTalents.RenameConfig and zoidsConfigID then
-                C_ClassTalents.RenameConfig(zoidsConfigID, BuildLoadoutName(buildLabel))
+                SecureTalentCall(C_ClassTalents.RenameConfig, zoidsConfigID, BuildLoadoutName(buildLabel))
             end
 
             ns._talentApplyInProgress = false
@@ -1541,7 +1553,7 @@ function ns:ApplyTalentImportString(importString, buildLabel, isContinuation)
             ))
         end
 
-        if not C_ClassTalents.CommitConfig or not C_ClassTalents.CommitConfig(zoidsConfigID) then
+        if not C_ClassTalents.CommitConfig or not SecureTalentCall(C_ClassTalents.CommitConfig, zoidsConfigID) then
             RollbackTalentConfig(activeConfigID)
             ns._talentApplyInProgress = false
             ClearPendingApply()
@@ -1555,7 +1567,7 @@ function ns:ApplyTalentImportString(importString, buildLabel, isContinuation)
         applyFrame:RegisterEvent("TRAIT_CONFIG_UPDATED")
 
         if C_ClassTalents.UpdateLastSelectedSavedConfigID then
-            C_ClassTalents.UpdateLastSelectedSavedConfigID(specID, zoidsConfigID)
+            SecureTalentCall(C_ClassTalents.UpdateLastSelectedSavedConfigID, specID, zoidsConfigID)
         end
     end)
 

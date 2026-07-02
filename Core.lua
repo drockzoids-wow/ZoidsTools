@@ -183,6 +183,7 @@ local defaults = {
     },
     damageMeterProfiles = {
         activeProfile = "profile1",
+        lastAppliedProfile = "profile1",
         profiles = {
             profile1 = {
                 name = "Profile 1",

@@ -7,38 +7,38 @@ local UI = ns.UI
 local Theme = UI.Theme
 local pages = {}
 local buttons = {}
+local RefreshHeaderStatus
 
-local WINDOW_WIDTH = 1020
-local WINDOW_HEIGHT = 720
-local OUTER_MARGIN = 16
-local SIDEBAR_WIDTH = 206
-local SIDEBAR_TOP = -104
-local SIDEBAR_BUTTON_HEIGHT = 31
-local SIDEBAR_BUTTON_SPACING = 34
-local SIDEBAR_BUTTON_TOP = -42
-local CONTENT_LEFT = OUTER_MARGIN + SIDEBAR_WIDTH + 18
-local HEADER_TOP = -52
+local WINDOW_WIDTH = 1120
+local WINDOW_HEIGHT = 760
+local OUTER_MARGIN = 18
+local SIDEBAR_WIDTH = 224
+local SIDEBAR_TOP = -108
+local SIDEBAR_BUTTON_HEIGHT = 30
+local SIDEBAR_BUTTON_SPACING = 33
+local CONTENT_LEFT = OUTER_MARGIN + SIDEBAR_WIDTH + 20
+local HEADER_TOP = -48
 local CONTENT_TOP = SIDEBAR_TOP
-local CONTENT_RIGHT = -16
-local CONTENT_BOTTOM = 24
+local CONTENT_RIGHT = -18
+local CONTENT_BOTTOM = 26
 local TITLE_BADGE_SIZE = 68
 local TITLE_BADGE_ICON_SIZE = 54
 
 local pageOrder = {
-    { key = "general", label = "General", description = "Core ZoidsTools settings." },
-    { key = "tooltips", label = "Tooltips", description = "Unit tooltip appearance and player detail settings." },
-    { key = "windows", label = "Windows", description = "Move Blizzard UI windows and default bags." },
-    { key = "items", label = "Items", description = "Item level, gem, enchant, and binding overlays." },
-    { key = "professions", label = "Professions", description = "Molinari-style profession actions for hovered bag items." },
-    { key = "builds", label = "Grimoire", description = "Talent build suggestions from generated local data." },
-    { key = "meters", label = "Meters", description = "Profiles for Blizzard's built-in damage meter windows." },
-    { key = "combat", label = "Combat", description = "Combat quality-of-life settings." },
-    { key = "unitframes", label = "Unit Frames", description = "Blizzard unit frame health, castbar, and aura settings." },
-    { key = "macros", label = "Macros", description = "Health, mana, and consumable macro settings." },
-    { key = "mounts", label = "Mounts", description = "Smart random mount and service mount settings." },
-    { key = "loot", label = "Loot", description = "Looting quality-of-life settings." },
-    { key = "quests", label = "Quests", description = "Quest and gossip automation settings." },
-    { key = "about", label = "About", description = "Version and command information." },
+    { key = "general", label = "General", group = "Core", icon = "G", description = "Core ZoidsTools settings." },
+    { key = "tooltips", label = "Tooltips", group = "Core", icon = "T", description = "Unit tooltip appearance and player detail settings." },
+    { key = "windows", label = "Windows", group = "Core", icon = "W", description = "Move Blizzard UI windows and default bags." },
+    { key = "items", label = "Items", group = "Character", icon = "I", description = "Item level, gem, enchant, and binding overlays." },
+    { key = "professions", label = "Professions", group = "Character", icon = "P", description = "Molinari-style profession actions for hovered bag items." },
+    { key = "builds", label = "Talents", group = "Character", icon = "B", description = "Talent build suggestions from generated local data." },
+    { key = "meters", label = "Meters", group = "Combat", icon = "M", description = "Profiles for Blizzard's built-in damage meter windows." },
+    { key = "combat", label = "Combat", group = "Combat", icon = "C", description = "Combat quality-of-life settings." },
+    { key = "unitframes", label = "Unit Frames", group = "Combat", icon = "U", description = "Blizzard unit frame health, castbar, and aura settings." },
+    { key = "macros", label = "Macros", group = "Combat", icon = "A", description = "Health, mana, and consumable macro settings." },
+    { key = "mounts", label = "Mounts", group = "Combat", icon = "R", description = "Smart random mount and service mount settings." },
+    { key = "loot", label = "Loot", group = "Automation", icon = "L", description = "Looting quality-of-life settings." },
+    { key = "quests", label = "Quests", group = "Automation", icon = "Q", description = "Quest and gossip automation settings." },
+    { key = "about", label = "About", group = "Info", icon = "?", description = "Version and command information." },
 }
 local pageInfoByKey = {}
 
@@ -48,8 +48,8 @@ end
 
 function UI.CreatePageFrame(parent)
     local frame = CreateFrame("Frame", nil, parent)
-    frame:SetPoint("TOPLEFT", parent.contentPanel, "TOPLEFT", 20, -18)
-    frame:SetPoint("BOTTOMRIGHT", parent.contentPanel, "BOTTOMRIGHT", -20, 18)
+    frame:SetPoint("TOPLEFT", parent.contentPanel, "TOPLEFT", 24, -22)
+    frame:SetPoint("BOTTOMRIGHT", parent.contentPanel, "BOTTOMRIGHT", -24, 22)
     frame:Hide()
     return frame
 end
@@ -120,6 +120,20 @@ local function SetButtonSelected(button, selected)
     if button.SetStyledSelected then
         button:SetStyledSelected(selected)
     end
+
+    if button.selectionBar then
+        button.selectionBar:SetShown(selected == true)
+    end
+
+    if button.iconBack then
+        if selected then
+            button.iconBack:SetBackdropColor(0.30, 0.22, 0.08, 0.95)
+            button.iconBack:SetBackdropBorderColor(1, 0.82, 0.25, 0.78)
+        else
+            button.iconBack:SetBackdropColor(0.045, 0.050, 0.060, 0.85)
+            button.iconBack:SetBackdropBorderColor(0.70, 0.56, 0.30, 0.36)
+        end
+    end
 end
 
 local function ShowPage(pageKey)
@@ -129,6 +143,7 @@ local function ShowPage(pageKey)
     if UI.frame and pageInfo then
         UI.frame.pageTitle:SetText(pageInfo.label)
         UI.frame.pageDescription:SetText(pageInfo.description or "")
+        RefreshHeaderStatus(UI.frame)
     end
 
     for key, page in pairs(pages) do
@@ -152,10 +167,30 @@ function UI.RefreshVisiblePage()
     end
 end
 
-local function CreateSidebarButton(parent, label, key, index)
+local function CreateSidebarButton(parent, info, yOffset)
+    local label = info.label
+    local key = info.key
     local button = UI.CreateButton(parent.sidebar, label, SIDEBAR_WIDTH - 28, SIDEBAR_BUTTON_HEIGHT)
-    button:SetPoint("TOPLEFT", parent.sidebar, "TOPLEFT", 14, SIDEBAR_BUTTON_TOP - ((index - 1) * SIDEBAR_BUTTON_SPACING))
+    button:SetPoint("TOPLEFT", parent.sidebar, "TOPLEFT", 14, yOffset)
     button:SetStyledTextAlign("LEFT")
+    button:SetStyledTextInset(44)
+
+    button.selectionBar = button:CreateTexture(nil, "OVERLAY")
+    button.selectionBar:SetPoint("TOPLEFT", button, "TOPLEFT", 4, -6)
+    button.selectionBar:SetPoint("BOTTOMLEFT", button, "BOTTOMLEFT", 4, 6)
+    button.selectionBar:SetWidth(3)
+    button.selectionBar:SetColorTexture(0.36, 0.9, 0.48, 0.88)
+    button.selectionBar:Hide()
+
+    button.iconBack = CreateFrame("Frame", nil, button, "BackdropTemplate")
+    button.iconBack:SetPoint("LEFT", button, "LEFT", 14, 0)
+    button.iconBack:SetSize(22, 22)
+    Theme.ApplySoftBackdrop(button.iconBack, 0.9)
+
+    button.iconText = button.iconBack:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    button.iconText:SetPoint("CENTER", button.iconBack, "CENTER", 0, 0)
+    button.iconText:SetText(info.icon or string.sub(label, 1, 1))
+    button.iconText:SetTextColor(0.95, 0.72, 0.28)
 
     button:SetScript("OnClick", function()
         ShowPage(key)
@@ -165,6 +200,22 @@ local function CreateSidebarButton(parent, label, key, index)
     SetButtonSelected(button, false)
 
     return button
+end
+
+local function CreateSidebarGroupLabel(parent, text, yOffset)
+    local label = parent.sidebar:CreateFontString(nil, "ARTWORK", "GameFontNormalSmall")
+    label:SetPoint("TOPLEFT", parent.sidebar, "TOPLEFT", 18, yOffset)
+    label:SetText(text)
+    label:SetTextColor(0.66, 0.62, 0.52)
+    label:SetJustifyH("LEFT")
+
+    local line = parent.sidebar:CreateTexture(nil, "ARTWORK")
+    line:SetPoint("LEFT", label, "RIGHT", 8, 0)
+    line:SetPoint("RIGHT", parent.sidebar, "RIGHT", -18, 0)
+    line:SetHeight(1)
+    line:SetColorTexture(0.95, 0.72, 0.28, 0.13)
+
+    return label
 end
 
 local function BuildPages(frame)
@@ -268,6 +319,110 @@ local function CreateBrandPlate(frame)
     frame.logoPlate = plate
 end
 
+local function CreateStatusPill(parent, width)
+    local pill = CreateFrame("Frame", nil, parent, "BackdropTemplate")
+    pill:SetSize(width or 132, 24)
+    Theme.ApplySoftBackdrop(pill, 0.68)
+
+    pill.text = pill:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    pill.text:SetPoint("LEFT", pill, "LEFT", 10, 0)
+    pill.text:SetPoint("RIGHT", pill, "RIGHT", -10, 0)
+    pill.text:SetJustifyH("CENTER")
+    pill.text:SetTextColor(0.86, 0.84, 0.76)
+
+    return pill
+end
+
+local function GetPlayerDisplayText()
+    local playerName = UnitName and UnitName("player") or "Player"
+    local classFile
+
+    if UnitClass then
+        _, classFile = UnitClass("player")
+    end
+
+    return tostring(playerName or "Player"), classFile
+end
+
+local function GetSpecDisplayText()
+    if not GetSpecialization or not GetSpecializationInfo then
+        return "No Spec"
+    end
+
+    local specIndex = GetSpecialization()
+
+    if not specIndex then
+        return "No Spec"
+    end
+
+    local _, specName = GetSpecializationInfo(specIndex)
+
+    return specName or "No Spec"
+end
+
+RefreshHeaderStatus = function(frame)
+    if not frame or not frame.statusPlayer then
+        return
+    end
+
+    local playerName, classFile = GetPlayerDisplayText()
+    local classColor = classFile and RAID_CLASS_COLORS and RAID_CLASS_COLORS[classFile]
+
+    frame.statusPlayer.text:SetText(playerName)
+
+    if classColor then
+        frame.statusPlayer.text:SetTextColor(classColor.r or 1, classColor.g or 1, classColor.b or 1)
+    else
+        frame.statusPlayer.text:SetTextColor(0.86, 0.84, 0.76)
+    end
+
+    frame.statusSpec.text:SetText(GetSpecDisplayText())
+
+    if InCombatLockdown and InCombatLockdown() then
+        frame.statusCombat.text:SetText("Combat Locked")
+        frame.statusCombat.text:SetTextColor(0.95, 0.34, 0.26)
+        frame.statusCombat:SetBackdropBorderColor(0.95, 0.30, 0.24, 0.45)
+    else
+        frame.statusCombat.text:SetText("Ready")
+        frame.statusCombat.text:SetTextColor(0.42, 0.95, 0.52)
+        frame.statusCombat:SetBackdropBorderColor(0.42, 0.95, 0.52, 0.30)
+    end
+end
+
+local function CreateHeaderStatus(frame)
+    frame.statusStrip = CreateFrame("Frame", nil, frame.pageHeader)
+    frame.statusStrip:SetPoint("TOPRIGHT", frame.pageHeader, "TOPRIGHT", 0, -1)
+    frame.statusStrip:SetSize(420, 24)
+
+    frame.statusCombat = CreateStatusPill(frame.statusStrip, 116)
+    frame.statusCombat:SetPoint("RIGHT", frame.statusStrip, "RIGHT", 0, 0)
+
+    frame.statusSpec = CreateStatusPill(frame.statusStrip, 126)
+    frame.statusSpec:SetPoint("RIGHT", frame.statusCombat, "LEFT", -8, 0)
+
+    frame.statusPlayer = CreateStatusPill(frame.statusStrip, 152)
+    frame.statusPlayer:SetPoint("RIGHT", frame.statusSpec, "LEFT", -8, 0)
+
+    RefreshHeaderStatus(frame)
+end
+
+local function RegisterHeaderStatusEvents(frame)
+    if frame.statusEventFrame then
+        return
+    end
+
+    local eventFrame = CreateFrame("Frame")
+    eventFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
+    eventFrame:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED")
+    eventFrame:RegisterEvent("PLAYER_REGEN_DISABLED")
+    eventFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
+    eventFrame:SetScript("OnEvent", function()
+        RefreshHeaderStatus(frame)
+    end)
+
+    frame.statusEventFrame = eventFrame
+end
+
 local function CreateMainWindow()
     if UI.frame then
         return UI.frame
@@ -275,6 +430,8 @@ local function CreateMainWindow()
 
     local frame = CreateFrame("Frame", "ZoidsToolsMainWindow", UIParent, "BasicFrameTemplateWithInset")
     frame:SetSize(WINDOW_WIDTH, WINDOW_HEIGHT)
+    frame:SetFrameStrata("DIALOG")
+    frame:SetToplevel(true)
     frame:SetMovable(true)
     frame:SetClampedToScreen(true)
     frame:EnableMouse(true)
@@ -295,7 +452,7 @@ local function CreateMainWindow()
 
     frame.TitleText:ClearAllPoints()
     frame.TitleText:SetPoint("TOP", frame, "TOP", 0, -5)
-    frame.TitleText:SetWidth(WINDOW_WIDTH - 140)
+    frame.TitleText:SetWidth(WINDOW_WIDTH - 160)
     frame.TitleText:SetJustifyH("CENTER")
 
     CreateTitleBadge(frame)
@@ -305,19 +462,12 @@ local function CreateMainWindow()
     frame.sidebar:SetPoint("TOPLEFT", frame, "TOPLEFT", OUTER_MARGIN, SIDEBAR_TOP)
     frame.sidebar:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT", OUTER_MARGIN, CONTENT_BOTTOM)
     frame.sidebar:SetWidth(SIDEBAR_WIDTH)
-    frame.sidebar:SetBackdrop({
-        bgFile = "Interface\\Buttons\\WHITE8x8",
-        edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
-        tile = false,
-        edgeSize = 10,
-        insets = { left = 2, right = 2, top = 2, bottom = 2 },
-    })
-    frame.sidebar:SetBackdropColor(0.02, 0.025, 0.035, 0.62)
-    frame.sidebar:SetBackdropBorderColor(0.85, 0.7, 0.38, 0.38)
+    Theme.ApplySurfaceBackdrop(frame.sidebar, 0.88)
 
     local navTitle = frame.sidebar:CreateFontString(nil, "ARTWORK", "GameFontNormal")
     navTitle:SetPoint("TOPLEFT", frame.sidebar, "TOPLEFT", 16, -18)
-    navTitle:SetText("Tools")
+    navTitle:SetText("Navigation")
+    navTitle:SetTextColor(1, 0.82, 0.14)
 
     frame.pageHeader = CreateFrame("Frame", nil, frame)
     frame.pageHeader:SetPoint("TOPLEFT", frame, "TOPLEFT", CONTENT_LEFT, HEADER_TOP)
@@ -326,24 +476,44 @@ local function CreateMainWindow()
 
     frame.pageTitle = frame.pageHeader:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
     frame.pageTitle:SetPoint("TOPLEFT", 0, 0)
+    frame.pageTitle:SetPoint("RIGHT", frame.pageHeader, "RIGHT", -432, 0)
     frame.pageTitle:SetTextColor(1, 0.82, 0)
     frame.pageTitle:SetJustifyH("LEFT")
 
     frame.pageDescription = frame.pageHeader:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
     frame.pageDescription:SetPoint("TOPLEFT", frame.pageTitle, "BOTTOMLEFT", 0, -8)
-    frame.pageDescription:SetPoint("RIGHT", frame.pageHeader, "RIGHT", 0, 0)
+    frame.pageDescription:SetPoint("RIGHT", frame.pageHeader, "RIGHT", -432, 0)
     frame.pageDescription:SetJustifyH("LEFT")
     frame.pageDescription:SetTextColor(0.86, 0.82, 0.72)
+
+    CreateHeaderStatus(frame)
+    RegisterHeaderStatusEvents(frame)
 
     frame.contentPanel = CreateFrame("Frame", nil, frame, "BackdropTemplate")
     frame.contentPanel:SetPoint("TOPLEFT", frame, "TOPLEFT", CONTENT_LEFT, CONTENT_TOP)
     frame.contentPanel:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", CONTENT_RIGHT, CONTENT_BOTTOM)
-    Theme.ApplyPanelBackdrop(frame.contentPanel, 0.9)
+    Theme.ApplySurfaceBackdrop(frame.contentPanel, 0.90)
+
+    frame.contentPanel.topLine = frame.contentPanel:CreateTexture(nil, "ARTWORK")
+    frame.contentPanel.topLine:SetPoint("TOPLEFT", frame.contentPanel, "TOPLEFT", 18, -6)
+    frame.contentPanel.topLine:SetPoint("TOPRIGHT", frame.contentPanel, "TOPRIGHT", -18, -6)
+    frame.contentPanel.topLine:SetHeight(1)
+    frame.contentPanel.topLine:SetColorTexture(0.95, 0.72, 0.28, 0.18)
 
     UI.frame = frame
 
-    for index, info in ipairs(pageOrder) do
-        CreateSidebarButton(frame, info.label, info.key, index)
+    local currentGroup
+    local yOffset = -48
+
+    for _, info in ipairs(pageOrder) do
+        if info.group ~= currentGroup then
+            currentGroup = info.group
+            CreateSidebarGroupLabel(frame, currentGroup, yOffset)
+            yOffset = yOffset - 22
+        end
+
+        CreateSidebarButton(frame, info, yOffset)
+        yOffset = yOffset - SIDEBAR_BUTTON_SPACING
     end
 
     BuildPages(frame)
@@ -355,6 +525,7 @@ end
 
 function UI.Show(pageKey)
     local frame = CreateMainWindow()
+    frame:Raise()
     frame:Show()
     ShowPage(pageKey or UI.currentPage or "general")
 end
@@ -365,6 +536,7 @@ function UI.Toggle(pageKey)
     if frame:IsShown() and (not pageKey or UI.currentPage == pageKey) then
         frame:Hide()
     else
+        frame:Raise()
         frame:Show()
         ShowPage(pageKey or UI.currentPage or "general")
     end

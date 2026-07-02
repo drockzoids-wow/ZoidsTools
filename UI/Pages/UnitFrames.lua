@@ -9,6 +9,20 @@ local frameColumns = {
     { key = "focus", label = "Focus" },
 }
 
+local function CreateColumnDivider(parent, anchor, xOffset, yOffset, height)
+    local glow = parent:CreateTexture(nil, "BACKGROUND")
+    glow:SetPoint("TOPLEFT", anchor, "BOTTOMLEFT", xOffset - 2, yOffset)
+    glow:SetSize(5, height)
+    glow:SetColorTexture(0.95, 0.72, 0.28, 0.035)
+
+    local line = parent:CreateTexture(nil, "BORDER")
+    line:SetPoint("TOPLEFT", anchor, "BOTTOMLEFT", xOffset, yOffset)
+    line:SetSize(1, height)
+    line:SetColorTexture(0.95, 0.72, 0.28, 0.16)
+
+    return line
+end
+
 function ns.UI.Pages.CreateUnitFramesPage(parent)
     local UI = ns.UI
     local frame = UI.CreatePageFrame(parent)
@@ -35,9 +49,14 @@ function ns.UI.Pages.CreateUnitFramesPage(parent)
     local frameSection = UI.PlaceSection(frame, "Frame Controls", classColorHealth)
     local columnWidth = 188
     local columnGap = 42
+    local dividerHeight = 238
 
     for index, info in ipairs(frameColumns) do
         local x = UI.Layout.indent + ((index - 1) * (columnWidth + columnGap))
+
+        if index > 1 then
+            CreateColumnDivider(frame, frameSection, x - math.floor(columnGap / 2), -UI.Layout.firstRowGap + 4, dividerHeight)
+        end
 
         local title = frame:CreateFontString(nil, "ARTWORK", "GameFontNormal")
         title:SetPoint("TOPLEFT", frameSection, "BOTTOMLEFT", x, -UI.Layout.firstRowGap)

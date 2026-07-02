@@ -4,10 +4,16 @@ local MAX_PROFILE_WINDOWS = 2
 local RESET_BUTTON_MAX_WINDOWS = 3
 local RESET_BUTTON_SIZE = 18
 local DEFAULT_PROFILE_KEY = "profile1"
-local AUTO_APPLY_DELAYS = { 0.4, 1.2, 2.5 }
+local AUTO_APPLY_DELAYS = { 0.4, 1.2, 2.5, 5.0 }
+local SETTLE_APPLY_DELAYS = { 0.1, 0.6, 1.6, 3.0 }
 local resetButtonTicker
 local autoApplyEventFrame
 local pendingAutoApply
+local autoApplyGeneration = 0
+local settleApplyGeneration = 0
+local damageMeterHooksInstalled = false
+local applyingProfileDepth = 0
+local hookedDamageMeterFrames = {}
 local PROFILE_OPTIONS = {
     { value = "profile1", text = "Profile 1" },
     { value = "profile2", text = "Profile 2" },
@@ -105,6 +111,11 @@ local function GetLastAppliedProfileKey()
     end
 
     return db.lastAppliedProfile or db.activeProfile or DEFAULT_PROFILE_KEY
+end
+
+local function BumpAutoApplyGeneration()
+    autoApplyGeneration = autoApplyGeneration + 1
+    return autoApplyGeneration
 end
 
 local function TryLoadBlizzardDamageMeter()
@@ -347,7 +358,39 @@ local function StartResetButtonWatcher()
     resetButtonTicker = C_Timer.NewTicker(2, AttachResetButtonsToDamageMeters)
 end
 
-local function TryAutoApplyLastProfile()
+local function QueueDamageMeterProfileSettleApply(profileKey)
+    if not profileKey or not C_Timer or not C_Timer.After then
+        return
+    end
+
+    settleApplyGeneration = settleApplyGeneration + 1
+    local generation = settleApplyGeneration
+
+    for _, delay in ipairs(SETTLE_APPLY_DELAYS) do
+        C_Timer.After(delay, function()
+            if generation ~= settleApplyGeneration then
+                return
+            end
+
+            if GetLastAppliedProfileKey() ~= profileKey then
+                return
+            end
+
+            if ns.ApplyDamageMeterProfile then
+                ns:ApplyDamageMeterProfile(profileKey, true, {
+                    keepAutoApplyGeneration = true,
+                    skipSettleApply = true,
+                })
+            end
+        end)
+    end
+end
+
+local function TryAutoApplyLastProfile(generation)
+    if generation and generation ~= autoApplyGeneration then
+        return false
+    end
+
     if InCombatLockdown and InCombatLockdown() then
         pendingAutoApply = true
         return false
@@ -358,7 +401,9 @@ local function TryAutoApplyLastProfile()
         return false
     end
 
-    local ok = ns.ApplyLastDamageMeterProfile and ns:ApplyLastDamageMeterProfile(true)
+    local ok = ns.ApplyLastDamageMeterProfile and ns:ApplyLastDamageMeterProfile(true, {
+        keepAutoApplyGeneration = true,
+    })
 
     if ok then
         pendingAutoApply = nil
@@ -369,18 +414,75 @@ end
 
 local function QueueDamageMeterProfileAutoApply()
     pendingAutoApply = true
+    local generation = BumpAutoApplyGeneration()
 
     if not C_Timer or not C_Timer.After then
-        TryAutoApplyLastProfile()
+        TryAutoApplyLastProfile(generation)
         return
     end
 
     for _, delay in ipairs(AUTO_APPLY_DELAYS) do
-        C_Timer.After(delay, TryAutoApplyLastProfile)
+        C_Timer.After(delay, function()
+            TryAutoApplyLastProfile(generation)
+        end)
     end
 end
 
+local function IsEditModeActive()
+    if DamageMeter and DamageMeter.IsEditing and SafeCall(DamageMeter.IsEditing, DamageMeter) == true then
+        return true
+    end
+
+    if EditModeManagerFrame and EditModeManagerFrame.IsShown and SafeCall(EditModeManagerFrame.IsShown, EditModeManagerFrame) == true then
+        return true
+    end
+
+    return false
+end
+
+local function QueueAfterBlizzardDamageMeterMove()
+    if applyingProfileDepth > 0 or IsEditModeActive() then
+        return
+    end
+
+    QueueDamageMeterProfileAutoApply()
+end
+
+local function InstallDamageMeterFrameHooks(frame)
+    if not frame or hookedDamageMeterFrames[frame] or not hooksecurefunc then
+        return
+    end
+
+    SafeCall(hooksecurefunc, frame, "ClearAllPoints", QueueAfterBlizzardDamageMeterMove)
+    SafeCall(hooksecurefunc, frame, "SetPoint", QueueAfterBlizzardDamageMeterMove)
+    SafeCall(hooksecurefunc, frame, "SetSize", QueueAfterBlizzardDamageMeterMove)
+
+    hookedDamageMeterFrames[frame] = true
+end
+
+local function InstallDamageMeterHooks()
+    if damageMeterHooksInstalled or not TryLoadBlizzardDamageMeter() or not hooksecurefunc then
+        return
+    end
+
+    local function QueueAfterBlizzardLayout()
+        if applyingProfileDepth > 0 or IsEditModeActive() then
+            return
+        end
+
+        QueueDamageMeterProfileAutoApply()
+    end
+
+    InstallDamageMeterFrameHooks(DamageMeter)
+    SafeCall(hooksecurefunc, DamageMeter, "SetupSessionWindow", QueueAfterBlizzardLayout)
+    SafeCall(hooksecurefunc, DamageMeter, "RefreshLayout", QueueAfterBlizzardLayout)
+    SafeCall(hooksecurefunc, DamageMeter, "UpdateShownState", QueueAfterBlizzardLayout)
+
+    damageMeterHooksInstalled = true
+end
+
 local function StartProfileAutoApplyWatcher()
+    InstallDamageMeterHooks()
     QueueDamageMeterProfileAutoApply()
 
     if autoApplyEventFrame then
@@ -388,13 +490,19 @@ local function StartProfileAutoApplyWatcher()
     end
 
     autoApplyEventFrame = CreateFrame("Frame")
-    autoApplyEventFrame:RegisterEvent("ADDON_LOADED")
-    autoApplyEventFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
+    SafeCall(autoApplyEventFrame.RegisterEvent, autoApplyEventFrame, "ADDON_LOADED")
+    SafeCall(autoApplyEventFrame.RegisterEvent, autoApplyEventFrame, "PLAYER_ENTERING_WORLD")
+    SafeCall(autoApplyEventFrame.RegisterEvent, autoApplyEventFrame, "LOADING_SCREEN_DISABLED")
+    SafeCall(autoApplyEventFrame.RegisterEvent, autoApplyEventFrame, "PLAYER_REGEN_ENABLED")
     autoApplyEventFrame:SetScript("OnEvent", function(_, event, addonName)
         if event == "ADDON_LOADED" then
             if addonName == "Blizzard_DamageMeter" then
+                InstallDamageMeterHooks()
                 QueueDamageMeterProfileAutoApply()
             end
+        elseif event == "PLAYER_ENTERING_WORLD" or event == "LOADING_SCREEN_DISABLED" then
+            InstallDamageMeterHooks()
+            QueueDamageMeterProfileAutoApply()
         elseif event == "PLAYER_REGEN_ENABLED" and pendingAutoApply then
             QueueDamageMeterProfileAutoApply()
         end
@@ -506,7 +614,13 @@ function ns:SaveDamageMeterProfile(key)
     return true
 end
 
-function ns:ApplyDamageMeterProfile(key, silent)
+function ns:ApplyDamageMeterProfile(key, silent, options)
+    options = options or {}
+
+    if not options.keepAutoApplyGeneration then
+        BumpAutoApplyGeneration()
+    end
+
     local isAvailable, reason = IsBlizzardDamageMeterAvailable()
 
     if not isAvailable then
@@ -531,9 +645,13 @@ function ns:ApplyDamageMeterProfile(key, silent)
         return false, "This profile does not have a saved layout yet."
     end
 
+    applyingProfileDepth = applyingProfileDepth + 1
+
     for index = 1, MAX_PROFILE_WINDOWS do
         ApplyWindowState(index, profile.windows[index])
     end
+
+    applyingProfileDepth = applyingProfileDepth - 1
 
     local db = EnsureDB()
 
@@ -542,10 +660,14 @@ function ns:ApplyDamageMeterProfile(key, silent)
         db.lastAppliedProfile = resolvedKey
     end
 
+    if not options.skipSettleApply then
+        QueueDamageMeterProfileSettleApply(resolvedKey)
+    end
+
     return true
 end
 
-function ns:ApplyActiveDamageMeterProfile(silent)
+function ns:ApplyActiveDamageMeterProfile(silent, options)
     local db = EnsureDB()
 
     if not db then
@@ -558,10 +680,10 @@ function ns:ApplyActiveDamageMeterProfile(silent)
         return false
     end
 
-    return ns:ApplyDamageMeterProfile(db.activeProfile, silent)
+    return ns:ApplyDamageMeterProfile(db.activeProfile, silent, options)
 end
 
-function ns:ApplyLastDamageMeterProfile(silent)
+function ns:ApplyLastDamageMeterProfile(silent, options)
     local key = GetLastAppliedProfileKey()
     local profile = GetProfile(key)
 
@@ -569,7 +691,7 @@ function ns:ApplyLastDamageMeterProfile(silent)
         return false
     end
 
-    return ns:ApplyDamageMeterProfile(key, silent)
+    return ns:ApplyDamageMeterProfile(key, silent, options)
 end
 
 function ns:ShowSecondBlizzardDamageMeterWindow()

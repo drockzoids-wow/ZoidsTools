@@ -1,3 +1,4 @@
 Tools/
 Data/*.test.lua
 *.tmp
+.codex/

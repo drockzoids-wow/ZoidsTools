@@ -24,6 +24,7 @@ local PENDING_APPLY_WATCHDOG_SECS = 10
 local pendingApply
 local pendingApplySeq = 0
 local applyToken = 0
+local SecureTalentCall
 local dungeonPromptQueued = false
 local lastDungeonZoneSignature
 local lastDungeonPromptSignature
@@ -663,7 +664,7 @@ local function RunNextFrame(callback)
     end
 end
 
-local function SecureTalentCall(func, ...)
+function SecureTalentCall(func, ...)
     if type(func) ~= "function" then
         return nil
     end
@@ -779,6 +780,20 @@ local function StoreConfigID(specID, configID)
     end
 end
 
+local function GetSelectedSavedConfigID(specID)
+    if specID and C_ClassTalents and C_ClassTalents.GetLastSelectedSavedConfigID then
+        return C_ClassTalents.GetLastSelectedSavedConfigID(specID)
+    end
+
+    return nil
+end
+
+local function RememberSavedConfigID(specID, configID)
+    if specID and C_ClassTalents and C_ClassTalents.UpdateLastSelectedSavedConfigID then
+        SecureTalentCall(C_ClassTalents.UpdateLastSelectedSavedConfigID, specID, configID)
+    end
+end
+
 local function BuildTalentLabel(context)
     if not context then
         return "Build"
@@ -843,6 +858,24 @@ local function FailTalentApply(message)
     ClearPendingApply()
     ns._talentApplyInProgress = false
     return nil, message
+end
+
+local function ContinuePendingApplyAfterLoad(applyState)
+    if pendingApply ~= applyState or not applyState.waitingForLoad then
+        return
+    end
+
+    applyState.waitingForLoad = false
+
+    if applyFrame then
+        applyFrame:UnregisterEvent("TRAIT_CONFIG_UPDATED")
+    end
+
+    RunNextFrame(function()
+        if pendingApply == applyState then
+            ns:ApplyTalentImportString(applyState.importString, applyState.buildLabel, true)
+        end
+    end)
 end
 
 local function ConfigHasStagedChanges(configID)
@@ -1376,14 +1409,22 @@ local function EnsureApplyFrame()
         elseif event == "TRAIT_CONFIG_UPDATED" then
             local updatedConfigID = type(arg1) == "table" and arg1.ID or arg1
             local activeConfigID = GetActiveConfigID()
+            local applyState = pendingApply
+
+            if applyState and applyState.waitingForLoad then
+                if updatedConfigID and activeConfigID and updatedConfigID ~= activeConfigID and updatedConfigID ~= applyState.loadedZoidsConfigID then
+                    return
+                end
+
+                ContinuePendingApplyAfterLoad(applyState)
+                return
+            end
 
             if updatedConfigID and activeConfigID and updatedConfigID ~= activeConfigID then
                 return
             end
 
             self:UnregisterEvent("TRAIT_CONFIG_UPDATED")
-
-            local applyState = pendingApply
 
             if applyState.renameOnly then
                 local configID = GetStoredConfigID(GetCurrentSpecID())
@@ -1444,26 +1485,6 @@ function ns:ApplyTalentImportString(importString, buildLabel, isContinuation)
         zoidsConfigID = activeConfigID
     end
 
-    if not isContinuation and ConfigHasStagedChanges(activeConfigID) then
-        if IsZoidsTalentConfig(activeConfigID, specID) and RollbackTalentConfig(activeConfigID) then
-            PrintTalentMessage("Discarded pending ZoidsTools talent changes.")
-        else
-            return FailTalentApply("You have unsaved talent changes. Apply or discard them first, then try again.")
-        end
-    end
-
-    local treeID = GetConfigTreeID(activeConfigID)
-
-    if not treeID then
-        return FailTalentApply("Could not determine the active talent tree.")
-    end
-
-    local entryInfo, parseError = ParseTalentImportString(importString, treeID, activeConfigID)
-
-    if not entryInfo then
-        return FailTalentApply(parseError)
-    end
-
     if not zoidsConfigID then
         if C_ClassTalents.CanCreateNewConfig and not C_ClassTalents.CanCreateNewConfig() then
             return FailTalentApply("No free talent loadout slots. Delete one, then try again.")
@@ -1481,36 +1502,48 @@ function ns:ApplyTalentImportString(importString, buildLabel, isContinuation)
         return true
     end
 
-    local currentLoadoutID
+    local alreadyPreparedZoids = pendingApply and pendingApply.loadedZoidsConfigID == zoidsConfigID
 
-    if C_ClassTalents.GetLastSelectedSavedConfigID then
-        currentLoadoutID = C_ClassTalents.GetLastSelectedSavedConfigID(specID)
-    end
+    if not isContinuation and ConfigHasStagedChanges(activeConfigID) then
+        local stagedChangesAreZoids = IsZoidsTalentConfig(activeConfigID, specID)
+            or GetSelectedSavedConfigID(specID) == zoidsConfigID
 
-    currentLoadoutID = currentLoadoutID or activeConfigID
-
-    if currentLoadoutID ~= zoidsConfigID then
-        local result = SecureTalentCall(C_ClassTalents.LoadConfig, zoidsConfigID, true)
-
-        if Enum and Enum.LoadConfigResult and result == Enum.LoadConfigResult.LoadInProgress then
-            EnsureApplyFrame()
-            SetPendingApply({ importString = importString, buildLabel = buildLabel })
-            applyFrame:RegisterEvent("TRAIT_CONFIG_UPDATED")
-            return true
-        elseif Enum and Enum.LoadConfigResult and result == Enum.LoadConfigResult.Error then
-            ClearStoredConfigID(specID)
-            return FailTalentApply("Could not load the ZoidsTools talent loadout. Apply or discard pending talent changes, then try again.")
+        if stagedChangesAreZoids and RollbackTalentConfig(activeConfigID) then
+            PrintTalentMessage("Discarded pending ZoidsTools talent changes.")
+        else
+            return FailTalentApply("You have unsaved talent changes. Apply or discard them first, then try again.")
         end
     end
 
+    if not isContinuation and not alreadyPreparedZoids then
+        EnsureApplyFrame()
+        local applyState = { importString = importString, buildLabel = buildLabel, waitingForLoad = true, loadedZoidsConfigID = zoidsConfigID }
+        SetPendingApply(applyState)
+        applyFrame:RegisterEvent("TRAIT_CONFIG_UPDATED")
+
+        local result = SecureTalentCall(C_ClassTalents.LoadConfig, zoidsConfigID, true)
+
+        if Enum and Enum.LoadConfigResult and result == Enum.LoadConfigResult.Error then
+            ClearStoredConfigID(specID)
+            return FailTalentApply("Could not load the ZoidsTools talent loadout. Apply or discard pending talent changes, then try again.")
+        end
+
+        if Enum and Enum.LoadConfigResult and result == Enum.LoadConfigResult.LoadInProgress then
+            return true
+        end
+
+        ContinuePendingApplyAfterLoad(applyState)
+        return true
+    end
+
     activeConfigID = GetActiveConfigID()
-    treeID = GetConfigTreeID(activeConfigID)
+    local treeID = GetConfigTreeID(activeConfigID)
 
     if not activeConfigID or not treeID then
         return FailTalentApply("Could not prepare the ZoidsTools talent loadout.")
     end
 
-    entryInfo, parseError = ParseTalentImportString(importString, treeID, activeConfigID)
+    local entryInfo, parseError = ParseTalentImportString(importString, treeID, activeConfigID)
 
     if not entryInfo then
         return FailTalentApply(parseError)
@@ -1567,7 +1600,7 @@ function ns:ApplyTalentImportString(importString, buildLabel, isContinuation)
         applyFrame:RegisterEvent("TRAIT_CONFIG_UPDATED")
 
         if C_ClassTalents.UpdateLastSelectedSavedConfigID then
-            SecureTalentCall(C_ClassTalents.UpdateLastSelectedSavedConfigID, specID, zoidsConfigID)
+            RememberSavedConfigID(specID, zoidsConfigID)
         end
     end)
 

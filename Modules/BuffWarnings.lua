@@ -28,6 +28,7 @@ local GROUP_BUFFS_BY_CLASS = {
 local eventFrame
 local warningFrame
 local checkQueued = false
+local refreshAfterCombat = false
 
 local function EnsureDB()
     if not ns.db then
@@ -65,6 +66,24 @@ local function SaveWarningFramePosition(frame)
         db.popup.x = x or 0
         db.popup.y = y or 0
     end
+end
+
+local function IsCombatLocked()
+    return InCombatLockdown and InCombatLockdown()
+end
+
+local function HideWarningFrame()
+    if not warningFrame then
+        return true
+    end
+
+    if IsCombatLocked() then
+        refreshAfterCombat = true
+        return false
+    end
+
+    warningFrame:Hide()
+    return true
 end
 
 local function RestoreWarningFramePosition(frame)
@@ -113,7 +132,7 @@ local function CreateWarningFrame()
     frame.title = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     frame.title:SetPoint("TOPLEFT", frame, "TOPLEFT", 12, -10)
     frame.title:SetPoint("RIGHT", frame, "RIGHT", -12, 0)
-    frame.title:SetJustifyH("LEFT")
+    frame.title:SetJustifyH("CENTER")
     frame.title:SetText("Missing Buffs")
 
     frame.buffIcons = {}
@@ -146,21 +165,18 @@ local function CreateWarningFrame()
     return frame
 end
 
-local function StartWarningFrameDrag(self)
-    local frame = self.owner or self
-
-    if frame and frame.StartMoving then
-        frame:StartMoving()
+local function SafeAPICall(func, ...)
+    if type(func) ~= "function" then
+        return nil
     end
-end
 
-local function StopWarningFrameDrag(self)
-    local frame = self.owner or self
+    local ok, result = pcall(func, ...)
 
-    if frame and frame.StopMovingOrSizing then
-        frame:StopMovingOrSizing()
-        SaveWarningFramePosition(frame)
+    if ok then
+        return result
     end
+
+    return nil
 end
 
 local function GetSpellName(spellID, fallbackName)
@@ -217,6 +233,53 @@ local function GetSpellIcon(spellID)
     end
 
     return MISSING_ICON_FALLBACK
+end
+
+local function PlayerCanCastBuff(spellID)
+    if not spellID then
+        return false
+    end
+
+    if IsPlayerSpell and SafeAPICall(IsPlayerSpell, spellID) == true then
+        return true
+    end
+
+    if IsSpellKnown and SafeAPICall(IsSpellKnown, spellID) == true then
+        return true
+    end
+
+    if C_SpellBook and C_SpellBook.IsSpellKnown and SafeAPICall(C_SpellBook.IsSpellKnown, spellID) == true then
+        return true
+    end
+
+    return false
+end
+
+local function GetMissingBuffChatType()
+    if IsInGroup and LE_PARTY_CATEGORY_INSTANCE and IsInGroup(LE_PARTY_CATEGORY_INSTANCE) then
+        return "INSTANCE_CHAT"
+    end
+
+    if IsInRaid and IsInRaid() then
+        return "RAID"
+    end
+
+    if IsInGroup and IsInGroup() then
+        return "PARTY"
+    end
+
+    return nil
+end
+
+local function AnnounceMissingBuff(buffName)
+    local message = "Missing group buff: " .. tostring(buffName or "group buff")
+    local chatType = GetMissingBuffChatType()
+
+    if chatType and SendChatMessage then
+        SendChatMessage(message, chatType)
+    elseif ns.Print then
+        ns:Print(message)
+    end
 end
 
 local function SafeEquals(left, right)
@@ -356,6 +419,7 @@ local function BuildMissingBuffList()
                 spellID = spellID,
                 name = GetSpellName(spellID, buff.fallbackName) or buff.fallbackName,
                 icon = GetSpellIcon(spellID),
+                canCast = PlayerCanCastBuff(spellID),
             })
         end
     end
@@ -376,10 +440,10 @@ local function GetWarningIconButton(frame, index)
         return button
     end
 
-    button = CreateFrame("Button", nil, frame, "BackdropTemplate")
+    button = CreateFrame("Button", nil, frame, "SecureActionButtonTemplate,BackdropTemplate")
     button:SetSize(WARNING_ICON_SIZE, WARNING_ICON_SIZE)
     button:SetMovable(false)
-    button:RegisterForDrag("LeftButton")
+    button:RegisterForClicks("LeftButtonUp", "RightButtonUp")
     button:SetBackdrop({
         edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
         edgeSize = 8,
@@ -392,17 +456,28 @@ local function GetWarningIconButton(frame, index)
     button.icon:SetPoint("TOPLEFT", button, "TOPLEFT", 3, -3)
     button.icon:SetPoint("BOTTOMRIGHT", button, "BOTTOMRIGHT", -3, 3)
 
-    button:SetScript("OnDragStart", StartWarningFrameDrag)
-    button:SetScript("OnDragStop", StopWarningFrameDrag)
     button:SetScript("OnEnter", function(self)
         GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
         GameTooltip:SetText(self.buffName or "Missing buff")
         GameTooltip:AddLine("Missing group buff.", 1, 1, 1, true)
-        GameTooltip:AddLine("Drag to move this popup.", 0.8, 0.8, 0.8, true)
+
+        if self.canCastBuff then
+            GameTooltip:AddLine("Left-click to cast.", 0.8, 1, 0.8, true)
+        else
+            GameTooltip:AddLine("Left-click to announce to the group.", 1, 0.85, 0.55, true)
+        end
+
+        GameTooltip:AddLine("Right-click to announce to the group.", 0.8, 0.8, 0.8, true)
+        GameTooltip:AddLine("Drag the popup by the empty space.", 0.8, 0.8, 0.8, true)
         GameTooltip:Show()
     end)
     button:SetScript("OnLeave", function()
         GameTooltip:Hide()
+    end)
+    button:SetScript("OnClick", function(self, mouseButton)
+        if mouseButton == "RightButton" or not self.canCastBuff then
+            AnnounceMissingBuff(self.buffName)
+        end
     end)
 
     frame.buffIcons[index] = button
@@ -411,9 +486,15 @@ local function GetWarningIconButton(frame, index)
 end
 
 local function UpdateWarningIcons(frame, missing)
+    if IsCombatLocked() then
+        refreshAfterCombat = true
+        return false
+    end
+
     local count = #missing
     local rowWidth = count * WARNING_ICON_SIZE + math.max(0, count - 1) * WARNING_ICON_GAP
     local frameWidth = math.max(WARNING_FRAME_MIN_WIDTH, rowWidth + 24)
+    local rowLeft = math.floor(((frameWidth - rowWidth) / 2) + 0.5)
 
     frame:SetSize(frameWidth, WARNING_FRAME_HEIGHT)
 
@@ -421,40 +502,59 @@ local function UpdateWarningIcons(frame, missing)
         local button = GetWarningIconButton(frame, index)
 
         button:ClearAllPoints()
-        button:SetPoint("TOPLEFT", frame, "TOPLEFT", 12 + (index - 1) * (WARNING_ICON_SIZE + WARNING_ICON_GAP), -34)
+        button:SetPoint("TOPLEFT", frame, "TOPLEFT", rowLeft + (index - 1) * (WARNING_ICON_SIZE + WARNING_ICON_GAP), -34)
         button.buffName = buff.name
         button.spellID = buff.spellID
+        button.canCastBuff = buff.canCast == true
         button.icon:SetTexture(buff.icon or MISSING_ICON_FALLBACK)
+
+        if button.canCastBuff then
+            button:SetAttribute("type1", "spell")
+            button:SetAttribute("spell1", buff.name or buff.spellID)
+            button:SetAttribute("unit1", "player")
+        else
+            button:SetAttribute("type1", nil)
+            button:SetAttribute("spell1", nil)
+            button:SetAttribute("unit1", nil)
+        end
+
+        button:SetAttribute("type2", nil)
+        button:SetAttribute("spell2", nil)
+        button:SetAttribute("unit2", nil)
         button:Show()
     end
 
     for index = count + 1, #(frame.buffIcons or {}) do
         frame.buffIcons[index]:Hide()
     end
+
+    return true
 end
 
 local function WarnMissingBuffs()
     if not IsWarningAllowed() then
-        if warningFrame then
-            warningFrame:Hide()
-        end
-
+        HideWarningFrame()
         return
     end
 
     local missing = BuildMissingBuffList()
 
     if #missing == 0 then
-        if warningFrame then
-            warningFrame:Hide()
-        end
-
+        HideWarningFrame()
         return
     end
 
     local frame = CreateWarningFrame()
 
-    UpdateWarningIcons(frame, missing)
+    if not UpdateWarningIcons(frame, missing) then
+        return
+    end
+
+    if IsCombatLocked() then
+        refreshAfterCombat = true
+        return
+    end
+
     frame:Show()
 end
 
@@ -495,8 +595,8 @@ function ns:SetBuffWarningsEnabled(value)
     if db.enabled then
         CreateWarningFrame()
         ScheduleCheck(0.2)
-    elseif warningFrame then
-        warningFrame:Hide()
+    else
+        HideWarningFrame()
     end
 end
 
@@ -529,9 +629,10 @@ function ns:InitializeBuffWarnings()
         end
 
         if event == "PLAYER_REGEN_DISABLED" then
-            ScheduleCheck(0)
+            refreshAfterCombat = true
         elseif event == "PLAYER_REGEN_ENABLED" then
-            ScheduleCheck(1.5)
+            refreshAfterCombat = false
+            ScheduleCheck(0.3)
         else
             ScheduleCheck(0.75)
         end

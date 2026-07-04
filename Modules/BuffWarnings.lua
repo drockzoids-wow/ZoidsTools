@@ -83,7 +83,38 @@ local function HideWarningFrame()
     end
 
     warningFrame:Hide()
+    warningFrame:SetAlpha(1)
+    warningFrame.ZTConcealedForCombat = nil
     return true
+end
+
+local function ConcealWarningFrameForCombat()
+    if not warningFrame then
+        return
+    end
+
+    refreshAfterCombat = true
+
+    if GameTooltip and GameTooltip.Hide then
+        GameTooltip:Hide()
+    end
+
+    if not IsCombatLocked() then
+        warningFrame:Hide()
+        warningFrame:SetAlpha(1)
+        warningFrame.ZTConcealedForCombat = nil
+        return
+    end
+
+    warningFrame.ZTConcealedForCombat = true
+    warningFrame:SetAlpha(0)
+end
+
+local function RestoreWarningFrameAfterCombat()
+    if warningFrame and warningFrame.ZTConcealedForCombat then
+        warningFrame:SetAlpha(1)
+        warningFrame.ZTConcealedForCombat = nil
+    end
 end
 
 local function RestoreWarningFramePosition(frame)
@@ -255,46 +286,6 @@ local function PlayerCanCastBuff(spellID)
     return false
 end
 
-local function GetMissingBuffChatType()
-    if IsInGroup and LE_PARTY_CATEGORY_INSTANCE and IsInGroup(LE_PARTY_CATEGORY_INSTANCE) then
-        return "INSTANCE_CHAT"
-    end
-
-    if IsInRaid and IsInRaid() then
-        return "RAID"
-    end
-
-    if IsInGroup and IsInGroup() then
-        return "PARTY"
-    end
-
-    return nil
-end
-
-local function GetMissingBuffChatPrefix(chatType)
-    if chatType == "INSTANCE_CHAT" then
-        return "/i "
-    elseif chatType == "RAID" then
-        return "/ra "
-    elseif chatType == "PARTY" then
-        return "/p "
-    end
-
-    return nil
-end
-
-local function BuildMissingBuffAnnouncementMacro(buffName)
-    local message = "Missing group buff: " .. tostring(buffName or "group buff")
-    local chatType = GetMissingBuffChatType()
-    local prefix = GetMissingBuffChatPrefix(chatType)
-
-    if prefix then
-        return prefix .. message
-    end
-
-    return nil
-end
-
 local function SafeEquals(left, right)
     local ok, matches = pcall(function()
         return left ~= nil and right ~= nil and left == right
@@ -456,7 +447,7 @@ local function GetWarningIconButton(frame, index)
     button = CreateFrame("Button", nil, frame, "SecureActionButtonTemplate,BackdropTemplate")
     button:SetSize(WARNING_ICON_SIZE, WARNING_ICON_SIZE)
     button:SetMovable(false)
-    button:RegisterForClicks("LeftButtonUp", "RightButtonUp")
+    button:RegisterForClicks("LeftButtonUp")
     button:SetBackdrop({
         edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
         edgeSize = 8,
@@ -477,10 +468,9 @@ local function GetWarningIconButton(frame, index)
         if self.canCastBuff then
             GameTooltip:AddLine("Left-click to cast.", 0.8, 1, 0.8, true)
         else
-            GameTooltip:AddLine("Left-click to announce to the group.", 1, 0.85, 0.55, true)
+            GameTooltip:AddLine("Someone in your group can provide this buff.", 1, 0.85, 0.55, true)
         end
 
-        GameTooltip:AddLine("Right-click to announce to the group.", 0.8, 0.8, 0.8, true)
         GameTooltip:AddLine("Drag the popup by the empty space.", 0.8, 0.8, 0.8, true)
         GameTooltip:Show()
     end)
@@ -516,24 +506,21 @@ local function UpdateWarningIcons(frame, missing)
         button.canCastBuff = buff.canCast == true
         button.icon:SetTexture(buff.icon or MISSING_ICON_FALLBACK)
 
-        local announcementMacro = BuildMissingBuffAnnouncementMacro(buff.name)
-
         if button.canCastBuff then
             button:SetAttribute("type1", "spell")
             button:SetAttribute("spell1", buff.name or buff.spellID)
             button:SetAttribute("unit1", "player")
-            button:SetAttribute("macrotext1", nil)
         else
-            button:SetAttribute("type1", announcementMacro and "macro" or nil)
+            button:SetAttribute("type1", nil)
             button:SetAttribute("spell1", nil)
             button:SetAttribute("unit1", nil)
-            button:SetAttribute("macrotext1", announcementMacro)
         end
 
-        button:SetAttribute("type2", announcementMacro and "macro" or nil)
+        button:SetAttribute("macrotext1", nil)
+        button:SetAttribute("type2", nil)
         button:SetAttribute("spell2", nil)
         button:SetAttribute("unit2", nil)
-        button:SetAttribute("macrotext2", announcementMacro)
+        button:SetAttribute("macrotext2", nil)
         button:Show()
     end
 
@@ -642,8 +629,9 @@ function ns:InitializeBuffWarnings()
         end
 
         if event == "PLAYER_REGEN_DISABLED" then
-            refreshAfterCombat = true
+            ConcealWarningFrameForCombat()
         elseif event == "PLAYER_REGEN_ENABLED" then
+            RestoreWarningFrameAfterCombat()
             refreshAfterCombat = false
             ScheduleCheck(0.3)
         else

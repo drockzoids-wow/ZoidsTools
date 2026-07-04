@@ -354,6 +354,49 @@ local function PlayerRace()
     return nil
 end
 
+local function NormalizeFactionToken(value)
+    if type(value) == "string" then
+        local token = string.lower(value)
+
+        if token == "horde" then
+            return "Horde"
+        elseif token == "alliance" then
+            return "Alliance"
+        end
+    elseif type(value) == "number" then
+        if LE_MOUNT_FACTION_HORDE ~= nil and value == LE_MOUNT_FACTION_HORDE then
+            return "Horde"
+        elseif LE_MOUNT_FACTION_ALLIANCE ~= nil and value == LE_MOUNT_FACTION_ALLIANCE then
+            return "Alliance"
+        end
+
+        if Enum and Enum.PlayerFaction then
+            if Enum.PlayerFaction.Horde ~= nil and value == Enum.PlayerFaction.Horde then
+                return "Horde"
+            elseif Enum.PlayerFaction.Alliance ~= nil and value == Enum.PlayerFaction.Alliance then
+                return "Alliance"
+            end
+        end
+
+        if value == 0 then
+            return "Horde"
+        elseif value == 1 then
+            return "Alliance"
+        end
+    end
+
+    return nil
+end
+
+local function GetPlayerFactionToken()
+    if not UnitFactionGroup then
+        return nil
+    end
+
+    local factionGroup, factionName = UnitFactionGroup("player")
+    return NormalizeFactionToken(factionGroup) or NormalizeFactionToken(factionName)
+end
+
 local function GetMountName(mountID)
     if not mountID or not C_MountJournal or not C_MountJournal.GetMountInfoByID then
         return nil
@@ -370,7 +413,7 @@ local function GetMountDetails(mountID)
         return nil
     end
 
-    local name, spellID, icon, isActive, isUsable, _, _, _, _, _, isCollected =
+    local name, spellID, icon, isActive, isUsable, _, _, isFactionSpecific, faction, shouldHideOnChar, isCollected =
         C_MountJournal.GetMountInfoByID(mountID)
 
     return {
@@ -380,8 +423,34 @@ local function GetMountDetails(mountID)
         icon = icon,
         isActive = isActive,
         isUsable = isUsable,
+        isFactionSpecific = isFactionSpecific,
+        faction = faction,
+        shouldHideOnChar = shouldHideOnChar,
         isCollected = isCollected,
     }
+end
+
+local function IsMountAllowedForCharacter(details)
+    if not details then
+        return false
+    end
+
+    if details.shouldHideOnChar == true then
+        return false
+    end
+
+    if details.isFactionSpecific ~= true then
+        return true
+    end
+
+    local mountFaction = NormalizeFactionToken(details.faction)
+    local playerFaction = GetPlayerFactionToken()
+
+    if not mountFaction or not playerFaction then
+        return false
+    end
+
+    return mountFaction == playerFaction
 end
 
 local function GetMountSpellName(mountID)
@@ -537,7 +606,7 @@ local function GetTargetMountMatch()
 
             foundMountName = foundMountName or mountName
 
-            if details and details.isCollected and details.isUsable then
+            if details and details.isCollected and details.isUsable and IsMountAllowedForCharacter(details) then
                 return {
                     available = true,
                     mountID = mountID,
@@ -547,7 +616,9 @@ local function GetTargetMountMatch()
                 }
             end
 
-            if details and details.isCollected then
+            if details and details.isCollected and not IsMountAllowedForCharacter(details) then
+                foundUnavailableStatus = "Not available to your faction: " .. tostring(mountName)
+            elseif details and details.isCollected then
                 foundUnavailableStatus = "Owned, but unusable here: " .. tostring(mountName)
             else
                 foundUnavailableStatus = "Not collected: " .. tostring(mountName)
@@ -1062,6 +1133,15 @@ local function SummonTrackedMount(mountID)
         return
     end
 
+    EnsureMountJournalLoaded()
+
+    local details = GetMountDetails(mountID)
+
+    if details and not IsMountAllowedForCharacter(details) then
+        Print("That mount is not available to your faction.")
+        return
+    end
+
     TrackSelectedMount(mountID)
 
     if C_MountJournal and C_MountJournal.SummonByID then
@@ -1083,14 +1163,15 @@ local function FindUsableMountByName(wantedName)
     local normalizedWanted = NormalizeMountName(wantedName)
 
     for _, mountID in ipairs(C_MountJournal.GetMountIDs()) do
-        local name, _, _, _, isUsable, _, _, _, _, _, isCollected =
-            C_MountJournal.GetMountInfoByID(mountID)
+        local details = GetMountDetails(mountID)
+        local name = details and details.name
 
         if name
-            and isCollected
-            and (isUsable or IsRecentlyOutOfCombat())
+            and details.isCollected
+            and IsMountAllowedForCharacter(details)
+            and (details.isUsable or IsRecentlyOutOfCombat())
             and NormalizeMountName(name) == normalizedWanted then
-            return mountID, name
+            return details.mountID, name
         end
     end
 
@@ -1127,11 +1208,11 @@ local function GetRideAlongMountCandidates()
     end
 
     for _, mountID in ipairs(C_MountJournal.GetMountIDs()) do
-        local name, _, _, _, isUsable, _, _, _, _, _, isCollected =
-            C_MountJournal.GetMountInfoByID(mountID)
+        local details = GetMountDetails(mountID)
+        local name = details and details.name
 
-        if name and isCollected and isUsable and IsRideAlongMountAllowed(name) then
-            candidates[#candidates + 1] = mountID
+        if name and details.isCollected and details.isUsable and IsMountAllowedForCharacter(details) and IsRideAlongMountAllowed(name) then
+            candidates[#candidates + 1] = details.mountID
         end
     end
 
@@ -1245,6 +1326,7 @@ local function BuildRandomMountPools()
             if details
                 and details.name
                 and details.isCollected
+                and IsMountAllowedForCharacter(details)
                 and (not requireUsable or details.isUsable or allowUnusableWaterMount or allowRecentCombatMount)
                 and (db.excludeServiceMountsFromRandom ~= true or not IsServiceMountName(details.name)) then
                 AddMountToPools(pools, details.mountID)
@@ -1656,12 +1738,12 @@ function ns:GetCollectedMountSearch(query, limit)
     end
 
     for _, mountID in ipairs(C_MountJournal.GetMountIDs()) do
-        local name, _, _, _, _, _, _, _, _, _, isCollected =
-            C_MountJournal.GetMountInfoByID(mountID)
+        local details = GetMountDetails(mountID)
+        local name = details and details.name
 
-        if name and isCollected and string.find(NormalizeMountName(name), query, 1, true) then
+        if name and details.isCollected and IsMountAllowedForCharacter(details) and string.find(NormalizeMountName(name), query, 1, true) then
             mounts[#mounts + 1] = {
-                id = mountID,
+                id = details.mountID,
                 name = name,
             }
         end
@@ -1691,10 +1773,10 @@ function ns:GetMountServiceOptions(serviceType)
     end
 
     for _, mountID in ipairs(C_MountJournal.GetMountIDs()) do
-        local name, _, _, _, isUsable, _, _, _, _, _, isCollected =
-            C_MountJournal.GetMountInfoByID(mountID)
+        local details = GetMountDetails(mountID)
+        local name = details and details.name
 
-        if name and isCollected and isUsable then
+        if name and details.isCollected and details.isUsable and IsMountAllowedForCharacter(details) then
             local normalized = NormalizeMountName(name)
             local matchesService = false
 

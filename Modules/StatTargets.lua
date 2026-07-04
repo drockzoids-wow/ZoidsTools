@@ -3,6 +3,7 @@ local _, ns = ...
 local eventFrame
 local showHooksInstalled = false
 local pendingRefresh = false
+local pendingCombatRefresh = false
 local trackedRows = {}
 local hookedFunctions = {}
 local fallbackTexts = {}
@@ -14,6 +15,10 @@ local SOURCE_OPTIONS = {
     { value = "raid", text = "Raid" },
     { value = "pvp", text = "PvP" },
 }
+
+local function IsCombatLocked()
+    return InCombatLockdown and InCombatLockdown()
+end
 local LABEL_COLUMN_WIDTH = 60
 local DELTA_COLUMN_WIDTH = 34
 local RAW_COLUMN_WIDTH = 30
@@ -1214,6 +1219,13 @@ local function ScanCharacterStatsPane()
 end
 
 local function QueueRefresh(delay)
+    if IsCombatLocked() then
+        pendingCombatRefresh = true
+        return
+    end
+
+    pendingCombatRefresh = false
+
     if pendingRefresh then
         return
     end
@@ -1404,6 +1416,15 @@ function ns:InitializeStatTargets()
         eventFrame:RegisterEvent("UNIT_STATS")
         eventFrame:RegisterEvent("UNIT_AURA")
         eventFrame:SetScript("OnEvent", function(_, event, unitOrAddon)
+            if event == "PLAYER_REGEN_ENABLED" then
+                if pendingCombatRefresh then
+                    pendingCombatRefresh = false
+                    QueueRefresh(0.12)
+                end
+
+                return
+            end
+
             if event == "ADDON_LOADED" then
                 InstallHook()
                 InstallShowHooks()

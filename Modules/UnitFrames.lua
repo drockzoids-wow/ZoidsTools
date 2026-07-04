@@ -10,6 +10,7 @@ local originalCastbarState = {}
 local originalAuraState = {}
 local pendingProtectedRefresh = false
 local refreshQueued = false
+local healthRefreshQueued = false
 local auraVisibilityQueued = false
 
 local DEFAULT_CASTBAR_WIDTH = 195
@@ -577,14 +578,38 @@ local function ApplyHealthBars()
     end
 end
 
+local function ScheduleHealthBars(delay)
+    if healthRefreshQueued then
+        return
+    end
+
+    healthRefreshQueued = true
+    delay = tonumber(delay) or 0.05
+
+    if InCombatLockdown and InCombatLockdown() then
+        delay = math.max(delay, 0.15)
+    end
+
+    local function Run()
+        healthRefreshQueued = false
+        ApplyHealthBars()
+    end
+
+    if C_Timer and C_Timer.After then
+        C_Timer.After(delay, Run)
+    else
+        Run()
+    end
+end
+
 local function HookHealthBar(info)
     for _, bar in ipairs(GetHealthBarFrames(info)) do
         if not healthHooks[bar] then
             healthHooks[bar] = true
 
             if bar.HookScript then
-                bar:HookScript("OnShow", ApplyHealthBars)
-                bar:HookScript("OnValueChanged", ApplyHealthBars)
+                bar:HookScript("OnShow", ScheduleHealthBars)
+                bar:HookScript("OnValueChanged", ScheduleHealthBars)
             end
         end
     end
@@ -1073,6 +1098,16 @@ local function ShouldHideAuraType(key, auraType)
     return false
 end
 
+local function HasAuraVisibilityOverrides()
+    for _, key in ipairs(auraFrameOrder) do
+        if ShouldHideAuraType(key, "buffs") or ShouldHideAuraType(key, "debuffs") then
+            return true
+        end
+    end
+
+    return false
+end
+
 local function ApplyAuraVisibilityFor(key, auraType)
     local info = auraTargets[key]
 
@@ -1103,6 +1138,10 @@ local function ScheduleAuraVisibility(delay)
 
     auraVisibilityQueued = true
     delay = tonumber(delay) or 0.05
+
+    if InCombatLockdown and InCombatLockdown() then
+        delay = math.max(delay, 0.15)
+    end
 
     local function Run()
         auraVisibilityQueued = false
@@ -1159,6 +1198,11 @@ end
 
 local function ScheduleRefresh(delay)
     if refreshQueued then
+        return
+    end
+
+    if InCombatLockdown and InCombatLockdown() then
+        pendingProtectedRefresh = true
         return
     end
 
@@ -1357,6 +1401,27 @@ function ns:InitializeUnitFrames()
 
         if unit and unit ~= "player" and unit ~= "target" and unit ~= "targettarget" and unit ~= "focus" then
             return
+        end
+
+        if event == "UNIT_HEALTH"
+            or event == "UNIT_MAXHEALTH"
+            or event == "UNIT_NAME_UPDATE"
+            or event == "UNIT_FACTION"
+            or event == "UNIT_CONNECTION" then
+            ScheduleHealthBars(0.08)
+            return
+        end
+
+        if event == "UNIT_AURA" then
+            if HasAuraVisibilityOverrides() then
+                ScheduleAuraVisibility(0.08)
+            end
+
+            return
+        end
+
+        if event == "UNIT_TARGET" then
+            ScheduleHealthBars(0.08)
         end
 
         ScheduleRefresh(0.05)

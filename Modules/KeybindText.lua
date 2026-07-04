@@ -365,8 +365,20 @@ local function SetRangeOverlay(button, show)
         return
     end
 
-    if show == true and IsRangeTintEnabled() then
-        overlay:SetColorTexture(RANGE_TINT_R, RANGE_TINT_G, RANGE_TINT_B, RANGE_TINT_A)
+    local shouldShow = show == true and IsRangeTintEnabled()
+
+    if overlay.ZTVisible == shouldShow then
+        return
+    end
+
+    overlay.ZTVisible = shouldShow
+
+    if shouldShow then
+        if overlay.ZTColorApplied ~= true then
+            overlay:SetColorTexture(RANGE_TINT_R, RANGE_TINT_G, RANGE_TINT_B, RANGE_TINT_A)
+            overlay.ZTColorApplied = true
+        end
+
         overlay:Show()
     else
         overlay:Hide()

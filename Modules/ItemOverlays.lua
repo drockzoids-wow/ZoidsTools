@@ -11,6 +11,12 @@ local pendingBagRefresh = false
 local pendingBankRefresh = false
 local pendingBagForceClear = false
 local pendingBankForceClear = false
+local pendingCombatCharacterRefresh = false
+local pendingCombatCharacterForceRefresh = false
+local pendingCombatBagRefresh = false
+local pendingCombatBankRefresh = false
+local pendingCombatBagForceClear = false
+local pendingCombatBankForceClear = false
 local qualityColorCache = {}
 
 local tableUnpack = unpack or table.unpack
@@ -20,6 +26,10 @@ local CHARACTER_GEM_SPACING = 1
 local CHARACTER_REFRESH_DELAY = 0.05
 local CHARACTER_SETTLE_REFRESH_DELAY = 0.45
 local EMPTY_SOCKET_TEXTURE = "Interface\\ItemSocketingFrame\\UI-EmptySocket-Prismatic"
+
+local function IsCombatLocked()
+    return InCombatLockdown and InCombatLockdown()
+end
 
 local equippableLocations = {
     INVTYPE_HEAD = true,
@@ -1112,6 +1122,12 @@ local function QueueCharacterRefresh(delay, force)
         delay = CHARACTER_REFRESH_DELAY
     end
 
+    if IsCombatLocked() then
+        pendingCombatCharacterRefresh = true
+        pendingCombatCharacterForceRefresh = pendingCombatCharacterForceRefresh or force == true
+        return
+    end
+
     pendingCharacterForceRefresh = pendingCharacterForceRefresh or force == true
 
     if pendingCharacterRefresh then
@@ -1160,6 +1176,12 @@ local function QueueCharacterSettleRefresh()
 end
 
 local function QueueBagRefresh(forceClear)
+    if IsCombatLocked() then
+        pendingCombatBagRefresh = true
+        pendingCombatBagForceClear = pendingCombatBagForceClear or forceClear == true
+        return
+    end
+
     pendingBagForceClear = pendingBagForceClear or forceClear == true
 
     if pendingBagRefresh then
@@ -1184,6 +1206,12 @@ local function QueueBagRefresh(forceClear)
 end
 
 local function QueueBankRefresh(forceClear)
+    if IsCombatLocked() then
+        pendingCombatBankRefresh = true
+        pendingCombatBankForceClear = pendingCombatBankForceClear or forceClear == true
+        return
+    end
+
     pendingBankForceClear = pendingBankForceClear or forceClear == true
 
     if pendingBankRefresh then
@@ -1398,7 +1426,30 @@ function ns:InitializeItemOverlays()
             QueueCharacterRefresh()
             QueueBagRefresh()
             QueueBankRefresh()
-        elseif event == "PLAYER_EQUIPMENT_CHANGED" or event == "PLAYER_REGEN_ENABLED" then
+        elseif event == "PLAYER_REGEN_ENABLED" then
+            if pendingCombatCharacterRefresh then
+                local force = pendingCombatCharacterForceRefresh
+                pendingCombatCharacterRefresh = false
+                pendingCombatCharacterForceRefresh = false
+                QueueCharacterRefresh(0.12, force)
+            else
+                QueueCharacterSettleRefresh()
+            end
+
+            if pendingCombatBagRefresh then
+                local force = pendingCombatBagForceClear
+                pendingCombatBagRefresh = false
+                pendingCombatBagForceClear = false
+                QueueBagRefresh(force)
+            end
+
+            if pendingCombatBankRefresh then
+                local force = pendingCombatBankForceClear
+                pendingCombatBankRefresh = false
+                pendingCombatBankForceClear = false
+                QueueBankRefresh(force)
+            end
+        elseif event == "PLAYER_EQUIPMENT_CHANGED" then
             QueueCharacterSettleRefresh()
         elseif event == "UNIT_INVENTORY_CHANGED" then
             local unit = ...

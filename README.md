@@ -1,79 +1,41 @@
 # ZoidsTools
 
-A personal World of Warcraft toolkit by Drockzoids.
+A personal World of Warcraft Retail quality-of-life addon by Drockzoids.
 
-## Current Features
+## Highlights
 
-- Opens a custom ZoidsTools control window with `/zt`, `/zoids`, or `/zoidstools`.
-- Makes supported Blizzard UI windows movable.
-- Adds movement handles to default bag windows, including the combined bag frame.
-- Saves moved window positions between sessions.
-- Saves per-window scale changes made with Ctrl + mouse wheel.
-- Adds a combat option to cast action bar keybinds on key down.
-- Adds configurable action bar keybind text with shorter labels, font sizing, color, bold, and outline options.
-- Adds a draggable class-colored FPS and latency widget with click-through locking.
-- Adds lightweight fast auto-loot behavior that enables WoW auto-loot when turned on.
-- Adds vendor automation for grey item selling and repairs.
-- Includes a LibDBIcon minimap launcher.
+- Opens a modern ZoidsTools settings window with `/zt`, `/zoids`, or `/zoidstools`.
+- Moves and scales supported Blizzard windows and default bags, with saved positions.
+- Adds tooltip details, item overlays, keybind label styling, range tint, and unit frame options.
+- Adds smart mount tools, service mount buttons, target mount matching, recent mount avoidance, and faction-safe mount filtering.
+- Adds Molinari-style profession actions for modifier-click disenchanting, milling, prospecting, and lockboxes.
+- Adds talent suggestions from generated local data, with Blizzard talent-frame controls for Mythic+, Raid, and PvP builds.
+- Adds account-wide position profiles and reset buttons for Blizzard's built-in damage meter windows.
+- Adds fast looting, grey item selling, repair automation, and quest/gossip automation with filters.
+- Adds missing buff warnings, consumable macros, coordinates, performance, minimap, and UI cleanup tools.
 
 ## Commands
 
 - `/zt` opens the ZoidsTools window.
-- `/zt windows` opens the Window Tools page.
-- `/zt combat` opens the Combat page.
-- `/zt loot` opens the Loot page.
-- `/zt windows on` enables movable Blizzard windows.
-- `/zt windows off` disables movable Blizzard windows.
-- `/zt bags on` enables default bag movement.
-- `/zt bags off` disables default bag movement.
-- `/zt fastloot on` enables fast auto loot.
-- `/zt fastloot off` disables fast auto loot.
-- `/zt autosell on` enables auto-sell grey items at vendors.
-- `/zt autosell off` disables auto-sell grey items at vendors.
-- `/zt autorepair personal` repairs with your own gold.
-- `/zt autorepair guild` repairs with guild bank funds when available.
-- `/zt autorepair off` disables auto repair.
-- `/zt keydown on` makes action keybinds cast on key down.
-- `/zt keydown off` makes action keybinds cast on key up.
-- `/zt perf on` shows the FPS and latency widget with both values.
-- `/zt perf off` hides the FPS and latency widget.
-- `/zt perf unlock` unlocks the click-through performance widget.
-- `/zt resetwindows` clears saved window positions.
-- `/zt resetscales` clears saved window scales.
-- `/zt minimap on` shows the minimap button.
-- `/zt minimap off` hides the minimap button.
+- `/zt tooltips`, `/zt windows`, `/zt items`, `/zt professions`, `/zt talents`, `/zt meters`, `/zt combat`, `/zt unitframes`, `/zt macros`, `/zt mounts`, `/zt loot`, or `/zt quests` opens that page.
+- `/zt windows on/off` toggles movable Blizzard windows.
+- `/zt bags on/off` toggles default bag movement.
+- `/zt talents on/off` toggles the Blizzard talent-frame controls.
+- `/zt fastloot on/off` toggles fast auto loot.
+- `/zt autosell on/off` toggles grey item selling.
+- `/zt autorepair personal/guild/off` changes auto repair.
+- `/zt autoquest on/off` toggles quest auto accept and turn-in.
+- `/zt keydown on/off` toggles action keybinds on key down.
+- `/zt smartmount on/off` toggles the smart mount keybind.
+- `/zt matchmount` matches your target's mount when possible.
+- `/zt perf on/off`, `/zt coords on/off`, and `/zt refreshmacros` control utility helpers.
 
-## Window Scaling
+## Notes
 
-- Hold `Ctrl` and mouse-wheel over a movable window or its `Move` handle to scale it.
-- Hold `Ctrl` and right-click a `Move` handle to reset that window to its default position.
-- Use `Windows > Reset Scales` in `/zt` to reset all saved window scales.
-
-## Loot
-
-- `Fast auto loot` performs one quick sweep when loot is ready.
-- Turning `Fast auto loot` on enables WoW's auto-loot setting if needed.
-- Turning `Fast auto loot` off only disables ZoidsTools fast looting; it does not turn WoW auto-loot off.
-- `Careful second pass` adds one delayed follow-up sweep for unusual loot delays.
-- `Auto-sell grey items` uses the merchant junk-sell behavior when a vendor opens.
-- `Auto repair` can be Disabled, Use My Gold, or Use Guild Bank.
-- `Use Guild Bank` repair skips instead of spending your own gold when guild repair is unavailable.
-
-## Combat
-
-- `Cast action keybinds on key down` uses WoW's action button key-down setting.
-- `Customize action keybind text` changes action bar keybind font, size, color, bold, and outline.
-- `Shorten keybind labels` condenses labels such as `s-C` to `SC` and `Mouse4` to `M4`.
-- `Use custom color` is off by default so Blizzard's normal keybind color is preserved.
-
-## Performance
-
-- `Performance widget` chooses Disabled, FPS, Latency, or Both.
-- `Widget size` adjusts the size of the draggable class-colored readout.
-- Mouse over the widget to see FPS, Home latency, and World latency, even while locked on supported clients.
-- Hold `Ctrl` and right-click the widget to lock it click-through.
-- Hold `Shift` and right-click the widget to reset its position.
-- Use `/zt perf unlock` or the unlock button in `/zt` to unlock the widget after it is click-through.
+- Talent data is generated by the separate local updater tools and written into `Data/TalentGrimoire.lua`.
+- Blizzard damage meter styling stays Blizzard-owned; ZoidsTools only saves and applies window positions.
+- Hold `Ctrl` and mouse-wheel over a movable window or its move handle to scale it.
+- Hold `Ctrl` and right-click a move handle to reset that window.
 
 ## Install
 

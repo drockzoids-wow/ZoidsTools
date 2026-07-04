@@ -7,12 +7,12 @@ function ns.UI.Pages.CreateBuildsPage(parent)
     local UI = ns.UI
     local frame = UI.CreatePageFrame(parent)
 
-    local mainSection = UI.PlaceSection(frame, "Talent Grimoire")
+    local mainSection = UI.PlaceSection(frame, "Talents")
 
     local enabled = UI.CreateCheckbox(
         frame,
         "Show talent frame controls",
-        "Shows the ZoidsTools Talent Grimoire widget on the Blizzard talents pane.",
+        "Shows the ZoidsTools talent controls on the Blizzard talents pane.",
         function()
             return ns.GetTalentGrimoireEnabled and ns:GetTalentGrimoireEnabled()
         end,

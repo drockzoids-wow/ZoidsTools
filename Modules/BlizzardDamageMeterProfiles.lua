@@ -9,6 +9,7 @@ local SETTLE_APPLY_DELAYS = { 0.1, 0.6, 1.6, 3.0 }
 local resetButtonTicker
 local autoApplyEventFrame
 local pendingAutoApply
+local autoApplyScheduled = false
 local autoApplyGeneration = 0
 local settleApplyGeneration = 0
 local damageMeterHooksInstalled = false
@@ -414,16 +415,35 @@ end
 
 local function QueueDamageMeterProfileAutoApply()
     pendingAutoApply = true
+
+    if InCombatLockdown and InCombatLockdown() then
+        BumpAutoApplyGeneration()
+        return
+    end
+
+    if autoApplyScheduled then
+        return
+    end
+
+    autoApplyScheduled = true
     local generation = BumpAutoApplyGeneration()
 
     if not C_Timer or not C_Timer.After then
+        autoApplyScheduled = false
         TryAutoApplyLastProfile(generation)
         return
     end
 
+    local remaining = #AUTO_APPLY_DELAYS
+
     for _, delay in ipairs(AUTO_APPLY_DELAYS) do
         C_Timer.After(delay, function()
             TryAutoApplyLastProfile(generation)
+            remaining = remaining - 1
+
+            if remaining <= 0 then
+                autoApplyScheduled = false
+            end
         end)
     end
 end

@@ -563,6 +563,11 @@ local function ScheduleCheck(delay)
         return
     end
 
+    if IsCombatLocked() then
+        refreshAfterCombat = true
+        return
+    end
+
     checkQueued = true
 
     local function RunCheck()

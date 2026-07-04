@@ -3,6 +3,7 @@ local _, ns = ...
 local initialized = false
 local eventFrame
 local itemLevelCache = {}
+local mythicScoreCache = {}
 local pendingInspects = {}
 local activeInspectGuid
 local lastInspectRequest = 0
@@ -17,6 +18,7 @@ local INSPECT_RESULT_RETRY_STEP = 0.25
 local INSPECT_RESULT_RETRIES = 8
 local ITEM_LEVEL_CACHE_TIME = 30
 local PLAYER_ITEM_LEVEL_CACHE_TIME = 2
+local MYTHIC_SCORE_CACHE_TIME = 30
 local MIN_FALLBACK_EQUIPPED_ITEMS = 12
 local playerItemLevelCache
 
@@ -170,6 +172,10 @@ end
 
 local function IsSecretValue(value)
     return issecretvalue and issecretvalue(value)
+end
+
+local function IsCombatLocked()
+    return InCombatLockdown and InCombatLockdown()
 end
 
 local function GetDisplayedUnit(tooltip)
@@ -611,6 +617,61 @@ local function GetMythicScoreDetails(unit)
     }
 end
 
+local function GetCachedMythicScore(guid)
+    if not guid or IsSecretValue(guid) then
+        return nil, false
+    end
+
+    local cache = mythicScoreCache[guid]
+
+    if not cache then
+        return nil, false
+    end
+
+    if GetTime and cache.time and (GetTime() - cache.time) > MYTHIC_SCORE_CACHE_TIME then
+        mythicScoreCache[guid] = nil
+        return nil, false
+    end
+
+    if cache.details == false then
+        return nil, true
+    end
+
+    return cache.details, true
+end
+
+local function CacheMythicScore(guid, details)
+    if not guid or IsSecretValue(guid) then
+        return
+    end
+
+    mythicScoreCache[guid] = {
+        details = details or false,
+        time = GetTime and GetTime() or 0,
+    }
+end
+
+local function GetTooltipMythicScore(unit, guid)
+    if not unit then
+        return nil
+    end
+
+    local cached, hasCache = GetCachedMythicScore(guid)
+
+    if hasCache then
+        return cached
+    end
+
+    if IsCombatLocked() then
+        return nil
+    end
+
+    local details = GetMythicScoreDetails(unit)
+    CacheMythicScore(guid, details)
+
+    return details
+end
+
 local function GetItemLevelFromLink(itemLink)
     if not itemLink or IsSecretValue(itemLink) then
         return nil
@@ -766,6 +827,10 @@ local function FinishPendingInspect(guid)
         activeInspectGuid = nil
     end
 
+    if IsCombatLocked() then
+        return
+    end
+
     if ClearInspectPlayer and not IsInspectUIBusy() then
         RunNextFrame(function()
             if not activeInspectGuid and ClearInspectPlayer and not IsInspectUIBusy() then
@@ -805,6 +870,11 @@ local function RetryInspectResult(guid, attempt)
         return
     end
 
+    if IsCombatLocked() then
+        FinishPendingInspect(guid)
+        return
+    end
+
     local unit = pending.unit
 
     if GetUnitGUIDSafe(unit) ~= guid then
@@ -838,7 +908,7 @@ local function RequestInspectIfNeeded(unit, guid, priority)
         return
     end
 
-    if not CanInspect or not NotifyInspect or (InCombatLockdown and InCombatLockdown()) or IsInspectUIBusy() then
+    if not CanInspect or not NotifyInspect or IsCombatLocked() or IsInspectUIBusy() then
         return
     end
 
@@ -897,6 +967,10 @@ local function RequestInspectIfNeeded(unit, guid, priority)
 end
 
 local function PrefetchUnitItemLevel(unit)
+    if IsCombatLocked() then
+        return
+    end
+
     if not IsTooltipItemLevelEnabled() or not UnitIsPlayerSafe(unit) or UnitIsUnitSafe(unit, "player") then
         return
     end
@@ -927,6 +1001,10 @@ local function GetTooltipItemLevel(unit, guid)
 
     if cached then
         return cached
+    end
+
+    if IsCombatLocked() then
+        return nil
     end
 
     local immediate = TryCacheItemLevel(unit, guid)
@@ -961,7 +1039,7 @@ local function AddTooltipDetails(tooltip, unit, guid)
         return
     end
 
-    local mythicScore = db.showMythicScore and GetMythicScoreDetails(unit) or nil
+    local mythicScore = db.showMythicScore and GetTooltipMythicScore(unit, guid) or nil
     local mythicScoreText = mythicScore and mythicScore.score or nil
 
     if mythicScoreText and db.showMythicPercentile and mythicScore.percentile then
@@ -1058,6 +1136,10 @@ RefreshCurrentTooltipForGUID = function(guid)
         return
     end
 
+    if IsCombatLocked() then
+        return
+    end
+
     local ok, mouseoverGuid = pcall(UnitGUID, "mouseover")
 
     if not ok or IsSecretValue(mouseoverGuid) or mouseoverGuid ~= guid then
@@ -1075,6 +1157,11 @@ end
 
 local function OnInspectReady(guid)
     if not guid or IsSecretValue(guid) or not pendingInspects[guid] then
+        return
+    end
+
+    if IsCombatLocked() then
+        FinishPendingInspect(guid)
         return
     end
 
@@ -1229,7 +1316,9 @@ function ns:InitializeTooltips()
         if event == "INSPECT_READY" then
             OnInspectReady(guid)
         elseif event == "UPDATE_MOUSEOVER_UNIT" then
-            PrefetchUnitItemLevel("mouseover")
+            if not IsCombatLocked() then
+                PrefetchUnitItemLevel("mouseover")
+            end
         end
     end)
 

@@ -311,7 +311,8 @@ local function PrintHelp()
     ns:Print("/zt coords reset resets the coordinates widget position.")
     ns:Print("/zt items opens item overlay options.")
     ns:Print("/zt iteminfo on/off toggles item overlays.")
-    ns:Print("/zt grimoire opens Talent Grimoire build options.")
+    ns:Print("/zt talents opens talent build options.")
+    ns:Print("/zt talents on/off toggles talent build controls.")
     ns:Print("/zt meters opens Blizzard damage meter profile options.")
     ns:Print("/zt professions opens profession helper options.")
     ns:Print("/zt loot opens loot options.")
@@ -504,15 +505,15 @@ local function HandleSlash(input)
             ns:SetItemOverlaysEnabled(false)
             ns:Print("Item overlays disabled.")
         end
-    elseif input == "grimoire on" or input == "builds on" then
+    elseif input == "grimoire on" or input == "builds on" or input == "talents on" then
         if ns.SetTalentGrimoireEnabled then
             ns:SetTalentGrimoireEnabled(true)
-            ns:Print("Talent Grimoire panel enabled.")
+            ns:Print("Talent controls enabled.")
         end
-    elseif input == "grimoire off" or input == "builds off" then
+    elseif input == "grimoire off" or input == "builds off" or input == "talents off" then
         if ns.SetTalentGrimoireEnabled then
             ns:SetTalentGrimoireEnabled(false)
-            ns:Print("Talent Grimoire panel disabled.")
+            ns:Print("Talent controls disabled.")
         end
     elseif input == "keydown on" or input == "castkeydown on" then
         if ns.SetCastOnKeyDown and ns:SetCastOnKeyDown(true) then

@@ -5,6 +5,7 @@ local eventFrame
 local applyFrame
 local QueueRefresh
 local refreshQueued = false
+local pendingCombatRefresh = false
 local talentFrameHooks = {}
 local talentCheckRefreshQueued = false
 local checkedTalentButtons = {}
@@ -2451,6 +2452,13 @@ local function UpdatePanelVisibility()
 end
 
 function QueueRefresh(delay)
+    if InCombatLockdown and InCombatLockdown() then
+        pendingCombatRefresh = true
+        return
+    end
+
+    pendingCombatRefresh = false
+
     if refreshQueued then
         return
     end
@@ -2607,7 +2615,7 @@ end
 
 function ns:GetTalentGrimoireStatusText()
     if not ns:GetTalentGrimoireEnabled() then
-        return "Talent Grimoire controls are disabled."
+        return "Talent controls are disabled."
     end
 
     local entry, context = GetBuildEntry()
@@ -2623,7 +2631,7 @@ function ns:GetTalentGrimoireStatusText()
         )
     end
 
-    return "No Talent Grimoire build data found for your current spec and selection. Run the external updater to refresh Data/TalentGrimoire.lua."
+    return "No talent build data found for your current spec and selection. Run the external updater to refresh Data/TalentGrimoire.lua."
 end
 
 function ns:RefreshTalentGrimoire()
@@ -2647,6 +2655,10 @@ function ns:InitializeTalentGrimoire()
         eventFrame:SetScript("OnEvent", function(_, event)
             InstallTalentFrameHooks()
             QueueRefresh(0.12)
+
+            if event == "PLAYER_REGEN_ENABLED" and pendingCombatRefresh then
+                QueueRefresh(0.12)
+            end
 
             if event == "PLAYER_ENTERING_WORLD" or event == "ZONE_CHANGED_NEW_AREA" then
                 QueueDungeonTalentPromptCheck(1.5)

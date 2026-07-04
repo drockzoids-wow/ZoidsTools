@@ -16,6 +16,11 @@ local DEFAULT_Y = 0
 local OLD_DEFAULT_Y = 245
 local DEFAULT_SCALE = 1
 local DEFAULT_UPDATE_INTERVAL = 0.15
+local DEFAULT_COMBAT_UPDATE_INTERVAL = 1
+
+local function IsCombatLocked()
+    return InCombatLockdown and InCombatLockdown()
+end
 
 local function ClampScale(value)
     value = tonumber(value) or DEFAULT_SCALE
@@ -291,6 +296,10 @@ local function OnWidgetUpdate(_, elapsed)
     local db = EnsureDB()
     local updateInterval = db and db.updateInterval or DEFAULT_UPDATE_INTERVAL
 
+    if IsCombatLocked() then
+        updateInterval = math.max(updateInterval, DEFAULT_COMBAT_UPDATE_INTERVAL)
+    end
+
     if elapsedSinceUpdate < updateInterval then
         return
     end
@@ -475,8 +484,9 @@ end
 
 local function OnMapUpdate(_, elapsed)
     mapElapsedSinceUpdate = mapElapsedSinceUpdate + (elapsed or 0)
+    local updateInterval = IsCombatLocked() and DEFAULT_COMBAT_UPDATE_INTERVAL or DEFAULT_UPDATE_INTERVAL
 
-    if mapElapsedSinceUpdate < DEFAULT_UPDATE_INTERVAL then
+    if mapElapsedSinceUpdate < updateInterval then
         return
     end
 

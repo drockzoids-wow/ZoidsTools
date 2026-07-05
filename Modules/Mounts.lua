@@ -8,6 +8,7 @@ local initialized = false
 local mountTypeIDByMountID = {}
 local mountIDByAuraName
 local targetMatchButton
+local targetMatchUpdateQueued = false
 local lastDryTime = 0
 local lastCombatEndedAt = 0
 
@@ -475,23 +476,12 @@ local function StoreMountNameLookup(name, mountID)
     end
 end
 
-local function GetMountIDByAuraName(name)
-    local key = NormalizeMountName(name)
-
-    if key == "" then
-        return nil
-    end
-
+local function RebuildMountAuraLookup()
     EnsureMountJournalLoaded()
-
-    if mountIDByAuraName then
-        return mountIDByAuraName[key]
-    end
-
     mountIDByAuraName = {}
 
     if not C_MountJournal or not C_MountJournal.GetMountIDs or not C_MountJournal.GetMountInfoByID then
-        return nil
+        return
     end
 
     for _, mountID in ipairs(C_MountJournal.GetMountIDs()) do
@@ -504,8 +494,20 @@ local function GetMountIDByAuraName(name)
             StoreMountNameLookup(GetSpellName(mountSpellID), plainMountID)
         end
     end
+end
 
-    return mountIDByAuraName[key]
+local function GetMountIDByAuraName(name)
+    local key = NormalizeMountName(name)
+
+    if key == "" then
+        return nil
+    end
+
+    if not mountIDByAuraName then
+        RebuildMountAuraLookup()
+    end
+
+    return mountIDByAuraName and mountIDByAuraName[key]
 end
 
 local function GetHelpfulAura(unit, index)
@@ -697,6 +699,26 @@ local function UpdateTargetMatchButton()
     button:Show()
 end
 
+local function ScheduleTargetMatchButtonUpdate(delay)
+    if targetMatchUpdateQueued then
+        return
+    end
+
+    targetMatchUpdateQueued = true
+    delay = tonumber(delay) or 0.08
+
+    local function Run()
+        targetMatchUpdateQueued = false
+        UpdateTargetMatchButton()
+    end
+
+    if C_Timer and C_Timer.After then
+        C_Timer.After(delay, Run)
+    else
+        Run()
+    end
+end
+
 local function CreateTargetMatchButton()
     if targetMatchButton then
         return targetMatchButton
@@ -741,7 +763,7 @@ local function CreateTargetMatchButton()
             API.MatchTargetMount()
         end
 
-        UpdateTargetMatchButton()
+        ScheduleTargetMatchButtonUpdate(0.08)
     end)
 
     button:SetScript("OnEnter", function(self)
@@ -773,7 +795,11 @@ local function CreateTargetMatchButton()
             return
         end
 
-        UpdateTargetMatchButton()
+        if event == "PLAYER_REGEN_ENABLED" then
+            UpdateTargetMatchButton()
+        else
+            ScheduleTargetMatchButtonUpdate(0.08)
+        end
     end)
 
     button:RegisterEvent("PLAYER_TARGET_CHANGED")
@@ -1892,6 +1918,7 @@ end
 
 function ns:InitializeMounts()
     EnsureDB()
+    RebuildMountAuraLookup()
     UpdateSmartButton()
     CreateTargetMatchButton()
     UpdateTargetMatchButton()
@@ -1928,6 +1955,8 @@ function ns:InitializeMounts()
             QueueSmartButtonUpdate(0.05)
             QueueSmartButtonUpdate(0.25)
             QueueSmartButtonUpdate(0.75)
+        elseif event == "MOUNT_JOURNAL_USABILITY_CHANGED" then
+            RebuildMountAuraLookup()
         elseif event == "PLAYER_MOUNT_DISPLAY_CHANGED" then
             QueueSmartButtonUpdate(0.05)
         end

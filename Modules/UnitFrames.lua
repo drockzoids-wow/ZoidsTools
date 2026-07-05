@@ -5,6 +5,7 @@ local initialized = false
 local healthHooks = {}
 local castbarHooks = {}
 local auraHooks = {}
+local auraFrameCache = {}
 local originalHealthColors = {}
 local originalCastbarState = {}
 local originalAuraState = {}
@@ -12,6 +13,7 @@ local pendingProtectedRefresh = false
 local refreshQueued = false
 local healthRefreshQueued = false
 local auraVisibilityQueued = false
+local unitStateQueued = {}
 
 local DEFAULT_CASTBAR_WIDTH = 195
 local DEFAULT_CASTBAR_HEIGHT = 16
@@ -1055,6 +1057,12 @@ end
 
 local function GetAuraFrames(info, auraType, unit)
     local config = info and info[auraType]
+    local cacheKey = tostring(unit or "") .. ":" .. tostring(auraType or "")
+
+    if auraFrameCache[cacheKey] then
+        return auraFrameCache[cacheKey]
+    end
+
     local frames = {}
     local seen = {}
 
@@ -1074,6 +1082,10 @@ local function GetAuraFrames(info, auraType, unit)
 
     for _, rootPath in ipairs(info.roots or {}) do
         ScanChildrenForAuraFrames(ResolvePath(rootPath), frames, seen, config.patterns, auraType, unit, 6)
+    end
+
+    if #frames > 0 then
+        auraFrameCache[cacheKey] = frames
     end
 
     return frames
@@ -1106,6 +1118,10 @@ local function HasAuraVisibilityOverrides()
     end
 
     return false
+end
+
+local function HasAuraVisibilityOverridesFor(key)
+    return ShouldHideAuraType(key, "buffs") or ShouldHideAuraType(key, "debuffs")
 end
 
 local function ApplyAuraVisibilityFor(key, auraType)
@@ -1146,6 +1162,50 @@ local function ScheduleAuraVisibility(delay)
     local function Run()
         auraVisibilityQueued = false
         ApplyAuraVisibility()
+    end
+
+    if C_Timer and C_Timer.After then
+        C_Timer.After(delay, Run)
+    else
+        Run()
+    end
+end
+
+local function ApplyUnitFrameState(key)
+    if key == "target" then
+        ApplyHealthBar(healthBars.target)
+        ApplyHealthBar(healthBars.targettarget)
+    elseif key == "focus" then
+        ApplyHealthBar(healthBars.focus)
+    elseif healthBars[key] then
+        ApplyHealthBar(healthBars[key])
+    end
+
+    if castbars[key] then
+        ApplyCastbar(key)
+    end
+
+    if HasAuraVisibilityOverridesFor(key) then
+        ApplyAuraVisibilityFor(key, "buffs")
+        ApplyAuraVisibilityFor(key, "debuffs")
+    end
+end
+
+local function ScheduleUnitFrameState(key, delay)
+    if not key or unitStateQueued[key] then
+        return
+    end
+
+    unitStateQueued[key] = true
+    delay = tonumber(delay) or 0.03
+
+    if InCombatLockdown and InCombatLockdown() then
+        delay = math.max(delay, 0.10)
+    end
+
+    local function Run()
+        unitStateQueued[key] = nil
+        ApplyUnitFrameState(key)
     end
 
     if C_Timer and C_Timer.After then
@@ -1366,11 +1426,15 @@ function ns:InitializeUnitFrames()
     initialized = true
 
     if type(UnitFrameHealthBar_Update) == "function" then
-        hooksecurefunc("UnitFrameHealthBar_Update", ApplyHealthBars)
+        hooksecurefunc("UnitFrameHealthBar_Update", ScheduleHealthBars)
     end
 
     if type(TargetFrame_UpdateAuras) == "function" then
-        hooksecurefunc("TargetFrame_UpdateAuras", ScheduleAuraVisibility)
+        hooksecurefunc("TargetFrame_UpdateAuras", function()
+            if HasAuraVisibilityOverrides() then
+                ScheduleAuraVisibility(0.08)
+            end
+        end)
     end
 
     eventFrame = CreateFrame("Frame")
@@ -1392,6 +1456,14 @@ function ns:InitializeUnitFrames()
                 ScheduleRefresh(0.05)
             end
 
+            return
+        end
+
+        if event == "PLAYER_TARGET_CHANGED" then
+            ScheduleUnitFrameState("target", 0.03)
+            return
+        elseif event == "PLAYER_FOCUS_CHANGED" then
+            ScheduleUnitFrameState("focus", 0.03)
             return
         end
 
@@ -1421,7 +1493,8 @@ function ns:InitializeUnitFrames()
         end
 
         if event == "UNIT_TARGET" then
-            ScheduleHealthBars(0.08)
+            ScheduleUnitFrameState("target", 0.08)
+            return
         end
 
         ScheduleRefresh(0.05)

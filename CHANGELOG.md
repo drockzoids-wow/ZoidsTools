@@ -7,6 +7,7 @@
 - Updated visible talent helper wording to use Talents instead of Grimoire.
 - Deferred non-essential UI refresh work during combat to reduce busy-fight frame churn.
 - Limited tooltip item-level and Mythic+ detail lookups during combat to cached data only.
+- Reduced target-change stutter by avoiding full unit-frame refreshes and prebuilding target mount lookup data.
 
 ## 0.1.0
 

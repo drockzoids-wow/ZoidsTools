@@ -9,6 +9,7 @@ local collectorPanel
 local collectorContent
 local collectorDragAngle
 local pendingRefresh = false
+local pendingCombatRefresh = false
 local mouseHooksInstalled = false
 local originalGetMinimapShape = GetMinimapShape
 local shapeOverrideApplied = false
@@ -75,6 +76,10 @@ local function Atan2(y, x)
     end
 
     return 0
+end
+
+local function IsCombatLocked()
+    return InCombatLockdown and InCombatLockdown()
 end
 
 local ignoredButtonNames = {
@@ -1379,6 +1384,11 @@ function LayoutCollectorButtons()
 end
 
 local function ApplyMouseoverButtonVisibility(forceShow)
+    if IsCombatLocked() then
+        pendingCombatRefresh = true
+        return
+    end
+
     local db = EnsureMinimapDB()
     local show = db
         and (
@@ -1399,11 +1409,21 @@ local function ApplyMouseoverButtonVisibility(forceShow)
 end
 
 local function ShowMouseoverButtons()
+    if IsCombatLocked() then
+        pendingCombatRefresh = true
+        return
+    end
+
     mouseoverHideToken = mouseoverHideToken + 1
     ApplyMouseoverButtonVisibility(true)
 end
 
 local function ScheduleMouseoverButtonHide()
+    if IsCombatLocked() then
+        pendingCombatRefresh = true
+        return
+    end
+
     mouseoverHideToken = mouseoverHideToken + 1
 
     local token = mouseoverHideToken
@@ -1557,6 +1577,11 @@ local function ScheduleMinimapUnclamp()
 end
 
 local function ApplyMinimapTools()
+    if IsCombatLocked() then
+        pendingCombatRefresh = true
+        return
+    end
+
     local db = EnsureMinimapDB()
 
     if not db then
@@ -1570,6 +1595,11 @@ local function ApplyMinimapTools()
 end
 
 local function ScheduleRefresh(delay)
+    if IsCombatLocked() then
+        pendingCombatRefresh = true
+        return
+    end
+
     if pendingRefresh then
         return
     end
@@ -1676,7 +1706,28 @@ function ns:InitializeMinimapTools()
     eventFrame:RegisterEvent("ZONE_CHANGED")
     eventFrame:RegisterEvent("ZONE_CHANGED_INDOORS")
     eventFrame:RegisterEvent("ZONE_CHANGED_NEW_AREA")
-    eventFrame:SetScript("OnEvent", function()
+    eventFrame:RegisterEvent("PLAYER_REGEN_DISABLED")
+    eventFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
+    eventFrame:SetScript("OnEvent", function(_, event)
+        if event == "PLAYER_REGEN_DISABLED" then
+            pendingCombatRefresh = true
+
+            if collectorPanel then
+                collectorPanel:Hide()
+            end
+
+            return
+        end
+
+        if event == "PLAYER_REGEN_ENABLED" then
+            if pendingCombatRefresh then
+                pendingCombatRefresh = false
+                ScheduleRefresh(0.35)
+            end
+
+            return
+        end
+
         ScheduleRefresh(0.35)
     end)
 

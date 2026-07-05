@@ -25,6 +25,10 @@ local function SafeCall(method, object, ...)
     return pcall(method, object, ...)
 end
 
+local function IsCombatLocked()
+    return InCombatLockdown and InCombatLockdown()
+end
+
 local function EnsureDB()
     if not ns.db then
         return nil
@@ -369,13 +373,18 @@ local function RefreshWidget()
         return
     end
 
+    local inCombat = IsCombatLocked()
+
     ApplyClassColor()
     ApplyWidgetSize()
     ApplyMouseBehavior()
-    UpdatePerformanceText()
+
+    if not inCombat then
+        UpdatePerformanceText()
+    end
 
     if db.displayMode ~= "disabled" then
-        frame:SetScript("OnUpdate", OnUpdate)
+        frame:SetScript("OnUpdate", inCombat and nil or OnUpdate)
         frame:Show()
     else
         frame:SetScript("OnUpdate", nil)
@@ -462,6 +471,8 @@ function ns:InitializePerformanceWidget()
 
     eventFrame = CreateFrame("Frame")
     eventFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
+    eventFrame:RegisterEvent("PLAYER_REGEN_DISABLED")
+    eventFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
     eventFrame:SetScript("OnEvent", function()
         ApplyClassColor()
         RefreshWidget()

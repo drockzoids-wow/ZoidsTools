@@ -99,6 +99,10 @@ local function NormalizeOutline(value)
     return DEFAULT_OUTLINE
 end
 
+local function IsCombatLocked()
+    return InCombatLockdown and InCombatLockdown()
+end
+
 local function EnsureCombatDB()
     if not ns.db then
         return nil
@@ -600,11 +604,16 @@ local function ApplyHotkey(button, forceCapture)
 end
 
 local function RefreshAllActionButtons()
+    local inCombat = IsCombatLocked()
+
     for _, group in ipairs(buttonPrefixes) do
         for index = 1, group.count do
             local button = _G[group.prefix .. index]
 
-            ApplyHotkey(button)
+            if not inCombat then
+                ApplyHotkey(button)
+            end
+
             EnsureRangeOverlay(button)
             RefreshRangeOverlay(button)
         end
@@ -633,13 +642,20 @@ local function InstallHooks()
     if type(hooksecurefunc) == "function" then
         if type(ActionButton_UpdateHotkeys) == "function" then
             hooksecurefunc("ActionButton_UpdateHotkeys", function(button)
+                if IsCombatLocked() then
+                    return
+                end
+
                 ApplyHotkey(button, true)
             end)
         end
 
         if type(ActionButton_Update) == "function" then
             hooksecurefunc("ActionButton_Update", function(button)
-                ApplyHotkey(button, true)
+                if not IsCombatLocked() then
+                    ApplyHotkey(button, true)
+                end
+
                 RefreshRangeOverlay(button)
             end)
         end

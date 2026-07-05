@@ -220,8 +220,9 @@ local defaults = {
         updateInterval = 0.15,
         point = "BOTTOM",
         relativePoint = "BOTTOM",
+        relativeTo = "Minimap",
         x = 0,
-        y = 8,
+        y = 0,
         scale = 1,
     },
     ui = {

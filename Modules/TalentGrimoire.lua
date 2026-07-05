@@ -6,6 +6,7 @@ local applyFrame
 local QueueRefresh
 local refreshQueued = false
 local pendingCombatRefresh = false
+local talentDataCompacted = false
 local talentFrameHooks = {}
 local talentCheckRefreshQueued = false
 local checkedTalentButtons = {}
@@ -115,6 +116,15 @@ local function TitleCase(value)
     return (value:gsub("(%a)([%w_']*)", function(first, rest)
         return string.upper(first) .. string.lower(rest)
     end))
+end
+
+local function NormalizeSpecName(value)
+    value = string.lower(tostring(value or ""))
+    value = value:gsub("&", "and")
+    value = value:gsub("[^%w]+", "-")
+    value = value:gsub("^%-+", "")
+    value = value:gsub("%-+$", "")
+    return value
 end
 
 local function GetOptionText(options, value)
@@ -252,10 +262,87 @@ local function GetRoot()
     return _G.ZoidsToolsTalentGrimoire
 end
 
+local function BuildEntriesEquivalent(left, right)
+    if type(left) ~= "table" or type(right) ~= "table" then
+        return false
+    end
+
+    return left.importString == right.importString
+        and left.title == right.title
+        and left.modeLabel == right.modeLabel
+        and left.keyRange == right.keyRange
+        and left.rankRange == right.rankRange
+        and left.difficulty == right.difficulty
+        and left.source == right.source
+end
+
+local function CompactTalentGrimoireData()
+    if talentDataCompacted then
+        return
+    end
+
+    talentDataCompacted = true
+
+    local root = GetRoot()
+    local data = root and root.data
+
+    if type(data) ~= "table" then
+        return
+    end
+
+    for _, classData in pairs(data) do
+        if type(classData) == "table" then
+            for _, specData in pairs(classData) do
+                if type(specData) == "table" then
+                    for contentType, contentData in pairs(specData) do
+                        if type(contentData) == "table" then
+                            for _, targetData in pairs(contentData) do
+                                local builds = type(targetData) == "table" and targetData.builds
+
+                                if type(builds) == "table" then
+                                    for _, entry in pairs(builds) do
+                                        if type(entry) == "table" then
+                                            entry.notes = nil
+
+                                            if entry.importString and entry.importString ~= "" then
+                                                entry.sourceUrl = nil
+                                            end
+                                        end
+                                    end
+
+                                    if contentType == "mythicplus" and BuildEntriesEquivalent(builds.popular, builds.highkey) then
+                                        builds.popular = builds.highkey
+                                    elseif contentType == "raid" and BuildEntriesEquivalent(builds.popular, builds.mythic) then
+                                        builds.popular = builds.mythic
+                                    end
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+
+    if collectgarbage then
+        pcall(collectgarbage, "collect")
+    end
+end
+
 local function GetClassAndSpec()
     local _, classToken = UnitClass("player")
     local specIndex = GetSpecialization and GetSpecialization()
     local specKey = classToken and specIndex and SPEC_KEYS[classToken] and SPEC_KEYS[classToken][specIndex]
+    local root = GetRoot()
+
+    if classToken and specIndex and GetSpecializationInfo and root and root.data and root.data[classToken] then
+        local _, specName = GetSpecializationInfo(specIndex)
+        local nameKey = NormalizeSpecName(specName)
+
+        if root.data[classToken][nameKey] then
+            specKey = nameKey
+        end
+    end
 
     return classToken, specKey
 end
@@ -551,10 +638,24 @@ local function GetBuildEntryForTarget(contentType, targetKey, mode)
     end
 
     local builds = targetData and targetData.builds
+    local preferredFallbackMode
+
+    if contentType == "mythicplus" then
+        preferredFallbackMode = "highkey"
+    elseif contentType == "raid" then
+        preferredFallbackMode = "mythic"
+    end
+
     local fallbackMode = GetFirstBuildKey(builds)
-    local entry = builds and (builds[mode] or builds.popular or (fallbackMode and builds[fallbackMode]))
+    local entry = builds and (builds[mode] or builds.popular or (preferredFallbackMode and builds[preferredFallbackMode]) or (fallbackMode and builds[fallbackMode]))
     if entry and (not builds or not builds[mode]) then
-        mode = fallbackMode or mode
+        if builds and preferredFallbackMode and builds[preferredFallbackMode] == entry then
+            mode = preferredFallbackMode
+        elseif builds and builds.popular == entry then
+            mode = "popular"
+        else
+            mode = fallbackMode or mode
+        end
     end
 
     return entry, {
@@ -2640,7 +2741,7 @@ end
 
 function ns:InitializeTalentGrimoire()
     EnsureDB()
-    CreatePanel()
+    CompactTalentGrimoireData()
     InstallTalentFrameHooks()
 
     if not eventFrame then

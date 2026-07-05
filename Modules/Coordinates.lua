@@ -13,10 +13,10 @@ local DEFAULT_RELATIVE_TO = "Minimap"
 local UI_PARENT_RELATIVE_TO = "UIParent"
 local DEFAULT_X = 0
 local DEFAULT_Y = 0
+local OLD_CORE_DEFAULT_Y = 8
 local OLD_DEFAULT_Y = 245
 local DEFAULT_SCALE = 1
 local DEFAULT_UPDATE_INTERVAL = 0.15
-local DEFAULT_COMBAT_UPDATE_INTERVAL = 1
 
 local function IsCombatLocked()
     return InCombatLockdown and InCombatLockdown()
@@ -91,7 +91,7 @@ local function EnsureDB()
     end
 
     if db.relativeTo == nil then
-        if IsDefaultPosition(db, DEFAULT_Y) or IsDefaultPosition(db, OLD_DEFAULT_Y) then
+        if IsDefaultPosition(db, DEFAULT_Y) or IsDefaultPosition(db, OLD_CORE_DEFAULT_Y) or IsDefaultPosition(db, OLD_DEFAULT_Y) then
             SetDefaultPosition(db)
         else
             db.relativeTo = UI_PARENT_RELATIVE_TO
@@ -296,10 +296,6 @@ local function OnWidgetUpdate(_, elapsed)
     local db = EnsureDB()
     local updateInterval = db and db.updateInterval or DEFAULT_UPDATE_INTERVAL
 
-    if IsCombatLocked() then
-        updateInterval = math.max(updateInterval, DEFAULT_COMBAT_UPDATE_INTERVAL)
-    end
-
     if elapsedSinceUpdate < updateInterval then
         return
     end
@@ -483,10 +479,13 @@ local function UpdateMapOverlay()
 end
 
 local function OnMapUpdate(_, elapsed)
-    mapElapsedSinceUpdate = mapElapsedSinceUpdate + (elapsed or 0)
-    local updateInterval = IsCombatLocked() and DEFAULT_COMBAT_UPDATE_INTERVAL or DEFAULT_UPDATE_INTERVAL
+    if IsCombatLocked() then
+        return
+    end
 
-    if mapElapsedSinceUpdate < updateInterval then
+    mapElapsedSinceUpdate = mapElapsedSinceUpdate + (elapsed or 0)
+
+    if mapElapsedSinceUpdate < DEFAULT_UPDATE_INTERVAL then
         return
     end
 
@@ -547,20 +546,32 @@ RefreshCoordinates = function()
         return
     end
 
+    local inCombat = IsCombatLocked()
+
     ApplyClassColor()
     ApplyWidgetSize()
-    UpdateWidgetText()
+
+    if not inCombat then
+        UpdateWidgetText()
+    end
 
     if db.enabled then
-        frame:SetScript("OnUpdate", OnWidgetUpdate)
+        frame:SetScript("OnUpdate", inCombat and nil or OnWidgetUpdate)
         frame:Show()
     else
         frame:SetScript("OnUpdate", nil)
         frame:Hide()
     end
 
-    CreateMapOverlay()
-    UpdateMapOverlay()
+    if not inCombat then
+        CreateMapOverlay()
+        if mapOverlay then
+            mapOverlay:SetScript("OnUpdate", OnMapUpdate)
+        end
+        UpdateMapOverlay()
+    elseif mapOverlay then
+        mapOverlay:SetScript("OnUpdate", nil)
+    end
 end
 
 function ns:SetCoordinatesWidgetShown(value)
@@ -635,6 +646,8 @@ function ns:InitializeCoordinates()
     eventFrame:RegisterEvent("ZONE_CHANGED")
     eventFrame:RegisterEvent("ZONE_CHANGED_INDOORS")
     eventFrame:RegisterEvent("ZONE_CHANGED_NEW_AREA")
+    eventFrame:RegisterEvent("PLAYER_REGEN_DISABLED")
+    eventFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
     eventFrame:SetScript("OnEvent", function()
         RefreshCoordinates()
     end)

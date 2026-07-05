@@ -1201,6 +1201,10 @@ local function InstallHooks()
     bagWatcher:RegisterEvent("PLAYERBANKSLOTS_CHANGED")
     bagWatcher:RegisterEvent("PLAYER_REGEN_ENABLED")
     bagWatcher:SetScript("OnEvent", function(_, event)
+        if InCombatLockdown() and event ~= "PLAYER_REGEN_ENABLED" then
+            return
+        end
+
         if event == "ADDON_LOADED" or event == "PLAYER_REGEN_ENABLED" then
             RefreshPanelWindowsSoon()
         end

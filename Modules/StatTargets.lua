@@ -192,10 +192,29 @@ local function GetContextButtonText()
     return "M+"
 end
 
+local function NormalizeSpecName(value)
+    value = string.lower(tostring(value or ""))
+    value = value:gsub("&", "and")
+    value = value:gsub("[^%w]+", "-")
+    value = value:gsub("^%-+", "")
+    value = value:gsub("%-+$", "")
+    return value
+end
+
 local function GetClassAndSpec()
     local _, classToken = UnitClass("player")
     local specIndex = GetSpecialization and GetSpecialization()
     local specKey = classToken and specIndex and SPEC_KEYS[classToken] and SPEC_KEYS[classToken][specIndex]
+    local root = _G.ZoidsToolsStatTargets
+
+    if classToken and specIndex and GetSpecializationInfo and root and root[classToken] then
+        local _, specName = GetSpecializationInfo(specIndex)
+        local nameKey = NormalizeSpecName(specName)
+
+        if root[classToken][nameKey] then
+            specKey = nameKey
+        end
+    end
 
     return classToken, specKey
 end
@@ -1247,6 +1266,11 @@ local function QueueRefresh(delay)
 end
 
 local function OnSetLabelAndText(row, label, text)
+    if IsCombatLocked() then
+        pendingCombatRefresh = true
+        return
+    end
+
     local statKey = GetStatKeyFromLabel(label)
 
     if not statKey then
@@ -1263,6 +1287,11 @@ local function OnSetLabelAndText(row, label, text)
 end
 
 local function OnStatSetter(statKey, row, unit)
+    if IsCombatLocked() then
+        pendingCombatRefresh = true
+        return
+    end
+
     if unit and unit ~= "player" then
         return
     end
@@ -1422,6 +1451,11 @@ function ns:InitializeStatTargets()
                     QueueRefresh(0.12)
                 end
 
+                return
+            end
+
+            if IsCombatLocked() then
+                pendingCombatRefresh = true
                 return
             end
 

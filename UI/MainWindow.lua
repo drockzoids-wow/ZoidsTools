@@ -543,5 +543,5 @@ function UI.Toggle(pageKey)
 end
 
 function UI.Initialize()
-    CreateMainWindow()
+    -- Build the settings window only when the player opens /zt.
 end

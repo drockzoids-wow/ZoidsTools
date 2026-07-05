@@ -639,6 +639,8 @@ function ns:InitializeBuffWarnings()
             RestoreWarningFrameAfterCombat()
             refreshAfterCombat = false
             ScheduleCheck(0.3)
+        elseif IsCombatLocked() then
+            refreshAfterCombat = true
         else
             ScheduleCheck(0.75)
         end

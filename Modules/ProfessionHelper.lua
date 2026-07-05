@@ -975,12 +975,24 @@ function ns:InitializeProfessionHelper()
         eventFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
         eventFrame:SetScript("OnEvent", function(_, event, arg1)
             if event == "BAG_UPDATE_DELAYED" then
+                if InCombatLockdown and InCombatLockdown() then
+                    return
+                end
+
                 HideButton()
             elseif event == "CVAR_UPDATE" then
+                if InCombatLockdown and InCombatLockdown() then
+                    return
+                end
+
                 if arg1 == ACTION_BUTTON_USE_KEY_DOWN_CVAR then
                     RegisterButtonForPreferredClickDirection(helperButton)
                 end
             elseif event == "MODIFIER_STATE_CHANGED" then
+                if InCombatLockdown and InCombatLockdown() then
+                    return
+                end
+
                 if not IsActivationModifierHeld() then
                     HideButton()
                 end

@@ -18,9 +18,11 @@ local pendingCombatBankRefresh = false
 local pendingCombatBagForceClear = false
 local pendingCombatBankForceClear = false
 local qualityColorCache = {}
+local qualityColorCacheCount = 0
 
 local tableUnpack = unpack or table.unpack
 local DEFAULT_FONT_SIZE = 12
+local QUALITY_COLOR_CACHE_MAX = 250
 local CHARACTER_GEM_SIZE = 13
 local CHARACTER_GEM_SPACING = 1
 local CHARACTER_REFRESH_DELAY = 0.05
@@ -223,6 +225,11 @@ local function SetQualityColor(fontString, itemLink, fallbackR, fallbackG, fallb
         local color = qualityColorCache[itemLink]
 
         if color == nil then
+            if qualityColorCacheCount >= QUALITY_COLOR_CACHE_MAX then
+                wipe(qualityColorCache)
+                qualityColorCacheCount = 0
+            end
+
             local quality
 
             if C_Item and C_Item.GetItemInfo then
@@ -252,6 +259,7 @@ local function SetQualityColor(fontString, itemLink, fallbackR, fallbackG, fallb
             end
 
             qualityColorCache[itemLink] = color
+            qualityColorCacheCount = qualityColorCacheCount + 1
         end
 
         if color then
@@ -1155,6 +1163,11 @@ local function QueueCharacterRefresh(delay, force)
 end
 
 local function QueueCharacterSettleRefresh()
+    if IsCombatLocked() then
+        pendingCombatCharacterRefresh = true
+        return
+    end
+
     QueueCharacterRefresh(0.08)
 
     if pendingCharacterSettleRefresh then
@@ -1449,6 +1462,25 @@ function ns:InitializeItemOverlays()
                 pendingCombatBankForceClear = false
                 QueueBankRefresh(force)
             end
+        elseif IsCombatLocked() then
+            if event == "PLAYER_EQUIPMENT_CHANGED"
+                or event == "UNIT_INVENTORY_CHANGED"
+                or event == "SOCKET_INFO_UPDATE"
+                or event == "SOCKET_INFO_SUCCESS"
+                or event == "SOCKET_INFO_CLOSE"
+            then
+                pendingCombatCharacterRefresh = true
+            elseif event == "BAG_UPDATE_DELAYED" then
+                pendingCombatBagRefresh = true
+                pendingCombatCharacterRefresh = true
+            elseif event == "PLAYERBANKSLOTS_CHANGED"
+                or event == "BANKFRAME_OPENED"
+                or event == "PLAYER_INTERACTION_MANAGER_FRAME_SHOW"
+            then
+                pendingCombatBankRefresh = true
+            end
+
+            return
         elseif event == "PLAYER_EQUIPMENT_CHANGED" then
             QueueCharacterSettleRefresh()
         elseif event == "UNIT_INVENTORY_CHANGED" then

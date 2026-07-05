@@ -790,13 +790,15 @@ local function CreateTargetMatchButton()
             return
         end
 
-        if event ~= "PLAYER_REGEN_ENABLED" and IsPlayerInCombat() then
+        if event == "PLAYER_REGEN_DISABLED" then
             HideTargetMatchButtonForCombat()
             return
         end
 
         if event == "PLAYER_REGEN_ENABLED" then
             UpdateTargetMatchButton()
+        elseif IsPlayerInCombat() then
+            return
         else
             ScheduleTargetMatchButtonUpdate(0.08)
         end
@@ -1946,11 +1948,20 @@ function ns:InitializeMounts()
     eventFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
     eventFrame:SetScript("OnEvent", function(_, event)
         EnsureDB()
-        UpdateWaterSurfaceState()
 
         if event == "PLAYER_REGEN_DISABLED" then
             lastCombatEndedAt = 0
-        elseif event == "PLAYER_REGEN_ENABLED" then
+            HideTargetMatchButtonForCombat()
+            return
+        end
+
+        if IsPlayerInCombat() then
+            return
+        end
+
+        UpdateWaterSurfaceState()
+
+        if event == "PLAYER_REGEN_ENABLED" then
             lastCombatEndedAt = GetTime and GetTime() or 0
             QueueSmartButtonUpdate(0.05)
             QueueSmartButtonUpdate(0.25)

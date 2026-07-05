@@ -948,6 +948,8 @@ function ns:InitializeConsumableMacros()
                 pendingCombatUpdate = false
                 ScheduleMacroUpdate(0.05, false)
             end
+        elseif InCombatLockdown and InCombatLockdown() then
+            pendingCombatUpdate = true
         elseif event == "GET_ITEM_INFO_RECEIVED" then
             if pendingItemInfo then
                 ScheduleMacroUpdate(0.15, false)

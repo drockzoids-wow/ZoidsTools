@@ -19,6 +19,8 @@ local INSPECT_RESULT_RETRIES = 8
 local ITEM_LEVEL_CACHE_TIME = 30
 local PLAYER_ITEM_LEVEL_CACHE_TIME = 2
 local MYTHIC_SCORE_CACHE_TIME = 30
+local ITEM_LEVEL_CACHE_MAX_ENTRIES = 80
+local MYTHIC_SCORE_CACHE_MAX_ENTRIES = 120
 local MIN_FALLBACK_EQUIPPED_ITEMS = 12
 local playerItemLevelCache
 
@@ -176,6 +178,29 @@ end
 
 local function IsCombatLocked()
     return InCombatLockdown and InCombatLockdown()
+end
+
+local function PruneTimedCache(cache, maxEntries, maxAge)
+    if type(cache) ~= "table" or not maxEntries then
+        return
+    end
+
+    local now = GetTime and GetTime() or 0
+    local count = 0
+
+    for key, value in pairs(cache) do
+        local timestamp = type(value) == "table" and (value.time or value.lastRequest)
+
+        if maxAge and timestamp and now > 0 and (now - timestamp) > maxAge then
+            cache[key] = nil
+        else
+            count = count + 1
+        end
+    end
+
+    if count > maxEntries then
+        wipe(cache)
+    end
 end
 
 local function GetDisplayedUnit(tooltip)
@@ -649,6 +674,8 @@ local function CacheMythicScore(guid, details)
         details = details or false,
         time = GetTime and GetTime() or 0,
     }
+
+    PruneTimedCache(mythicScoreCache, MYTHIC_SCORE_CACHE_MAX_ENTRIES, MYTHIC_SCORE_CACHE_TIME)
 end
 
 local function GetTooltipMythicScore(unit, guid)
@@ -814,6 +841,8 @@ local function CacheItemLevel(guid, itemLevel)
         itemLevel = itemLevel,
         time = GetTime and GetTime() or 0,
     }
+
+    PruneTimedCache(itemLevelCache, ITEM_LEVEL_CACHE_MAX_ENTRIES, ITEM_LEVEL_CACHE_TIME)
 end
 
 local function FinishPendingInspect(guid)
@@ -947,6 +976,7 @@ local function RequestInspectIfNeeded(unit, guid, priority)
     lastInspectRequest = now
     itemLevelCache[guid] = itemLevelCache[guid] or {}
     itemLevelCache[guid].lastRequest = now
+    PruneTimedCache(itemLevelCache, ITEM_LEVEL_CACHE_MAX_ENTRIES, ITEM_LEVEL_CACHE_TIME)
 
     local inspectOk = pcall(NotifyInspect, unit)
 
@@ -1035,7 +1065,7 @@ end
 local function AddTooltipDetails(tooltip, unit, guid)
     local db = EnsureDB()
 
-    if not db or not UnitIsPlayerSafe(unit) then
+    if not db or IsCombatLocked() or not UnitIsPlayerSafe(unit) then
         return
     end
 
@@ -1187,6 +1217,10 @@ local function HookTooltipScript(scriptName, handler)
 end
 
 local function RefreshCurrentTooltip()
+    if IsCombatLocked() then
+        return
+    end
+
     if GameTooltip and GameTooltip:IsShown() then
         local unit = GetDisplayedUnit(GameTooltip)
 

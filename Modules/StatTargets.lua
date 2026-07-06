@@ -19,6 +19,49 @@ local SOURCE_OPTIONS = {
 local function IsCombatLocked()
     return InCombatLockdown and InCombatLockdown()
 end
+
+local function IsSecretValue(value)
+    return issecretvalue and issecretvalue(value)
+end
+
+local function IsSafeWidth(value)
+    if IsSecretValue(value) then
+        return false
+    end
+
+    return type(value) == "number" and value > 0
+end
+
+local function RegisterUnitEventSafe(frame, event, ...)
+    if frame and type(frame.RegisterUnitEvent) == "function" then
+        local ok, registered = pcall(frame.RegisterUnitEvent, frame, event, ...)
+
+        if ok and registered ~= false then
+            return
+        end
+    end
+
+    frame:RegisterEvent(event)
+end
+
+local function RegisterStatUnitEvents()
+    if not eventFrame then
+        return
+    end
+
+    RegisterUnitEventSafe(eventFrame, "UNIT_STATS", "player")
+    RegisterUnitEventSafe(eventFrame, "UNIT_AURA", "player")
+end
+
+local function UnregisterStatUnitEvents()
+    if not eventFrame or type(eventFrame.UnregisterEvent) ~= "function" then
+        return
+    end
+
+    eventFrame:UnregisterEvent("UNIT_STATS")
+    eventFrame:UnregisterEvent("UNIT_AURA")
+end
+
 local LABEL_COLUMN_WIDTH = 60
 local DELTA_COLUMN_WIDTH = 34
 local RAW_COLUMN_WIDTH = 30
@@ -584,7 +627,7 @@ local function RestoreRow(row)
         valueFont:SetText(row.ZTStatTargetDefaultText)
     end
 
-    if valueFont and row.ZTStatTargetOriginalValueWidth then
+    if valueFont and IsSafeWidth(row.ZTStatTargetOriginalValueWidth) then
         valueFont:SetWidth(row.ZTStatTargetOriginalValueWidth)
     end
 
@@ -811,7 +854,11 @@ local function SetRowValueText(row, statKey, defaultText)
     end
 
     if not row.ZTStatTargetOriginalValueWidth and valueFont.GetWidth then
-        row.ZTStatTargetOriginalValueWidth = valueFont:GetWidth()
+        local width = valueFont:GetWidth()
+
+        if IsSafeWidth(width) then
+            row.ZTStatTargetOriginalValueWidth = width
+        end
     end
 
     local labelFont = FindLabelFont(row, statKey) or row.ZTStatTargetLabelFont or FindRowLabelFont(row)
@@ -1441,11 +1488,19 @@ function ns:InitializeStatTargets()
         eventFrame:RegisterEvent("PLAYER_EQUIPMENT_CHANGED")
         eventFrame:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED")
         eventFrame:RegisterEvent("ACTIVE_TALENT_GROUP_CHANGED")
+        eventFrame:RegisterEvent("PLAYER_REGEN_DISABLED")
         eventFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
-        eventFrame:RegisterEvent("UNIT_STATS")
-        eventFrame:RegisterEvent("UNIT_AURA")
+        RegisterStatUnitEvents()
         eventFrame:SetScript("OnEvent", function(_, event, unitOrAddon)
+            if event == "PLAYER_REGEN_DISABLED" then
+                pendingCombatRefresh = true
+                UnregisterStatUnitEvents()
+                return
+            end
+
             if event == "PLAYER_REGEN_ENABLED" then
+                RegisterStatUnitEvents()
+
                 if pendingCombatRefresh then
                     pendingCombatRefresh = false
                     QueueRefresh(0.12)

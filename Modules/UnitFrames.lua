@@ -14,6 +14,7 @@ local refreshQueued = false
 local healthRefreshQueued = false
 local auraVisibilityQueued = false
 local unitStateQueued = {}
+local HasAuraVisibilityOverrides
 
 local DEFAULT_CASTBAR_WIDTH = 195
 local DEFAULT_CASTBAR_HEIGHT = 16
@@ -262,6 +263,32 @@ local function EnsureDB()
     end
 
     return db
+end
+
+local function RegisterUnitEventSafe(frame, event, ...)
+    if frame and type(frame.RegisterUnitEvent) == "function" then
+        local ok, registered = pcall(frame.RegisterUnitEvent, frame, event, ...)
+
+        if ok and registered ~= false then
+            return
+        end
+    end
+
+    frame:RegisterEvent(event)
+end
+
+local function UpdateAuraEventRegistration()
+    if not eventFrame then
+        return
+    end
+
+    if type(eventFrame.UnregisterEvent) == "function" then
+        eventFrame:UnregisterEvent("UNIT_AURA")
+    end
+
+    if HasAuraVisibilityOverrides() then
+        RegisterUnitEventSafe(eventFrame, "UNIT_AURA", "target", "focus")
+    end
 end
 
 local function ResolvePath(path)
@@ -1110,7 +1137,7 @@ local function ShouldHideAuraType(key, auraType)
     return false
 end
 
-local function HasAuraVisibilityOverrides()
+function HasAuraVisibilityOverrides()
     for _, key in ipairs(auraFrameOrder) do
         if ShouldHideAuraType(key, "buffs") or ShouldHideAuraType(key, "debuffs") then
             return true
@@ -1389,6 +1416,7 @@ function ns:SetUnitFrameAuraHidden(key, auraType, value)
         frameDB.hideDebuffs = value == true
     end
 
+    UpdateAuraEventRegistration()
     RefreshUnitFrames()
 end
 
@@ -1441,13 +1469,13 @@ function ns:InitializeUnitFrames()
     eventFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
     eventFrame:RegisterEvent("PLAYER_TARGET_CHANGED")
     eventFrame:RegisterEvent("PLAYER_FOCUS_CHANGED")
-    eventFrame:RegisterEvent("UNIT_TARGET")
-    eventFrame:RegisterEvent("UNIT_AURA")
-    eventFrame:RegisterEvent("UNIT_NAME_UPDATE")
-    eventFrame:RegisterEvent("UNIT_FACTION")
-    eventFrame:RegisterEvent("UNIT_CONNECTION")
-    eventFrame:RegisterEvent("UNIT_HEALTH")
-    eventFrame:RegisterEvent("UNIT_MAXHEALTH")
+    RegisterUnitEventSafe(eventFrame, "UNIT_TARGET", "player", "target")
+    UpdateAuraEventRegistration()
+    RegisterUnitEventSafe(eventFrame, "UNIT_NAME_UPDATE", "player", "target", "targettarget", "focus")
+    RegisterUnitEventSafe(eventFrame, "UNIT_FACTION", "player", "target", "targettarget", "focus")
+    RegisterUnitEventSafe(eventFrame, "UNIT_CONNECTION", "player", "target", "targettarget", "focus")
+    RegisterUnitEventSafe(eventFrame, "UNIT_HEALTH", "player", "target", "targettarget", "focus")
+    RegisterUnitEventSafe(eventFrame, "UNIT_MAXHEALTH", "player", "target", "targettarget", "focus")
     eventFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
     eventFrame:SetScript("OnEvent", function(_, event, unit)
         if event == "PLAYER_REGEN_ENABLED" then

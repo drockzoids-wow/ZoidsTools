@@ -228,6 +228,28 @@ local function IsPlayerInCombat()
     return UnitAffectingCombat and UnitAffectingCombat("player") == true
 end
 
+local function RegisterUnitEventSafe(frame, event, ...)
+    if frame and type(frame.RegisterUnitEvent) == "function" then
+        local ok, registered = pcall(frame.RegisterUnitEvent, frame, event, ...)
+
+        if ok and registered ~= false then
+            return
+        end
+    end
+
+    frame:RegisterEvent(event)
+end
+
+local function RegisterTargetAuraEvent(frame)
+    RegisterUnitEventSafe(frame, "UNIT_AURA", "target")
+end
+
+local function UnregisterTargetAuraEvent(frame)
+    if frame and type(frame.UnregisterEvent) == "function" then
+        frame:UnregisterEvent("UNIT_AURA")
+    end
+end
+
 local function IsRecentlyOutOfCombat()
     if not GetTime or lastCombatEndedAt <= 0 then
         return false
@@ -785,17 +807,19 @@ local function CreateTargetMatchButton()
         GameTooltip:Hide()
     end)
 
-    button:SetScript("OnEvent", function(_, event, unit)
+    button:SetScript("OnEvent", function(self, event, unit)
         if event == "UNIT_AURA" and unit ~= "target" then
             return
         end
 
         if event == "PLAYER_REGEN_DISABLED" then
+            UnregisterTargetAuraEvent(self)
             HideTargetMatchButtonForCombat()
             return
         end
 
         if event == "PLAYER_REGEN_ENABLED" then
+            RegisterTargetAuraEvent(self)
             UpdateTargetMatchButton()
         elseif IsPlayerInCombat() then
             return
@@ -805,7 +829,7 @@ local function CreateTargetMatchButton()
     end)
 
     button:RegisterEvent("PLAYER_TARGET_CHANGED")
-    button:RegisterEvent("UNIT_AURA")
+    RegisterTargetAuraEvent(button)
     button:RegisterEvent("PLAYER_ENTERING_WORLD")
     button:RegisterEvent("ZONE_CHANGED")
     button:RegisterEvent("ZONE_CHANGED_INDOORS")

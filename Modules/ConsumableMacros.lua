@@ -56,6 +56,28 @@ local function EnsureMacroDB()
     return ns.db.macros
 end
 
+local function RegisterMacroWorkEvents()
+    if not frame then
+        return
+    end
+
+    frame:RegisterEvent("BAG_UPDATE_DELAYED")
+    frame:RegisterEvent("PLAYER_LEVEL_UP")
+    frame:RegisterEvent("GET_ITEM_INFO_RECEIVED")
+    frame:RegisterEvent("SPELLS_CHANGED")
+end
+
+local function UnregisterMacroWorkEvents()
+    if not frame or type(frame.UnregisterEvent) ~= "function" then
+        return
+    end
+
+    frame:UnregisterEvent("BAG_UPDATE_DELAYED")
+    frame:UnregisterEvent("PLAYER_LEVEL_UP")
+    frame:UnregisterEvent("GET_ITEM_INFO_RECEIVED")
+    frame:UnregisterEvent("SPELLS_CHANGED")
+end
+
 local function GetBagIds()
     local bags = {}
     local maxBag = NUM_BAG_SLOTS or 4
@@ -937,13 +959,16 @@ function ns:InitializeConsumableMacros()
     initialized = true
     frame = CreateFrame("Frame")
     frame:RegisterEvent("PLAYER_LOGIN")
-    frame:RegisterEvent("BAG_UPDATE_DELAYED")
+    frame:RegisterEvent("PLAYER_REGEN_DISABLED")
     frame:RegisterEvent("PLAYER_REGEN_ENABLED")
-    frame:RegisterEvent("PLAYER_LEVEL_UP")
-    frame:RegisterEvent("GET_ITEM_INFO_RECEIVED")
-    frame:RegisterEvent("SPELLS_CHANGED")
+    RegisterMacroWorkEvents()
     frame:SetScript("OnEvent", function(_, event)
-        if event == "PLAYER_REGEN_ENABLED" then
+        if event == "PLAYER_REGEN_DISABLED" then
+            pendingCombatUpdate = true
+            UnregisterMacroWorkEvents()
+        elseif event == "PLAYER_REGEN_ENABLED" then
+            RegisterMacroWorkEvents()
+
             if pendingCombatUpdate then
                 pendingCombatUpdate = false
                 ScheduleMacroUpdate(0.05, false)

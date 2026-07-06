@@ -13,6 +13,44 @@ local BUTTON_NAME = "ZoidsToolsProfessionActionButton"
 local ACTION_BUTTON_USE_KEY_DOWN_CVAR = "ActionButtonUseKeyDown"
 local MACRO_SALVAGE = "/run C_TradeSkillUI.CraftSalvage(%d, 1, ItemLocation:CreateFromBagAndSlot(%d, %d))"
 
+local function RegisterProfessionWorkEvents()
+    if not eventFrame then
+        return
+    end
+
+    eventFrame:RegisterEvent("BAG_UPDATE_DELAYED")
+    eventFrame:RegisterEvent("CVAR_UPDATE")
+    eventFrame:RegisterEvent("MODIFIER_STATE_CHANGED")
+end
+
+local function UnregisterProfessionWorkEvents()
+    if not eventFrame or type(eventFrame.UnregisterEvent) ~= "function" then
+        return
+    end
+
+    eventFrame:UnregisterEvent("BAG_UPDATE_DELAYED")
+    eventFrame:UnregisterEvent("CVAR_UPDATE")
+    eventFrame:UnregisterEvent("MODIFIER_STATE_CHANGED")
+end
+
+local function IsSecretValue(value)
+    return issecretvalue and issecretvalue(value)
+end
+
+local function GetSafePositiveNumber(value)
+    if IsSecretValue(value) then
+        return nil
+    end
+
+    value = tonumber(value)
+
+    if value and value > 0 then
+        return value
+    end
+
+    return nil
+end
+
 local ACTION_COLORS = {
     disenchant = { 0.50, 0.50, 1.00, 1 },
     mill = { 0.50, 1.00, 0.50, 1 },
@@ -635,6 +673,15 @@ local function AnchorButtonToTooltipOwner(button)
         height = owner:GetHeight()
     end
 
+    if IsSecretValue(left) or IsSecretValue(bottom) then
+        return false
+    end
+
+    left = tonumber(left)
+    bottom = tonumber(bottom)
+    width = GetSafePositiveNumber(width)
+    height = GetSafePositiveNumber(height)
+
     if not left or not bottom or not width or not height then
         return false
     end
@@ -969,12 +1016,14 @@ function ns:InitializeProfessionHelper()
 
     if not eventFrame then
         eventFrame = CreateFrame("Frame")
-        eventFrame:RegisterEvent("BAG_UPDATE_DELAYED")
-        eventFrame:RegisterEvent("CVAR_UPDATE")
-        eventFrame:RegisterEvent("MODIFIER_STATE_CHANGED")
+        RegisterProfessionWorkEvents()
+        eventFrame:RegisterEvent("PLAYER_REGEN_DISABLED")
         eventFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
         eventFrame:SetScript("OnEvent", function(_, event, arg1)
-            if event == "BAG_UPDATE_DELAYED" then
+            if event == "PLAYER_REGEN_DISABLED" then
+                UnregisterProfessionWorkEvents()
+                return
+            elseif event == "BAG_UPDATE_DELAYED" then
                 if InCombatLockdown and InCombatLockdown() then
                     return
                 end
@@ -999,6 +1048,8 @@ function ns:InitializeProfessionHelper()
 
                 RecheckCurrentTooltip()
             elseif event == "PLAYER_REGEN_ENABLED" then
+                RegisterProfessionWorkEvents()
+
                 if clickRegistrationPending then
                     RegisterButtonForPreferredClickDirection(helperButton)
                 end

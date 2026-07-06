@@ -1326,6 +1326,50 @@ local function RegisterEventSafe(frame, event)
     end
 end
 
+local function RegisterUnitEventSafe(frame, event, ...)
+    if frame and type(frame.RegisterUnitEvent) == "function" then
+        local ok, registered = pcall(frame.RegisterUnitEvent, frame, event, ...)
+
+        if ok and registered ~= false then
+            return
+        end
+    end
+
+    RegisterEventSafe(frame, event)
+end
+
+local function RegisterItemOverlayWorkEvents()
+    if not eventFrame then
+        return
+    end
+
+    RegisterEventSafe(eventFrame, "PLAYER_EQUIPMENT_CHANGED")
+    RegisterUnitEventSafe(eventFrame, "UNIT_INVENTORY_CHANGED", "player")
+    RegisterEventSafe(eventFrame, "BAG_UPDATE_DELAYED")
+    RegisterEventSafe(eventFrame, "PLAYERBANKSLOTS_CHANGED")
+    RegisterEventSafe(eventFrame, "BANKFRAME_OPENED")
+    RegisterEventSafe(eventFrame, "PLAYER_INTERACTION_MANAGER_FRAME_SHOW")
+    RegisterEventSafe(eventFrame, "SOCKET_INFO_UPDATE")
+    RegisterEventSafe(eventFrame, "SOCKET_INFO_SUCCESS")
+    RegisterEventSafe(eventFrame, "SOCKET_INFO_CLOSE")
+end
+
+local function UnregisterItemOverlayWorkEvents()
+    if not eventFrame or type(eventFrame.UnregisterEvent) ~= "function" then
+        return
+    end
+
+    eventFrame:UnregisterEvent("PLAYER_EQUIPMENT_CHANGED")
+    eventFrame:UnregisterEvent("UNIT_INVENTORY_CHANGED")
+    eventFrame:UnregisterEvent("BAG_UPDATE_DELAYED")
+    eventFrame:UnregisterEvent("PLAYERBANKSLOTS_CHANGED")
+    eventFrame:UnregisterEvent("BANKFRAME_OPENED")
+    eventFrame:UnregisterEvent("PLAYER_INTERACTION_MANAGER_FRAME_SHOW")
+    eventFrame:UnregisterEvent("SOCKET_INFO_UPDATE")
+    eventFrame:UnregisterEvent("SOCKET_INFO_SUCCESS")
+    eventFrame:UnregisterEvent("SOCKET_INFO_CLOSE")
+end
+
 function ns:SetItemOverlaysEnabled(value)
     local db = EnsureDB()
 
@@ -1422,16 +1466,9 @@ function ns:InitializeItemOverlays()
 
     eventFrame = CreateFrame("Frame")
     RegisterEventSafe(eventFrame, "PLAYER_ENTERING_WORLD")
-    RegisterEventSafe(eventFrame, "PLAYER_EQUIPMENT_CHANGED")
-    RegisterEventSafe(eventFrame, "UNIT_INVENTORY_CHANGED")
-    RegisterEventSafe(eventFrame, "BAG_UPDATE_DELAYED")
-    RegisterEventSafe(eventFrame, "PLAYERBANKSLOTS_CHANGED")
-    RegisterEventSafe(eventFrame, "BANKFRAME_OPENED")
-    RegisterEventSafe(eventFrame, "PLAYER_INTERACTION_MANAGER_FRAME_SHOW")
+    RegisterItemOverlayWorkEvents()
+    RegisterEventSafe(eventFrame, "PLAYER_REGEN_DISABLED")
     RegisterEventSafe(eventFrame, "PLAYER_REGEN_ENABLED")
-    RegisterEventSafe(eventFrame, "SOCKET_INFO_UPDATE")
-    RegisterEventSafe(eventFrame, "SOCKET_INFO_SUCCESS")
-    RegisterEventSafe(eventFrame, "SOCKET_INFO_CLOSE")
 
     eventFrame:SetScript("OnEvent", function(_, event, ...)
         if event == "PLAYER_ENTERING_WORLD" then
@@ -1439,7 +1476,13 @@ function ns:InitializeItemOverlays()
             QueueCharacterRefresh()
             QueueBagRefresh()
             QueueBankRefresh()
+        elseif event == "PLAYER_REGEN_DISABLED" then
+            pendingCombatCharacterRefresh = true
+            pendingCombatBagRefresh = true
+            UnregisterItemOverlayWorkEvents()
         elseif event == "PLAYER_REGEN_ENABLED" then
+            RegisterItemOverlayWorkEvents()
+
             if pendingCombatCharacterRefresh then
                 local force = pendingCombatCharacterForceRefresh
                 pendingCombatCharacterRefresh = false

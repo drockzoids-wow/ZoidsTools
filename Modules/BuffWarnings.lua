@@ -72,6 +72,30 @@ local function IsCombatLocked()
     return InCombatLockdown and InCombatLockdown()
 end
 
+local function RegisterUnitEventSafe(frame, event, ...)
+    if frame and type(frame.RegisterUnitEvent) == "function" then
+        local ok, registered = pcall(frame.RegisterUnitEvent, frame, event, ...)
+
+        if ok and registered ~= false then
+            return
+        end
+    end
+
+    frame:RegisterEvent(event)
+end
+
+local function RegisterBuffUnitEvents()
+    if eventFrame then
+        RegisterUnitEventSafe(eventFrame, "UNIT_AURA", "player")
+    end
+end
+
+local function UnregisterBuffUnitEvents()
+    if eventFrame and type(eventFrame.UnregisterEvent) == "function" then
+        eventFrame:UnregisterEvent("UNIT_AURA")
+    end
+end
+
 local function HideWarningFrame()
     if not warningFrame then
         return true
@@ -624,7 +648,7 @@ function ns:InitializeBuffWarnings()
     eventFrame:RegisterEvent("GROUP_ROSTER_UPDATE")
     eventFrame:RegisterEvent("PLAYER_REGEN_DISABLED")
     eventFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
-    eventFrame:RegisterEvent("UNIT_AURA")
+    RegisterBuffUnitEvents()
     eventFrame:RegisterEvent("ZONE_CHANGED")
     eventFrame:RegisterEvent("ZONE_CHANGED_INDOORS")
     eventFrame:RegisterEvent("ZONE_CHANGED_NEW_AREA")
@@ -634,8 +658,10 @@ function ns:InitializeBuffWarnings()
         end
 
         if event == "PLAYER_REGEN_DISABLED" then
+            UnregisterBuffUnitEvents()
             ConcealWarningFrameForCombat()
         elseif event == "PLAYER_REGEN_ENABLED" then
+            RegisterBuffUnitEvents()
             RestoreWarningFrameAfterCombat()
             refreshAfterCombat = false
             ScheduleCheck(0.3)

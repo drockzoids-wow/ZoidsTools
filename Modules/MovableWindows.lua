@@ -1120,6 +1120,28 @@ local function RefreshBagsSoon()
     end
 end
 
+local function RegisterBagWatcherWorkEvents()
+    if not bagWatcher then
+        return
+    end
+
+    bagWatcher:RegisterEvent("BAG_OPEN")
+    bagWatcher:RegisterEvent("BAG_CLOSED")
+    bagWatcher:RegisterEvent("BAG_UPDATE_DELAYED")
+    bagWatcher:RegisterEvent("PLAYERBANKSLOTS_CHANGED")
+end
+
+local function UnregisterBagWatcherWorkEvents()
+    if not bagWatcher or type(bagWatcher.UnregisterEvent) ~= "function" then
+        return
+    end
+
+    bagWatcher:UnregisterEvent("BAG_OPEN")
+    bagWatcher:UnregisterEvent("BAG_CLOSED")
+    bagWatcher:UnregisterEvent("BAG_UPDATE_DELAYED")
+    bagWatcher:UnregisterEvent("PLAYERBANKSLOTS_CHANGED")
+end
+
 local function RefreshFrameSoon(frame, isBagWindow)
     if not frame or InCombatLockdown() then
         return
@@ -1195,17 +1217,24 @@ local function InstallHooks()
 
     bagWatcher = CreateFrame("Frame")
     bagWatcher:RegisterEvent("ADDON_LOADED")
-    bagWatcher:RegisterEvent("BAG_OPEN")
-    bagWatcher:RegisterEvent("BAG_CLOSED")
-    bagWatcher:RegisterEvent("BAG_UPDATE_DELAYED")
-    bagWatcher:RegisterEvent("PLAYERBANKSLOTS_CHANGED")
+    RegisterBagWatcherWorkEvents()
+    bagWatcher:RegisterEvent("PLAYER_REGEN_DISABLED")
     bagWatcher:RegisterEvent("PLAYER_REGEN_ENABLED")
     bagWatcher:SetScript("OnEvent", function(_, event)
+        if event == "PLAYER_REGEN_DISABLED" then
+            UnregisterBagWatcherWorkEvents()
+            return
+        end
+
         if InCombatLockdown() and event ~= "PLAYER_REGEN_ENABLED" then
             return
         end
 
         if event == "ADDON_LOADED" or event == "PLAYER_REGEN_ENABLED" then
+            if event == "PLAYER_REGEN_ENABLED" then
+                RegisterBagWatcherWorkEvents()
+            end
+
             RefreshPanelWindowsSoon()
         end
 

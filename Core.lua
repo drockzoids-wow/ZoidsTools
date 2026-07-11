@@ -3,6 +3,7 @@ local ADDON_NAME, ns = ...
 ns.addonName = ADDON_NAME
 ns.title = "ZoidsTools"
 ns.version = "0.1.0"
+local CURRENT_MIGRATION_VERSION = 1
 
 local defaults = {
     migrationVersion = 1,
@@ -258,6 +259,25 @@ local function CopyDefaults(source, target)
     end
 end
 
+local function RunMigrations(db)
+    local version = tonumber(db and db.migrationVersion) or 0
+
+    if version < 1 then
+        if db.performance and db.performance.displayMode == nil and db.performance.enabled ~= nil then
+            db.performance.displayMode = db.performance.enabled and "both" or "disabled"
+        end
+
+        if db.ui and db.ui.minimap then
+            if db.ui.minimap.show == nil and db.ui.minimap.hide ~= nil then
+                db.ui.minimap.show = db.ui.minimap.hide ~= true
+            end
+            db.ui.minimap.hide = db.ui.minimap.show == false
+        end
+    end
+
+    db.migrationVersion = CURRENT_MIGRATION_VERSION
+end
+
 local function Trim(value)
     return (value or ""):match("^%s*(.-)%s*$")
 end
@@ -310,6 +330,7 @@ local function PrintHelp()
     ns:Print("/zt perf unlock unlocks the click-through performance widget.")
     ns:Print("/zt coords on/off toggles the coordinates widget.")
     ns:Print("/zt coords reset resets the coordinates widget position.")
+    ns:Print("/zt diag start/stop/report/reset controls performance diagnostics.")
     ns:Print("/zt items opens item overlay options.")
     ns:Print("/zt iteminfo on/off toggles item overlays.")
     ns:Print("/zt talents opens talent build options.")
@@ -574,6 +595,22 @@ local function HandleSlash(input)
     elseif input == "minimap off" then
         ns:SetMinimapShown(false)
         ns:Print("Minimap button hidden.")
+    elseif input == "diag" or input == "diag status" or input == "diag report" then
+        if ns.ReportDiagnostics then
+            ns:ReportDiagnostics()
+        end
+    elseif input == "diag start" then
+        if ns.StartDiagnostics then
+            ns:StartDiagnostics()
+        end
+    elseif input == "diag stop" then
+        if ns.StopDiagnostics then
+            ns:StopDiagnostics()
+        end
+    elseif input == "diag reset" then
+        if ns.ResetDiagnostics then
+            ns:ResetDiagnostics()
+        end
     elseif input == "help" then
         PrintHelp()
     else
@@ -592,9 +629,14 @@ eventFrame:RegisterEvent("PLAYER_LOGIN")
 eventFrame:SetScript("OnEvent", function(_, event, addonName)
     if event == "ADDON_LOADED" and addonName == ADDON_NAME then
         ZoidsToolsDB = ZoidsToolsDB or {}
+        RunMigrations(ZoidsToolsDB)
         CopyDefaults(defaults, ZoidsToolsDB)
         ns.db = ZoidsToolsDB
     elseif event == "PLAYER_LOGIN" then
+        if ns.InitializeDiagnostics then
+            ns:InitializeDiagnostics()
+        end
+
         if ns.InitializeMovableWindows then
             ns:InitializeMovableWindows()
         end

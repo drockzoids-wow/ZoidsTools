@@ -760,6 +760,8 @@ local function RefreshCharacterSlots()
     end
 end
 
+RefreshCharacterSlots = ns:WrapDiagnosticFunction("ItemOverlays.Character", RefreshCharacterSlots)
+
 local function IsCharacterFrameVisible()
     if CharacterFrame and type(CharacterFrame.IsShown) == "function" and CharacterFrame:IsShown() then
         return true
@@ -1099,6 +1101,8 @@ local function RefreshBagFrames(forceClear)
     end
 end
 
+RefreshBagFrames = ns:WrapDiagnosticFunction("ItemOverlays.Bags", RefreshBagFrames)
+
 local function RefreshBankFrames(forceClear)
     local db = EnsureDB()
 
@@ -1124,6 +1128,8 @@ local function RefreshBankFrames(forceClear)
         end
     end
 end
+
+RefreshBankFrames = ns:WrapDiagnosticFunction("ItemOverlays.Bank", RefreshBankFrames)
 
 local function QueueCharacterRefresh(delay, force)
     if type(delay) ~= "number" then
@@ -1378,6 +1384,15 @@ function ns:SetItemOverlaysEnabled(value)
     end
 
     db.enabled = value == true
+
+    if eventFrame then
+        if db.enabled then
+            RegisterItemOverlayWorkEvents()
+        else
+            UnregisterItemOverlayWorkEvents()
+        end
+    end
+
     ns:RefreshItemOverlays()
 
     if ns.RefreshStatTargets then
@@ -1466,7 +1481,10 @@ function ns:InitializeItemOverlays()
 
     eventFrame = CreateFrame("Frame")
     RegisterEventSafe(eventFrame, "PLAYER_ENTERING_WORLD")
-    RegisterItemOverlayWorkEvents()
+    local db = EnsureDB()
+    if db and db.enabled == true then
+        RegisterItemOverlayWorkEvents()
+    end
     RegisterEventSafe(eventFrame, "PLAYER_REGEN_DISABLED")
     RegisterEventSafe(eventFrame, "PLAYER_REGEN_ENABLED")
 
@@ -1481,7 +1499,10 @@ function ns:InitializeItemOverlays()
             pendingCombatBagRefresh = true
             UnregisterItemOverlayWorkEvents()
         elseif event == "PLAYER_REGEN_ENABLED" then
-            RegisterItemOverlayWorkEvents()
+            local db = EnsureDB()
+            if db and db.enabled == true then
+                RegisterItemOverlayWorkEvents()
+            end
 
             if pendingCombatCharacterRefresh then
                 local force = pendingCombatCharacterForceRefresh
@@ -1537,7 +1558,6 @@ function ns:InitializeItemOverlays()
         elseif event == "BAG_UPDATE_DELAYED" then
             HookContainerFrames()
             QueueBagRefresh()
-            QueueCharacterSettleRefresh()
         elseif event == "PLAYERBANKSLOTS_CHANGED" or event == "BANKFRAME_OPENED" or event == "PLAYER_INTERACTION_MANAGER_FRAME_SHOW" then
             HookBankPanel()
             QueueBankRefresh()

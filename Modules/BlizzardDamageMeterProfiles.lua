@@ -7,6 +7,8 @@ local DEFAULT_PROFILE_KEY = "profile1"
 local AUTO_APPLY_DELAYS = { 0.4, 1.2, 2.5, 5.0 }
 local SETTLE_APPLY_DELAYS = { 0.1, 0.6, 1.6, 3.0 }
 local resetButtonTicker
+local resetButtonWatcherAttempts = 0
+local RESET_BUTTON_WATCH_MAX_ATTEMPTS = 15
 local autoApplyEventFrame
 local pendingAutoApply
 local autoApplyScheduled = false
@@ -349,6 +351,8 @@ local function AttachResetButtonsToDamageMeters()
     end
 end
 
+AttachResetButtonsToDamageMeters = ns:WrapDiagnosticFunction("DamageMeters.Watcher", AttachResetButtonsToDamageMeters)
+
 local function StartResetButtonWatcher()
     AttachResetButtonsToDamageMeters()
 
@@ -356,7 +360,18 @@ local function StartResetButtonWatcher()
         return
     end
 
-    resetButtonTicker = C_Timer.NewTicker(2, AttachResetButtonsToDamageMeters)
+    resetButtonWatcherAttempts = 0
+    resetButtonTicker = C_Timer.NewTicker(2, function()
+        resetButtonWatcherAttempts = resetButtonWatcherAttempts + 1
+        AttachResetButtonsToDamageMeters()
+
+        if resetButtonWatcherAttempts >= RESET_BUTTON_WATCH_MAX_ATTEMPTS then
+            if resetButtonTicker and resetButtonTicker.Cancel then
+                resetButtonTicker:Cancel()
+            end
+            resetButtonTicker = nil
+        end
+    end)
 end
 
 local function QueueDamageMeterProfileSettleApply(profileKey)

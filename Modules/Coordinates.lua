@@ -304,6 +304,8 @@ local function OnWidgetUpdate(_, elapsed)
     UpdateWidgetText()
 end
 
+OnWidgetUpdate = ns:WrapDiagnosticFunction("Coordinates.Widget", OnWidgetUpdate)
+
 local function CreateWidget()
     if widget then
         return widget
@@ -492,6 +494,8 @@ local function OnMapUpdate(_, elapsed)
     mapElapsedSinceUpdate = 0
     UpdateMapOverlay()
 end
+
+OnMapUpdate = ns:WrapDiagnosticFunction("Coordinates.Map", OnMapUpdate)
 
 local function CreateMapOverlay()
     if mapOverlay or not WorldMapFrame then

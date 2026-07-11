@@ -607,7 +607,14 @@ local function ApplyHealthBars()
     end
 end
 
+ApplyHealthBars = ns:WrapDiagnosticFunction("UnitFrames.HealthBars", ApplyHealthBars)
+
 local function ScheduleHealthBars(delay)
+    local db = EnsureDB()
+    if not db or db.classColorHealth ~= true then
+        return
+    end
+
     if healthRefreshQueued then
         return
     end
@@ -632,6 +639,11 @@ local function ScheduleHealthBars(delay)
 end
 
 local function HookHealthBar(info)
+    local db = EnsureDB()
+    if not db or db.classColorHealth ~= true then
+        return
+    end
+
     for _, bar in ipairs(GetHealthBarFrames(info)) do
         if not healthHooks[bar] then
             healthHooks[bar] = true
@@ -1263,10 +1275,12 @@ local function HookAuraFramesFor(key, auraType)
 end
 
 local function RefreshUnitFrames()
-    EnsureDB()
+    local db = EnsureDB()
 
-    for _, info in pairs(healthBars) do
-        HookHealthBar(info)
+    if db and db.classColorHealth == true then
+        for _, info in pairs(healthBars) do
+            HookHealthBar(info)
+        end
     end
 
     for _, key in ipairs(frameOrder) do
@@ -1420,6 +1434,8 @@ function ns:SetUnitFrameAuraHidden(key, auraType, value)
     RefreshUnitFrames()
 end
 
+RefreshUnitFrames = ns:WrapDiagnosticFunction("UnitFrames.FullRefresh", RefreshUnitFrames)
+
 function ns:GetUnitFrameAuraHidden(key, auraType)
     local db = EnsureDB()
     local frameDB = db and db.frames and db.frames[key]
@@ -1445,7 +1461,6 @@ function ns:InitializeUnitFrames()
     EnsureDB()
     RefreshUnitFrames()
     ScheduleRefresh(1)
-    ScheduleRefresh(3)
 
     if initialized then
         return

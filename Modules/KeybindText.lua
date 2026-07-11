@@ -438,6 +438,8 @@ local function RefreshRangeOverlay(button)
     SetRangeOverlay(button, IsActionButtonOutOfRange(button))
 end
 
+RefreshRangeOverlay = ns:WrapDiagnosticFunction("KeybindText.RangeOverlay", RefreshRangeOverlay)
+
 local function CaptureOriginalFont(hotkey)
     if hotkey.ZTOriginalFont then
         return hotkey.ZTOriginalFont
@@ -572,6 +574,11 @@ local function ApplyHotkey(button, forceCapture)
     local originalText = CaptureOriginalText(hotkey, forceCapture)
 
     if db.enabled ~= true then
+        local signature = "disabled:" .. tostring(originalText or "")
+        if hotkey.ZTStyleSignature == signature then
+            return
+        end
+
         if originalFont and originalFont.font then
             hotkey:SetFont(originalFont.font, originalFont.size or DEFAULT_SIZE, originalFont.outline or "")
         end
@@ -579,6 +586,7 @@ local function ApplyHotkey(button, forceCapture)
         RestoreOriginalColor(hotkey, originalColor)
         hotkey:SetText(originalText or "")
         hotkey.ZTStyledText = nil
+        hotkey.ZTStyleSignature = signature
 
         return
     end
@@ -587,21 +595,35 @@ local function ApplyHotkey(button, forceCapture)
     local size = ClampFontSize(db.fontSize) + (db.bold == true and 1 or 0)
     local outline = ResolveOutlineFlag(db, originalFont)
 
-    if fontPath then
-        hotkey:SetFont(fontPath, size, outline)
-    end
-
-    ApplyConfiguredColor(hotkey, db, originalColor)
-
     local displayText = originalText
 
     if db.shorten == true then
         displayText = ShortenKeybind(originalText)
     end
 
+    local color = db.color or {}
+    local signature = table.concat({
+        tostring(displayText or ""), tostring(fontPath or ""), tostring(size), tostring(outline or ""),
+        tostring(db.useCustomColor == true), tostring(color.r or ""), tostring(color.g or ""),
+        tostring(color.b or ""), tostring(db.bold == true),
+    }, ":")
+
+    if hotkey.ZTStyleSignature == signature then
+        return
+    end
+
+    if fontPath then
+        hotkey:SetFont(fontPath, size, outline)
+    end
+
+    ApplyConfiguredColor(hotkey, db, originalColor)
+
     hotkey.ZTStyledText = displayText
     hotkey:SetText(displayText)
+    hotkey.ZTStyleSignature = signature
 end
+
+ApplyHotkey = ns:WrapDiagnosticFunction("KeybindText.ApplyHotkey", ApplyHotkey)
 
 local function RefreshAllActionButtons()
     local inCombat = IsCombatLocked()
@@ -619,6 +641,8 @@ local function RefreshAllActionButtons()
         end
     end
 end
+
+RefreshAllActionButtons = ns:WrapDiagnosticFunction("KeybindText.RefreshAll", RefreshAllActionButtons)
 
 local function ScheduleRefresh()
     if C_Timer and C_Timer.After then

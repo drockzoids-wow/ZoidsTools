@@ -1594,6 +1594,8 @@ local function ApplyMinimapTools()
     ApplyAddonButtons()
 end
 
+ApplyMinimapTools = ns:WrapDiagnosticFunction("MinimapTools.Refresh", ApplyMinimapTools)
+
 local function ScheduleRefresh(delay)
     if IsCombatLocked() then
         pendingCombatRefresh = true

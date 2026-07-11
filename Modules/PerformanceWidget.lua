@@ -478,3 +478,5 @@ function ns:InitializePerformanceWidget()
         RefreshWidget()
     end)
 end
+
+OnUpdate = ns:WrapDiagnosticFunction("PerformanceWidget.Update", OnUpdate)

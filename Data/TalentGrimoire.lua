@@ -4,7 +4,7 @@
 
 ZoidsToolsTalentGrimoire = ZoidsToolsTalentGrimoire or {}
 ZoidsToolsTalentGrimoire.schemaVersion = 1
-ZoidsToolsTalentGrimoire.generatedAt = "2026-07-07 08:54:32 -05:00"
+ZoidsToolsTalentGrimoire.generatedAt = "2026-07-11 15:34:02 -05:00"
 ZoidsToolsTalentGrimoire.source = "Archon + Icy Veins"
 ZoidsToolsTalentGrimoire.targets = {
     mythicplus = {
@@ -34,7 +34,7 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - All Dungeons",
-                            importString = "CoPAAAAAAAAAAAAAAAAAAAAAAwMzyMzwMmxYMLzMz0MLzMjZmBAAAAwgZmZmZMzMjBAzMzMzAAAMmtBGwCYZYCMsAYGDAAmZAYMA",
+                            importString = "CoPAAAAAAAAAAAAAAAAAAAAAAwMzyMzMmxMGMLzMz0MLzMjZmBAAAAwgZmZmZMzMjBAzMzMzAAAMmtBGwCYZYCMsAYGDAAmZAYMA",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -85,7 +85,7 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Maisara Caverns",
-                            importString = "CoPAAAAAAAAAAAAAAAAAAAAAAwMzyMzwMmxYMLzMz0MLzMjZmBAAAAwgZmZmZMzMjBAzMzMzAAAMmtBGwCYZYCMsAYGDAAmZAYMA",
+                            importString = "CoPAAAAAAAAAAAAAAAAAAAAAAwMzyMzMmxMGMLzMz0MLzMjZmBAAAAwgZmZmZMzMjBAzMzMzAAAMmtBGwCYZYCMsAYGDAAmZAYMA",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -136,13 +136,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Seat of the Triumvirate",
-                            importString = "CoPAAAAAAAAAAAAAAAAAAAAAAwMzyMzwMmBMbzMz0MLzMjZmBAAAAwgZmZmZMzMjBAzMzMzAAAMmtBGwCYZYCMsMAzYAAwMDwYMA",
+                            importString = "CoPAAAAAAAAAAAAAAAAAAAAAAwMzyMzMmxMGMLzMz0MLzMjZmBAAAAwgZmZmZMzMjBAzMzMzAAAMmtBGwCYZYCMsAYGDAAmZAYMA",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Seat of the Triumvirate",
-                            importString = "CoPAAAAAAAAAAAAAAAAAAAAAAwMzyMzwMmBMbzMz0MLzMjZmBAAAAwgZmZmZMzMjBAzMzMzAAAMmtBGwCYZYCMsMAzYAAwMDwYMA",
+                            importString = "CoPAAAAAAAAAAAAAAAAAAAAAAwMzyMzMmxMGMLzMz0MLzMjZmBAAAAwgZmZmZMzMjBAzMzMzAAAMmtBGwCYZYCMsAYGDAAmZAYMA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -189,7 +189,7 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         normal = {
                             title = "Normal Raid - All Bosses",
-                            importString = "CoPAAAAAAAAAAAAAAAAAAAAAAwYWGzMmxMzMMbzMz0MLmZMmxAAAAAzMzMzMzMDzYMAYMzMzAAAYgBmxmGLbA2GwGgZYAAAzMYwA",
+                            importString = "CoPAAAAAAAAAAAAAAAAAAAAAAwMzyMzwMmxYMLzMz0MLzMjZmBAAAAwgZmZmZMzMjBAzMzMzAAAMmtBGwCYZYCMsAYGDAAmZAYMA",
                             difficulty = "Normal",
                         },
                         heroic = {
@@ -219,7 +219,7 @@ ZoidsToolsTalentGrimoire.data = {
                         },
                         highkey = {
                             title = "High Keys - All Dungeons",
-                            importString = "CsPAAAAAAAAAAAAAAAAAAAAAAMAzMMjxYGzyMzMzMbzY0MjxMzMzAjZGmZmZMDAAAAAAAAAjZbgBsAWGmAjFMzwMDMDghZGAGM",
+                            importString = "CsPAAAAAAAAAAAAAAAAAAAAAAMAzMjZMGDz2MzMzMbzY0MjxMzMzAjZGmZmZMDAAAAAAAAAjZbgBsAWGmAjFMzwMDMDghZGAGM",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -264,13 +264,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Maisara Caverns",
-                            importString = "CsPAAAAAAAAAAAAAAAAAAAAAAMAzMYMmZY2mZmZmZbGjmZMzMzMzAjZGmZmZMDAAAAAAAAAjZbgBsAWGmAjFMzwMDMDghZGAGM",
+                            importString = "CsPAAAAAAAAAAAAAAAAAAAAAAMAzMMjxYY2mZmZmZbmZ0MjxMzMzAjZGmZmZMDAAAAAAAAAjZbgBsAWGmAjFMzwMDMDghZGAGM",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Maisara Caverns",
-                            importString = "CsPAAAAAAAAAAAAAAAAAAAAAAMAzMYMmZY2mZmZmZbGjmZMzMzMzAjZGmZmZMDAAAAAAAAAjZbgBsAWGmAjFMzwMDMDghZGAGM",
+                            importString = "CsPAAAAAAAAAAAAAAAAAAAAAAMAzMMjxYY2mZmZmZbmZ0MjxMzMzAjZGmZmZMDAAAAAAAAAjZbgBsAWGmAjFMzwMDMDghZGAGM",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -315,7 +315,7 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Seat of the Triumvirate",
-                            importString = "CsPAAAAAAAAAAAAAAAAAAAAAAMAzMMjZmZY2mZmZmxMGNzYMzMzMwYmhZmZGzAAAAAAAAAwY2GYALglhJwYBzMMzAzAYYmBgBD",
+                            importString = "CsPAAAAAAAAAAAAAAAAAAAAAAMAzMYMmZY2mZmZmZbGjmZMzMzMzAjZGmZmZMDAAAAAAAAAjZbgBsAWGmAjFMzwMDMDghZGAGM",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -430,13 +430,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Algethar Academy",
-                            importString = "CwPAAAAAAAAAAAAAAAAAAAAAAAYmZMjZMYWGzMTjZmxMzYAAAAAAAAYmxwAglZMzsZmxMzA2MbGGYgZjhGLYAzAwYmZMDwMzYGD",
+                            importString = "CwPAAAAAAAAAAAAAAAAAAAAAAAYmhZMjBzyMzMTjZmxMzYAAAAAAAAYmxwAglZMzsZmxMzA2MbGGYgZjhGLYAzAwYmZMDwMzYGD",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Algethar Academy",
-                            importString = "CwPAAAAAAAAAAAAAAAAAAAAAAAYmhZMmZY2mZmZaYmxMzYAAAAAAAAYmxwAglZMzsZmxMzAWMbGGYgZjhGLYAzAwYmZMDwMzMGD",
+                            importString = "CwPAAAAAAAAAAAAAAAAAAAAAAAYmhZMmZY2GzMTjZmxMzYAAAAAAAAYmxwAglZMzsZmxMzAWMbGGYgZjhGLYAzAwYmZMDwMzYGD",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -515,13 +515,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Seat of the Triumvirate",
-                            importString = "CwPAAAAAAAAAAAAAAAAAAAAAAAYmhZMjBz2MzMTjZmxMzYAAAAAAAAYmxwAglZMzsZmxMzA2MbGGYgZjhGLYAzAwYmZMDwMzYGD",
+                            importString = "CwPAAAAAAAAAAAAAAAAAAAAAAAYmZMjZMYWGzMTjZmxMzYAAAAAAAAYmxwAglZMzsZmxMzA2MbGGYgZjhGLYAzAwYmZMDwMzYGD",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Seat of the Triumvirate",
-                            importString = "CwPAAAAAAAAAAAAAAAAAAAAAAAYmhZMjBz2MzMTjZmxMzYAAAAAAAAYmxwAglZMzsZmxMzA2MbGGYgZjhGLYAzAwYmZMDwMzYGD",
+                            importString = "CwPAAAAAAAAAAAAAAAAAAAAAAAYmZMjZMYWGzMTjZmxMzYAAAAAAAAYmxwAglZMzsZmxMzA2MbGGYgZjhGLYAzAwYmZMDwMzYGD",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -538,7 +538,7 @@ ZoidsToolsTalentGrimoire.data = {
                         },
                         highkey = {
                             title = "High Keys - Skyreach",
-                            importString = "CwPAAAAAAAAAAAAAAAAAAAAAAAYmZMjZMYWGzMTjZmxMzYAAAAAAAAYmxwAglZMzsZmxMzAWMbGGYgZjhGLYAzAwYmZMDwMzYGD",
+                            importString = "CwPAAAAAAAAAAAAAAAAAAAAAAAYmhZMmZYWGzMTjZmxMzYAAAAAAAAYmxwAglZMzsZmxMzAWMbGGYgZjhGLYAzAwYmZMDwMzYGD",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -723,7 +723,7 @@ ZoidsToolsTalentGrimoire.data = {
                         },
                         highkey = {
                             title = "High Keys - Seat of the Triumvirate",
-                            importString = "CgcBAAAAAAAAAAAAAAAAAAAAAAA2mxMzMzMzMGmBAAAAAAgxsNYGAAAAAAAAmxMMzMzMzMzMDzsYGjFZhZmZmt2mZmBwwAAwMGMmB",
+                            importString = "CgcBAAAAAAAAAAAAAAAAAAAAAAA2mxMzMzYmxwMAAAAAAAMmthZGAAAAAAAAmxMMzMzMzMzMDzsYGjFZhZmZmt2mZmBwwAAwMGMmB",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -734,7 +734,7 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Skyreach",
-                            importString = "CgcBAAAAAAAAAAAAAAAAAAAAAAA2mxMzMzYmxwMAAAAAAAMmthZGAAAAAAAAmxMMzMzMzMzMDzsYGjFZhZmZmt2mZmBwwAAwMGMmB",
+                            importString = "CgcBAAAAAAAAAAAAAAAAAAAAAAA2mxMzMzMzMGmBAAAAAAgxsNYGAAAAAAAAmxMMzMzMzMzMDzsYGjFZhZmZmt2mZmBwwAAwMGMmB",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -822,13 +822,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - All Dungeons",
-                            importString = "CEkAAAAAAAAAAAAAAAAAAAAAAYmZmZmZ2mxMzMGzkxMDAAAAAAY2MmtZYmBmx2sNzMjxALDsNbmxwsw0YmZMjNAAAgBAAAwMDGAAAAG",
+                            importString = "CEkAAAAAAAAAAAAAAAAAAAAAAYmZmZmZ2mxMzMGzkxMDAAAAAAYWMmtZYmBmx2sNzMjxALDsNbmxwsw0YmZMjNAAAgBAAAwMDGAAAAG",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - All Dungeons",
-                            importString = "CEkAAAAAAAAAAAAAAAAAAAAAAYmZmZmZ2mxMzMGzkxMDAAAAAAYWMmlZeAzMwM2mtZmZMGYZglZzMGmFmGzMjhNAAAgBAAAwMDGAAAAG",
+                            importString = "CEkAAAAAAAAAAAAAAAAAAAAAAYmZmZmZ2mxMzMGzkxMDAAAAAAYWMmlZYmBmx2sNzMjxALDsMbmxwsw0YmZMjNAAAgBAAAwMDGAAAAG",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -856,7 +856,7 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Magisters' Terrace",
-                            importString = "CEkAAAAAAAAAAAAAAAAAAAAAAYmZmZmZ2mxMzMmZmMmZAAAAAAAzmxsNDzMwM2mtZmZMGYZgtZzMGmFmGzMjhNAAAgBAAAwMDGAAAAG",
+                            importString = "CEkAAAAAAAAAAAAAAAAAAAAAAYmZmZmZ2mxMzMGzkxMDAAAAAAYWMmtZYmBmx2sNzMjxALDsNbmxwsw0YmZMjNAAAgBAAAwMDGAAAAG",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -879,7 +879,7 @@ ZoidsToolsTalentGrimoire.data = {
                         },
                         highkey = {
                             title = "High Keys - Maisara Caverns",
-                            importString = "CEkAAAAAAAAAAAAAAAAAAAAAAYmZmZmZWmxMzMGzkxMDAAAAAAYWMmlZeAzMwM2mtZmZMGYZglZzMGmFmGzMjhNAAAgBAAAwMDGAAAAG",
+                            importString = "CEkAAAAAAAAAAAAAAAAAAAAAAYmZmZmZ2mxMzMmZmMmZAAAAAAAzixsNDzMwM2mtZmZMGYZglZzMGmFmGzMjhNAAAgBAAAwMDGAAAAG",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -896,7 +896,7 @@ ZoidsToolsTalentGrimoire.data = {
                         },
                         highkey = {
                             title = "High Keys - Nexus-Point Xenas",
-                            importString = "CEkAAAAAAAAAAAAAAAAAAAAAAYmZmZmZ2mxMzMGzkxMDAAAAAAYWMmlZeAzMwM2mtZmZMGYZglZzMGmFmGzMjhNAAAgBAAAwMDGAAAAG",
+                            importString = "CEkAAAAAAAAAAAAAAAAAAAAAAYmZmZmZ2mxMzMGzkxMDAAAAAAYWMmlZYmBmx2sNzMjxALDsMbmxwsw0YmZMjNAAAgBAAAwMDGAAAAG",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -907,7 +907,7 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Pit of Saron",
-                            importString = "CEkAAAAAAAAAAAAAAAAAAAAAAYmZmZmZ2mxMzMGzkxMDAAAAAAY2MmtZYmBmx2sNzMjxALDsNbmxwsw0YmZMjNAAAgBAAAwMDGAAAAG",
+                            importString = "CEkAAAAAAAAAAAAAAAAAAAAAAYmZmZmZ2mxMzMGzkxMDAAAAAAYWMmtZYmBmx2sNzMjxALDsNbmxwsw0YmZMjNAAAgBAAAwMDGAAAAG",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -947,7 +947,7 @@ ZoidsToolsTalentGrimoire.data = {
                         },
                         highkey = {
                             title = "High Keys - Skyreach",
-                            importString = "CEkAAAAAAAAAAAAAAAAAAAAAAYmZmZmZ2mxMzMGzkxMDAAAAAAYWMmtZYmBmx2sNzMjxALDsMbmxwsw0YmZMjNAAAgBAAAwMDGAAAAG",
+                            importString = "CEkAAAAAAAAAAAAAAAAAAAAAAYmZmZmZ2mxMzMGzkxMDAAAAAAYWMmlZYmBmx2sNzMjxALDsMbmxwsw0YmZMjNAAAgBAAAwMDGAAAAG",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -958,7 +958,7 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Windrunner Spire",
-                            importString = "CEkAAAAAAAAAAAAAAAAAAAAAAYmZmZmZ2mxMzMzYmMmZAAAAAAAzmxsNeAzMwM2mtZmZMGYZgtZzMGmFmGzMjhNAAAgBAAAwMDGAAAAG",
+                            importString = "CEkAAAAAAAAAAAAAAAAAAAAAAYmZmZmZ2mxMzMGzkxMDAAAAAAYWMmtZYmBmx2sNzMjxALDsNbmxwsw0YmZMjNAAAgBAAAwMDGAAAAG",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -1028,7 +1028,7 @@ ZoidsToolsTalentGrimoire.data = {
                         },
                         highkey = {
                             title = "High Keys - All Dungeons",
-                            importString = "CUkAAAAAAAAAAAAAAAAAAAAAAAAWmxMzMGmRmZGMLmxMYmxMjZegZmZMY2mZsZmZbMMAAAAAAAAMzM2AAAAwAzMzMzWbzMzAADAAAgB",
+                            importString = "CUkAAAAAAAAAAAAAAAAAAAAAAAAMjZmZMMjMzMYWMjZwMjZGz8AzMzYwsNzYzMz2YMDAAAAAAAAzMjNAAAAMwMzMzs12MzMAwAAAAYA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -1039,13 +1039,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Algethar Academy",
-                            importString = "CUkAAAAAAAAAAAAAAAAAAAAAAAAWmxMzMzwMyMzgZxMmBzMmZMzDMzMjBz2MjtHwMbjxMAAAAAAAAMzwGAAAAGYmZmZ2abmZGAAAAAgB",
+                            importString = "CUkAAAAAAAAAAAAAAAAAAAAAAAAMjZmZmhZkZmBziZMDmZMzYmHYmZGDmtZGbzMz2YYAAAAAAAAYmhNAAAAMwMzMzs12MzMAAAAAAD",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Algethar Academy",
-                            importString = "CUkAAAAAAAAAAAAAAAAAAAAAAAAWmxMzMzwMyMzgZxMmBzMmZMzDMzMjBz2MjtHwMbjxMAAAAAAAAMzwGAAAAGYmZmZ2abmZGAAAAAgB",
+                            importString = "CUkAAAAAAAAAAAAAAAAAAAAAAAAMjZmZmhZkZmBziZMDmZMzYmHYmZGDmtZGbzMz2YYAAAAAAAAYmhNAAAAMwMzMzs12MzMAAAAAAD",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -1056,13 +1056,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Magisters' Terrace",
-                            importString = "CUkAAAAAAAAAAAAAAAAAAAAAAAAMjZmZMMjMzMYWMjZwMjZGz8AzMzYwsNzYzMz2YYAAAAAAAAYmZmNAAAAMwMzMzs12MzMAwAAAAYA",
+                            importString = "CUkAAAAAAAAAAAAAAAAAAAAAAAAMjZmZMMjMzMYWMjZwMjZGz8AzMzYwsNzYzMz2YMDAAAAAAAAzMjNAAAAMwMzMzs12MzMAwAAAAYA",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Magisters' Terrace",
-                            importString = "CUkAAAAAAAAAAAAAAAAAAAAAAAAMjZmZMMjMzMYWMjZwMjZGz8AzMzYwsNzYzMz2YYAAAAAAAAYmZmNAAAAMwMzMzs12MzMAwAAAAYA",
+                            importString = "CUkAAAAAAAAAAAAAAAAAAAAAAAAMjZmZMMjMzMYWMjZwMjZGz8AzMzYwsNzYbmZ2GjZAAAAAAAAYmhNAAAAMwMzMzs12MzMAAAAAAD",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -1073,13 +1073,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Maisara Caverns",
-                            importString = "CUkAAAAAAAAAAAAAAAAAAAAAAAAWmxMzMGmRmZGMLmxMYmxMjZegZmZMY2mZs9AzMbjhBAAAAAAAgZmxGAAAAGYmZmZ2abmZGAAAAAgB",
+                            importString = "CUkAAAAAAAAAAAAAAAAAAAAAAAAMjZmZMMjMzMYWMjZwMjZGz8AzMzYwsNzYzMz2YMDAAAAAAAAzMjNAAAAMwMzMzs12MzMAwAAAAYA",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Maisara Caverns",
-                            importString = "CUkAAAAAAAAAAAAAAAAAAAAAAAAWmxMzMGmRmZGMLmxMYmxMjZegZmZMY2mZs9AzMbjhBAAAAAAAgZmxGAAAAGYmZmZ2abmZGAAAAAgB",
+                            importString = "CUkAAAAAAAAAAAAAAAAAAAAAAAAMjZmZMMjMzMYWMjZwMjZGz8AzMzYwsNzYzMz2YMDAAAAAAAAzMjNAAAAMwMzMzs12MzMAwAAAAYA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -1090,13 +1090,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Nexus-Point Xenas",
-                            importString = "CUkAAAAAAAAAAAAAAAAAAAAAAAAMjZmZMMjMzMYWMjZwMjZGz8AzMzYwsNzYzMz2YYAAAAAAAAYmZmNAAAAMwMzMzs12MzMAwAAAAYA",
+                            importString = "CUkAAAAAAAAAAAAAAAAAAAAAAAAMjZmZMMjMzMYWMjZwMjZGz8AzMzYwsNzYzMz2YMDAAAAAAAAzMjNAAAAMwMzMzs12MzMAwAAAAYA",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Nexus-Point Xenas",
-                            importString = "CUkAAAAAAAAAAAAAAAAAAAAAAAAMjZmZMMjMzMYWMjZwMjZGz8AzMzYwsNzYbmZ2GjZAAAAAAAAYmhNAAAAMwMzMzs12MzMAAAAAAD",
+                            importString = "CUkAAAAAAAAAAAAAAAAAAAAAAAAMjZmZMMjMzMYWMjZwMjZGz8AzMzYwsNzYzMz2YMDAAAAAAAAzMjNAAAAMwMzMzs12MzMAwAAAAYA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -1124,13 +1124,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Seat of the Triumvirate",
-                            importString = "CUkAAAAAAAAAAAAAAAAAAAAAAAAMjZmZmhZkZmBziZMDmZMzYmHYmZGDmtZGbzMz2YYAAAAAAAAYmhNAAAAMwMzMzs12MzMAAAAAAD",
+                            importString = "CUkAAAAAAAAAAAAAAAAAAAAAAAAMjZmZMmZkZmBziZMDmZMzYmHYmZGDmtZGbmZ2GDDAAAAAAAAzMjNAAAAMwMzMzs12MzMAwAAAAYA",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Seat of the Triumvirate",
-                            importString = "CUkAAAAAAAAAAAAAAAAAAAAAAAAMjZmZmhZkZmBziZMDmZMzYmHYmZGDmtZGbzMz2YYAAAAAAAAYmhNAAAAMwMzMzs12MzMAAAAAAD",
+                            importString = "CUkAAAAAAAAAAAAAAAAAAAAAAAAMjZmZMMjMzMYWMjZwMjZGz8AzMzYwsNzYzMz2YYAAAAAAAAYmZmNAAAAMwMzMzs12MzMAwAAAAYA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -1177,7 +1177,7 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         normal = {
                             title = "Normal Raid - All Bosses",
-                            importString = "CUkAAAAAAAAAAAAAAAAAAAAAAAAYMzMjhZkZmBWMjZwMjZGz8AzMzYYmtZGbjZMGzAAAAAAAAwMzYDAAAADMzMzMLtNzMDAmBAAAwA",
+                            importString = "CUkAAAAAAAAAAAAAAAAAAAAAAAAYMzMjZmZkZmZYWMzMjhZMzYGzYmZYGmx2MzYMAAAAAAAAgZmxGAAAAGMmZmZWabmZGAYAAAAMA",
                             difficulty = "Normal",
                         },
                         heroic = {
@@ -1220,13 +1220,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Algethar Academy",
-                            importString = "CYGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWoMbNjxMDwswMzMLMMjZZmlZWMzM2YZmlxMjxCGGgx22MDGz2AYCAAAwCzMzMYzYGjBAgZGYA",
+                            importString = "CYGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWoMbNjxMDwsYmZmZhBjZZmlZWMzM2YZmlxMjxCGGgx22MDGz2AYCAAAwiZmZmBbGGjBAgZGYA",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Algethar Academy",
-                            importString = "CYGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWoMbNjxMDwswMzMLMMjZZmlZWMzM2YZmlxMjxCGGgx22MDGz2AYCAAAwCzMzMYzYGjBAgZGYA",
+                            importString = "CYGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWoMbNjxMDwsYmZmZhBjZZmlZWMzM2YZmlxMjxCGGgx22MDGz2AYCAAAwiZmZmBbGGjBAgZGYA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -1254,13 +1254,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Maisara Caverns",
-                            importString = "CYGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWoMbNjxMDMmFmZmZhBMLzsMziZmxGLzsMmZMWwwAM22mZwY2GATAAAAWMzMzMYzwYMAAMzADA",
+                            importString = "CYGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWoMbNjxMDwsYmZmZhBjZZmlZWMzM2YZmlxMjxCGGgx22MDGz2AYCAAAwiZmZmBbGGjBAgZGYA",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Maisara Caverns",
-                            importString = "CYGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWoMbNjxMDwswMzMLMMjZZmlZWMzM2YZmlxMjxCGGgx22MDGz2AYCAAAwCzMzMYzYGjBAgZGYA",
+                            importString = "CYGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWoMbNjxMDwsYmZmZhBjZZmlZWMzM2YZmlxMjxCGGgx22MDGz2AYCAAAwiZmZmBbGGjBAgZGYA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -1271,13 +1271,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Nexus-Point Xenas",
-                            importString = "CYGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWoMbNjxMDwsMzMzMLMYMLzsMziZmxGLzsMmZMWwAgx22MDGz2AYCAAAwCzMzMYzYGjBAgZGYA",
+                            importString = "CYGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWoMbNjxMDwsMmZmZhBjZZmlZWMzM2YZmlxMjxCGGgx22MDGz2AYCAAAwiZmZmBbGGjBAgZGYA",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Nexus-Point Xenas",
-                            importString = "CYGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWoMbNjxMDwsMzMzMLMYMLzsMziZmxGLzsMmZMWwAgx22MDGz2AYCAAAwCzMzMYzYGjBAgZGYA",
+                            importString = "CYGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWoMbNjxMDwsMmZmZhBjZZmlZWMzM2YZmlxMjxCGGgx22MDGz2AYCAAAwiZmZmBbGGjBAgZGYA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -1288,13 +1288,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Pit of Saron",
-                            importString = "CYGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWoMbNjxMDwswMzMLMMjZZmlZWMzM2YZmlxMjxCGGgx22MDGz2AYCAAAwCzMzMYzYGjBAgZGYA",
+                            importString = "CYGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWoMbNjxMDwsYmZmZhBjZZmlZWMzM2YZmlxMjxCGGgx22MDGz2AYCAAAwiZmZmBbGGjBAgZGYA",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Pit of Saron",
-                            importString = "CYGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWoMbNjxMDwswMzMLMMjZZmlZWMzM2YZmlxMjxCGGgx22MDGz2AYCAAAwCzMzMYzYGjBAgZGYA",
+                            importString = "CYGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWoMbNjxMDwsYmZmZhBjZZmlZWMzM2YZmlxMjxCGGgx22MDGz2AYCAAAwiZmZmBbGGjBAgZGYA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -1568,7 +1568,7 @@ ZoidsToolsTalentGrimoire.data = {
                         },
                         mythic = {
                             title = "Mythic Raid - All Bosses",
-                            importString = "CcGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAjZwMzMzMmtl5BWGbzYm5BmZAAAAYLY2MMmZUzYWmZmZGjZMAAAAAAMwAAAAAAMbzs0sNzyGYmHAYxMYAAMzAgB",
+                            importString = "CcGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAjZwMzMzMmtl5BWGbzYGzMDAAAALBzmhxMjaGzyYmZGjZAAAAAAgBGAAAAAgZbmlmtZW2AzMALmZYAAMzAgB",
                             difficulty = "Mythic",
                         },
                     },
@@ -1722,13 +1722,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Skyreach",
-                            importString = "CgGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgZmZmFzMjZWmZxMPwMLLDMbzwoJyMzyMzMzsMMAAAAAwAjNzALbzMYMLDgJAAAgNMzAsYMMwsYBgZGAA",
+                            importString = "CgGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgZmZmFzMjZWmZxMPwMLLDMbGGNRmZWmZmZmlxMMAAAAAAjNzALbzMYMLDgJAAAgNMzAsYMMwsYBgZGAA",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Skyreach",
-                            importString = "CgGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgZmZmFzMjZWmZxMPwMLLDMbzwoJyMzyMzMzsMMAAAAAwAjNzALbzMYMLDgJAAAgNMzAsYMMwsYBgZGAA",
+                            importString = "CgGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgZmZmFzMjZWmZxMPwMLLDMbGGNRmZWmZmZmlxMMAAAAAAjNzALbzMYMLDgJAAAgNMzAsYMMwsYBgZGAA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -1799,13 +1799,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Algethar Academy",
-                            importString = "CkGAAAAAAAAAAAAAAAAAAAAAAMMmZZMjZmxsN8AMzswsYbGAAAAAAAAAAsMoZzw0MjZMmFzMzMLzwDYAAAAAAAwAAAAAgZbmtmlZWsxMzAzMLgmBAYmBgB",
+                            importString = "CkGAAAAAAAAAAAAAAAAAAAAAAMMmZZMjZmxsN8AMzswsYbGAAAAAAAAAAsMoZbGmmZM8AmFzMzYZGeADAAAAgBAYGAAAAAMbzs1sMziNmZGYmZB0MAAzMAMA",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Algethar Academy",
-                            importString = "CkGAAAAAAAAAAAAAAAAAAAAAAMMmZZMjZmxsN8AMzswsYbGAAAAAAAAAAsMoZzw0MjZMmFzMzMLzwDYAAAAAAAwAAAAAgZbmtmlZWsxMzAzMLgmBAYmBgB",
+                            importString = "CkGAAAAAAAAAAAAAAAAAAAAAAMMmZZMjZmxsN8AMzswsYbGAAAAAAAAAAsMoZbGmmZM8AmFzMzYZGeADAAAAgBAYGAAAAAMbzs1sMziNmZGYmZB0MAAzMAMA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -1822,7 +1822,7 @@ ZoidsToolsTalentGrimoire.data = {
                         },
                         highkey = {
                             title = "High Keys - Magisters' Terrace",
-                            importString = "CkGAAAAAAAAAAAAAAAAAAAAAAMMmZZMjZmxsN8AMzswsYbGAAAAAAAAAAsMoZbGmmZM8AmFzMzwMMGAAAAADAwMAAAAAY2mZrZZmFbMm5BwMzCoZAAmZAYA",
+                            importString = "CkGAAAAAAAAAAAAAAAAAAAAAAMMmZZMjZmxsN8AMzswsYbGAAAAAAAAAAsMoZbGmmZM8AmFzMzYZGeADAAAAgBAYGAAAAAMbzs1sMziNmZGYmZB0MAAzMAMA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -1833,13 +1833,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Maisara Caverns",
-                            importString = "CkGAAAAAAAAAAAAAAAAAAAAAAMMmZZMjZmxsN8AMzsNjFbzAAAAAAAAAAgFDNbzw0MAmFzMzMLGGAAAAAMAAzAAAAAgZbmtmtZWsxMzMDmZD0MAAzMAMA",
+                            importString = "CkGAAAAAAAAAAAAAAAAAAAAAAMMmZZMjZmxsN8AMzswsYbGAAAAAAAAAAsMoZzw0MjhxsYmZGLzwDMDAAAAAAAGAAAAAMbzs1sMziNGzMYmZB0MAAzMAMA",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Maisara Caverns",
-                            importString = "CkGAAAAAAAAAAAAAAAAAAAAAAMMmZZMjZmxsN8AMzswsYbGAAAAAAAAAAsMoZzMmmhZ8AmFzMzwMMDAAAAAAAMAAAAAY2mZrZZmFbMzMDmZWANDAwMDAD",
+                            importString = "CkGAAAAAAAAAAAAAAAAAAAAAAMMmZZMjZmxsN8AMzswsYbGAAAAAAAAAAsMoZzw0MjhxsYmZGLzwDMDAAAAAAAGAAAAAMbzs1sMziNGzMYmZB0MAAzMAMA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -1850,13 +1850,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Nexus-Point Xenas",
-                            importString = "CkGAAAAAAAAAAAAAAAAAAAAAAMMmZZMjZmxsN8AMzswsYbGAAAAAAAAAAsMoZzMmmhZ8AmFzMzwMMDAAAAAAAMAAAAAY2mZrZZmFbMzMDmZWANDAwMDAD",
+                            importString = "CkGAAAAAAAAAAAAAAAAAAAAAAMMmZZMjZmxsN8AMzswsYbGAAAAAAAAAAsANbzw0MDMmFzMzYxwAAAAAgBAYGAAAAAMbzs1sMziNmZmBzMLgmBAYmBgB",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Nexus-Point Xenas",
-                            importString = "CkGAAAAAAAAAAAAAAAAAAAAAAMMmZZMjZmxsN8AMzswsYbGAAAAAAAAAAsMoZzMmmhZ8AmFzMzwMMDAAAAAAAMAAAAAY2mZrZZmFbMzMDmZWANDAwMDAD",
+                            importString = "CkGAAAAAAAAAAAAAAAAAAAAAAMMmZZMjZmxsN8AMzswsYbGAAAAAAAAAAsANbzw0MDMmFzMzYxwAAAAAgBAYGAAAAAMbzs1sMziNmZmBzMLgmBAYmBgB",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -1873,7 +1873,7 @@ ZoidsToolsTalentGrimoire.data = {
                         },
                         highkey = {
                             title = "High Keys - Pit of Saron",
-                            importString = "CkGAAAAAAAAAAAAAAAAAAAAAAMMmZZMjZmxsN8AMzswsYbGAAAAAAAAAAsMoZbGmmZMMmFzMzghZGAAAAADAwMAAAAAY2mZrZZmFbMmBmZWANDAwMDAD",
+                            importString = "CkGAAAAAAAAAAAAAAAAAAAAAAMMmZZMjZmxsN8AMzswsYbGAAAAAAAAAAsMoZbw0MDMmFzMzYxwAAAAAgBAYGAAAAAMbzs1sMziNmZmBzMLgmBAYmBgB",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -1901,13 +1901,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Skyreach",
-                            importString = "CkGAAAAAAAAAAAAAAAAAAAAAAMMmZZMjZmxsN8AMzswsYbGAAAAAAAAAAsMoZbGmmZMMmFzMzwMMAAAAAYAAmBAAAAAz2MbNLzsYjZmBmZWANDAwMDAD",
+                            importString = "CkGAAAAAAAAAAAAAAAAAAAAAAMMmZZMjZmxsN8AMzswsYbGAAAAAAAAAAsMoZbGmmZM8AmFzMzYZGeADAAAAgBAYGAAAAAMbzs1sMziNmZGYmZB0MAAzMAMA",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Skyreach",
-                            importString = "CkGAAAAAAAAAAAAAAAAAAAAAAMMmZZMjZmxsN8AMzswsYbGAAAAAAAAAAsMoZbGmmZMMmFzMzwMMAAAAAYAAmBAAAAAz2MbNLzsYjZmBmZWANDAwMDAD",
+                            importString = "CkGAAAAAAAAAAAAAAAAAAAAAAMMmZZMjZmxsN8AMzswsYbGAAAAAAAAAAsMoZbGmmZM8AmFzMzYZGeADAAAAgBAYGAAAAAMbzs1sMziNmZGYmZB0MAAzMAMA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -1918,13 +1918,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Windrunner Spire",
-                            importString = "CkGAAAAAAAAAAAAAAAAAAAAAAMMmZZMjZmxsN8AMzswsYbGAAAAAAAAAAsMoZbGmmZM8AmFzMzYZGeADAAAAgBAYGAAAAAMbzs1sMziNmZGYmZB0MAAzMAMA",
+                            importString = "CkGAAAAAAAAAAAAAAAAAAAAAAMMmZZMjZmxsN8AMzswsYbGAAAAAAAAAAsMoZjx0MjxMmFzMzMmhxAAAAAAAgBAAAAAz2MbNLzsYjZmBmZWANDAwMDAD",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Windrunner Spire",
-                            importString = "CkGAAAAAAAAAAAAAAAAAAAAAAMMmZZMjZmxsN8AMzswsYbGAAAAAAAAAAsMoZbGmmZM8AmFzMzYZGeADAAAAgBAYGAAAAAMbzs1sMziNmZGYmZB0MAAzMAMA",
+                            importString = "CkGAAAAAAAAAAAAAAAAAAAAAAMMmZZMjZmxsN8AMzswsYbGAAAAAAAAAAsMoZjx0MjxMmFzMzMmhxAAAAAAAgBAAAAAz2MbNLzsYjZmBmZWANDAwMDAD",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -2001,13 +2001,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Algethar Academy",
-                            importString = "CEcBAAAAAAAAAAAAAAAAAAAAAgZmZbMzgZYmZZGzMjZ2AAAAAgBAAmhZGYM1YmZGAAAAYmZMmZ2GzMwMbzYwCsMGGLDgZQshxMYmBwA",
+                            importString = "CEcBAAAAAAAAAAAAAAAAAAAAAgZmZbMzgZYmZZGzMjZ2AAAAAAAAwMMmBjpGzMzAAAAAjZmxMzyYmBmZbGDWglxwYZAMDiNMmBzMAG",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Algethar Academy",
-                            importString = "CEcBAAAAAAAAAAAAAAAAAAAAAMMzMbjZGMDzMLzYmZMzGAAAAAAAAmhxMYM1YmZGAAAAYmZmxMzyYmBmZzYwCsMGGLDgZQshxAzMAG",
+                            importString = "CEcBAAAAAAAAAAAAAAAAAAAAAMMzMbjZGMDzMLzYmZMzGAAAAAAAAmZMmBjpGzMzAAAAAjZmxMzyYmBmZzYwCsMGGLDgZQshxAzMAG",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -2058,7 +2058,7 @@ ZoidsToolsTalentGrimoire.data = {
                         },
                         highkey = {
                             title = "High Keys - Nexus-Point Xenas",
-                            importString = "CEcBAAAAAAAAAAAAAAAAAAAAAgZmZbMzgZYmZZGzMjZ2AAAAAAAAwMMzAjpGzMzAAAAAzMzMmZWGzMwMbzYwCsMGGLDgZQshxMYmBwA",
+                            importString = "CEcBAAAAAAAAAAAAAAAAAAAAAgZmZbMzgZYmZZGzMjZ2AAAAAAAAwMMzMYM1YmZGAAAAYmZMmZWGzMwMbzYwCsMGGLDgZQshxAzMAG",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -2069,7 +2069,7 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Pit of Saron",
-                            importString = "CEcBAAAAAAAAAAAAAAAAAAAAAgZmZbMzgZYmZZGzMjZ2AAAAAAAAwMMmBjpGzMzAAAAAjZmxMzyYmBmZbGDWglxwYZAMDiNMmBzMAG",
+                            importString = "CEcBAAAAAAAAAAAAAAAAAAAAAgZmZbMzgZYmZZGzMjZ2AAAAAAAAwMMmHAjpGzMzAAAAAzMzMmZWGzMwMbzYwCsMGGLDgZQshxMYmBwA",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -2086,13 +2086,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Seat of the Triumvirate",
-                            importString = "CEcBAAAAAAAAAAAAAAAAAAAAAgZmZbMzgZYmZZGzMjZ2AAAAAAAAwMMzAjpGzMzAAAAAzMzMmZWGzMwMbzYwCsMGGLDgZQshxMYmBwA",
+                            importString = "CEcBAAAAAAAAAAAAAAAAAAAAAgZmZbMzgZYmZZGzMjZ2AAAAAAAAwMMmBjpGzMzAAAAAjZmxMzyYmBmZbGDWglxwYZAMDiNMmBzMAG",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Seat of the Triumvirate",
-                            importString = "CEcBAAAAAAAAAAAAAAAAAAAAAgZmZbMzgZYmZZGzMjZ2AAAAAAAAYmZ8AmBjpGzMzAAAAAjZmxMzyYmBmZbGDWglxwYZAMDiNMGYmBwA",
+                            importString = "CEcBAAAAAAAAAAAAAAAAAAAAAgZmZbMzgZYmZZGzMjZ2AAAAAAAAwMMmBjpGzMzAAAAAjZmxMzyYmBmZbGDWglxwYZAMDiNMmBzMAG",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -2144,7 +2144,7 @@ ZoidsToolsTalentGrimoire.data = {
                         },
                         heroic = {
                             title = "Heroic Raid - All Bosses",
-                            importString = "CEcBAAAAAAAAAAAAAAAAAAAAAMmZmZbmZmxyAzsMjxwMAAAAAgBAAzMDMYM1YmZGAAAAMjZmxMzyYmBmZzYwCsMGGbDgZQshZGYmBwA",
+                            importString = "CEcBAAAAAAAAAAAAAAAAAAAAAMmZmZbmZmxyAzsMjxwMAAAAAgBAAzMDMYM1YmZGAAAAMjZmxMz2YmBmZzYwCsMGGbDgZQshZGYmBwA",
                             difficulty = "Heroic",
                         },
                         mythic = {
@@ -2184,13 +2184,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - All Dungeons",
-                            importString = "CsbBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAzMDgZGmBGGjZaMzMNDz2MmZmZmZmZGwMzMGzMbzMDMwYwCsMGN2GAzAwGmBzMYYA",
+                            importString = "CsbBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAzMDgZGmhxAjHYamZmpZY2mxMzMzMzMzAMzMzYmZZmZgBGDWglxox2AYGA2wAzMYYA",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - All Dungeons",
-                            importString = "CsbBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAzMDgZGmBGGjZaMzMNDz2MmZmZmZmZGwMzMGzMbzMDMwYwCsMGN2GAzAwGmBzMYYA",
+                            importString = "CsbBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAzMDgZGmhxAjHYamZmpZY2mxMzMzMzMzAMzMzYmZZmZgBGDWglxox2AYGA2wAzMYYA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -2201,13 +2201,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Algethar Academy",
-                            importString = "CsbBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAzMDgZGmhHw8AYMTjZmpZY2mxMzMzMzMzAMmZGzMLzMDMwYwCsMGN2GAzAwGmBzMYYA",
+                            importString = "CsbBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAzMDgZGM8AmHAjZaMzMNDz2MmZmZmZmZGgZmZGzMLzMDMwYwCsMGN2GAzAwGmBzMYYA",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Algethar Academy",
-                            importString = "CsbBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAzMDgZGmhHw8AYMTjZmpZY2mxMzMzMzMzAMmZGzMLzMDMwYwCsMGN2GAzAwGmBzMYYA",
+                            importString = "CsbBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAzMDgZGM8AmHAjZaMzMNDz2MmZmZmZmZGgZmZGzMLzMDMwYwCsMGN2GAzAwGmBzMYYA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -2218,7 +2218,7 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Magisters' Terrace",
-                            importString = "CsbBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwYmZAMzYmZgBzMTjZmpZY2mxMzMzMzMzAMzwwMbzMDMADWglxox2AYGA2wMYmBDD",
+                            importString = "CsbBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAzMDgZGmhxAjHYamZmpZY2mxMzMzMzMzAMzMzYmZZmZgBGDWglxox2AYGA2wAzMYYA",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -2235,13 +2235,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Maisara Caverns",
-                            importString = "CsbBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAzMDgZGzMYGYmZaMzMNDz2MmZmZmZmZGgZmxYmZbmZgBGDWglxox2AYGA2wAzMYYA",
+                            importString = "CsbBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAzMDgZGMMGYMTjZmpZY2mxMzMzMzMzAMjZGzMLzMDMwYwCsMGN2GAzAwGmBzMYGD",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Maisara Caverns",
-                            importString = "CsbBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAzMDgZGzMYGYmZaMzMNDz2MmZmZmZmZGgZmxYmZbmZgBGDWglxox2AYGA2wAzMYYA",
+                            importString = "CsbBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAzMDMDzYmBMYMTzMzMNjx2MmZmZmHYmZGwMmxYmZbmZgBGDWglxox2AYGA2wAzMYYA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -2258,7 +2258,7 @@ ZoidsToolsTalentGrimoire.data = {
                         },
                         highkey = {
                             title = "High Keys - Nexus-Point Xenas",
-                            importString = "CsbBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAzMDmZMzwMMmBDTzMzMZgxMzMMzMzMAzMjxMjZmBzAzYGYDsBmhJwGYZYGgZmhB",
+                            importString = "CsbBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAzMDmZMzwMwMYMTjZmJDMmZmhZmZmBYMzMmZWmZGMDMjZgNwCYGmAbglhZAmZGG",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -2292,7 +2292,7 @@ ZoidsToolsTalentGrimoire.data = {
                         },
                         highkey = {
                             title = "High Keys - Seat of the Triumvirate",
-                            importString = "CsbBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAzMDgZGmhxMYMTjZmpZY2mxMzMzMzMzAmxMzYmxYGYgxgFYZMasNAmBgNMDmZAG",
+                            importString = "CsbBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAzMDgZGmBz8AYMTjZmpZY2mxMzMzMzMzAMzMGzMLzMDMwYwCsMGN2GAzAwGmBzMYYA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -2303,13 +2303,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Skyreach",
-                            importString = "CsbBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgZmZAMzwMwAjZaMzMNDz2MmZmZmZmZGwMzMGzMLzMDMwYwCsMGN2GAzAwGmBzMYYA",
+                            importString = "CsbBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAzMDgZGmBGGjZaMzMNDz2MmZmZmZmZGwMzMzYmZZmZgBGDWglxox2AYGA2wAzMYYA",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Skyreach",
-                            importString = "CsbBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAzMDmZMzwMMmBDTzMzMZgxMzMMzMzMAzMjxMjZmBzAzYGYDsBmhJwGYZYGgZmhB",
+                            importString = "CsbBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAzMDmZMzwMwMYMTjZmJDMmZmhZmZmBYMzMmZWmZGMDMjZgNwCYGmAbglhZAmZGG",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -2320,13 +2320,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Windrunner Spire",
-                            importString = "CsbBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAzMDgZGmhxAjZaMzMNDz2MmZmZmZmZGgZmZGzMmZGYgxgFYZMasNAmBgNMDmZwwA",
+                            importString = "CsbBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAzMDgZGmhxAjHYamZmpZY2mxMzMzMzMzAMzMzYmZZmZgBGDWglxox2AYGA2wAzMYYA",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Windrunner Spire",
-                            importString = "CsbBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAzMDgZGmhxAjZaMzMNDz2MmZmZmZmZGgZmZGzMmZGYgxgFYZMasNAmBgNMDmZwwA",
+                            importString = "CsbBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAzMDgZGmhxAjHYamZmpZY2mxMzMzMzMzAMzMzYmZZmZgBGDWglxox2AYGA2wAzMYYA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -2424,7 +2424,7 @@ ZoidsToolsTalentGrimoire.data = {
                         },
                         highkey = {
                             title = "High Keys - Magisters' Terrace",
-                            importString = "CwbBAAAAAAAAAAAAAAAAAAAAAAAAAAAmZmZ2WGYYmZmNzA2GGAAYGzYeAjxMTMzMAAAgZmZywMzMGzAAjZgFwCYGmAbmxmhZAmZYA",
+                            importString = "CwbBAAAAAAAAAAAAAAAAAAAAAAAAAAAMzMz2yADzMzsZGjx2wAAAzYGzYMmZiZmBAAAMzMTGzMjxYGAAGzYjFYgZYohhFYmZGAGA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -2435,7 +2435,7 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Maisara Caverns",
-                            importString = "CwbBAAAAAAAAAAAAAAAAAAAAAAAAAAAMzMz2yADzMmFzYM2mxAAAzYmZGmhZyMmBAAA2mZmJjZmZGjZAAYMjNWgBmhhGGWgZmZAYA",
+                            importString = "CwbBAAAAAAAAAAAAAAAAAAAAAAAAAAAMzMz2yADzMmFzYM2mBAAYmZGzMjhZyMmBAAA2mZGNjZmZGjZAAYMjNWgBmhhGGWgZmZAYA",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -2469,7 +2469,7 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Pit of Saron",
-                            importString = "CwbBAAAAAAAAAAAAAAAAAAAAAAAAAAAMzMz2yADzMmFzYM2mBAAYmZGzMjhZyMmBAAA2mZGNjZmZGjZAAYMjNWgBmhhGGWgZmZAYA",
+                            importString = "CwbBAAAAAAAAAAAAAAAAAAAAAAAAAAAMzMz2yADzMmFzYM2mxAAAzYGzYmhZyMmBAAA2mZmJjZmZGjZAAYMjNWgBmhhGGWgZmZAYA",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -2486,13 +2486,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Seat of the Triumvirate",
-                            importString = "CwbBAAAAAAAAAAAAAAAAAAAAAAAAAAAegZmZ2WGYYmxsZGjx2wAAAzMzYmZMMTMmBAAA2mZmJjZmZGjZAAYMjNWgBmhhGGWgZmZAYA",
+                            importString = "CwbBAAAAAAAAAAAAAAAAAAAAAAAAAAAMzMz2yADzMmFzYM2mBAAYGzYGMmRmZGAAAw2MzMNjZmZGjZAAYMjNWgBmhhGGWgZmZAYA",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Seat of the Triumvirate",
-                            importString = "CwbBAAAAAAAAAAAAAAAAAAAAAAAAAAAMzMz2yADzMzsZGjx2YGAAYGzYGjhZiZmBAAAMzMTGzMjxMzAAwYGbsADMDDNMsAjZGgxA",
+                            importString = "CwbBAAAAAAAAAAAAAAAAAAAAAAAAAAAmZmZ2WGYYmZmNzA2GGAAYGmZGMMTjZmBAAAMzMTGmZmZZMDAMmB2AbgZYCsZGbGmBYmhB",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -2509,7 +2509,7 @@ ZoidsToolsTalentGrimoire.data = {
                         },
                         highkey = {
                             title = "High Keys - Skyreach",
-                            importString = "CwbBAAAAAAAAAAAAAAAAAAAAAAAAAAAMzMz2yADzMzsZGjx2wAAAzYGzYMmZCzMAAAgZmZyYmZegxYGAAGzYjFYgZYohhFYmZGAGA",
+                            importString = "CwbBAAAAAAAAAAAAAAAAAAAAAAAAAAAMzMz2yADzMPwsZGjx2wAAAzYGzMjhZiZmBAAA2mZmJjZmxYmZAAYMjNWgBmhhGGWgxMDwYA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -2526,7 +2526,7 @@ ZoidsToolsTalentGrimoire.data = {
                         },
                         highkey = {
                             title = "High Keys - Windrunner Spire",
-                            importString = "CwbBAAAAAAAAAAAAAAAAAAAAAAAAAAAMzMz2yADzMzsZGjx2wAAAzYGzYMmZCzMAAAgZmZyYmZegxYGAAGzYjFYgZYohhFYmZGAGA",
+                            importString = "CwbBAAAAAAAAAAAAAAAAAAAAAAAAAAAmZmZ2WGYYmZmNzA2GAAAzYmZGMMTjZmBAAAMzMTzwMzMLjZAgxMwCYDMDTgNzYzwAYmhB",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -2549,7 +2549,7 @@ ZoidsToolsTalentGrimoire.data = {
                         },
                         mythic = {
                             title = "Mythic Raid - All Bosses",
-                            importString = "CwbBAAAAAAAAAAAAAAAAAAAAAAAAAAAYmZ2MzMmxMjhxMzMbYAAgZMj5BMGzIMDAAAwMzIzYmZmlZmBAzYGYDsAmhJwCsZYAMzMGA",
+                            importString = "CwbBAAAAAAAAAAAAAAAAAAAAAAAAAAAYmZ2MzMmxMjhxMzMbYAAgZMj5BwYGZmZAAAAmZGZMzMzsMzMAwYGYDsAmhJwCsZYAMzMGA",
                             difficulty = "Mythic",
                         },
                     },
@@ -2586,13 +2586,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - All Dungeons",
-                            importString = "C0PAAAAAAAAAAAAAAAAAAAAAAAMmxwCsAzwQDbAAYGPwyMzsYGmZmZGzMMzMmhZGzMzgZGzYGMmmBAAAAAAAAMzYMgZ2AYxsA2GA",
+                            importString = "C0PAAAAAAAAAAAAAAAAAAAAAAAMmxwCsAzwQDbAAYGPwyMzsYGmZmZGzMMzMmhZGzYGbmZMjZYZMNDAAAAAAAAYmxYAzsBAzCYbAA",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - All Dungeons",
-                            importString = "C0PAAAAAAAAAAAAAAAAAAAAAAAMmxwCsAzwQDbAAYGPwyMzsYGmZmZGzMMzMmhZGzMzgZGzYGMmmBAAAAAAAAMzYMgZ2AYxsA2GA",
+                            importString = "C0PAAAAAAAAAAAAAAAAAAAAAAAMmxwCsAzwQDbAAYGPwyMzsYGmZmZGzMMzMmhZGzYGbmZMjZYZMNDAAAAAAAAYmxYAzsBAzCYbAA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -2603,13 +2603,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Algethar Academy",
-                            importString = "C0PAAAAAAAAAAAAAAAAAAAAAAAMmxwCsAzwQDbAAYGPwyMzsYGmZmZGzMMzMmhZGzMzgZGzYGM0MAAAAAAAAgZGjBMzGgZxsA2GA",
+                            importString = "C0PAAAAAAAAAAAAAAAAAAAAAAAMmxwCsAzwQDbAAYGPwyMzsYGmZmZGzMMzMmhZGzYGbmZMjZYZMNDAAAAAAAAYmxYAzsBAzCYbAA",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Algethar Academy",
-                            importString = "C0PAAAAAAAAAAAAAAAAAAAAAAAMmxwCsAzwQDbAAYGPwyMzsYGmZmZGzMMzMmhZGzMzgZGzYGM0MAAAAAAAAgZGjBMzGgZxsA2GA",
+                            importString = "C0PAAAAAAAAAAAAAAAAAAAAAAAMmxwCsAzwQDbAAYGPwyMzsYGmZmZGzMMzMmhZGzYGbmZMjZYZMNDAAAAAAAAYmxYAzsBAzCYbAA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -2620,13 +2620,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Magisters' Terrace",
-                            importString = "C0PAAAAAAAAAAAAAAAAAAAAAAAMmxwCsAzwQDbAAYGPwyMzsYGmZmZGzMMzMmhZGzMzgZGzYGMmmBAAAAAAAAMzYMgZ2AYxsA2GA",
+                            importString = "C0PAAAAAAAAAAAAAAAAAAAAAAAMmxwCsAzwQDbAAYGPwyMzsYGmZmZGzMMzMmhZGzYGbmZMjZYZMNDAAAAAAAAYmxYAzsBAzCYbAA",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Magisters' Terrace",
-                            importString = "C0PAAAAAAAAAAAAAAAAAAAAAAAMmxwCsAzwQDbAAYGPwyMzsYGmZmZGzMMzMmhZGzYGMzYGzwyYaGAAAAAAAAwMjxAmZDgFzCYbAA",
+                            importString = "C0PAAAAAAAAAAAAAAAAAAAAAAAMmxwCsAzwQDbAAYGPwyMzsYGmZmZGzMMzMmhZGzYGbmZMjZYZMNDAAAAAAAAYmxYAzsBAzCYbAA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -2637,7 +2637,7 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Maisara Caverns",
-                            importString = "C0PAAAAAAAAAAAAAAAAAAAAAAAMmxwCsAzwQDbAAYGPwyMzsYGmZmZGzMMzMmhZGzMzYbmZMjZwQzAAAAAAAAAmZMGwMbAwsA2GA",
+                            importString = "C0PAAAAAAAAAAAAAAAAAAAAAAAMmxwCsAzwQDbAAYGPwyMzsYGmZmZGzMMzMmhZGzMzgZGzYGMmmBAAAAAAAAMzYMgZ2AYxsA2GA",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -2654,13 +2654,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Nexus-Point Xenas",
-                            importString = "C0PAAAAAAAAAAAAAAAAAAAAAAAMmxwCsAzwQDbAAYGPwyMzsYGmZmZGzMMzMmhZGzYGMzYGzwyYaGAAAAAAAAwMjxAmZDgFzCYbAA",
+                            importString = "C0PAAAAAAAAAAAAAAAAAAAAAAAMmxwCsAzwQDbAAYGPwyMzsYGmZmZGzMMzMmhZGzMzYzMjZMDGaGAAAAAAAAwMjxAmZDgFzCYbAA",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Nexus-Point Xenas",
-                            importString = "C0PAAAAAAAAAAAAAAAAAAAAAAAMmxwCsAzwQDbAAYGPwyMzsYGmZmZGzMMzMmhZGzMzYbmZYMDLDNDAAAAAAAAwMGDYmNADzCYbAA",
+                            importString = "C0PAAAAAAAAAAAAAAAAAAAAAAAMmxwCsAzwQDbAAYGPwyMzsYGmZmZGzMMzMmhZGzMzYzMjZMDGaGAAAAAAAAwMjxAmZDgFzCYbAA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -2671,13 +2671,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Pit of Saron",
-                            importString = "C0PAAAAAAAAAAAAAAAAAAAAAAAMmxwCsAzwQDbAAYGPwyMzsYGmZmZGzMMzMmhZGzMzYbmZMjZwQzAAAAAAAAAmZMGwMbAwsA2GA",
+                            importString = "C0PAAAAAAAAAAAAAAAAAAAAAAAMmxwCsAzwQDbAAYGPwyMzsYGmZmZGzMMzMmhZGzMzYbmZMjZwQzAAAAAAAAAMjxAmZDwwsA2GA",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Pit of Saron",
-                            importString = "C0PAAAAAAAAAAAAAAAAAAAAAAAMmxwCsAzwQDbAAYGPwyMzsYGmZmZGzMMzMmhZGzMzYbmZMjZwQzAAAAAAAAAmZMGwMbAwsA2GA",
+                            importString = "C0PAAAAAAAAAAAAAAAAAAAAAAAMmxwCsAzwQDbAAYGPwyMzsYGmZmZGzMMzMmhZGzMzYbmZMjZwQzAAAAAAAAAMjxAmZDwwsA2GA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -2688,13 +2688,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Seat of the Triumvirate",
-                            importString = "C0PAAAAAAAAAAAAAAAAAAAAAAAMmxwCsAzwQDbAAYGPwyMzsYGmZmZGzMMzMmhZGzMzgZGzYGM0MAAAAAAAAgZGjBMzGgZxsA2GA",
+                            importString = "C0PAAAAAAAAAAAAAAAAAAAAAAAMmxwCsAzwQDbAAYGPwyMzsYGmZmZGzMMzMmhZGzMzgZGzYGMmmBAAAAAAAAMzYMgZ2AYxsA2GA",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Seat of the Triumvirate",
-                            importString = "C0PAAAAAAAAAAAAAAAAAAAAAAAMmxwCsAzwQDbAAYGPwyMzsYGmZmZGzMMzMmhZGzMzgZGzYGM0MAAAAAAAAgZGjBMzGgZxsA2GA",
+                            importString = "C0PAAAAAAAAAAAAAAAAAAAAAAAMmxwCsAzwQDbAAYGPwyMzsYGmZmZGzMMzMmhZGzMzgZGzYGMmmBAAAAAAAAMzYMgZ2AYxsA2GA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -2705,13 +2705,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Skyreach",
-                            importString = "C0PAAAAAAAAAAAAAAAAAAAAAAAMmxwCsAzwQDbAAYGPwyMzsYGmZmZGzMMzMmhZGzYGMzYGzw2YaGAAAAAAAAwMjxAmZDgFzCYbAA",
+                            importString = "C0PAAAAAAAAAAAAAAAAAAAAAAAMmxwCsAzwQDbAAYGPwyMzsYGmZmZGzMMzMmhZGzMzgZGzYGM0MAAAAAAAAgZGjBMzGgZxsA2GA",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Skyreach",
-                            importString = "C0PAAAAAAAAAAAAAAAAAAAAAAAMmxwCsAzwQDbAAYGPwyMzsYGmZmZGzMMzMmhZGzYGMzYGzw2YaGAAAAAAAAwMjxAmZDgFzCYbAA",
+                            importString = "C0PAAAAAAAAAAAAAAAAAAAAAAAMmxwCsAzwQDbAAYGPwyMzsYGmZmZGzMMzMmhZGzMzgZGzYGM0MAAAAAAAAgZGjBMzGgZxsA2GA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -2728,7 +2728,7 @@ ZoidsToolsTalentGrimoire.data = {
                         },
                         highkey = {
                             title = "High Keys - Windrunner Spire",
-                            importString = "C0PAAAAAAAAAAAAAAAAAAAAAAAMmxwCsAzwQDbAAYGPwyMzsYGmZmZGzMMzMmhZGzMzYbmZMjZwQzAAAAAAAAAmZMGwMbAwsA2GA",
+                            importString = "C0PAAAAAAAAAAAAAAAAAAAAAAAMmxwCsAzwQDbAAYGPwyMzsYGmZmZGzMMzMmhZGzMzYbmZMjZwQzAAAAAAAAAMjxAmZDwwsA2GA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -2786,13 +2786,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - All Dungeons",
-                            importString = "C4PAAAAAAAAAAAAAAAAAAAAAAYzsMwAGwMsEYWAAAAAAAAAmxMzMMjZMmhlx0MGMLbmZGmZGzMzCzsMMzAAAMjxMzMDYghBYhZGD",
+                            importString = "C4PAAAAAAAAAAAAAAAAAAAAAAYzsMwAGwMsEYWAAAAAAAAAmxMmhZMzMmhlx0MGMLbmZGmZGzMzCzsMMzAAAMjxMzMDYghBYhZGD",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - All Dungeons",
-                            importString = "C4PAAAAAAAAAAAAAAAAAAAAAAYzsMwAGwMsEYWAAAAAAAAAmxMzMMjZMmhlx0MGMLbmZGmZGzMzCzsMMzAAAMjxMzMDYghBYhZGD",
+                            importString = "C4PAAAAAAAAAAAAAAAAAAAAAAYzsMwAGwMsEYWAAAAAAAAAmxMmhZMzMmhlx0MGMLbmZGmZGzMzCzsMMzAAAMjxMzMDYghBYhZGD",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -2803,13 +2803,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Algethar Academy",
-                            importString = "C4PAAAAAAAAAAAAAAAAAAAAAAYzsMwAGwMsEYWAAAAAAAAAmxMzM2MmZGzwyYaGDmlNzMDzMjZmZhZWGmZAAAmxYmZmBMAGgNmZM",
+                            importString = "C4PAAAAAAAAAAAAAAAAAAAAAAYzsMwAGwMsEYWAAAAAAAAAmxMzM2MmZGzgx0MGMLbmZGmZGzMzCzsMMzAAAmZMmZmZADgBYjZGD",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Algethar Academy",
-                            importString = "C4PAAAAAAAAAAAAAAAAAAAAAAYzsMwAGwMsEYWAAAAAAAAAmxMzM2MmZGzwyYaGDmlNzMDzMjZmZhZWGmZAAAmxYmZmBMAGgNmZM",
+                            importString = "C4PAAAAAAAAAAAAAAAAAAAAAAYzsMwAGwMsEYWAAAAAAAAAmxMzM2MmZGzgx0MGMLbmZGmZGzMzCzsMMzAAAmZMmZmZADgBYjZGD",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -2820,13 +2820,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Magisters' Terrace",
-                            importString = "C4PAAAAAAAAAAAAAAAAAAAAAAYzsMwAGwMsEYWAAAAAAAAAmxMzMMjZMmhlx0MGMLbmZGmZGzMzCzsMMzAAAMjxMzMDYghBYhZGD",
+                            importString = "C4PAAAAAAAAAAAAAAAAAAAAAAYzsMwAGwMsEYWAAAAAAAAAmxMzM2MmZGzgx0MGMLbmZGmZGzMzCzsMMzAAAmZMmZmZADgBYjZGD",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Magisters' Terrace",
-                            importString = "C4PAAAAAAAAAAAAAAAAAAAAAAYzsMwAGwMsEYWAAAAAAAAAmxMzMMjZMmhlx0MGMLbmZGmZGzMzCzsMMzAAAMjxMzMDYghBYhZGD",
+                            importString = "C4PAAAAAAAAAAAAAAAAAAAAAAYzsMwAGwMsEYWAAAAAAAAAmxMzM2MmZGzgx0MGMLbmZGmZGzMzCzsMMzAAAmZMmZmZADgBYjZGD",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -2871,13 +2871,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Pit of Saron",
-                            importString = "C4PAAAAAAAAAAAAAAAAAAAAAAYzsMwAGwMsEYWAAAAAAAAAmxMzMMjZMmhlx0MGMLbmZGmZGzMzCzsMMzAAAMjxMzMDYghBYhZGD",
+                            importString = "C4PAAAAAAAAAAAAAAAAAAAAAAYzsMwAGwMsEYWAAAAAAAAAmxMmx2MmZGzwyYaGDmlNzMDzMjZmZhZWGmZAAAmxYmZmBMAGgNmZM",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Pit of Saron",
-                            importString = "C4PAAAAAAAAAAAAAAAAAAAAAAYzsMwAGwMsEYWAAAAAAAAAmxMzMMjZMmhlx0MGMLbmZGmZGzMzCzsMMzAAAMjxMzMDYghBYhZGD",
+                            importString = "C4PAAAAAAAAAAAAAAAAAAAAAAYzsMwAGwMsEYWAAAAAAAAAmxMzM2mxMGzgx0MGMLbmZGmZGzMzCzsMMzAAAmHYMzMzMDYAMAbMzYA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -2888,13 +2888,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Seat of the Triumvirate",
-                            importString = "C4PAAAAAAAAAAAAAAAAAAAAAAYzsMwAGwMsEYWAAAAAAAAAmxMzM2MmZGzwyYaGDmlNzMDzMjZmZhZWGmZAAAmxYmZmBMAGgNmZM",
+                            importString = "C4PAAAAAAAAAAAAAAAAAAAAAAYzsMwAGwMsEYWAAAAAAAAAmxMzM2MmZGzgx0MGMLbmZGmZGzMzCzsMMzAAAmZMmZmZADgBYjZGD",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Seat of the Triumvirate",
-                            importString = "C4PAAAAAAAAAAAAAAAAAAAAAAYzsMwAGwMsEYWAAAAAAAAAmxMzM2MmZGzwyYaGDmlNzMDzMjZmZhZWGmZAAAmxYmZmBMAGgNmZM",
+                            importString = "C4PAAAAAAAAAAAAAAAAAAAAAAYzsMwAGwMsEYWAAAAAAAAAmxMzM2MmZGzgx0MGMLbmZGmZGzMzCzsMMzAAAmZMmZmZADgBYjZGD",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -2986,13 +2986,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - All Dungeons",
-                            importString = "C8PAAAAAAAAAAAAAAAAAAAAAAMgxMG2gFYGGawiZmZmZYZAAAAAAwMmxMMjxMmhlx0MAAAAMAwYZZmZWMzMDzYMgZ2AMMGzMbGA",
+                            importString = "C8PAAAAAAAAAAAAAAAAAAAAAAMgxMG2gFYGGawiZmZmZYZAAAAAAwMmZmx2MGzYGMmmBAAAgBAGLLzMziZmZYGjBMzGAMGzMbGA",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - All Dungeons",
-                            importString = "C8PAAAAAAAAAAAAAAAAAAAAAAMgxMG2gFYGGawiZmZmZYZAAAAAAwMmxMMjxMmhlx0MAAAAMAwYZZmZWMzMDzYMgZ2AMMGzMbGA",
+                            importString = "C8PAAAAAAAAAAAAAAAAAAAAAAMgxMG2gFYGGawiZmZmZYZAAAAAAwMmZmx2MGzYGMmmBAAAgBAGLLzMziZmZYGjBMzGAMGzMbGA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -3003,13 +3003,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Algethar Academy",
-                            importString = "C8PAAAAAAAAAAAAAAAAAAAAAAMgxMG2gFYGGawiZmZmZYZAAAAAAwMmxMMjxMmhlx0MAAAAMAwYZZmZWMzMDzYMgZ2AMMGzMbGA",
+                            importString = "C8PAAAAAAAAAAAAAAAAAAAAAAMgxMG2gFYGGawiZmZmZYZAAAAAAwMmxMMjhxMYMNDAAAADAMWWmZmFzMzYmxYAzsBYMjxMzmBA",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Algethar Academy",
-                            importString = "C8PAAAAAAAAAAAAAAAAAAAAAAMgxMG2gFYGGawiZmZmZYZAAAAAAwMmxMMjxMmhlx0MAAAAMAwYZZmZWMzMDzYMgZ2AMMGzMbGA",
+                            importString = "C8PAAAAAAAAAAAAAAAAAAAAAAMgxMG2gFYGGawiZmZmZYZAAAAAAwMmxMMjhxMYMNDAAAADAMWWmZmFzMzYmxYAzsBYMjxMzmBA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -3020,7 +3020,7 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Magisters' Terrace",
-                            importString = "C8PAAAAAAAAAAAAAAAAAAAAAAMgxMG2gFYGGawiZmZmZYZAAAAAAwMmZmx2MGzYGMmmBAAAgBAGLLzMziZmZYGjBMzGAMGzMbGA",
+                            importString = "C8PAAAAAAAAAAAAAAAAAAAAAAMgxMG2gFYGGawiZmZmZYZAAAAAAwMmxM2mxYGzwyYaGAAAAGAYssMzMLmZmhZMGwMbAwYMzsZA",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -3054,13 +3054,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Nexus-Point Xenas",
-                            importString = "C8PAAAAAAAAAAAAAAAAAAAAAAMgxMG2gFYGGawiZmZmZYZAAAAAAwMmxMMjhxMsNmmBAAAgBAGLLzMziZmZMzYMgZ2AwMGzMbGA",
+                            importString = "C8PAAAAAAAAAAAAAAAAAAAAAAMgxMG2gFYGGawiZmZmZYZAAAAAAwMmZmx2MGzYGMmmBAAAgBAGLLzMziZmZYGjBMzGAMGzMbGA",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Nexus-Point Xenas",
-                            importString = "C8PAAAAAAAAAAAAAAAAAAAAAAMgxMG2gFYGGawiZmZmZYZAAAAAAwMmxMMjhxMsNmmBAAAgBAGLLzMziZmZMzYMgZ2AwMGzMbGA",
+                            importString = "C8PAAAAAAAAAAAAAAAAAAAAAAMgxMG2gFYGGawiZmZmZYZAAAAAAwMmZmx2MGzYGMmmBAAAgBAGLLzMziZmZYGjBMzGAMGzMbGA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -3071,13 +3071,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Pit of Saron",
-                            importString = "C8PAAAAAAAAAAAAAAAAAAAAAAMgxMG2gFYGGawiZmZmZYZAAAAAAwMmxM2mxwYGWGTzAAAAwAAjllZmZxMzMMjxAmZDwwYMzsZA",
+                            importString = "C8PAAAAAAAAAAAAAAAAAAAAAAMgxMG2gFYGGawiZmZmZYZAAAAAAwMmZmx2MGzYGMmmBAAAgBAGLLzMziZmZYGjBMzGAMGzMbGA",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Pit of Saron",
-                            importString = "C8PAAAAAAAAAAAAAAAAAAAAAAMgxMG2gFYGGawiZmZmZYZAAAAAAwMmxM2mxYGzgx0MAAAAMAwYZZmZWMzMDzMjBMzGAMGzMbGA",
+                            importString = "C8PAAAAAAAAAAAAAAAAAAAAAAMgxMG2gFYGGawiZmZmZYZAAAAAAwMmZmx2MGzYGMmmBAAAgBAGLLzMziZmZYGjBMzGAMGzMbGA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -3088,7 +3088,7 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Seat of the Triumvirate",
-                            importString = "C8PAAAAAAAAAAAAAAAAAAAAAAMgxMG2gFYGGawiZmZmZYZAAAAAAwMmxM2mxYGzwyYaGAAAAGAYssMzMLmZmhZMGwMbAwYMzsZA",
+                            importString = "C8PAAAAAAAAAAAAAAAAAAAAAAMgxMG2gFYGGawiZmZmZYZAAAAAAwMmZmx2MGzYGMmmBAAAgBAGLLzMziZmZYGjBMzGAMGzMbGA",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -3222,13 +3222,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Magisters' Terrace",
-                            importString = "C4DAAAAAAAAAAAAAAAAAAAAAAMzwMLzMzsgZGamxAAAwAAAAzMzssMzELAAsNjZmxsZWmZmxMjxwMzMWYmZmHYGAgBAAwMLAgZAwwA",
+                            importString = "C4DAAAAAAAAAAAAAAAAAAAAAAMzwYZm5BmFMzQzMzAAAwAAAAzMzssMzELAAsNjZmxsZWmZmxMjxwMzMWYmZmHYGAgBAAwMLAwMDAGG",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Magisters' Terrace",
-                            importString = "C4DAAAAAAAAAAAAAAAAAAAAAAMzwMLzMzsgZGamxAAAwAAAAzMzssMzELAAsNjZmxsZWmZmxMjxwMzMWYmZmHYGAgBAAwMLAgZAwwA",
+                            importString = "C4DAAAAAAAAAAAAAAAAAAAAAAMzwYZm5BmFMzQzMzAAAwAAAAzMzssMzELAAsNjZmxsZWmZmxMjxwMzMWYmZmHYGAgBAAwMLAwMDAGG",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -3239,13 +3239,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Maisara Caverns",
-                            importString = "C4DAAAAAAAAAAAAAAAAAAAAAAMzwMLzMzsgZGamxAAAwAAAAzMzssMzELAAsNjZmxsZWmZmxMjxwMzMWYmZmHYGAgBAAwMLAgZAwwA",
+                            importString = "C4DAAAAAAAAAAAAAAAAAAAAAAMzwYZmZmFMDamZGAAAGAAAYmZmllZmYBAgtZMzMmNzyMzMmZMGmZmxCzMzMzAAMAAAmZBAMDAGG",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Maisara Caverns",
-                            importString = "C4DAAAAAAAAAAAAAAAAAAAAAAMzwMLzMzsgZGamxAAAwAAAAzMzssMzELAAsNjZmxsZWmZmxMjxwMzMWYmZmHYGAgBAAwMLAgZAwwA",
+                            importString = "C4DAAAAAAAAAAAAAAAAAAAAAAMzwYZmZmFMDamZGAAAGAAAYmZmllZmYBAgtZMzMmNzyMzMmZMGmZmxCzMzMzAAMAAAmZBAMDAGG",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -3256,13 +3256,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Nexus-Point Xenas",
-                            importString = "C4DAAAAAAAAAAAAAAAAAAAAAAMzwMLzMzsgZGamxAAAwAAAAzMzssMzELAAsNjZmxsZWmZmxMjxwMzMWYmZmHYGAgBAAwMLAgZAwwA",
+                            importString = "C4DAAAAAAAAAAAAAAAAAAAAAAMzwYZmZmFMzQzMzAAAwAAAAzMzssMzELAAsNjZmxsZWmZmxMjxwMzMWYmZGzAAMAAAmZBAmZAwwA",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Nexus-Point Xenas",
-                            importString = "C4DAAAAAAAAAAAAAAAAAAAAAAMzwMLzMzsgZGamxAAAwAAAAzMzssMzELAAsNjZmxsZWmZmxMjxwMzMWYmZmHYGAgBAAwMLAgZAwwA",
+                            importString = "C4DAAAAAAAAAAAAAAAAAAAAAAMzwYZmZmFMzQzMzAAAwAAAAzMzssMzELAAsNjZmxsZWmZmxMjxwMzMWYmZGzAAMAAAmZBAmZAwwA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -3279,7 +3279,7 @@ ZoidsToolsTalentGrimoire.data = {
                         },
                         highkey = {
                             title = "High Keys - Pit of Saron",
-                            importString = "C4DAAAAAAAAAAAAAAAAAAAAAAMzwMLzMzsgZGamxAAAwAAAAzMzssMzELAAsNjZmxsZWmZmxMjxwMzMWYmZmHYGAgBAAwMLAgZAwwA",
+                            importString = "C4DAAAAAAAAAAAAAAAAAAAAAAMzwYZmZmFMzQzMzAAAwAAAAzMzssMzELAAsNjZmxsZWmZmxMjxwMzMWYmZGzAAMAAAmZBAmZAwwA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -3324,13 +3324,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Windrunner Spire",
-                            importString = "C4DAAAAAAAAAAAAAAAAAAAAAAMzwMLzMzsgZGamZGAAAGAAAYmZmllZmYBAgtZMzMmNzyMzMmZMGmZmxCzMzYGAgBAAwMLAgZAwwA",
+                            importString = "C4DAAAAAAAAAAAAAAAAAAAAAAMzwYZmZmFMzQzMzAAAwAAAAzMzssMzELAAsNjZmxsZWmZmxMjxwMzMWYmZmHYGAgBAAwMLAgZAwwA",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Windrunner Spire",
-                            importString = "C4DAAAAAAAAAAAAAAAAAAAAAAMzwMLzMzsgZGamZGAAAGAAAYmZmllZmYBAgtZMzMmNzyMzMmZMGmZmxCzMzYGAgBAAwMLAgZAwwA",
+                            importString = "C4DAAAAAAAAAAAAAAAAAAAAAAMzwYZmZmFMzQzMzAAAwAAAAzMzssMzELAAsNjZmxsZWmZmxMjxwMzMWYmZmHYGAgBAAwMLAgZAwwA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -3394,7 +3394,7 @@ ZoidsToolsTalentGrimoire.data = {
                         },
                         highkey = {
                             title = "High Keys - All Dungeons",
-                            importString = "C8DAAAAAAAAAAAAAAAAAAAAAAMzYZsMzMzCmZkZGDAAADAYmZaWWWmBAYzMzYbMzMjNAAAAAYxMzMzDAAgxMMmZmZmlBgZGYMGDmhB",
+                            importString = "C8DAAAAAAAAAAAAAAAAAAAAAAMzwYZmZmFMzIzYmBAAwAAmZmmlllZAA2MzM2GzMzYDAAAAA2MzMzAAAjZYMzMzMbDAzMYGjxgZYA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -3405,13 +3405,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Algethar Academy",
-                            importString = "C8DAAAAAAAAAAAAAAAAAAAAAAMzwMLzMzsgZGZmZGAAAGAwMz0sssMDAwmZmx2YmZGbAAAAAwmZmZGAAYMDjZmZmZbAYmBGjxgZYA",
+                            importString = "C8DAAAAAAAAAAAAAAAAAAAAAAMzwMLzMzsgZGZmZGAAAGAwMz0sssMDAwmZmx2YmZGbAAAAAwiZmZGAAYMDjZmZmZbAYmBGjxgZYA",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Algethar Academy",
-                            importString = "C8DAAAAAAAAAAAAAAAAAAAAAAMzwMLzMzsgZGZmxMAAAGAwMz0sssMDAwmZmx2YmZGbAAAAAwiZmZGAAYMDjZmZmZDAzMwYMzgZYA",
+                            importString = "C8DAAAAAAAAAAAAAAAAAAAAAAMzwMLzMzsgZGZmZGAAAGAwMz0sssMDAwmZmx2YmZGbAAAAAwiZmZGAAYMDjZmZmZZAYmBGjxgZYA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -3428,7 +3428,7 @@ ZoidsToolsTalentGrimoire.data = {
                         },
                         highkey = {
                             title = "High Keys - Magisters' Terrace",
-                            importString = "C8DAAAAAAAAAAAAAAAAAAAAAAMzwMLzMzsgZGZmZGAAAGAwMz0sssMDAwmZmx2YmZGbAAAAAwiZmZGAAYMDjZmZmZZAYmBGjxgZYA",
+                            importString = "C8DAAAAAAAAAAAAAAAAAAAAAAYGmZZmZmFMzIzYmBAAwAAmZmmlllZAA2MzM2GzMzYDAAAAA2MzMzAAAjZYMzMzMbDAzMYGjxgZYA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -3439,13 +3439,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Maisara Caverns",
-                            importString = "C8DAAAAAAAAAAAAAAAAAAAAAAMzwYZmZmFegZIzMGAAAGAwMz0sssMDAwmZmx2YmZGbAAAAAwiZmZmBAAjZYMzMzMbDAzMwYMGMDD",
+                            importString = "C8DAAAAAAAAAAAAAAAAAAAAAAMzwYZmZmFMzIzYmBAAwAAmZmmlllZAA2MzM2GzMzYDAAAAA2MzMzAAAjZYMzMzMbDAzMYGjxgZYA",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Maisara Caverns",
-                            importString = "C8DAAAAAAAAAAAAAAAAAAAAAAMzwYZmZmFegZIzMGAAAGAwMz0sssMDAwmZmx2YmZGbAAAAAwiZmZmBAAjZYMzMzMbDAzMwYMGMDD",
+                            importString = "C8DAAAAAAAAAAAAAAAAAAAAAAMzwYZmZmFMzIzYmBAAwAAmZmmlllZAA2MzM2GzMzYDAAAAA2MzMzAAAjZYMzMzMbDAzMYGjxgZYA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -3456,13 +3456,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Nexus-Point Xenas",
-                            importString = "C8DAAAAAAAAAAAAAAAAAAAAAAMzwYZmZmFMzIzYmBAAwAAmZmmlllZAA2MzM2GzMzYDAAAAA2MzMzAAAjZYMzMzMbDAzMYGjxgZYA",
+                            importString = "C8DAAAAAAAAAAAAAAAAAAAAAAMzwYZmZmFegZIzMGAAAGAwMz0sssMDAwmZmx2YmZGbAAAAAwiZmZmBAAjZYMzMzMbDAzMwYMGMDD",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Nexus-Point Xenas",
-                            importString = "C8DAAAAAAAAAAAAAAAAAAAAAAMzwMLzMzsgZGZmZGAAAGAwMz0sssMDAwmZmx2YmZGbAAAAAwiZmZGAAYMDjZmZmZZAYmBGjxgZYA",
+                            importString = "C8DAAAAAAAAAAAAAAAAAAAAAAMzwYZmZmFegZIzMGAAAGAwMz0sssMDAwmZmx2YmZGbAAAAAwiZmZmBAAjZYMzMzMbDAzMwYMGMDD",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -3473,13 +3473,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Pit of Saron",
-                            importString = "C8DAAAAAAAAAAAAAAAAAAAAAAMzwMLzMzsgZGZmZGAAAGAwMz0sssMDAwmZmx2YmZGbAAAAAwiZmZGAAYMDjZmZmZbAYmBMjxgZYA",
+                            importString = "C8DAAAAAAAAAAAAAAAAAAAAAAMzwYZmZmFegZGZmxAAAwAAmZmmlllZAA2MzM2GzMzYDAAAAAWMzMzMAAYMDjZmZmZbAYmBYMGMDD",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Pit of Saron",
-                            importString = "C8DAAAAAAAAAAAAAAAAAAAAAAMzYZsMzMzCmZkZGDAAADAYmZaWWWmBAYzMzYbMzMjNAAAAAYxMzMzDAAgxMMmZmZmlBgZGYMGDmhB",
+                            importString = "C8DAAAAAAAAAAAAAAAAAAAAAAMzwYZmZmFMzIzYmBAAwAAmZmmlllZAA2MzM2GzMzYDAAAAA2MzMzAAAjZYMzMzMbDAzMYGjxgZYA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -3490,13 +3490,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Seat of the Triumvirate",
-                            importString = "C8DAAAAAAAAAAAAAAAAAAAAAAMzwYZmZmNMzIzMzMAAAGAwMz0sssMDAwmZmx2YmZGLAAAAAwmZmZGAAYMDjZmZmZbAYmBGjxgZYA",
+                            importString = "C8DAAAAAAAAAAAAAAAAAAAAAAMzwYZmZmFMzIzYmBAAwAAmZmmlllZAA2MzM2GzMzYDAAAAA2MzMzAAAjZYMzMzMbDAzMYGjxgZYA",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Seat of the Triumvirate",
-                            importString = "C8DAAAAAAAAAAAAAAAAAAAAAAMzYZsMzMziNzMyMzMAAAMAgZmpZZZZGAgNzMjtxMzM2AAAAAgFzMzMAAwYGGzMzMzyAwMDwYMYGG",
+                            importString = "C8DAAAAAAAAAAAAAAAAAAAAAAMzYZsMzMzCzMjMzYAAAYAAzMTz2yyMAAbmZGbjZmZsBAAAAALmZmZAAgxMMmZmZmNAMzAMmZwMMA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -3524,13 +3524,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Windrunner Spire",
-                            importString = "C8DAAAAAAAAAAAAAAAAAAAAAAMzwYZmZmFegZGZmxAAAwAAmZmmlllZAA2MzM2GzMzYDAAAAAWMzMzMAAYMDjZmZmZbAYmBYMGMDD",
+                            importString = "C8DAAAAAAAAAAAAAAAAAAAAAAMzwYZmZmFMzIzMzMAAAGAwMz0sssMDAwmZmx2YmZGbAAAAAwmZmZGAAYMDjZmZmZbAYmBGjxgZYA",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Windrunner Spire",
-                            importString = "C8DAAAAAAAAAAAAAAAAAAAAAAMzwMLzMzsgZGZmxMAAAGAwMz0sssMDAwmZmx2YmZGbAAAAAwiZmZGAAYMDjZmZmZDAzMwYMzgZYA",
+                            importString = "C8DAAAAAAAAAAAAAAAAAAAAAAMzwYZmZmFMzIzMzMAAAGAwMz0sssMDAwmZmx2YmZGbAAAAAwmZmZGAAYMDjZmZmZbAYmBGjxgZYA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -3543,7 +3543,7 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         normal = {
                             title = "Normal Raid - All Bosses",
-                            importString = "C8DAAAAAAAAAAAAAAAAAAAAAAYGGLzMzswMDZmZGAAAGAwMz0sssMDAwmZmx2YmZGAAAAAgFzMzMDAAGzwYmZmZ2GAmZgxYMYGG",
+                            importString = "C8DAAAAAAAAAAAAAAAAAAAAAAYGGLzMzswMDZmZGAAAGAwMz0sssMDAwmZmx2YmZGAAAAAgFzMzMDAAGzYGzMzMzGAmZgxYMYGG",
                             difficulty = "Normal",
                         },
                         heroic = {
@@ -3594,7 +3594,7 @@ ZoidsToolsTalentGrimoire.data = {
                         },
                         highkey = {
                             title = "High Keys - All Dungeons",
-                            importString = "CAEAAAAAAAAAAAAAAAAAAAAAAYGLjlZmZWGmZiZGjZmZmZxMzwMmBAAAmZmZZZmpNAAYDAAAYBgttxMzMDz2wYmxCAAAzsBMDMgZwA",
+                            importString = "CAEAAAAAAAAAAAAAAAAAAAAAAMzYZsMzMzywMTMzYMzMzMLmZGmxMAAAwMzMLLzMtBAAbAAAALAstNmZmBz2wYmxCAAAzsBMDjBMDGA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -3605,13 +3605,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Algethar Academy",
-                            importString = "CAEAAAAAAAAAAAAAAAAAAAAAAMzwMLzMzsMegZmYmxMzMzMziZmhZMDAAAMzMzyyMTbAAwCAAAwCAbbjZMDmthxMjNAAAmZDYGYAzgB",
+                            importString = "CAEAAAAAAAAAAAAAAAAAAAAAAMzwYZmZmlhZmYmxMzMzMziZmhZMDAAAMzMzyyMTbAAwCAAAwCAbbjZmZwsNMmZsBAAwMbAzwYAzgB",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Algethar Academy",
-                            importString = "CAEAAAAAAAAAAAAAAAAAAAAAAYGLjlZmZWGmRMzMjZmZmZxMzwMmBAAAmZmZZZmpNAAYDAAAYBgttxMzMDz2wYmxCAAAzsBMDMgZwA",
+                            importString = "CAEAAAAAAAAAAAAAAAAAAAAAAMzwMLzMzsMMzEzMzYmZmZWMzMMjZAAAgZmZWWmZaDAA2AAAAWAYbZMzMDmthxMjFAAAmZDYGYAzgB",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -3622,7 +3622,7 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Magisters' Terrace",
-                            importString = "CAEAAAAAAAAAAAAAAAAAAAAAAMzwYZmZmFMzEzMzMzMzMziZmhZMDAAAMzMzyyMTbAAwGAAAwCAbLjZmZwsNMmZsBAAwMbAzwYAzgB",
+                            importString = "CAEAAAAAAAAAAAAAAAAAAAAAAMzwYZmZmlhZmYmxMzMzMziZmhZMDAAAMzMzyyMTbAAwGAAAwCAbLjZmZwsNMmZsBAAwMbAzwYAzgB",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -3639,13 +3639,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Maisara Caverns",
-                            importString = "CAEAAAAAAAAAAAAAAAAAAAAAAMzwYZmZmlhZmYmxMzMzMziZmhZMDAAAMzMzyyMTbAAwGAAAwCAbLjZmZwsNMmZsBAAwMbAzwYAzgB",
+                            importString = "CAEAAAAAAAAAAAAAAAAAAAAAAMzwMLzMzsMMzEzMGzMzMziZmhZMDAAAMzMzyyMTbAAwGAAAwCAbLjZmZwsNMmZsBAAwMbAzwYAzgB",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Maisara Caverns",
-                            importString = "CAEAAAAAAAAAAAAAAAAAAAAAAMzYZsMzMzywMiZGjZmZmZxMzwMmBAAAmZmZZZmpNAAYDAAAYBgttxMzMDz2wYmxCAAAzsBMDMgZwA",
+                            importString = "CAEAAAAAAAAAAAAAAAAAAAAAAMzYZsMzMzCmZiZGjZmZmZxMzwMmBAAAmZmZZZmpNAAYDAAAYBgtlxMzMDz2wYmxCAAAzsBMDMgZwA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -3656,13 +3656,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Nexus-Point Xenas",
-                            importString = "CAEAAAAAAAAAAAAAAAAAAAAAAMzwYZmZmlhZmYmZmZmZmZWMzMMjZAAAgZmZWWmZaDAA2AAAAWAYbZMzMDmthxMjNAAAmZDYGYAzgB",
+                            importString = "CAEAAAAAAAAAAAAAAAAAAAAAAMzwYZmZmFMzEzMmZmZmZWMzMMjZAAAgZmZWWmZaDAAWAAAAWAYbZMzMzDwsNMmZsBAAwMbAzwYAzgB",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Nexus-Point Xenas",
-                            importString = "CAEAAAAAAAAAAAAAAAAAAAAAAMzwYZmZmFMjYmxMzMzMziZmhZMDAAAMzMzyyMTbAAwCAAAwCAbLjZmZGmthxMjFAAAmZDYGGDYGMA",
+                            importString = "CAEAAAAAAAAAAAAAAAAAAAAAAMzYZsMzMzywMTMzYMzMzMLmZGmxMAAAwMzMLLzMtBAAbAAAALAstNmZmBz2wYmxCAAAzsBMDjBMDGA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -3673,7 +3673,7 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Pit of Saron",
-                            importString = "CAEAAAAAAAAAAAAAAAAAAAAAAMzwYZmZmFmZmYGmZmZmZWMzMMjZAAAgZmZWWmZaDAA2AAAAWAYbbMzMDmthxMjNAAAmZDYGGDYGMA",
+                            importString = "CAEAAAAAAAAAAAAAAAAAAAAAAMzwYZmZmlhZmYmZGzMzMziZmhZMDAAAMzMzyyMTbAAwGAAAwCAbLjZmZwsNMmZsBAAwMbAzwYAzgB",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -3696,7 +3696,7 @@ ZoidsToolsTalentGrimoire.data = {
                         },
                         highkey = {
                             title = "High Keys - Seat of the Triumvirate",
-                            importString = "CAEAAAAAAAAAAAAAAAAAAAAAAMzwYZmZmlhZmYmZGzMzMziZmhZMDAAAMzMzyyMTbAAwGAAAwCAbLjZmZwsNMmZsAAAwMbAzwYAzgB",
+                            importString = "CAEAAAAAAAAAAAAAAAAAAAAAAYGGLzMzsMbmRMzMjZmZmZxMzwMmBAAAmZmZZZmpNAAYDAAAYBgttxMzMDz2wYmxCAAAzsBMDMgZwA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -3713,7 +3713,7 @@ ZoidsToolsTalentGrimoire.data = {
                         },
                         highkey = {
                             title = "High Keys - Skyreach",
-                            importString = "CAEAAAAAAAAAAAAAAAAAAAAAAMzwYZmZmlhZEzMzYmZmZWMzMMjZAAAgZmZWWmZaDAA2AAAAWAYbbMzMzwsNMmZsAAAwMbAzADYGMA",
+                            importString = "CAEAAAAAAAAAAAAAAAAAAAAAAMzwYZmZmlhZmYmxYmZmZWMzMMjZAAAgZmZWWmZaDAA2AAAAWAYbZMzMzDwsNMmZsAAAwMbAzwYAzgB",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -3724,13 +3724,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Windrunner Spire",
-                            importString = "CAEAAAAAAAAAAAAAAAAAAAAAAMzwYZmZmFegZmYmxMzMzMziZmhZMDAAAMzMzyyMTbAAwCAAAwCAbbjZmZwsNMmZsBAAwMbAzwYAzgB",
+                            importString = "CAEAAAAAAAAAAAAAAAAAAAAAAMzwMLzYmFMzEzMmZmZmZWMzMMjZAAAgZmZWWmZaDAA2AAAAWAYbbMzMzDwsNMmZsBAAwMbAzwYAzgB",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Windrunner Spire",
-                            importString = "CAEAAAAAAAAAAAAAAAAAAAAAAMzwYZmZmlhZmYmZGzMzMziZmhZMDAAAMzMzyyMTbAAwGAAAwCAbLjZmZwsNMmZsAAAwMbAzwYAzgB",
+                            importString = "CAEAAAAAAAAAAAAAAAAAAAAAAMzYZsMzMzywMTMzMjZmZmZxMzwMmBAAAmZmZZZmpNAAYDAAAYBgttxMzMY2GGzMWAAAYmNgZgBMDGA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -3790,13 +3790,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - All Dungeons",
-                            importString = "CwQAAAAAAAAAAAAAAAAAAAAAAAAAAgZbzYGGzyMzGzMjBAAAAAAYZBmYmBmhZ2MwMzMDzGzMmZZYZ7BW2mNMLAAwysMtMbzsMAAAAG2AzMgpxAAAG",
+                            importString = "CwQAAAAAAAAAAAAAAAAAAAAAAAAAAgZbzYGGzyMzGzMjBAAAAAAYZBzEmBmhxmBmZmZMzGzMmZZYZ7BW2mNMLAAwysMtMbzsMAAAAG2AzMgpxAAAG",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - All Dungeons",
-                            importString = "CwQAAAAAAAAAAAAAAAAAAAAAAAAAAgZbzYGGzyMzGzMjBAAAAAAYZBjYmBmhZ2MwMzMDzGzMmZZYZ7BW2mNMLAAwysMtMbzsMAAAAG2AzMgpxAAAG",
+                            importString = "CwQAAAAAAAAAAAAAAAAAAAAAAAAAAgZbzYGGzyMzGzMjBAAAAAAYZBzEmBmhxmBmZmZMzGzMmZZYZ7BW2mNMLAAwysMtMbzsMAAAAG2AzMgpxAAAG",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -3824,7 +3824,7 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Magisters' Terrace",
-                            importString = "CwQAAAAAAAAAAAAAAAAAAAAAAAAAAgZbzYGGzyMzGzMjBAAAAAAYZBmYmBmhZ2MwMzMDzGzMmZZYZ7BW2mNMLAAwysMtMbzsMAAAAG2AzMgpxAAAG",
+                            importString = "CwQAAAAAAAAAAAAAAAAAAAAAAAAAAgZbzYGGzyMzGzMjBAAAAAAYZBjYmBmhZ2MwMzMDzGzMmZZYZ7BW2mNMLAAwysMtMbzsMAAAAG2AzMgpxAAAG",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -3841,7 +3841,7 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Maisara Caverns",
-                            importString = "CwQAAAAAAAAAAAAAAAAAAAAAAAAAAgZbzYGGzyMzGzMjBAAAAAAYZBjYmBmhZ2MwMzMDzGzMmZZYZ7BW2mNMLAAwysMtMbzsMAAAAG2AzMgpxAAAG",
+                            importString = "CwQAAAAAAAAAAAAAAAAAAAAAAAAAAgZbzYGGzyMzGzMjBAAAAAAYZBmYmBmhZ2MwMzMDzGzMmZZYZ7BW2mNMLAAwysMtMbzsMAAAAG2AzMgpxAAAG",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -3858,7 +3858,7 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Nexus-Point Xenas",
-                            importString = "CwQAAAAAAAAAAAAAAAAAAAAAAAAAAgZbzYGGzyMzGzMjBAAAAAAYZBjYmBmhZ2MwMzMDzGzMmZZYZ7BW2mNMLAAwysMtMbzsMAAAAG2AzMgpxAAAG",
+                            importString = "CwQAAAAAAAAAAAAAAAAAAAAAAAAAAgZbzYGGzyMzGzMjBAAAAAAYZBmYmBmhZ2MwMzMDzGzMmZZYZ7BW2mNMLAAwysMtMbzsMAAAAG2AzMgpxAAAG",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -3875,13 +3875,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Pit of Saron",
-                            importString = "CwQAAAAAAAAAAAAAAAAAAAAAAAAAAgZbzYGGzyMzGzMjBAAAAAAYZBjYmBmhZ2MwMzMDzGzMmZZYZ7BW2mNMLAAwysMtMbzsMAAAAG2AzMgpxAAAG",
+                            importString = "CwQAAAAAAAAAAAAAAAAAAAAAAAAAAgZbzYGGzyMzGzMjBAAAAAAYZBzEmBmhxmBmZmZMzGzMmZZYZ7BW2mNMLAAwysMtMbzsMAAAAG2AzMgpxAAAG",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Pit of Saron",
-                            importString = "CwQAAAAAAAAAAAAAAAAAAAAAAAAAAgZbzYGGzyMzGzMjBAAAAAAYZBjYmBmhZ2MwMzMDzGzMmZZYZ7BW2mNMLAAwysMtMbzsMAAAAG2AzMgpxAAAG",
+                            importString = "CwQAAAAAAAAAAAAAAAAAAAAAAAAAAgZbzYGGzyMzGzMjBAAAAAAYZBzEmBmhxmBmZmZMzGzMmZZYZ7BW2mNMLAAwysMtMbzsMAAAAG2AzMgpxAAAG",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -3892,13 +3892,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Seat of the Triumvirate",
-                            importString = "CwQAAAAAAAAAAAAAAAAAAAAAAAAAAgZbzYGGzyMzGzMDAAAAAAALLYEzMwMMzGDmZmZY2YmxMLDLbPwy2shZBAAWmlplZbmlBAAAwwGYmBMNGgBAG",
+                            importString = "CwQAAAAAAAAAAAAAAAAAAAAAAAAAAgZbzYGGzyMzGzMjBAAAAAAYZBzEzMwMM2MwMzMDzmtZGjlhltHYZb2wsAAALzy0ysNzyAAAAYYDMzAmGDAAYA",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Seat of the Triumvirate",
-                            importString = "CwQAAAAAAAAAAAAAAAAAAAAAAAAAAgZbzYGGzyMzGzMjBAAAAAAYZBjYmBmhxGMmZmZY2sNzYmlhltHYZb2wsAAALzy0ysNzyAAAAYYDMzAmGDAAYA",
+                            importString = "CwQAAAAAAAAAAAAAAAAAAAAAAAAAAgZbzYGGzyMzGzMjBAAAAAAYZBzEzMwMM2MwMzMDzmtZGjlhltHYZb2wsAAALzy0ysNzyAAAAYYDMzAmGDAAYA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -3909,13 +3909,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Skyreach",
-                            importString = "CwQAAAAAAAAAAAAAAAAAAAAAAAAAAgZbzYGGzyMzGzMjBAAAAAAYZBzEzMwMM2AmZmZY2sNzYmlhltHYZb2wsAAALzy0ysNzyAAAAYYDMzAmGDAAYA",
+                            importString = "CwQAAAAAAAAAAAAAAAAAAAAAAAAAAgZbzYGGzyMzGzMjBAAAAAAYZBjYmBmhZ2AmZmZY2YmxMLDLbPwy2shZBAAWmlplZbmlBAAAwwGYmBMNGgBAG",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Skyreach",
-                            importString = "CwQAAAAAAAAAAAAAAAAAAAAAAAAAAgZbzYGGzyMzGzMjBAAAAAAYZBzEzMwMM2AmZmZY2sNzYmlhltHYZb2wsAAALzy0ysNzyAAAAYYDMzAmGDAAYA",
+                            importString = "CwQAAAAAAAAAAAAAAAAAAAAAAAAAAgZbzYGGzyMzGzMjBAAAAAAYZBzEzMwMM2MwMzMDzmtZGjlhltHYZb2wsAAALzy0ysNzyAAAAYYDMzAmGDAAYA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -3986,7 +3986,7 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Algethar Academy",
-                            importString = "C4QAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAghxyMLjZx2MmZsZstsMjZ2Mz2yyMjFGaGzAGMALzMzMMbYGmlZCAAAAAAWsNzysNzAAADAwMgxgZRGzA",
+                            importString = "C4QAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAghxyMLjZx2MmZsYstsMjZ2Mz2yyMjFmRzYGwgBwMzMDzGmhZZmAAAAAAgFbzsMbzMAAwAAMDYMYWkxMA",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -4009,7 +4009,7 @@ ZoidsToolsTalentGrimoire.data = {
                         },
                         highkey = {
                             title = "High Keys - Magisters' Terrace",
-                            importString = "C4QAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMWmZZML2mxMjFjtllZMzmZ2WWmZswMaGzAGMAmZmZY2wMMLzEAAAAAAsYbmlZbmBAAGMAMDYMYWkxMA",
+                            importString = "C4QAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAghxyMLjZx2MmZsYstsMjZ2Mz2yyMjFmRzYGwgBwMzMDzGmhZZmAAAAAAgFbzsMbzMAAwgBgZAjBWkxMA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -4037,7 +4037,7 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Nexus-Point Xenas",
-                            importString = "C4QAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMWmZZML2mxMjNjtllZMzmZ2WWmZswMaGzAGjBYZmZmhZDGmlZCAAAAAAWsNzysNzAAADAwMgxgZRGzA",
+                            importString = "C4QAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMWmZZML2mxMjNjtllZMzmZ2WWmZswMaGzAGjBwMzMDzGMMLzEAAAAAAsYbmlZbmBAAGMAMDYMYWkxMA",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -4077,7 +4077,7 @@ ZoidsToolsTalentGrimoire.data = {
                         },
                         highkey = {
                             title = "High Keys - Seat of the Triumvirate",
-                            importString = "C4QAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMWmZZML2mxMjNjtllZMzmZ2WWmZswQzYGbYMGglZmZGmNYYWmJAAAAAAYx2MLz2MDAAMAAzAGDmFZMDA",
+                            importString = "C4QAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMWmZZML2mxMjNjtllZMzmZ2WWmZswMaGzAGjBwMzMDzGmhZZmAAAAAAgFbzsMbzMAAwAAMDYMYWkxMA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -4088,7 +4088,7 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Skyreach",
-                            importString = "C4QAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMWmZZML2mxMjNjtllZMzmZ2WWmZswMaGzAGMAmZmZY2mNGmlZCAAAAAAWsNzysNzAAADAwMgxgZRGzA",
+                            importString = "C4QAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMWmZZML2mxMjFjtllZMzmZ2WWmZswMaGzAGMAmZmZY2mNGmlZCAAAAAAWsNzysNzAAADAwMgxgZRGzA",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -4183,13 +4183,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - All Dungeons",
-                            importString = "C0QAAAAAAAAAAAAAAAAAAAAAAMzYMYMYbmZ2mxAAAAAAAAAAAALDzEmhhBMjhZmZGmNMDzyMBAsYmtxwYmZAAsBAzys0MzMLAjZgZGAYZMgBM",
+                            importString = "C0QAAAAAAAAAAAAAAAAAAAAAAMzYMYMYbmZ2mxAAAAAAAAAAAALDjmxMMMGMMMzMzwshZYWmJAgFzsNGGzMDAgNAYWmlmZmZBYMDMzAwwAYAD",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - All Dungeons",
-                            importString = "C0QAAAAAAAAAAAAAAAAAAAAAAMzYMYMYbmZ2mxAAAAAAAAAAAALDzEmhhBMjhZmZGmNMDzyMBAsYmtxwYmZAAsBAzys0MzMLAjZgZGAYZMgBM",
+                            importString = "C0QAAAAAAAAAAAAAAAAAAAAAAMzYMYMYbmZ2mxAAAAAAAAAAAALDjmxMMMGMMMzMzwshZYWmJAgFzsNGGzMDAgNAYWmlmZmZBYMDMzAwwAYAD",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -4200,13 +4200,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Algethar Academy",
-                            importString = "C0QAAAAAAAAAAAAAAAAAAAAAAMzYMYMYbmZ2mxAAAAAAAAAAAALDjmxMMMghhZmZGmNMDzyMBAsYmtxwYmZAAsBAzys0MzMLAjZgZGAGbDgBM",
+                            importString = "C0QAAAAAAAAAAAAAAAAAAAAAAMzYMYMYbmZ2mxAAAAAAAAAAAALDjmxMMMghhZmZGmthZYWmJAgFzsNGGzMDAgNAYWmlmZmZBYYgZGAGLDgBM",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Algethar Academy",
-                            importString = "C0QAAAAAAAAAAAAAAAAAAAAAAMzYMYMYbmZ2mxAAAAAAAAAAAALDjmxMMMghhZmZGmNMDzyMBAsYmtxwYmZAAsBAzys0MzMLAjZgZGAGbDgBM",
+                            importString = "C0QAAAAAAAAAAAAAAAAAAAAAAMzYMYMYbmZ2mxAAAAAAAAAAAALDjmxMgBMMMzMzwsNMDzyMBAsYmtxwYmZAAsBAzys0MzMLADDMzAwYZMgBM",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -4217,13 +4217,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Magisters' Terrace",
-                            importString = "C0QAAAAAAAAAAAAAAAAAAAAAAMzYMYMYbmZ2mxAAAAAAAAAAAALDzEmhhBMjhZmZGmNMDzyMBAsYmtxwYmZAAsBAzys0MzMLAjZgZGAYZMgBM",
+                            importString = "C0QAAAAAAAAAAAAAAAAAAAAAAMzYMYMYbmZ2mxAAAAAAAAAAAALDjmxMMMghhZGzwsNbmhZZmAAWMz2YYMzMAA2AgZZWamZmFghBmZAYsNAGwA",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Magisters' Terrace",
-                            importString = "C0QAAAAAAAAAAAAAAAAAAAAAAMzYMYMYbmZ2mxAAAAAAAAAAAALDzEmhhBMjhZmZGmNMDzyMBAsYmtxwYmZAAsBAzys0MzMLAjZgZGAYZMgBM",
+                            importString = "C0QAAAAAAAAAAAAAAAAAAAAAAMzYMYMYbmZ2mxAAAAAAAAAAAALDjmxMMMghhZGzwsNbmhZZmAAWMz2YYMzMAA2AgZZWamZmFghBmZAYsNAGwA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -4268,13 +4268,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Pit of Saron",
-                            importString = "C0QAAAAAAAAAAAAAAAAAAAAAAMzYMYMYbmZ2mxAAAAAAAAAAAALDjmxMMMghhZmZGmNMDzyMBAsYmtxwYmZAAsBAzys0MzMLAjZgZGAGbDgBM",
+                            importString = "C0QAAAAAAAAAAAAAAAAAAAAAAMzYMYMYbmZ2mxAAAAAAAAAAAALDjmxMMMGMMMzMzwshZYWmJAgFzsNGGzMDAgNAYWmlmZmZBYMDMzAwwAYAD",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Pit of Saron",
-                            importString = "C0QAAAAAAAAAAAAAAAAAAAAAAMzYMYMYbmZ2mxAAAAAAAAAAAALDjmxMMMghhZmZGmNMDzyMBAsYmtxwYmZAAsBAzys0MzMLAjZgZGAGbDgBM",
+                            importString = "C0QAAAAAAAAAAAAAAAAAAAAAAMzYMYMYbmZ2mxAAAAAAAAAAAALDjmxMMMGMMMzMzwshZYWmJAgFzsNGGzMDAgNAYWmlmZmZBYMDMzAwwAYAD",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -4285,13 +4285,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Seat of the Triumvirate",
-                            importString = "C0QAAAAAAAAAAAAAAAAAAAAAAMzYMYMYbmZ2mxAAAAAAAAAAAALDzEmhhxgZMMzMzwshZYWmJAgFzsNGGzMDAgNAYWmlmZmZBYYgZGAYZMgBM",
+                            importString = "C0QAAAAAAAAAAAAAAAAAAAAAAMzYMYMYbmZ2mxAAAAAAAAAAAALDjmxMgxgZMjZmZGmNMDzyDMBAsYmtxwYmZAAsBAzys0MzMLADDMzAwYZAMgB",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Seat of the Triumvirate",
-                            importString = "C0QAAAAAAAAAAAAAAAAAAAAAAMzYMYMYbmZ2mxAAAAAAAAAAAALDzEmhhxgZMMzMzwshZYWmJAgFzsNGGzMDAgNAYWmlmZmZBYYgZGAYZMgBM",
+                            importString = "C0QAAAAAAAAAAAAAAAAAAAAAAMzYMYMYbmZ2mxAAAAAAAAAAAALDjmxMgxgZMjZmZGmNMDzyDMBAsYmtxwYmZAAsBAzys0MzMLADDMzAwYZAMgB",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -4302,13 +4302,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Skyreach",
-                            importString = "C0QAAAAAAAAAAAAAAAAAAAAAAMzYMYMYbmZ2mxAAAAAAAAAAAALDzEmhhBMjhZmZGmtZjhZZmAAWMz2YYMzMAA2AgZZWamZmFghBmZAglxAGwA",
+                            importString = "C0QAAAAAAAAAAAAAAAAAAAAAAMzYMYMYbmZ2mxAAAAAAAAAAAALDjmxMMMghhZGzwsNbmhZZmAAWMz2YYMzMAA2AgZZWamZmFghBmZAYsNAGwA",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Skyreach",
-                            importString = "C0QAAAAAAAAAAAAAAAAAAAAAAMzYMYMYbmZ2mxAAAAAAAAAAAALDjmxMgBMjZMzYGmtZzMMLPwEAwiZ2GDjZmBAwGAMLzSzMzsAMMwMDAjlBwAG",
+                            importString = "C0QAAAAAAAAAAAAAAAAAAAAAAMzYMYMYbmZ2mxAAAAAAAAAAAALDjmxMMMghhZGzwsNbmhZZmAAWMz2YYMzMAA2AgZZWamZmFghBmZAYsNAGwA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -4325,7 +4325,7 @@ ZoidsToolsTalentGrimoire.data = {
                         },
                         highkey = {
                             title = "High Keys - Windrunner Spire",
-                            importString = "C0QAAAAAAAAAAAAAAAAAAAAAAMzYMYMYbmZ2mxAAAAAAAAAAAALDjmxMMMghhZmZGmNMDzyMBAsYmtxwYmZAAsBAzys0MzMLAjZgZGAGbDgBM",
+                            importString = "C0QAAAAAAAAAAAAAAAAAAAAAAMzYMYMYbmZ2mxAAAAAAAAAAAALDjmxMMMghhZmZGmFMDzyMBAsYmtxwYmZAAsBAzys0MzMLAjZgZGAGLDgBM",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -4419,7 +4419,7 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Magisters' Terrace",
-                            importString = "CEEAAAAAAAAAAAAAAAAAAAAAAAAAAYBAMDAwglxMzMzYmZWgxwyYbmZxMNxwYmZYY2yAwAwGYjlZmZWmtZmZrBAAAYhNMYzAzYGAAwMDzYMMA",
+                            importString = "CEEAAAAAAAAAAAAAAAAAAAAAAAAAAYBAMDAwglxMzMzYmZWgxwyYbmZxMNxsYMzMMMbZAYAYDsxyMzMLz2Mzs1AAAAswGGsZgZMAAAzMMjxwA",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -4453,7 +4453,7 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Nexus-Point Xenas",
-                            importString = "CEEAAAAAAAAAAAAAAAAAAAAAAAAAAYBAMDAwglxMzMzYmZWgxwyYbmZxMNxwYmZYY2yAwAwGYjtZmZWmtZmZrBAAAYhNegBbGYGDAAwMDzYMMA",
+                            importString = "CEEAAAAAAAAAAAAAAAAAAAAAAAAAAYBAMDAwglxMzMzYmZWgxwyYbmZxMNxsYMzMjhZLDADAbgN2mZmZZ2mZmtGAAAgF2wgNYMjBAAYmhZMGGA",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -4504,7 +4504,7 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Skyreach",
-                            importString = "CEEAAAAAAAAAAAAAAAAAAAAAAAAAAYBAMDAAsMmZmZGzMzCMGWGbzMLmpJmlZMzMMMbZAYAYDsx2MzMLz2Mzs1AAAAswGPAsZgZYAAAzMMjxwA",
+                            importString = "CEEAAAAAAAAAAAAAAAAAAAAAAAAAAYBAMDAwglxMzMzYmZWgxwyYbmZxMNxwYmZYY2yAwAwGYjlZmZWmtZmZrBAAAYhNMYzAzYGAAwMDzYMMA",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -4585,13 +4585,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - All Dungeons",
-                            importString = "CIEAAAAAAAAAAAAAAAAAAAAAAsNjBzyYbMjZmZZZMzwsMLDDAwAAAAAAgmmZWmZMDGmt2AwADYGsBAAAAzMLbLtMzYxMYAMGzwYAwMDAmZAD",
+                            importString = "CIEAAAAAAAAAAAAAAAAAAAAAAsNjBzyYbMjZmZZZMzwsMLzYAAGAAAAAA00MzyMjZGGegt2AwADYGsBAAAAzMLbLtMzYxMYAMYGGDAmZAwMDYA",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - All Dungeons",
-                            importString = "CIEAAAAAAAAAAAAAAAAAAAAAAsNjBzyYbMjZmZZZMzwsMLDDAwAAAAAAgmmZWmZMDGmt2AwADYGsBAAAAzMLbLtMzYxMYAMGzwYAwMDAmZAD",
+                            importString = "CIEAAAAAAAAAAAAAAAAAAAAAAsNjBzyYbMjZmZZZMzwsMLzYAAGAAAAAA00MzyMjZGGegt2AwADYGsBAAAAzMLbLtMzYxMYAMYGGDAmZAwMDYA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -4602,13 +4602,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Algethar Academy",
-                            importString = "CIEAAAAAAAAAAAAAAAAAAAAAAsNjBzyYbMjZmZZZMzwsMLzYAAGAAAAAA00MzyMjZwws1GAGYAzgNAAAAYmZZbplZGLmBDgBzwYAwMDAmZAD",
+                            importString = "CIEAAAAAAAAAAAAAAAAAAAAAAsNjBzyYbMjZmZZZMzwsMLzYAAGAAAAAA00MzyMjZGGegt2AwADYGsBAAAAzMLbLtMzYxMYAMYGGDAmZAwMDYA",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Algethar Academy",
-                            importString = "CIEAAAAAAAAAAAAAAAAAAAAAAsNjBzyYbMjZmZZZMzwsMLzYAAGAAAAAA00MzyMjZwws1GAGYAzgNAAAAYmZZbplZGLmBDgBzwYAwMDAmZAD",
+                            importString = "CIEAAAAAAAAAAAAAAAAAAAAAAsNjBzyYbMjZmZZZMzwsMLzYAAGAAAAAA00MzyMjZGGmt2AwADYGsBAAAAzMLbLtMzYxMYAAzwYAwMDAmZAD",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -4721,13 +4721,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Windrunner Spire",
-                            importString = "CIEAAAAAAAAAAAAAAAAAAAAAAsNjBzyYbMjZmZZZMzwsMLzYAAGAAAAAA00MzyMjZwws1GAGYAzgNAAAAYmZZbplZGLmBDgBzwYAwMDAmZAD",
+                            importString = "CIEAAAAAAAAAAAAAAAAAAAAAAsNjBzyYbMjZmZZZMzwsMLzYAAGAAAAAA00MzyMjZGGegt2AwADYGsBAAAAzMLbLtMzYxMYAMYGGDAmZAwMDYA",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Windrunner Spire",
-                            importString = "CIEAAAAAAAAAAAAAAAAAAAAAAsNjBzyYbMjZmZZZMzwsMLzYAAGAAAAAA00MzyMjZGGmt2AwADYgNAAAAYmZZbplZGLmBDgBzwYAwMDAmZAD",
+                            importString = "CIEAAAAAAAAAAAAAAAAAAAAAAsNjBzyYbMjZmZZZMzwsMLzYAAGAAAAAA00MzyMjZGGegt2AwADYGsBAAAAzMLbLtMzYxMYAMYGGDAmZAwMDYA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -4764,13 +4764,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - All Dungeons",
-                            importString = "CYEAAAAAAAAAAAAAAAAAAAAAAAAAAAAQz22MzsMGzMAAAAAAmpMLzwMjthZbYmtZMGjhZsxGAAAzMtNzsNDAYDwAgxMMwMzMzGWmBDjZMYA",
+                            importString = "CYEAAAAAAAAAAAAAAAAAAAAAAAAAAAAMa22mZmlxYmBAAAAAwMlZZGmZsNMbDzsNjxYMMjN2AAAYmptZmtZAAbAGAMmhBmZmZ2wyMYYMMYA",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - All Dungeons",
-                            importString = "CYEAAAAAAAAAAAAAAAAAAAAAAAAAAAAMa22mZmlxwMAAAAAAmpMLzwMjthZbYmtZMGjhZsxGAAAzMtNzsNDAYDwAgxMMwMzMzGWmBDjZMYA",
+                            importString = "CYEAAAAAAAAAAAAAAAAAAAAAAAAAAAAMa22mZmlxYmBAAAAAwMlZZGmZsNMbDzsNjxYMMjN2AAAYmptZmtZAAbAGAMmhBmZmZ2wyMYYMMYA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -4798,13 +4798,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Magisters' Terrace",
-                            importString = "CYEAAAAAAAAAAAAAAAAAAAAAAAAAAAAQz22MzsMGzMAAAAAAmpMLzwMjthZbYmtZMGjhZsxGAAAzMtNzsNDAYDwAAmhBmZmZ2wyMYMjZMYA",
+                            importString = "CYEAAAAAAAAAAAAAAAAAAAAAAAAAAAAMa22mZmlxYmBAAAAAwMlZZGmZsNMbDzsNjxYMMjN2AAAYmptZmtZAAbAGAwMMwMzMzGWmBDjZMYA",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Magisters' Terrace",
-                            importString = "CYEAAAAAAAAAAAAAAAAAAAAAAAAAAAAQz22MzsMGzMAAAAAAmpMLzwMjthZbYmtZMzYMMjN2AAAYmptZmtZAAbAGAwMMwMzMzGWmBDjZMYA",
+                            importString = "CYEAAAAAAAAAAAAAAAAAAAAAAAAAAAAMa22mZmlxYmBAAAAAwMlZZGmZsNMbDzsNjxYMMjN2AAAYmptZmtZAAbAGAwMMwMzMzGWmBDjZMYA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -4815,13 +4815,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Maisara Caverns",
-                            importString = "CYEAAAAAAAAAAAAAAAAAAAAAAAAAAAAMa22mZmlxYmBAAAAAwMlZZGmZsNMbDzsNjxYMMjN2AAAYmptZmtZAAbAGAwMMwMzMzGWmBDjZMYA",
+                            importString = "CYEAAAAAAAAAAAAAAAAAAAAAAAAAAAAMa22mZmlxYmBAAAAAwMlZZGmZsNMbDzsNjxYMMjN2AAAYmptZmtZAAbAGAMmhBmZmZ2wyMYYMMYA",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Maisara Caverns",
-                            importString = "CYEAAAAAAAAAAAAAAAAAAAAAAAAAAAAMa22mZmlxYmBAAAAAwMlZZGmZsNMbDzsNjxYMMjN2AAAYmptZmtZAAbAGAwMMwMzMzGWmBDjZMYA",
+                            importString = "CYEAAAAAAAAAAAAAAAAAAAAAAAAAAAAMa22mZmlxYmBAAAAAwMlZZGmZsNMbDzsNjxYMMjN2AAAYmptZmtZAAbAGAMmhBmZmZ2wyMYYMMYA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -4832,13 +4832,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Nexus-Point Xenas",
-                            importString = "CYEAAAAAAAAAAAAAAAAAAAAAAAAAAAAQz22MzsMGzMAAAAAAmpMLzwMjthZbYmtZMGjhZsxGAAAzMtNzsNDAYDwAgxMMwMzMzGWmBDjZMYA",
+                            importString = "CYEAAAAAAAAAAAAAAAAAAAAAAAAAAAAQz22MzsMGmBAAAAAwMlZZGmZsNMbDzsNjxYMMjN2AAAYmptZmtZAAbAGYBGzwAzMzMbYZGMMmxgB",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Nexus-Point Xenas",
-                            importString = "CYEAAAAAAAAAAAAAAAAAAAAAAAAAAAAQz22MzsMGzMAAAAAAmpMLzwMjthZbYmtZMGjhZsxGAAAzMtNzsNDAYDwAgxMMwMzMzGWmBDjZMYA",
+                            importString = "CYEAAAAAAAAAAAAAAAAAAAAAAAAAAAAQz22MzsMGmBAAAAAwMlZZGmZsNMbDzsNjxYMMjN2AAAYmptZmtZAAbAGYBGzwAzMzMbYZGMMmxgB",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -4866,7 +4866,7 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Seat of the Triumvirate",
-                            importString = "CYEAAAAAAAAAAAAAAAAAAAAAAAAAAAAMa22mZmlxwMAAAAAAmpMLzwMzsNMbDzsNjxYMMjN2AAAYmptZmtZAAbAGAMmhBmZmZ2wyMYYMMYA",
+                            importString = "CYEAAAAAAAAAAAAAAAAAAAAAAAAAAAAQz22MzsMGzMAAAAAAmpMLzwMzsNMbDzsNjxYMMjN2AAAYmptZmtZAAbAGAwMMwMzMzGWmBDjZMYA",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -4972,7 +4972,7 @@ ZoidsToolsTalentGrimoire.data = {
                         },
                         highkey = {
                             title = "High Keys - All Dungeons",
-                            importString = "CAQAAAAAAAAAAAAAAAAAAAAAAADsMzwyMjZmBMbzYmZMjZGAAAAAAAAAADzyMYmZGmhZwmpZiBYmFMEGzyAMGsAAAzMzMjBzAMzYAD",
+                            importString = "CAQAAAAAAAAAAAAAAAAAAAAAAADsMzwyMjZmBMbzYmZMjZGAAAAAAAAAAjZWmZMzMzMGMD2MNTMAzsghwYWGgxgFAAYMzYMYGgZmBYA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -4983,7 +4983,7 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Algethar Academy",
-                            importString = "CAQAAAAAAAAAAAAAAAAAAAAAAADsYwyMjZmZGMbzYmZmZMzAAAAAAAAAAYMzyMYmZmxMMD2MNTMAzsghwYWGgxgFAAYMzYMYGgZmBYA",
+                            importString = "CAQAAAAAAAAAAAAAAAAAAAAAAADsYwyMjZmZGMbzYmZmZMzAAAAAAAAAAYMzyMYmZGmxMjBTzEDwMLYIMmlBYMYBAAGzMGDGAzMzAG",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -5000,13 +5000,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Magisters' Terrace",
-                            importString = "CAQAAAAAAAAAAAAAAAAAAAAAAADsYwyMjZmZGMbzYmZmZMzAAAAAAAAAAYMzyMYmZGmxMjBTzEDwMLYIMmlBYMYBAAGzMGDmBYmZAG",
+                            importString = "CAQAAAAAAAAAAAAAAAAAAAAAAADsYwyMjZmZGMbzYmZmZMzAAAAAAAAAAYYWmBzMzwMmZATzEDwMLYIMmlBYMYBAAGzMzYwMAzMzAG",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Magisters' Terrace",
-                            importString = "CAQAAAAAAAAAAAAAAAAAAAAAAADsMzwyMjZmBMbzYmZMjZGAAAAAAAAAADzyMYmZmhhZwGNTMAzsghwYWGgxgFAAYMzMjhZGgZmZAD",
+                            importString = "CAQAAAAAAAAAAAAAAAAAAAAAAADsMzwyMjZmBMbzYmZMjZGAAAAAAAAAAjZWmhZmZmxMmZwmpZiBYmFMEGzyAMGsAAADzDYMYAMzMDYA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -5017,13 +5017,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Maisara Caverns",
-                            importString = "CAQAAAAAAAAAAAAAAAAAAAAAAADsYwyMjZmZGMbzYmZmZMzAAAAAAAAAAYYWmBzMzwMmZMYamYAmZBDhxsMAjBLAAwYmZGDmBYmZAG",
+                            importString = "CAQAAAAAAAAAAAAAAAAAAAAAAADsYwyMjZmZGMbzYmZmZMzAAAAAAAAAAYGWmBzMzMMmZwmpZiBYmFMEGzyAMGsAAAjZmZMYGgZmBYA",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Maisara Caverns",
-                            importString = "CAQAAAAAAAAAAAAAAAAAAAAAAADsMzwyMjZmBMbzYmZMjZGAAAAAAAAAADzyMMzMzwMMjBTzEDwMLYIMmlBYMYBAAGzMGDzMAzMDwA",
+                            importString = "CAQAAAAAAAAAAAAAAAAAAAAAAADsMzwyMjZmBMbzYmZMjZGAAAAAAAAAADzyMMzMzMmhZM2MNTMAzsghwYWGgxgFAAYMzYMYGgZGAD",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -5034,13 +5034,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Nexus-Point Xenas",
-                            importString = "CAQAAAAAAAAAAAAAAAAAAAAAAADsYwyMjZmZGMbzYmZmZMzAAAAAAAAAAYMzyMYmZGmxMDYamYAmZBDhxsMAjBLAAwYmxYwMAzMzAG",
+                            importString = "CAQAAAAAAAAAAAAAAAAAAAAAAADsYwyMjZmZGMbzYmZmZMzAAAAAAAAAAYMzyMYmZGmxMDYamYAmZBDhxsMAjBLAAwYmHYGDmBYmZGwA",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Nexus-Point Xenas",
-                            importString = "CAQAAAAAAAAAAAAAAAAAAAAAAADsMzwyMjZmBMbzYmZMjZGAAAAAAAAAAjZWmBzMzwMmZATzEDwMLYIMmlBYMYBAAGzMGDmBYmZGwA",
+                            importString = "CAQAAAAAAAAAAAAAAAAAAAAAAADsMzwyMjZmBMbzYmZMjZGAAAAAAAAAAjZWmBzMzwMMDYamYAmZBDhxsMAjBLAAwYmxYYmBYmZGwA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -5051,13 +5051,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Pit of Saron",
-                            importString = "CAQAAAAAAAAAAAAAAAAAAAAAAADsYwyMjZmZGMbzYmZmZMzAAAAAAAAAAYMWmBzMzYzYmxgpZiBYmFMEGzyAMGsAAAjZmZMYGgZmBYA",
+                            importString = "CAQAAAAAAAAAAAAAAAAAAAAAAADsYwyMjZmZGMbzYmZmZMzAAAAAAAAAAYMWmBzMzgxMjxmpZiBYmFMEGzyAMGsAAAjZmZMYGgZmBYA",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Pit of Saron",
-                            importString = "CAQAAAAAAAAAAAAAAAAAAAAAAADsMzwyMjZmBMbzYmZMjZGAAAAAAAAAAjZWmBzMzwMMjBTzEDwMLYIMmlBYMYBAAGzMGDmBYmZGwA",
+                            importString = "CAQAAAAAAAAAAAAAAAAAAAAAAADsMzwyMjZmBMbzYmZMjZGAAAAAAAAAAjZWmBzMzMmhZM2MNTMAzsghwYWGgxgFAAYMzYMYGgZGAD",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -5074,7 +5074,7 @@ ZoidsToolsTalentGrimoire.data = {
                         },
                         highkey = {
                             title = "High Keys - Seat of the Triumvirate",
-                            importString = "CAQAAAAAAAAAAAAAAAAAAAAAAADsMzwyMjZmBMbzYmZMjZGAAAAAAAAAAjZWmBzMzMmhZwmpZiBYmFMEGzyAMGsAAAjZGjBDgZmZAD",
+                            importString = "CAQAAAAAAAAAAAAAAAAAAAAAAADsNzDwyMjxMzgZbmtZmxMmZAAAAAAAAAAMGLzgZmZGzwMYz0MxAMzCGCjZZAGDWAAgxMzMGMDwMzAM",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -5173,13 +5173,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - All Dungeons",
-                            importString = "CEQAAAAAAAAAAAAAAAAAAAAAAwYAAAAAAgZzwYWGMmZmZMzMjlZmZAAAAYMWmBzMzYzYmxAmpAAzsZGmNDAMGsZMWA0MmZMGmZ2WGgBMA",
+                            importString = "CEQAAAAAAAAAAAAAAAAAAAAAAwYAAAAAAgZzwYWGMmZmZMzMjlZmZAAAAYMzyMYmZGmxMjxGmpAAzsZGmNDAMGsZMWA0MMjxgZ2WGgBMA",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - All Dungeons",
-                            importString = "CEQAAAAAAAAAAAAAAAAAAAAAAwYAAAAAAAbGzYWGzwMjhZYsMzMzAAAAYYWmhZmZGmhZAMTBwMLYIMmlBYMwiZmBAzYmxYYmBYmZGYA",
+                            importString = "CEQAAAAAAAAAAAAAAAAAAAAAAwYAAAAAAAbGzYWGzwMjhZYsMzMzAAAAYYWmhZmZGmxMDgZKAmZBDhxsMAjBWMzMAYGzMGDmBYmZGYA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -5190,13 +5190,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Algethar Academy",
-                            importString = "CEQAAAAAAAAAAAAAAAAAAAAAAwYAAAAAAgZzwYWGMmZmZMzMjlZmZAAAAYMWmBzMzgxMjxGmpAAzsZGmNDAMGsZMWA0MmZMGmZ2WGgBMA",
+                            importString = "CEQAAAAAAAAAAAAAAAAAAAAAAwYAAAAAAgZzwYWGMmZmZMzMjlZmZAAAAYMWmZMzMzYzYmxAmpAAzsZGmNDAMGsZMWA0MmhxwMz2yAMgB",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Algethar Academy",
-                            importString = "CEQAAAAAAAAAAAAAAAAAAAAAAwYAAAAAAAbGzY2GzwMjhZYsMzMzAAAAYYWmhZmZGmxMDgZKAmZBDhxsMAjBWMzMAYGzMGDmBYmZGYA",
+                            importString = "CEQAAAAAAAAAAAAAAAAAAAAAAwYAAAAAAAbGzYWGzwMjhZYsMzMzAAAAYYWmZMzMzYbGzMAmpAYmFMEGzyAMGYxMzAgZMeAjBzAMzMDMA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -5207,13 +5207,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Magisters' Terrace",
-                            importString = "CEQAAAAAAAAAAAAAAAAAAAAAAwYAAAAAAgZzwYWGMmZmZMzMjlZmZAAAAYMzyMYmZGbGzMGwMFAYmNzwsZAgxgNjxCgmxMjxgZ2WGgBMA",
+                            importString = "CEQAAAAAAAAAAAAAAAAAAAAAAwYAAAAAAgZzwYWGMmZmZMzMjlZmZAAAAYMzyMYmZGmxMjxGmpAAzsZGmNDAMGsZMWA0MMjxgZ2WGgBMA",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Magisters' Terrace",
-                            importString = "CEQAAAAAAAAAAAAAAAAAAAAAAwYAAAAAAAMmxsMMjZGDzwYZmZmBAAAwglZGzMzMMjZGAzUAMzCGCjZZAGDsYmZWAYGzMGDmBYmZGYA",
+                            importString = "CEQAAAAAAAAAAAAAAAAAAAAAAwYAAAAAAAMmxsMMjZGDzwYZmZmBAAAwYsMDzMzMMjZGDYmCgZWwQYMLDwYgFzMzCAzYmxYwMAzMDYA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -5230,7 +5230,7 @@ ZoidsToolsTalentGrimoire.data = {
                         },
                         highkey = {
                             title = "High Keys - Maisara Caverns",
-                            importString = "CEQAAAAAAAAAAAAAAAAAAAAAAwYAAAAAAAMmxsMMjZGDzwYZmZmBAAAwYsMDzMzMMjZGDYmCgZWwQYMLDwYgFzMzCAzYmxYwMAzMDYA",
+                            importString = "CEQAAAAAAAAAAAAAAAAAAAAAAwYAAAAAAAbGzYWGzwMjhZYsMzMzAAAAYYWmhZmZGmhZMgZKAmZBDhxsMAjBWMzMAYGzMGDmBYmZGYA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -5241,13 +5241,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Nexus-Point Xenas",
-                            importString = "CEQAAAAAAAAAAAAAAAAAAAAAAwYAAAAAAgZzwYWGMmZmZMzMjlZmZAAAAYMzyMMzMzwMmZMgZKAwMbmhZzAAjBbGjFANjZeAjBzstMADYA",
+                            importString = "CEQAAAAAAAAAAAAAAAAAAAAAAwYAAAAAAgZzwYWGMmZmZMzMjlZmZAAAAYMWmBzMzgxMjxGmpAAzsZGmNDAMGsZMWA0MmZMGmZ2WGgBMA",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Nexus-Point Xenas",
-                            importString = "CEQAAAAAAAAAAAAAAAAAAAAAAwYAAAAAAAMmxsMMjZGDzwYZmZmBAAAwYsMDzMzMMjZGDYmCgZWwQYMLDwYgFzMzCAzYmxYwMAzMDYA",
+                            importString = "CEQAAAAAAAAAAAAAAAAAAAAAAwYAAAAAAgZzYGzygxMzMDzMjtZmZGAAAAjZWmhZmZGmxMDgZKAwMLmhZzAAjBbmZsBoZMzDYMYmtlBYG4BA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -5298,7 +5298,7 @@ ZoidsToolsTalentGrimoire.data = {
                         },
                         highkey = {
                             title = "High Keys - Skyreach",
-                            importString = "CEQAAAAAAAAAAAAAAAAAAAAAAwYAAAAAAAbGzY2GzwMjhZYsMzMzAAAAYYWmhZmZGmxMDgZKAmZBDhxsMAjBWMzMAYGzMGDmBYmZGYA",
+                            importString = "CEQAAAAAAAAAAAAAAAAAAAAAAwYAAAAAAAbGzYWGzwMjhZYsMzMzAAAAYYWmhZmZGmxMDgZKAmZBDhxsMAjBWMzMAYGzMGDmBYmZGYA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -5396,7 +5396,7 @@ ZoidsToolsTalentGrimoire.data = {
                         },
                         highkey = {
                             title = "High Keys - Algethar Academy",
-                            importString = "CIQAAAAAAAAAAAAAAAAAAAAAAMjZMGAAAAAAAAAAAAjZZmxYZmxMz2MDzw2MzYmZmZDZYZz0AMzMDAEgZb22AzGDAMYMzMjZbMDmZwMYA",
+                            importString = "CIQAAAAAAAAAAAAAAAAAAAAAAMjZMGAAAAAAAAAAAAjZZmxYZmxMz2MDDz2MzYmZGbID2MNGYmZGAIAz2stBmNGAYwMzMzY2GzgZGMDGA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -5407,13 +5407,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Magisters' Terrace",
-                            importString = "CIQAAAAAAAAAAAAAAAAAAAAAAMjZMGAAAAAAAAAAAAjZZmxYZmxMz2MDDz2MzYmZGQGsNTzMwMzMAQAmtZbDMbMAwgxMzMmtxMYmBzgB",
+                            importString = "CIQAAAAAAAAAAAAAAAAAAAAAAMjZMGAAAAAAAAAAAAjZZmxYZmxMz2MDzw2MzYmZGQmhtZaAmZmBACwsNbbgZjBAGMzMzMmtxMYmBzgB",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Magisters' Terrace",
-                            importString = "CIQAAAAAAAAAAAAAAAAAAAAAAMjZMGAAAAAAAAAAAAjZZmxYZmxMz2MDDz2MzYmZGbID2MNGYmZGAIAz2stBmNGAYwMzMzY2GzgZGMDGA",
+                            importString = "CIQAAAAAAAAAAAAAAAAAAAAAAMjZMGAAAAAAAAAAAAjZZmxYZmxMz2MDzw2MzYmZGQmhtZaAmZmBACwsNbbgZjBAGMzMzMmtxMYmBzgB",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -5464,7 +5464,7 @@ ZoidsToolsTalentGrimoire.data = {
                         },
                         highkey = {
                             title = "High Keys - Pit of Saron",
-                            importString = "CIQAAAAAAAAAAAAAAAAAAAAAAMjZMGAAAAAAAAAAAAjZZmxYZmxMz2MDjx2MzYmZmByMsZaMwMzMAQAmtZbDMbMAwgxMzMmtxMYmBzgB",
+                            importString = "CIQAAAAAAAAAAAAAAAAAAAAAAMjZMGAAAAAAAAAAAAjZZmxYZmxMz2MDjx2MzYmZGQmBz0YgZmZAgAMbz2GY2YAgBjZmZMbzMDmZwMYA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -5498,7 +5498,7 @@ ZoidsToolsTalentGrimoire.data = {
                         },
                         highkey = {
                             title = "High Keys - Skyreach",
-                            importString = "CIQAAAAAAAAAAAAAAAAAAAAAAMjZMGAAAAAAAAAAAAjZZmxYZmxMz2MDzw2MzYmZGboZYhpZAzMzAABY2mtNwsxAADGzMzY2GzgZGMDGA",
+                            importString = "CIQAAAAAAAAAAAAAAAAAAAAAAMjZMGAAAAAAAAAAAAjZZmxYZmxMz2MDDz2MzYmZGbID2mpxAzMzAABY2mtNwsxAADGzMzY2GzgZGMDGA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -5509,13 +5509,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Windrunner Spire",
-                            importString = "CIQAAAAAAAAAAAAAAAAAAAAAAMjZMGAAAAAAAAAAAAjZZmxYZmxMz2MDDz2MzYmZGQGsNTzMwMzMAQAmtZbDMbMAwgxMzMmtxMYmBzgB",
+                            importString = "CIQAAAAAAAAAAAAAAAAAAAAAAMjZMGAAAAAAAAAAAAjZZmxYZmxMz2MDzw2MzYmZmZDZYhpBYmZGAIAz2stBmNGAYwYmZGz2MzgZGMDGA",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Windrunner Spire",
-                            importString = "CIQAAAAAAAAAAAAAAAAAAAAAAMjZMGAAAAAAAAAAAAjZZmxYZmxMz2MDDz2MzYmZGQGsNTzMwMzMAQAmtZbDMbMAwgxMzMmtxMYmBzgB",
+                            importString = "CIQAAAAAAAAAAAAAAAAAAAAAAMjZMGAAAAAAAAAAAAjZZmxYZmxMz2MDDz2MzYmZmZDZwmpxAzMzAABY2mtNwsxAADGzMzY2GzgZGMDGA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -5575,13 +5575,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - All Dungeons",
-                            importString = "CMQAAAAAAAAAAAAAAAAAAAAAAYmlZmNDGAAAAAYWGsNDAAAAAotlZmZmZmxYmZmZbmlZGPgHYmZmZMMzYMAGYBmxoxsBYbAbGAMzMYA",
+                            importString = "CMQAAAAAAAAAAAAAAAAAAAAAAYmlZmNDGAAAAAYWGsNDAAAAAotlZmZmZmxYmZmZbmlZGPgHYmZmZMMzYmBwALwMGNmNAbDYDAMzMYA",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - All Dungeons",
-                            importString = "CMQAAAAAAAAAAAAAAAAAAAAAAYmlZmNDGAAAAAYWGsNDAAAAAotlZmZmZmxYmZmZbmlZGPgHYmZmZMMzYMAGYBmxoxsBYbAbGAMzMYA",
+                            importString = "CMQAAAAAAAAAAAAAAAAAAAAAAYmlZmNDGAAAAAYWGsNDAAAAAotlZmZmZmxYmZmZbmlZGPgHYmZmZMMzYmBwALwMGNmNAbDYDAMzMYA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -5666,7 +5666,7 @@ ZoidsToolsTalentGrimoire.data = {
                         },
                         highkey = {
                             title = "High Keys - Pit of Saron",
-                            importString = "CMQAAAAAAAAAAAAAAAAAAAAAAYmlZmNDGAAAAAYWGsNDAAAAAotlZmZmZmxYmZmZbmlZGPgHYmZmZMMzYMAGYBmxoxsBYbAbGAMzMYA",
+                            importString = "CMQAAAAAAAAAAAAAAAAAAAAAAYmlZmNDGAAAAAYWGsNDAAAAAILzMzMzMjxMzMz2MLzM4BmZmZGDzMGzA2MLDMgFwywEYYxYxMDwgB",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -5677,13 +5677,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Seat of the Triumvirate",
-                            importString = "CMQAAAAAAAAAAAAAAAAAAAAAAYmlZmNDGAAAAAYWGsNDAAAAAotlZmZmZmxYmZmZbmlZGPgHYmZmZMMzYMAGYBmxoxsBYbAbGAMzMYA",
+                            importString = "CMQAAAAAAAAAAAAAAAAAAAAAAYmlZmNDGAAAAAYWGsNDAAAAAotlxMzMzMGzMzMbzsMz4B8AzMzMjhZGjZAGYBmxoxsBYbAbGAMzMYA",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Seat of the Triumvirate",
-                            importString = "CMQAAAAAAAAAAAAAAAAAAAAAAYmlZmNDGAAAAAYWGsNDAAAAAotlZmZmZmxYmZmZbmlZGPgHYmZmZMMzYMAGYBmxoxsBYbAbGAMzMYA",
+                            importString = "CMQAAAAAAAAAAAAAAAAAAAAAAYmlZmNDGAAAAAYWGsNDAAAAAotlxMzMzMGzMzMbzsMz4B8AzMzMjhZGjZAGYBmxoxsBYbAbGAMzMYA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -5781,7 +5781,7 @@ ZoidsToolsTalentGrimoire.data = {
                         },
                         highkey = {
                             title = "High Keys - All Dungeons",
-                            importString = "CQQAAAAAAAAAAAAAAAAAAAAAAAgZ2mBzMzMzsNzMjZmZmFwMbTLD2mBAAAAAYZZmZGmZmZGzMzyAAAAwYAwYWMMwAzCL0CbMAzMYgB",
+                            importString = "CQQAAAAAAAAAAAAAAAAAAAAAAAgx2MYmZmZmtZmZMzMzsAmZbaZw2MAAAAAALLzMzwMzMzYmZ2GAAAAGDAGzihBGYWYhWYjBYmBzgB",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -5798,7 +5798,7 @@ ZoidsToolsTalentGrimoire.data = {
                         },
                         highkey = {
                             title = "High Keys - Algethar Academy",
-                            importString = "CQQAAAAAAAAAAAAAAAAAAAAAAAgx2MYmZmZmtZmZMzMzsBmZbaZw2MAAAAAAbLzMzwMzMzYmZ2GAAAAGDAGzihBGYWYhWYjBYmBzgB",
+                            importString = "CQQAAAAAAAAAAAAAAAAAAAAAAAgx2MYmZmZmtZmZMzMzsAmZbaZw2MAAAAAALLzMzwMzMzYmZ2GAAAAGDAGzihBGYWYhWYjBYmBzgB",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -5860,7 +5860,7 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Pit of Saron",
-                            importString = "CQQAAAAAAAAAAAAAAAAAAAAAAAgx2MYmZmZmtZmZMzMzsBmZbaZw2MAAAAAgZbZmZGmZmZGzMz2AAAAwYAwYWMMwAzCL0CbMAzMYgB",
+                            importString = "CQQAAAAAAAAAAAAAAAAAAAAAAAgx2MYmZmZmtZmZMzMzsBmZbaZw2MAAAAAAbLzMzwMzMzYmZ2GAAAAGDAGzihBGYWYhWYjBYmBzgB",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -5877,13 +5877,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Seat of the Triumvirate",
-                            importString = "CQQAAAAAAAAAAAAAAAAAAAAAAAgx2MYmZmZmtZmZMzMzsBmZbaZw2MAAAAAALLzMzwMzMzYmZ2GAAAAzYAwYWMMwAzCL0CbMAzMYgB",
+                            importString = "CQQAAAAAAAAAAAAAAAAAAAAAAAgx2MYmZmZmtZmZMzMzsBmZbaZw2MAAAAAAbLzMzwMzMzYmZ2GAAAAGDAGzihBGYWYhWYjBYmBzgB",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Seat of the Triumvirate",
-                            importString = "CQQAAAAAAAAAAAAAAAAAAAAAAAgx2MYmZmZmtZmZMzMzsAmZbaZw2MAAAAAAbLzMzwMzMzYmZ2GAAAAGDAGzihBGYWYhWYjBYmBzgB",
+                            importString = "CQQAAAAAAAAAAAAAAAAAAAAAAAgZ2mBzMzMzsNzMjZmZmFwMbTLD2mBAAAAAYZZmZGmZmZGzMz2AAAAwYAwYWMMwAzCL0CbMAzMYgB",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -5900,7 +5900,7 @@ ZoidsToolsTalentGrimoire.data = {
                         },
                         highkey = {
                             title = "High Keys - Skyreach",
-                            importString = "CQQAAAAAAAAAAAAAAAAAAAAAAAgx2MYmZmZmtZmZMzMzsBmZbaZw2MAAAAAgZZZmZGmZmZGzMz2AAAAwYAwYWMMwAzCL0CbMAzMYgB",
+                            importString = "CQQAAAAAAAAAAAAAAAAAAAAAAAgx2MYmZmZmtZmZMzMzsAmZbaZw2MAAAAAALLzMzwMzMzYmZ2GAAAAGDAGzihBGYWYhWYjBYmBzgB",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -6060,13 +6060,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Pit of Saron",
-                            importString = "CUQAAAAAAAAAAAAAAAAAAAAAAAgx2MAAAAAwsMGLTMbbjxMjZMegZmZGjZbYmZbZmZMzMjBjZWGAAAAGMGwY2MMwAzCL0iNMDYmBzYA",
+                            importString = "CUQAAAAAAAAAAAAAAAAAAAAAAAgx2MAAAAAwsMGLTMbbjxMjZMegZmZGjZbYGbLzMzMzMjBjZWGAAAAGMGwY2MMwAzCL0iNMDYmBzYA",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Pit of Saron",
-                            importString = "CUQAAAAAAAAAAAAAAAAAAAAAAAgx2MAAAAAwsMGLTMbbjxMjZMegZmZGjZbYmZbZmZMzMjBjZWGAAAAGMGwY2MMwAzCL0iNMDYmBzYA",
+                            importString = "CUQAAAAAAAAAAAAAAAAAAAAAAAgx2MAAAAAwsMGLTMbbjxMjZMegZmZGjZbYGbLzMzMzMjBjZWGAAAAGMGwY2MMwAzCL0iNMDYmBzYA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -6077,13 +6077,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Seat of the Triumvirate",
-                            importString = "CUQAAAAAAAAAAAAAAAAAAAAAAAgx2MAAAAAwsMGLTMbbjxMjZMegZmZGjZbYGbLzMjZmZMYMzyAAAAYGMGwY2MMwAzCL0iNMDYmBzYA",
+                            importString = "CUQAAAAAAAAAAAAAAAAAAAAAAAgx2MAAAAAwsMGLTMbbjxMjZMegZmZGjZbYGbLzMzMzMjBjZWGAAAAGMGwY2MMwAzCL0iNMDYmBzYA",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Seat of the Triumvirate",
-                            importString = "CUQAAAAAAAAAAAAAAAAAAAAAAAgx2MAAAAAwsMGLTMbbjxMjZMegZmZGjZbYGbLzMjZmZMYMzyAAAAYGMGwY2MMwAzCL0iNMDYmBzYA",
+                            importString = "CUQAAAAAAAAAAAAAAAAAAAAAAAgx2MAAAAAwsMGLTMbbjxMjZMegZmZGjZbYGbLzMzMzMjBjZWGAAAAGMGwY2MMwAzCL0iNMDYmBzYA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -6100,7 +6100,7 @@ ZoidsToolsTalentGrimoire.data = {
                         },
                         highkey = {
                             title = "High Keys - Skyreach",
-                            importString = "CUQAAAAAAAAAAAAAAAAAAAAAAAgx2MAAAAAwsMGLTMbbjxMjZMegZmZGjZbYmZbZmZMzMjBjZ2GAAAAGMGwY2MMwAzCL0iNMDYmBzYA",
+                            importString = "CUQAAAAAAAAAAAAAAAAAAAAAAAgx2MAAAAAwsMGLTMbbjxMjZMegZmZGjZbYmZbZmZMzMjBjZWGAAAAGMGwY2MMwAzCL0iNMDYmBzYA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -6111,13 +6111,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Windrunner Spire",
-                            importString = "CUQAAAAAAAAAAAAAAAAAAAAAAAgx2MAAAAAwsMGLTMbbjxMjZMegZmZGjZbYGbLzMzMzMjBjZ2GAAAAGMGwY2MMwAzCL0iNMDYmBzYA",
+                            importString = "CUQAAAAAAAAAAAAAAAAAAAAAAAgx2MAAAAAwsMGLTMbbjxMjZMegZmZGjZbYmZbZMzMzMjBjZ2GAAAAGMGwY2MMwAzCL0iNMDYmBzYA",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Windrunner Spire",
-                            importString = "CUQAAAAAAAAAAAAAAAAAAAAAAAgx2MAAAAAwsMGLTMbbjxMjZMegZmZGjZbYGbLzMzMzMjBjZ2GAAAAGMGwY2MMwAzCL0iNMDYmBzYA",
+                            importString = "CUQAAAAAAAAAAAAAAAAAAAAAAAgx2MAAAAAwsMGLTMbbjxMjZMegZmZGjZbYmZbZMzMzMjBjZ2GAAAAGMGwY2MMwAzCL0iNMDYmBzYA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -6217,7 +6217,7 @@ ZoidsToolsTalentGrimoire.data = {
                         },
                         highkey = {
                             title = "High Keys - Magisters' Terrace",
-                            importString = "CYQAAAAAAAAAAAAAAAAAAAAAAAAAAAzMbbzMzYML2mhZMzAAAAAAbmxwGsAzwQjNAY2mZmxMLLmwM2GLz8AzMGWmlZsYmZMzCAwMAzMwwwA",
+                            importString = "CYQAAAAAAAAAAAAAAAAAAAAAAAAAAAzMbbzMzYML2mhZMzAAAAAAbmxwGsAzwQjNAY2mZmxMLLmYmx2YZGzMGWmlZsYmZMzCAwMAzMwwwA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -6228,7 +6228,7 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Maisara Caverns",
-                            importString = "CYQAAAAAAAAAAAAAAAAAAAAAAAAAAAzMbLzMzYML2mhZMzAAAAAAbmxwGsAzwQjNAYWmZmxYbxEmx2YZmZm5BGWsMjFzMjZWAAGGYmBGGG",
+                            importString = "CYQAAAAAAAAAAAAAAAAAAAAAAAAAAAzMbLzMzYML2mhZMzAAAAAAbmxwGsAzwQjNAY2mZmxMLLm2YGbjlZMzYYZWmxiZmxMLAAzAMzADDD",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -6251,7 +6251,7 @@ ZoidsToolsTalentGrimoire.data = {
                         },
                         highkey = {
                             title = "High Keys - Nexus-Point Xenas",
-                            importString = "CYQAAAAAAAAAAAAAAAAAAAAAAAAAAAzMbbzMzYML2mhZMzAAAAAAbmxwGsAzwQjNAY2mZmxMLLzEzM2GLzYmxYWsMjFzMjZWAAGAzMwwwA",
+                            importString = "CYQAAAAAAAAAAAAAAAAAAAAAAAAAAAzMbbzMzYML2mhZMzAAAAAAbmxwGsAzwQjNAY2mZmxYZxEmx2YZmZm5BGWmlZsYmZMzCAwAYmBGGG",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -6279,13 +6279,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Seat of the Triumvirate",
-                            importString = "CYQAAAAAAAAAAAAAAAAAAAAAAAAAAAzMbLzMzYML2mhZMzAAAAAAbmxwGsAzwQjNAY2mZmxMLLmwM2GLzYmxMWmlZsYmZMzCAwMAzMwwwA",
+                            importString = "CYQAAAAAAAAAAAAAAAAAAAAAAAAAAAzMbLzMzYML2mhZMzAAAAAAbmxwGsAzwQjNAY2mZmxYbxEmx2YZmZmxMWsMjFzMjZWAAGGYmBGGG",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Seat of the Triumvirate",
-                            importString = "CYQAAAAAAAAAAAAAAAAAAAAAAAAAAAzMbbzMzYML2mhZMzAAAAAAbmxwGsAzwQjNAY2mZmxYZxEmZ2GLzMzMGWmlZsYmZMzCAwAYmBGGG",
+                            importString = "CYQAAAAAAAAAAAAAAAAAAAAAAAAAAAzMbLzMzYML2mhZMzAAAAAAbmxwGsAzwQjNAY2mZmxYbxEmx2YZmZmxMWsMjFzMjZWAAGGYmBGGG",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -6302,7 +6302,7 @@ ZoidsToolsTalentGrimoire.data = {
                         },
                         highkey = {
                             title = "High Keys - Skyreach",
-                            importString = "CYQAAAAAAAAAAAAAAAAAAAAAAAAAAAzMbbzMzYML2mhZMzAAAAAAbmxwGsAzwQjNAY2mZmxMbLzEzMwyMzMjhFLzYxMzYmFAgZAmZghhB",
+                            importString = "CYQAAAAAAAAAAAAAAAAAAAAAAAAAAAzMbLzMzYML2mhZMzAAAAAAbmxwGsAzwQjNAY2mZmxYbxEmZ2GLzMzMGzilZsYmZMzCAwAYmBGGG",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -6383,7 +6383,7 @@ ZoidsToolsTalentGrimoire.data = {
                         },
                         highkey = {
                             title = "High Keys - All Dungeons",
-                            importString = "CcQAAAAAAAAAAAAAAAAAAAAAAMzMzgZmZmZmhZmZAAAAAAAAAsBYzMG2gFYGGawCAz2MzMGLLzAzMbjlZmZGGLMDAwMMmZYmAzMYwYA",
+                            importString = "CcQAAAAAAAAAAAAAAAAAAAAAAMzMzgZmZmZmhZmZAAAAAAAAAsBYzMG2gFYGGawCAz2MmxYZZGLMzsNWmZmZYsMmBAYGGzMMCMzgBjB",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -6434,7 +6434,7 @@ ZoidsToolsTalentGrimoire.data = {
                         },
                         highkey = {
                             title = "High Keys - Maisara Caverns",
-                            importString = "CcQAAAAAAAAAAAAAAAAAAAAAAMzMzgZmZmZmhZmZAAAAAAAAAsBYzMG2gFYGGawCAz2MzMGLLzAzMbjlZmZGGLMDAwMMmZYmAzMYwYA",
+                            importString = "CcQAAAAAAAAAAAAAAAAAAAAAAMzMzgZmZmZmhZmZAAAAAAAAAsBYzMG2gFYGGawCAz2MmxYZZGYmZjlZmZmxYZMDAwMMmZYEYmBDGD",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -6445,13 +6445,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Nexus-Point Xenas",
-                            importString = "CcQAAAAAAAAAAAAAAAAAAAAAAMzMzgZmZmZmhZmZAAAAAAAAAsBYzMG2gFYGGawCAz2MzMGLLzAzMbjlZmZGGLMDAwMMmZYmAzMYwYA",
+                            importString = "CcQAAAAAAAAAAAAAAAAAAAAAAMzMzgZmZmZmhZmZAAAAAAAAAsBYzMG2gFYGGawCAz2MmxYZZGYmZbsMzMzwMLjZAAmhxMDjAzMYwYA",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Nexus-Point Xenas",
-                            importString = "CcQAAAAAAAAAAAAAAAAAAAAAAMzMzgZmZmZmhZmZAAAAAAAAAsBYzMG2gFYGGawCAz2MmxMLLGYmZbsMzMzMMYGAgZYMzwMBmZwgxA",
+                            importString = "CcQAAAAAAAAAAAAAAAAAAAAAAMzMzgZmZmZmhZmZAAAAAAAAAsBYzMG2gFYGGawCAz2MmxYZZGYmZbsMzMzwMLjZAAmhxMDjAzMYwYA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -6462,13 +6462,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Pit of Saron",
-                            importString = "CcQAAAAAAAAAAAAAAAAAAAAAAMzMzgZmZmZmhZmZAAAAAAAAAsBYzMG2gFYGGawCAz2MzMGLLzAzMbjlZmZGGLMDAwMMmZYmAzMYwYA",
+                            importString = "CcQAAAAAAAAAAAAAAAAAAAAAAMzMzgZmZmZmhZmZAAAAAAAAAsBYzMG2gFYGGawCAz2MmxYZZGLMzsNWmZmZYsMmBAYGGzMMCMzgBjB",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Pit of Saron",
-                            importString = "CcQAAAAAAAAAAAAAAAAAAAAAAMzMzgZmZmZmhZmZAAAAAAAAAsBYzMG2gFYGGawCAz2MzMGLLzAzMbjlZmZGGLMDAwMMmZYmAzMYwYA",
+                            importString = "CcQAAAAAAAAAAAAAAAAAAAAAAMzMzgZmZmZmhZmZAAAAAAAAAsBYzMG2gFYGGawCAz2MmxMLLzgZmZbsMzMzALjZAAmhxMDjAzMYwYA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -6485,7 +6485,7 @@ ZoidsToolsTalentGrimoire.data = {
                         },
                         highkey = {
                             title = "High Keys - Seat of the Triumvirate",
-                            importString = "CcQAAAAAAAAAAAAAAAAAAAAAAMzMzgZmZmZmhZmZAAAAAAAAAsBYzMG2gFYGGawCAz2MzMGLLzAzMbjlZmZGGLMDAwMMmZYmAzMYwYA",
+                            importString = "CcQAAAAAAAAAAAAAAAAAAAAAAMzMzgZmZmZmhZmZAAAAAAAAAsBYzMG2gFYGGawCAz2MmxMLLzgZmZbsMzDMzwYZMDAwMMmZYEYmBDGD",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -6502,7 +6502,7 @@ ZoidsToolsTalentGrimoire.data = {
                         },
                         highkey = {
                             title = "High Keys - Skyreach",
-                            importString = "CcQAAAAAAAAAAAAAAAAAAAAAAMzMzgZmZmZmhZmZAAAAAAAAAsBYzMG2gFYGGawCAz2MmxMbLzgZmxYZGzMDzyYGAgZYMzwIwMDGMGA",
+                            importString = "CcQAAAAAAAAAAAAAAAAAAAAAAMzMzgZmZmZmhZmZAAAAAAAAAsBYzMG2gFYGGawCAz2MmxYZxAzMbzsMzMzMYZMDAwMMmZYEYmBDGD",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -6513,7 +6513,7 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Windrunner Spire",
-                            importString = "CcQAAAAAAAAAAAAAAAAAAAAAAMzMzgZmZmZmhZmZAAAAAAAAAsBYzMG2gFYGGawCAz2MmxYZxYjZmtxyMzMzgFmBAYGGzMMTgZGMYMA",
+                            importString = "CcQAAAAAAAAAAAAAAAAAAAAAAMzMzgZmZmZmhZmZAAAAAAAAAsBYzMG2gFYGGawCAzyMmxYZxYjZmtxyMzMDsMmBAYGGzMmZCMzgBjB",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -6577,13 +6577,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - All Dungeons",
-                            importString = "CgQAAAAAAAAAAAAAAAAAAAAAAAAAAgBAAAAjZmZZbZMzMzYmZGDDLwGMjFN2GAzAbYmBz2MjZaWWmZYGzGLmHYmxwysMAAYAMzgZGAGDG",
+                            importString = "CgQAAAAAAAAAAAAAAAAAAAAAAAAAAgBAAAAjZmZZbZMzMzYmZGDDLwGMjFN2GAzAbYmBz2MjRz2yMDzY2YxYmxYWmlZAAYAMzgZGAGDG",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - All Dungeons",
-                            importString = "CgQAAAAAAAAAAAAAAAAAAAAAAAAAAgBAAAAjZmZZbZMzMzYmZGDDLwGMjFN2GAzAbYmBz2MjZaWWmZYGzGLmHYmxwysMAAYAMzgZGAGDG",
+                            importString = "CgQAAAAAAAAAAAAAAAAAAAAAAAAAAgBAAAAjZmZZbZMzMzYmZGDDLwGMjFN2GAzAbYmBz2MjRz2yMDzY2YxYmxYWmlZAAYAMzgZGAGDG",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -6662,13 +6662,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Pit of Saron",
-                            importString = "CgQAAAAAAAAAAAAAAAAAAAAAAAAAAgBAAAAjZmZZbZMzMzYmZGzYYB2gZsox2AYGYDzMY2mZMTzyyMDzY2YxYmxwysMAAYAMzgZGAGDG",
+                            importString = "CgQAAAAAAAAAAAAAAAAAAAAAAAAAAgBAAAAjZmZZbZMzMzYmZGzYYB2gZsox2AYGYDzMY2mZMTzyyMDzY2Yx8AzMGMLDAAGAzMYmBgxgB",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Pit of Saron",
-                            importString = "CgQAAAAAAAAAAAAAAAAAAAAAAAAAAgBAAAAjZmZZbZMzMzYmZGzYYB2gZsox2AYGYDzMY2mZmRzyyMDzY2YZGzMGMLDAAGAzMYmBgxgB",
+                            importString = "CgQAAAAAAAAAAAAAAAAAAAAAAAAAAgBAAAAjZmZZbZMzMzYmZGzYYB2gZsox2AYGYDzMY2mZMTzyyMDzY2Yx8AzMGMLDAAGAzMYmBgxgB",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -6679,13 +6679,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Seat of the Triumvirate",
-                            importString = "CgQAAAAAAAAAAAAAAAAAAAAAAAAAAgBAAAAjZmZZbZMzMzYmZGDDLwGMjFN2GAzAbYmBz2MzMaWWmZwY2YZGzMmhZZGAAGAzMYmBgxgB",
+                            importString = "CgQAAAAAAAAAAAAAAAAAAAAAAAAAAgBAAAAjZmZZbZMzMzYmZGzYYB2gZsox2AYGYDzMY2mZMaWWmZYGzGLGzMmhZZGAAGAzMYmBgxgB",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Seat of the Triumvirate",
-                            importString = "CgQAAAAAAAAAAAAAAAAAAAAAAAAAAgBAAAAjZmZZbZMzMzYmZGDDLwGMjFN2GAzAbYmBz2MzMaWWmZwY2YZGzMmhZZGAAGAzMYmBgxgB",
+                            importString = "CgQAAAAAAAAAAAAAAAAAAAAAAAAAAgBAAAAjZmZZbZMzMzYmZGDDLwGMjFN2GAzAbYmBz2MjZaWWmZYGzGLmHYmxMMLDAAGAzMYmBgxgB",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -6713,7 +6713,7 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Windrunner Spire",
-                            importString = "CgQAAAAAAAAAAAAAAAAAAAAAAAAAAgBAAAAjZmZZbZMzMzYmZGzYYB2gZsox2AYGYDzMY2mZmRzyyMzmZMYZGzMGWmFAAYAMzgZGAGDG",
+                            importString = "CgQAAAAAAAAAAAAAAAAAAAAAAAAAAgBAAAAjZmZZbZMzMzYmZGzYYB2gZsox2AYGYDzMY2mZMaWWmZYGzGLGzMGWmlZAAYAMzgZGAGDG",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -6823,13 +6823,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Maisara Caverns",
-                            importString = "CkQAAAAAAAAAAAAAAAAAAAAAAwMMzoZzMz2MzMzyAAAmZmlZzMzyYAgx2yADYAzwWghtBAAgZAAAMzMmxM2GjZMmZmZMMzMDAwAG",
+                            importString = "CkQAAAAAAAAAAAAAAAAAAAAAAwMegZGNbmZ2mZGzyAAAmZmlZzMzyYAgx2yADYAzwWghtBAAgZAAAMzMmxM2GjZMmZmZMMzMDAwAG",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Maisara Caverns",
-                            importString = "CkQAAAAAAAAAAAAAAAAAAAAAAwMMzoZzMz2MzMzyAAAmZmlZzMzyYAgx2yADYAzwWghtBAAgZAAAMzMmxM2GjZMmZmZMMzMDAwAG",
+                            importString = "CkQAAAAAAAAAAAAAAAAAAAAAAwMMzoZzMz2MzMz2AAAmZmlZzMzyYAgx2yADYAzwWghtBAAgZAAAMzMmxM2GjZMmZmZMMzMDAwAG",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -6863,7 +6863,7 @@ ZoidsToolsTalentGrimoire.data = {
                         },
                         highkey = {
                             title = "High Keys - Pit of Saron",
-                            importString = "CkQAAAAAAAAAAAAAAAAAAAAAAwMjZGNbmZ2mZGzyAAAmZmlZzMzyYAgx2yADYAzwWghtBAAgZAAAMzMmxM2GjZMmZmZMMzMDAwAG",
+                            importString = "CkQAAAAAAAAAAAAAAAAAAAAAAwMMzoZzMz2MzMzyAAAmZmlZzMzyYAgx2yADYAzwWghtBAAgZAAAMzMmxM2GjZMmZmZMMzMDAwAG",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -6874,7 +6874,7 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Seat of the Triumvirate",
-                            importString = "CkQAAAAAAAAAAAAAAAAAAAAAAwMMzoZzMz2MzMzyAAAmZmlZzMzyYAgx2yADYAzwWghtBAAgZAAAMzMmxM2GjZMmZmZMMzMDAwAG",
+                            importString = "CkQAAAAAAAAAAAAAAAAAAAAAAwMjZGNbmZ2mZGzyAAAmZmlZzMzyYAgx2yADYAzwWghtBAAgZAAAMzMmxM2GjZMmZmZMMzMDAwAG",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -6999,13 +6999,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Magisters' Terrace",
-                            importString = "CoQAAAAAAAAAAAAAAAAAAAAAAwMmZGNbMz2MzYWGAAAAAAAwYGDLwAbDL0wixMjlZbmZGzAAzMGzMzMAjZMjNAAwYmZGDDLzYAD",
+                            importString = "CoQAAAAAAAAAAAAAAAAAAAAAAsZGmZ0sZmZbmZMbDAAAAAAAYMjhFYgthFaYxYmxysNzMjZAgZGjZmZGAmxMzGAAYMzMjhhlZMgB",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Magisters' Terrace",
-                            importString = "CoQAAAAAAAAAAAAAAAAAAAAAAwMmZGNbMz2MzYWGAAAAAAAwYGDLwAbDL0wixMjlZbmZGzAAzMGzMzMAjZMjNAAwYmZGDDLzYAD",
+                            importString = "CoQAAAAAAAAAAAAAAAAAAAAAAsZGmZ0sZmZbmZMbDAAAAAAAYMjhFYgthFaYxYmxysNzMjZAgZGjZmZGAmxMzGAAYMzMjhhlZMgB",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -7101,13 +7101,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Windrunner Spire",
-                            importString = "CoQAAAAAAAAAAAAAAAAAAAAAAwMMzoZzMz2MzYWGAAAAAAAwYGDLwAbDL0wixMjlZbmZGzAAzMGzMzMAjZMzsBAAGzMzYYYZGDYA",
+                            importString = "CoQAAAAAAAAAAAAAAAAAAAAAAwMmZGNbMz2MzY2GAAAAAAAwYGDLwAbDL0wixMjlZbmZGzAAzMGzMzMAjZMjNAAwYmZGDDLzYAD",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Windrunner Spire",
-                            importString = "CoQAAAAAAAAAAAAAAAAAAAAAAwMMzoZzMz2MzYWGAAAAAAAwYGDLwAbDL0wixMjlZbmZGzAAzMGzMzMAjZMzsBAAGzMzYYYZGDYA",
+                            importString = "CoQAAAAAAAAAAAAAAAAAAAAAAwMmZGNbMz2MzY2GAAAAAAAwYGDLwAbDL0wixMjlZbmZGzAAzMGzMzMAjZMjNAAwYmZGDDLzYAD",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -7175,13 +7175,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Algethar Academy",
-                            importString = "CsQAAAAAAAAAAAAAAAAAAAAAAwMMzoZxMz2MzMzysZmZmFzMLLjBAAzYMzMLgxMGWgB2GWoxCDAAMGMAAzMAjZMjNAAAzMzAAgZYA",
+                            importString = "CsQAAAAAAAAAAAAAAAAAAAAAAgxMzMNbM2YmZ2mNzMzsYmZZZMAAYGjZmZBMmxwCMw2wCNWYAAgxgBAYmBYmZMzsBAAYmZGAAMDD",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Algethar Academy",
-                            importString = "CsQAAAAAAAAAAAAAAAAAAAAAAgxMzoZzM2mZmZWmNzMzsYmZZZMAAYGjZmZBMmxwCMw2wCNWYAAgxgBAYmBYMjZGAAAmZmBAAzwA",
+                            importString = "CsQAAAAAAAAAAAAAAAAAAAAAAgxMzMNbM2YmZ2mNzMzsYmZZZMAAYGjZmZBMmxwCMw2wCNWYAAgxgBAYmBYmZMzsBAAYmZGAAMDD",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -7192,13 +7192,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Magisters' Terrace",
-                            importString = "CsQAAAAAAAAAAAAAAAAAAAAAAsZGzMjmFmZzMjZb2MzMziZmllxAAgZMmZmFwYGDLwAbDL0YhBAAGDGAgZGgxMmxGAAgZmZAAwMM",
+                            importString = "CsQAAAAAAAAAAAAAAAAAAAAAAgxMzoZzM2mZmZWmNzMzsYmZZZMAAYGjZmZBMmxwCMw2wCNWYAAgxgBAYmBYMjZGAAAmZmBAAzwA",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Magisters' Terrace",
-                            importString = "CsQAAAAAAAAAAAAAAAAAAAAAAwMegZGNbmx2MzY2mNzMzsYmZZZegBAAzYMzMLgxMGWgB2GWoxCDAAMGgNAMzAMmxMzGAAgZmZAAYMM",
+                            importString = "CsQAAAAAAAAAAAAAAAAAAAAAAgxMzMNbMzGzMz2sZmZmFzMLLjBAAzYMzMLgxMGWgB2GWoxCDAAMGMAAzMAzMjZGAAAmZmBAAzwA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -7226,13 +7226,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Nexus-Point Xenas",
-                            importString = "CsQAAAAAAAAAAAAAAAAAAAAAAwMjZGNbmZ2mZGz2sZmZmFzMLLjBAAzYMzMLgxMGWgB2GWoxCDAAMGMAAzMAjZMjNAAAzMzAAgZYA",
+                            importString = "CsQAAAAAAAAAAAAAAAAAAAAAAwMzDMzoZzMzmZGz2sZmZmFzMLLjBAAzYMzMLgxMGWgB2GWoxCDAAMGMAAzMAjZwsBAAYmZmBAgZYA",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Nexus-Point Xenas",
-                            importString = "CsQAAAAAAAAAAAAAAAAAAAAAAwMjZGNbmZ2mZGz2sZmZmFzMLLjBAAzYMzMLgxMGWgB2GWoxCDAAMGMAAzMAjZMjNAAAzMzAAgZYA",
+                            importString = "CsQAAAAAAAAAAAAAAAAAAAAAAwMzDMzoZzMzmZGz2sZmZmFzMLLjBAAzYMzMLgxMGWgB2GWoxCDAAMGMAAzMAjZwsBAAYmZmBAgZYA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -7277,13 +7277,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Skyreach",
-                            importString = "CsQAAAAAAAAAAAAAAAAAAAAAAwMzDMzoZzM2mZGz2sZmZmFzMLLjBAAzYMzMLgxMGWgB2GWoxCDAAMGMAAzMAjZwsBAAYmZmBAgZYA",
+                            importString = "CsQAAAAAAAAAAAAAAAAAAAAAAgxMzoZzM2mZmZWmNzMzsYmZZZMAAYGjZmZBMmxwCMw2wCNWYAAgxgBAYmBYMjZGAAAmZmBAAzwA",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Skyreach",
-                            importString = "CsQAAAAAAAAAAAAAAAAAAAAAAwMzDMzoZzM2mZGz2sZmZmFzMLLjBAAzYMzMLgxMGWgB2GWoxCDAAMGMAAzMAjZwsBAAYmZmBAgZYA",
+                            importString = "CsQAAAAAAAAAAAAAAAAAAAAAAgxMzoZzM2mZmZWmNzMzsYmZZZMAAYGjZmZBMmxwCMw2wCNWYAAgxgBAYmBYMjZGAAAmZmBAAzwA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -7294,7 +7294,7 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Windrunner Spire",
-                            importString = "CsQAAAAAAAAAAAAAAAAAAAAAAwMmZGNbM2mZGzysZmZmFzMLLjBAAzYMzMLgxMGWgB2GWoxCDAAMGMAAzMAjZMzsBAAYmZGAAMDD",
+                            importString = "CsQAAAAAAAAAAAAAAAAAAAAAAgxMzoZzM2mZmZWmNzMzsYmZZZMAAYGjZmZBMmxwCMw2wCNWYAAgxgBAYmBYMjZGAAAmZmBAAzwA",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -7353,7 +7353,7 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - All Dungeons",
-                            importString = "CcEAAAAAAAAAAAAAAAAAAAAAAgZmxsMzMzYGAAAghphZGzMbmZmZGmxMDAAAAgxmZgtYAbmxwCMwMsRjBLgZGGGMbmtBzMAAzMMA",
+                            importString = "CcEAAAAAAAAAAAAAAAAAAAAAAgZmxsMzMzYGAAAghphxwMbLzMzMjZGzMAAAAAGbmB2iBsZGDLwAzwGNGsAmZYYwsZ2GMzAAMzwA",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -7370,13 +7370,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Algethar Academy",
-                            importString = "CcEAAAAAAAAAAAAAAAAAAAAAAgZmxsMzMzYGAAAghphZGmZzMzMzwMmZAAAAAM2MDsFDYzMGWgBmhNaMYBMzYbYwsZ2GMzAAMzwA",
+                            importString = "CcEAAAAAAAAAAAAAAAAAAAAAAgZmxsMzMzYGAAAghphZGmZbZmZmZYGzMAAAAAGbmB2iBsZGDLwAzwGNGsAmZYYwsZ2GMzAAMzwA",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Algethar Academy",
-                            importString = "CcEAAAAAAAAAAAAAAAAAAAAAAgZmxsMzMzYGAAAghphxwMbmZmZGzMmZAAAAAM2MDsFDYzMGWgBmhNaMYBMzYZYwsZ2GMzAAMzwA",
+                            importString = "CcEAAAAAAAAAAAAAAAAAAAAAAgZmxsMzMzYGAAAghphxYmZzMzMzYmxMDAAAAgxmZgtYAbmxwCMwMsRjBLgZGGGMbmtBzMAAzMMA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -7393,7 +7393,7 @@ ZoidsToolsTalentGrimoire.data = {
                         },
                         highkey = {
                             title = "High Keys - Magisters' Terrace",
-                            importString = "CcEAAAAAAAAAAAAAAAAAAAAAAgZmxsMzMzYGAAAghphZGmZbZmZmZYGzMAAAAAGbmB2iBsZGDLwAzwGNGsAmZYYwsZ2GMzAAMzwA",
+                            importString = "CcEAAAAAAAAAAAAAAAAAAAAAAgZmxsMzMzYGAAAghphZGmZzMzMzYmxMDAAAAgxmZgtYAbmxwCMwMsRjBLgZGGGMbmtBzMAAzMMA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -7421,13 +7421,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Nexus-Point Xenas",
-                            importString = "CcEAAAAAAAAAAAAAAAAAAAAAAgZmxsMzMzYGAAAghphZGmZbZmZmZYGzMAAAAAGbmB2iBsZGDLwAzwGNGsAmZYYwsZ2GMzAAMzwA",
+                            importString = "CcEAAAAAAAAAAAAAAAAAAAAAAgZmxsMzMzYGAAAghphZGzMbmZmZGmxMDAAAAgxmZgtYAbmxwCMwMsRjBLgZGGGMbmtBzMAAzMMA",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Nexus-Point Xenas",
-                            importString = "CcEAAAAAAAAAAAAAAAAAAAAAAgZmxsMzMzYGAAAghphZGmZbZmZmZYGzMAAAAAGbmB2iBsZGDLwAzwGNGsAmZYYwsZ2GMzAAMzwA",
+                            importString = "CcEAAAAAAAAAAAAAAAAAAAAAAgZmxsMzMzYGAAAghphZGzMbmZmZGmxMDAAAAgxmZgtYAbmxwCMwMsRjBLgZGGGMbmtBzMAAzMMA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -7438,13 +7438,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Pit of Saron",
-                            importString = "CcEAAAAAAAAAAAAAAAAAAAAAAgZmxsMzMzYGAAAghphxwMbLzMzMDzYmBAAAAwYzMwWMgNzYYBGYG2oxgFwMjlhBzmZbwMDAwMDD",
+                            importString = "CcEAAAAAAAAAAAAAAAAAAAAAAgZmxsMzMzYGAAAghphxwMbLzMzMjZGzMAAAAAGbmB2iBsZGDLwAzwGNGsAmZYYwsZ2GMzAAMzwA",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Pit of Saron",
-                            importString = "CcEAAAAAAAAAAAAAAAAAAAAAAgZmxsMzMzYGAAAghphxwMbLzMzMDzYmBAAAAwYzMwWMgNzYYBGYG2oxgFwMjlhBzmZbwMDAwMDD",
+                            importString = "CcEAAAAAAAAAAAAAAAAAAAAAAgZmxsMzMzYGAAAghphxwMbLzMzMjZGzMAAAAAGbmB2iBsZGDLwAzwGNGsAmZYYwsZ2GMzAAMzwA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -7489,13 +7489,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Windrunner Spire",
-                            importString = "CcEAAAAAAAAAAAAAAAAAAAAAAgZmxsMzMzYGAAAghphZGmZbZmZmZYGzMAAAAAGbmB2iBsZGDLwAzwGNGsAmZYYwsZ2GMzAAMzwA",
+                            importString = "CcEAAAAAAAAAAAAAAAAAAAAAAgZmxsMzMzYGAAAghphZGzMbmZmZGmxMDAAAAgxmZgtYAbmxwCMwMsRjBLgZGGGMbmtBzMAAzMMA",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Windrunner Spire",
-                            importString = "CcEAAAAAAAAAAAAAAAAAAAAAAgZmxsMzMzYGAAAghphZGmZbZmZmZYGzMAAAAAGbmB2iBsZGDLwAzwGNGsAmZYYwsZ2GMzAAMzwA",
+                            importString = "CcEAAAAAAAAAAAAAAAAAAAAAAgZmxsMzMzYGAAAghphZGzMbmZmZGmxMDAAAAgxmZgtYAbmxwCMwMsRjBLgZGGGMbmtBzMAAzMMA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -7518,7 +7518,7 @@ ZoidsToolsTalentGrimoire.data = {
                         },
                         mythic = {
                             title = "Mythic Raid - All Bosses",
-                            importString = "CcEAAAAAAAAAAAAAAAAAAAAAAAzMzsMzYmZAAAAMMNMzYGWmZmZGMmZAAAAAMzyMDslxYZZgFwAmhJwMYDMzgZbMYmtBYmBgZMMA",
+                            importString = "CcEAAAAAAAAAAAAAAAAAAAAAAAzMzsMzMzMDAAAghphZGzwyMzMzgxMDAAAAgZWmZAZMWWGYBMgZYCMD2AzMY2GDmxAMzAwMGGA",
                             difficulty = "Mythic",
                         },
                     },
@@ -7587,7 +7587,7 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Magisters' Terrace",
-                            importString = "CgEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgGDjZMz2yMzMjZmxMjZMjZWmZGjZmlxMzAAAhB2glFjGzAYWwMWAMDGDAmZAMMzMDGM",
+                            importString = "CgEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgGDDzMjlZmZmZMjZGzYGzsMzMGzMLjZmBAACDsBLLGNmBwsgZsAYGMbDAmZAMMzMDGM",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -7638,7 +7638,7 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Pit of Saron",
-                            importString = "CgEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgGDjZmZ2WmZmZMmxMjZMjZWmZGjZmlxMzAAAhB2glFjGzAYWwMWAMDGDAmZAMMzMDGM",
+                            importString = "CgEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgGDjZMz2yMzMjZmxMjZMjZWmZGjZmlxMzAAAhB2glFjGzAYWwMWAmZYYAwMDghZmBGM",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -7661,7 +7661,7 @@ ZoidsToolsTalentGrimoire.data = {
                         },
                         highkey = {
                             title = "High Keys - Seat of the Triumvirate",
-                            importString = "CgEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgGDzMMz2yMzMzMmxMjZMzMzyMzYMzsNmHYGAAIGLLDsAGwMMBmhNAzgxAAgZGDzMzMMYA",
+                            importString = "CgEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgGDDjZ2WmZmZmxMmZMjZmZWmZGjxsMmZGAAIMwGssY0YGAzCmxCgZwYAwMDghZmZGGM",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -7689,7 +7689,7 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Windrunner Spire",
-                            importString = "CgEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgGDjZMjlZmZGzMjZGzYGzsMzMGzMLjZmBAACDsBLLGNmBwsgZsAYGMbDAmZAMMzMDGM",
+                            importString = "CgEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgGDjZMz2yMzMjZmxMjZMjZWmZGjZmlxMzAAAhB2glFjGzAYWwMWAMDGDAmZAMMzMDGM",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -7753,13 +7753,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - All Dungeons",
-                            importString = "CkEAAAAAAAAAAAAAAAAAAAAAAkBAAGzwMzMzMmNzMLzYMGNzMGWMmZGzwMDAAAAWmZAmxAMwGssY0YGAzCmZDGzMDjtBAzMAAMDYA",
+                            importString = "CkEAAAAAAAAAAAAAAAAAAAAAAkBAAGzwMzMzMmNzMLzYMGNmxwyMmZGzwMDAAAAWmZAmxAMwGssY0YGAzCmZDGzMDjtBAzMAAMDYA",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - All Dungeons",
-                            importString = "CkEAAAAAAAAAAAAAAAAAAAAAAkBAAGzwMzMzMmNzMLzYMGNzMGWMmZGzwMDAAAAWmZAmxAMwGssY0YGAzCmZDGzMDjtBAzMAAMDYA",
+                            importString = "CkEAAAAAAAAAAAAAAAAAAAAAAkBAAGzwMzMzMmNzMLzYMGNmxwyMmZGzwMDAAAAWmZAmxAMwGssY0YGAzCmZDGzMDjtBAzMAAMDYA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -7787,13 +7787,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Magisters' Terrace",
-                            importString = "CkEAAAAAAAAAAAAAAAAAAAAAAkBAAGzwMzMzMmNzMLzYMGNmxwyMmZGzwMDAAAAWmZAmxAMwGssY0YGAzCmZDGzMDjtBAzMAAMDYA",
+                            importString = "CkEAAAAAAAAAAAAAAAAAAAAAAkBAAGzwMzMzMmNzMLzYMGNmxwiZmZGzwMDAAAAWmZAmxAMwGssY0YGAzCmZDGzMDjtBAzMAAMDYA",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Magisters' Terrace",
-                            importString = "CkEAAAAAAAAAAAAAAAAAAAAAAkBAAGzwMzMzMmNzMLzYMGNmxwyMmZGzwMDAAAAWmZAmxAMwGssY0YGAzCmZDGzMDjtBAzMAAMDYA",
+                            importString = "CkEAAAAAAAAAAAAAAAAAAAAAAkBAAGzwMzMzMmNzMLzYMGNmxwiZmZGzwMDAAAAWmZAmxAMwGssY0YGAzCmZDGzMDjtBAzMAAMDYA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -7804,13 +7804,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Maisara Caverns",
-                            importString = "CkEAAAAAAAAAAAAAAAAAAAAAAkBAAGzwMzMzMmNzMLzYMGNmxwiZmZGzwMDAAAAWmZAmxAMwGssY0YGAzCmZDGzMDjtBAzMAAMDYA",
+                            importString = "CkEAAAAAAAAAAAAAAAAAAAAAAkBAAGzwMzMzMmNzMLzYMGNmxwyMmZGzwMDAAAAWmZAmxAMwGssY0YGAzCmZDGzMDjtBAzMAAMDYA",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Maisara Caverns",
-                            importString = "CkEAAAAAAAAAAAAAAAAAAAAAAkBAAGzwMzMzMmNzMLzYMGNmxwiZmZGzwMDAAAAWmZAmxAMwGssY0YGAzCmZDGzMDjtBAzMAAMDYA",
+                            importString = "CkEAAAAAAAAAAAAAAAAAAAAAAkBAAGzwMzMzMmNzMLzYMGNmxwyMmZGzwMDAAAAWmZAmxAMwGssY0YGAzCmZDGzMDjtBAzMAAMDYA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -7855,7 +7855,7 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Seat of the Triumvirate",
-                            importString = "CkEAAAAAAAAAAAAAAAAAAAAAAkBAAGzwMzMzMmNzMLzYMGNmxYbxMzMjZYmBAAAALzMAzYAGYDWWMaMDgZBzsBjZmhhBAzMAAMDYA",
+                            importString = "CkEAAAAAAAAAAAAAAAAAAAAAAkBAAGzwMzMzMmNzMLzYMGNmxwyMmZGzwMDAAAAWmZAmxAMwGssY0YGAzCmZDGzMDjtBAzMAAMDYA",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -7872,13 +7872,13 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Skyreach",
-                            importString = "CkEAAAAAAAAAAAAAAAAAAAAAAkBAAGzwMzMzMmNzMLzYMGNzMGWMmZGzwMDAAAAWmZAmxAMwGssY0YGAzCmZDGzMDjtBAzMAAMDYA",
+                            importString = "CkEAAAAAAAAAAAAAAAAAAAAAAkBAAGzwMzMzMmNzMLzYMGNmxwyMmZGzwMDAAAAWmZAmxAMwGssY0YGAzCmZDGzMDjtBAzMAAMDYA",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
                         highkey = {
                             title = "High Keys - Skyreach",
-                            importString = "CkEAAAAAAAAAAAAAAAAAAAAAAkBAAGzwMzMzMmNzMLzYMGNzMGWMmZGzwMDAAAAWmZAmxAMwGssY0YGAzCmZDGzMDjtBAzMAAMDYA",
+                            importString = "CkEAAAAAAAAAAAAAAAAAAAAAAkBAAGzwMzMzMmNzMLzYMGNmxwyMmZGzwMDAAAAWmZAmxAMwGssY0YGAzCmZDGzMDjtBAzMAAMDYA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -7895,7 +7895,7 @@ ZoidsToolsTalentGrimoire.data = {
                         },
                         highkey = {
                             title = "High Keys - Windrunner Spire",
-                            importString = "CkEAAAAAAAAAAAAAAAAAAAAAAkBAAGzwMzMzMmNzMLzYMGNmxwyMmZGzwMDAAAAWmZAmxAMwGssY0YGAzCmZDGzMDjtBAzMAAMDYA",
+                            importString = "CkEAAAAAAAAAAAAAAAAAAAAAAkBAAGzwMzMzMmNzMLzYMGNmxwiZmZGzwMDAAAAWmZAmxAMwGssY0YGAzCmZDGzMDmtBAzMAAMDYA",
                             keyRange = "High Keys, this week",
                             difficulty = "Mythic+",
                         },

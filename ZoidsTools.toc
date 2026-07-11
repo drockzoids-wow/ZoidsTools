@@ -14,6 +14,7 @@ Libs\LibDBIcon-1.0\LibDBIcon-1.0.lua
 
 Bindings.lua
 Core.lua
+Modules\Diagnostics.lua
 Modules\MovableWindows.lua
 Modules\FastLoot.lua
 Modules\VendorAutomation.lua

@@ -641,6 +641,20 @@ local function RestoreSavedPoint(frame, isBagWindow)
     end
 
     local relativeTo = _G[saved.relativeTo] or UIParent
+
+    if frame.GetNumPoints and frame.GetPoint and frame:GetNumPoints() == 1 then
+        local point, currentRelativeTo, relativePoint, x, y = frame:GetPoint(1)
+        if point == saved.point
+            and currentRelativeTo == relativeTo
+            and relativePoint == saved.relativePoint
+            and math.abs((x or 0) - (saved.x or 0)) < 0.5
+            and math.abs((y or 0) - (saved.y or 0)) < 0.5
+        then
+            SetManagedPlacement(frame, true)
+            return true
+        end
+    end
+
     frame.ZTRestoringPoint = true
     SafeCall(frame.ClearAllPoints, frame)
     SafeCall(frame.SetPoint, frame, saved.point, relativeTo, saved.relativePoint, saved.x, saved.y)
@@ -673,9 +687,6 @@ local function RestoreSavedPointSoon(frame, isBagWindow)
         RestoreSavedPoint(frame, isBagWindow)
     end)
 
-    C_Timer.After(0.05, function()
-        RestoreSavedPoint(frame, isBagWindow)
-    end)
 end
 
 function RestoreOriginalPoint(frame, keepManaged)

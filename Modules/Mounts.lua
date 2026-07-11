@@ -1016,6 +1016,9 @@ local function GetMountUsage(mountID)
     return db.mountUsage[mountID] or db.mountUsage[tostring(mountID)] or 0
 end
 
+local cachedSmartSelectionPool
+local cachedSmartSelectionMountID
+
 local function RecordMountUsage(mountID)
     local db = EnsureDB()
     mountID = tonumber(mountID)
@@ -1062,6 +1065,8 @@ local function TrackSelectedMount(mountID)
     db.lastMountID = mountID
     RecordMountUsage(mountID)
     RecordRecentMount(mountID)
+    cachedSmartSelectionPool = nil
+    cachedSmartSelectionMountID = nil
 end
 
 local function BuildRecentMountSet()
@@ -1114,28 +1119,21 @@ local function PickLeastUsedMount(mountIDs)
         return nil
     end
 
-    local weighted = {}
     local totalWeight = 0
 
     for _, mountID in ipairs(mountIDs) do
         local weight = 1 / math.sqrt(GetMountUsage(mountID) + 1)
-
-        weighted[#weighted + 1] = {
-            mountID = mountID,
-            weight = weight,
-        }
-
         totalWeight = totalWeight + weight
     end
 
     local roll = math.random() * totalWeight
     local running = 0
 
-    for _, entry in ipairs(weighted) do
-        running = running + entry.weight
+    for _, mountID in ipairs(mountIDs) do
+        running = running + (1 / math.sqrt(GetMountUsage(mountID) + 1))
 
         if roll <= running then
-            return entry.mountID
+            return mountID
         end
     end
 
@@ -1344,11 +1342,40 @@ local function AddMountToPools(pools, mountID)
     end
 end
 
+local cachedMountPools
+local cachedMountPoolsKey
+
+local function InvalidateMountPoolCache()
+    cachedMountPools = nil
+    cachedMountPoolsKey = nil
+    cachedSmartSelectionPool = nil
+    cachedSmartSelectionMountID = nil
+end
+
+local function GetMountPoolCacheKey(db, canFly, isSurface, isUnderwater, isFlyableWater)
+    local mapID = C_Map and C_Map.GetBestMapForUnit and C_Map.GetBestMapForUnit("player") or 0
+    return table.concat({
+        tostring(mapID or 0), tostring(canFly == true), tostring(isSurface == true),
+        tostring(isUnderwater == true), tostring(isFlyableWater == true),
+        tostring(db and db.excludeServiceMountsFromRandom == true),
+    }, ":")
+end
+
 local function BuildRandomMountPools()
     local db = EnsureDB()
 
     EnsureMountJournalLoaded()
     UpdateWaterSurfaceState()
+
+    local canFly = CanFlyHere()
+    local isSurface = IsPlayerSwimmingAtSurface()
+    local isUnderwater = IsPlayerUnderwaterForMounts()
+    local isFlyableWater = IsFlyableWaterContext()
+    local cacheKey = GetMountPoolCacheKey(db, canFly, isSurface, isUnderwater, isFlyableWater)
+
+    if cachedMountPools and cachedMountPoolsKey == cacheKey then
+        return cachedMountPools
+    end
 
     local pools = {
         all = {},
@@ -1357,10 +1384,10 @@ local function BuildRandomMountPools()
         flying = {},
         surfaceFlying = {},
         water = {},
-        canFly = CanFlyHere(),
-        isSurface = IsPlayerSwimmingAtSurface(),
-        isUnderwater = IsPlayerUnderwaterForMounts(),
-        isFlyableWater = IsFlyableWaterContext(),
+        canFly = canFly,
+        isSurface = isSurface,
+        isUnderwater = isUnderwater,
+        isFlyableWater = isFlyableWater,
     }
 
     if not db or not C_MountJournal or not C_MountJournal.GetMountIDs then
@@ -1373,13 +1400,11 @@ local function BuildRandomMountPools()
             local details = GetMountDetails(mountID)
 
             local allowUnusableWaterMount = pools.isUnderwater and IsWaterMount(details and details.mountID)
-            local allowRecentCombatMount = IsRecentlyOutOfCombat()
-
             if details
                 and details.name
                 and details.isCollected
                 and IsMountAllowedForCharacter(details)
-                and (not requireUsable or details.isUsable or allowUnusableWaterMount or allowRecentCombatMount)
+                and (not requireUsable or details.isUsable or allowUnusableWaterMount)
                 and (db.excludeServiceMountsFromRandom ~= true or not IsServiceMountName(details.name)) then
                 AddMountToPools(pools, details.mountID)
             end
@@ -1392,8 +1417,12 @@ local function BuildRandomMountPools()
         AddCollectedMounts(false)
     end
 
+    cachedMountPools = pools
+    cachedMountPoolsKey = cacheKey
     return pools
 end
+
+BuildRandomMountPools = ns:WrapDiagnosticFunction("Mounts.BuildPools", BuildRandomMountPools)
 
 local function GetPreferredRandomPool(pools)
     local db = EnsureDB()
@@ -1429,6 +1458,17 @@ local function GetPreferredRandomPool(pools)
     return {}
 end
 
+local function PickStableSmartMount(pool)
+    if pool and cachedSmartSelectionPool == pool and cachedSmartSelectionMountID then
+        return cachedSmartSelectionMountID
+    end
+
+    local mountID = PickMountFromPool(pool)
+    cachedSmartSelectionPool = pool
+    cachedSmartSelectionMountID = mountID
+    return mountID
+end
+
 local function PickSmartMountID()
     local db = EnsureDB()
 
@@ -1447,11 +1487,11 @@ local function PickSmartMountID()
     end
 
     if pools.isFlyableWater and pools.canFly and #pools.surfaceFlying > 0 then
-        return PickMountFromPool(pools.surfaceFlying)
+        return PickStableSmartMount(pools.surfaceFlying)
     end
 
     if pools.isUnderwater and #pools.water > 0 then
-        return PickMountFromPool(pools.water)
+        return PickStableSmartMount(pools.water)
     end
 
     if db.preferredMount and db.preferredMount ~= "" then
@@ -1468,12 +1508,14 @@ local function PickSmartMountID()
         return nil, "No eligible mounts found."
     end
 
-    return PickMountFromPool(pool)
+    return PickStableSmartMount(pool)
 end
 
 local SMART_MOUNT_MACRO_PREFIX = "/dismount [mounted]\n/stopmacro [mounted]\n/stopmacro [combat]\n"
 local DISMOUNT_MACRO = "/dismount [mounted]\n/stopmacro [mounted]"
 local smartButton
+local lastSmartUpdateAt = 0
+local SMART_UPDATE_MIN_INTERVAL = 0.15
 
 local function BuildChatMessageMacro(message)
     return SMART_MOUNT_MACRO_PREFIX
@@ -1482,7 +1524,7 @@ local function BuildChatMessageMacro(message)
         .. ") end"
 end
 
-local function ClearSmartButtonAction()
+local function ClearSmartButtonAttributes()
     smartButton._ztSmartMountID = nil
     smartButton:SetAttribute("type", nil)
     smartButton:SetAttribute("spell", nil)
@@ -1491,12 +1533,25 @@ local function ClearSmartButtonAction()
 end
 
 local function SetSmartButtonMacro(macroText)
+    local signature = "macro:" .. tostring(macroText or "")
+    if smartButton._ztActionSignature == signature then
+        return
+    end
+
+    ClearSmartButtonAttributes()
     smartButton._ztSmartMountID = nil
     smartButton:SetAttribute("type", "macro")
     smartButton:SetAttribute("macrotext", macroText)
+    smartButton._ztActionSignature = signature
 end
 
 local function SetSmartButtonSpell(spellName, unit, mountID)
+    local signature = table.concat({ "spell", tostring(spellName or ""), tostring(unit or ""), tostring(mountID or "") }, ":")
+    if smartButton._ztActionSignature == signature then
+        return
+    end
+
+    ClearSmartButtonAttributes()
     smartButton._ztSmartMountID = mountID and tonumber(mountID) or nil
     smartButton:SetAttribute("type", "spell")
     smartButton:SetAttribute("spell", spellName)
@@ -1504,11 +1559,11 @@ local function SetSmartButtonSpell(spellName, unit, mountID)
     if unit then
         smartButton:SetAttribute("unit", unit)
     end
+    smartButton._ztActionSignature = signature
 end
 
 local function ApplySmartMountAction()
     local db = EnsureDB()
-    ClearSmartButtonAction()
 
     if IsMounted and IsMounted() then
         SetSmartButtonMacro(DISMOUNT_MACRO)
@@ -1572,21 +1627,28 @@ smartButton = CreateFrame("Button", "ZoidsToolsSmartMountButton", UIParent, "Sec
 smartButton:RegisterForClicks("AnyDown", "AnyUp")
 smartButton:SetAttribute("type", nil)
 
-local function UpdateSmartButton()
+local function UpdateSmartButton(force)
     if InCombatLockdown and InCombatLockdown() then
         return
     end
 
+    local now = GetTime and GetTime() or 0
+    if force ~= true and now > 0 and (now - lastSmartUpdateAt) < SMART_UPDATE_MIN_INTERVAL then
+        return
+    end
+    lastSmartUpdateAt = now
+
     local fallingAction = GetFallingRescueAction()
 
     if fallingAction then
-        ClearSmartButtonAction()
         SetSmartButtonSpell(fallingAction.spell, fallingAction.unit)
         return
     end
 
     ApplySmartMountAction()
 end
+
+UpdateSmartButton = ns:WrapDiagnosticFunction("Mounts.UpdateSmartButton", UpdateSmartButton)
 
 local function QueueSmartButtonUpdate(delay)
     if C_Timer and C_Timer.After then
@@ -1598,7 +1660,7 @@ end
 
 smartButton:SetScript("PreClick", function()
     if IsFalling and IsFalling() then
-        UpdateSmartButton()
+        UpdateSmartButton(true)
     end
 end)
 
@@ -1965,6 +2027,7 @@ function ns:InitializeMounts()
     eventFrame:RegisterEvent("ZONE_CHANGED_INDOORS")
     eventFrame:RegisterEvent("ZONE_CHANGED_NEW_AREA")
     eventFrame:RegisterEvent("MOUNT_JOURNAL_USABILITY_CHANGED")
+    eventFrame:RegisterEvent("NEW_MOUNT_ADDED")
     eventFrame:RegisterEvent("PLAYER_MOUNT_DISPLAY_CHANGED")
     eventFrame:RegisterEvent("PLAYER_STARTED_MOVING")
     eventFrame:RegisterEvent("PLAYER_STOPPED_MOVING")
@@ -1972,6 +2035,12 @@ function ns:InitializeMounts()
     eventFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
     eventFrame:SetScript("OnEvent", function(_, event)
         EnsureDB()
+
+        if event == "PLAYER_ENTERING_WORLD"
+            or event == "NEW_MOUNT_ADDED"
+        then
+            InvalidateMountPoolCache()
+        end
 
         if event == "PLAYER_REGEN_DISABLED" then
             lastCombatEndedAt = 0
@@ -1990,7 +2059,7 @@ function ns:InitializeMounts()
             QueueSmartButtonUpdate(0.05)
             QueueSmartButtonUpdate(0.25)
             QueueSmartButtonUpdate(0.75)
-        elseif event == "MOUNT_JOURNAL_USABILITY_CHANGED" then
+        elseif event == "NEW_MOUNT_ADDED" then
             RebuildMountAuraLookup()
         elseif event == "PLAYER_MOUNT_DISPLAY_CHANGED" then
             QueueSmartButtonUpdate(0.05)

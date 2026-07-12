@@ -165,6 +165,14 @@ function ns.UI.Pages.CreateItemsPage(parent)
         fontSize:Refresh()
         qualityColor:Refresh()
 
+        local active = ns.GetItemOverlaysEnabled and ns:GetItemOverlaysEnabled()
+        UI.SetControlEnabled(characterOptions, active)
+        UI.SetControlEnabled(bagBankOptions, active)
+        UI.SetControlEnabled(statTargetContext, active)
+        UI.SetControlEnabled(fontSize, active)
+        UI.SetControlEnabled(qualityColor, active)
+        UI.SetControlEnabled(refreshButton, active)
+
         if ns.GetStatTargetStatusText then
             status:SetText(ns:GetStatTargetStatusText())
         else

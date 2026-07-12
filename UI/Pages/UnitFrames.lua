@@ -27,6 +27,7 @@ function ns.UI.Pages.CreateUnitFramesPage(parent)
     local UI = ns.UI
     local frame = UI.CreatePageFrame(parent)
     local controls = {}
+    local castbarDependencies = {}
 
     local healthSection = UI.PlaceSection(frame, "Health Bars")
 
@@ -129,6 +130,11 @@ function ns.UI.Pages.CreateUnitFramesPage(parent)
         )
         UI.PlaceBelow(castbarHeight, castbarWidth, 0, 26)
         controls[#controls + 1] = castbarHeight
+        castbarDependencies[#castbarDependencies + 1] = {
+            enabled = resizeCastbar,
+            width = castbarWidth,
+            height = castbarHeight,
+        }
 
         if info.key ~= "player" then
             local hideBuffs = UI.CreateCheckbox(
@@ -182,6 +188,12 @@ function ns.UI.Pages.CreateUnitFramesPage(parent)
             if control.Refresh then
                 control:Refresh()
             end
+        end
+
+        for _, dependency in ipairs(castbarDependencies) do
+            local active = dependency.enabled:GetChecked() == true
+            UI.SetControlEnabled(dependency.width, active)
+            UI.SetControlEnabled(dependency.height, active)
         end
     end
 

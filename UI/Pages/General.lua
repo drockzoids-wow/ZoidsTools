@@ -325,7 +325,7 @@ function ns.UI.Pages.CreateGeneralPage(parent)
     talkingHeadFontSize:SetPoint("TOPLEFT", talkingHeadOpacity, "TOPLEFT", 150, 0)
 
     local previewTalkingHead = UI.CreateButton(frame, "Preview Subtitle", 150)
-    previewTalkingHead:SetPoint("TOPLEFT", talkingHeadOpacity, "BOTTOMLEFT", -UI.Layout.sliderIndent, -22)
+    previewTalkingHead:SetPoint("TOPLEFT", talkingHeadOpacity, "BOTTOMLEFT", -UI.Layout.sliderIndent, -12)
     previewTalkingHead:SetScript("OnClick", function()
         if ns.PreviewSubtleTalkingHead then ns:PreviewSubtleTalkingHead() end
     end)
@@ -360,6 +360,17 @@ function ns.UI.Pages.CreateGeneralPage(parent)
         coordinatesWidget:Refresh()
         mapCoordinates:Refresh()
         coordinatesScale:Refresh()
+
+        local coordinatesActive = coordinatesWidget:GetChecked() == true or mapCoordinates:GetChecked() == true
+        UI.SetControlEnabled(coordinatesScale, coordinatesActive)
+        UI.SetControlEnabled(resetCoordinates, coordinatesActive)
+
+        local talkingHeadActive = subtleTalkingHead:GetChecked() == true
+        UI.SetControlEnabled(talkingHeadBackground, talkingHeadActive)
+        UI.SetControlEnabled(talkingHeadBold, talkingHeadActive)
+        UI.SetControlEnabled(talkingHeadOpacity, talkingHeadActive)
+        UI.SetControlEnabled(talkingHeadFontSize, talkingHeadActive)
+        UI.SetControlEnabled(previewTalkingHead, talkingHeadActive)
 
         resetCoordinates:ClearAllPoints()
         unlockPerformance:ClearAllPoints()

@@ -159,6 +159,11 @@ function ns.UI.Pages.CreateMacrosPage(parent)
         manaCombat:Refresh()
         hearthstoneEnabled:Refresh()
 
+        UI.SetControlEnabled(healthRecuperate, ns.GetHealthMacroEnabled and ns:GetHealthMacroEnabled())
+        UI.SetControlEnabled(healthCombat, ns.GetHealthMacroEnabled and ns:GetHealthMacroEnabled())
+        UI.SetControlEnabled(manaCombat, ns.GetManaMacroEnabled and ns:GetManaMacroEnabled())
+        UI.SetControlEnabled(selectHearthstones, ns.GetRandomHearthstoneEnabled and ns:GetRandomHearthstoneEnabled())
+
         local healthStatus = "Health macro disabled."
         local manaStatus = "Mana macro disabled."
 

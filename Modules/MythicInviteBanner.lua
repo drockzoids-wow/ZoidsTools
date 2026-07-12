@@ -108,52 +108,52 @@ local function CreateBanner()
     if banner then return banner end
 
     local frame = CreateFrame("Frame", FRAME_NAME, UIParent, "BackdropTemplate")
-    frame:SetSize(470, 176)
-    frame:SetPoint("TOP", UIParent, "TOP", 0, 0)
+    frame:SetSize(420, 142)
+    frame:SetPoint("TOP", UIParent, "TOP", 0, -4)
     frame:SetFrameStrata("DIALOG")
     frame:SetFrameLevel(80)
     frame:SetClampedToScreen(true)
     frame:SetBackdrop({
         bgFile = "Interface\\Buttons\\WHITE8x8",
         edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
-        edgeSize = 14,
-        insets = { left = 4, right = 4, top = 4, bottom = 4 },
+        edgeSize = 11,
+        insets = { left = 3, right = 3, top = 3, bottom = 3 },
     })
     frame:SetBackdropColor(0.018, 0.022, 0.032, 0.96)
     frame:SetBackdropBorderColor(0.92, 0.68, 0.20, 0.94)
 
     local accent = frame:CreateTexture(nil, "ARTWORK")
-    accent:SetPoint("TOPLEFT", 10, -9)
-    accent:SetPoint("TOPRIGHT", -10, -9)
-    accent:SetHeight(3)
+    accent:SetPoint("TOPLEFT", 9, -7)
+    accent:SetPoint("TOPRIGHT", -9, -7)
+    accent:SetHeight(2)
     accent:SetColorTexture(0.95, 0.58, 0.12, 0.9)
 
     local eyebrow = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    eyebrow:SetPoint("TOP", 0, -23)
+    eyebrow:SetPoint("TOP", 0, -17)
     eyebrow:SetText("MYTHIC+ GROUP INVITATION")
     eyebrow:SetTextColor(0.95, 0.69, 0.24)
 
     frame.dungeonName = frame:CreateFontString(nil, "OVERLAY")
-    frame.dungeonName:SetPoint("TOPLEFT", 24, -47)
-    frame.dungeonName:SetPoint("TOPRIGHT", -24, -47)
-    frame.dungeonName:SetFont(STANDARD_TEXT_FONT or "Fonts\\FRIZQT__.TTF", 22, "OUTLINE")
+    frame.dungeonName:SetPoint("TOPLEFT", 20, -37)
+    frame.dungeonName:SetPoint("TOPRIGHT", -20, -37)
+    frame.dungeonName:SetFont(STANDARD_TEXT_FONT or "Fonts\\FRIZQT__.TTF", 18, "OUTLINE")
     frame.dungeonName:SetTextColor(1, 1, 1)
     frame.dungeonName:SetJustifyH("CENTER")
     frame.dungeonName:SetWordWrap(false)
 
     local teleport = CreateFrame("Button", FRAME_NAME .. "Teleport", frame, "InsecureActionButtonTemplate,BackdropTemplate")
-    teleport:SetSize(286, 52)
+    teleport:SetSize(244, 42)
     -- Protected frames may only be anchored to other frames, not FontStrings.
-    teleport:SetPoint("TOP", frame, "TOP", 0, -82)
+    teleport:SetPoint("TOP", frame, "TOP", 0, -67)
     teleport:RegisterForClicks("AnyDown", "AnyUp")
     StyleButton(teleport, 0.24, 0.78, 1)
     teleport.icon = teleport:CreateTexture(nil, "ARTWORK")
-    teleport.icon:SetSize(36, 36)
-    teleport.icon:SetPoint("LEFT", 10, 0)
+    teleport.icon:SetSize(30, 30)
+    teleport.icon:SetPoint("LEFT", 8, 0)
     teleport.icon:SetTexCoord(0.08, 0.92, 0.08, 0.92)
-    teleport.text = teleport:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
-    teleport.text:SetPoint("LEFT", teleport.icon, "RIGHT", 10, 0)
-    teleport.text:SetPoint("RIGHT", -10, 0)
+    teleport.text = teleport:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    teleport.text:SetPoint("LEFT", teleport.icon, "RIGHT", 8, 0)
+    teleport.text:SetPoint("RIGHT", -8, 0)
     teleport.text:SetText("TELEPORT TO DUNGEON")
     teleport.text:SetTextColor(0.90, 0.97, 1)
     frame.teleport = teleport
@@ -163,8 +163,8 @@ local function CreateBanner()
     frame.unavailable:SetTextColor(0.65, 0.68, 0.74)
 
     local close = CreateFrame("Button", nil, frame, "BackdropTemplate")
-    close:SetSize(74, 27)
-    close:SetPoint("BOTTOMRIGHT", -12, 11)
+    close:SetSize(62, 23)
+    close:SetPoint("BOTTOMRIGHT", -10, 8)
     StyleButton(close, 0.54, 0.56, 0.62)
     close.text = close:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     close.text:SetPoint("CENTER", 0, 0)

@@ -149,6 +149,15 @@ function ns.UI.Pages.CreateWindowsPage(parent)
         savePositions:Refresh()
         scaleEnabled:Refresh()
 
+        local active = ns.GetMovableWindowsEnabled and ns:GetMovableWindowsEnabled()
+        UI.SetControlEnabled(bagsEnabled, active)
+        UI.SetControlEnabled(bagHandles, active and ns.GetMoveBagsEnabled and ns:GetMoveBagsEnabled())
+        UI.SetControlEnabled(savePositions, active)
+        UI.SetControlEnabled(scaleEnabled, active)
+        UI.SetControlEnabled(refreshButton, active)
+        UI.SetControlEnabled(resetButton, active)
+        UI.SetControlEnabled(resetScalesButton, active)
+
         local windowCount, bagCount, scaleCount = 0, 0, 0
 
         if ns.GetMovableWindowStats then

@@ -119,6 +119,13 @@ function ns.UI.Pages.CreateQuestsPage(parent)
         pauseModifier:Refresh()
         skipDaily:Refresh()
         skipWarband:Refresh()
+
+        local automationActive = (ns.GetQuestAutoAccept and ns:GetQuestAutoAccept())
+            or (ns.GetQuestAutoTurnIn and ns:GetQuestAutoTurnIn())
+            or (ns.GetQuestAutoGossip and ns:GetQuestAutoGossip())
+        UI.SetControlEnabled(pauseModifier, automationActive)
+        UI.SetControlEnabled(skipDaily, ns.GetQuestAutoAccept and ns:GetQuestAutoAccept())
+        UI.SetControlEnabled(skipWarband, ns.GetQuestAutoAccept and ns:GetQuestAutoAccept())
     end
 
     frame:SetScript("OnShow", frame.Refresh)

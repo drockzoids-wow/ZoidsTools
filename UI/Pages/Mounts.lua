@@ -656,6 +656,21 @@ function ns.UI.Pages.CreateMountsPage(parent)
 
         local match = ns.GetTargetMountMatch and ns:GetTargetMountMatch()
         matchStatus:SetText(match and match.status or "Select a mounted target.")
+
+        local active = enabled:GetChecked() == true
+        UI.SetControlEnabled(searchBox, active)
+        UI.SetControlEnabled(resetPreferred, active)
+        UI.SetControlEnabled(recentAvoid, active)
+        UI.SetControlEnabled(preferGround, active)
+        UI.SetControlEnabled(surfaceWater, active)
+        UI.SetControlEnabled(excludeService, active)
+        UI.SetControlEnabled(classOptions, active)
+        UI.SetControlEnabled(repair, active)
+        UI.SetControlEnabled(auctionHouse, active)
+        UI.SetControlEnabled(rideAlong, active)
+        UI.SetControlEnabled(matchEnabled, active)
+        UI.SetControlEnabled(showMatchButton, active and matchEnabled:GetChecked() == true)
+        UI.SetControlEnabled(matchButton, active and matchEnabled:GetChecked() == true)
     end
 
     frame:SetScript("OnShow", frame.Refresh)

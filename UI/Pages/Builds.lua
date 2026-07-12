@@ -83,6 +83,11 @@ function ns.UI.Pages.CreateBuildsPage(parent)
 
     function frame:Refresh()
         enabled:Refresh()
+        local active = ns.GetTalentGrimoireEnabled and ns:GetTalentGrimoireEnabled()
+        UI.SetControlEnabled(contentButton, active)
+        UI.SetControlEnabled(targetButton, active)
+        UI.SetControlEnabled(modeButton, active)
+        UI.SetControlEnabled(refreshButton, active)
 
         if ns.GetTalentGrimoireStatusText then
             status:SetText(ns:GetTalentGrimoireStatusText())

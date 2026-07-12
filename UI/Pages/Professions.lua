@@ -128,6 +128,13 @@ function ns.UI.Pages.CreateProfessionsPage(parent)
         prospect:Refresh()
         open:Refresh()
 
+        local active = ns.GetProfessionHelperEnabled and ns:GetProfessionHelperEnabled()
+        UI.SetControlEnabled(activation, active)
+        UI.SetControlEnabled(disenchant, active)
+        UI.SetControlEnabled(mill, active)
+        UI.SetControlEnabled(prospect, active)
+        UI.SetControlEnabled(open, active)
+
         if ns.GetProfessionHelperStatusText then
             status:SetText(ns:GetProfessionHelperStatusText())
         else

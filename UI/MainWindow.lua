@@ -9,20 +9,20 @@ local pages = {}
 local buttons = {}
 local RefreshHeaderStatus
 
-local WINDOW_WIDTH = 1120
-local WINDOW_HEIGHT = 760
-local OUTER_MARGIN = 18
-local SIDEBAR_WIDTH = 224
-local SIDEBAR_TOP = -108
-local SIDEBAR_BUTTON_HEIGHT = 30
-local SIDEBAR_BUTTON_SPACING = 33
-local CONTENT_LEFT = OUTER_MARGIN + SIDEBAR_WIDTH + 20
-local HEADER_TOP = -48
-local CONTENT_TOP = SIDEBAR_TOP
-local CONTENT_RIGHT = -18
-local CONTENT_BOTTOM = 26
-local TITLE_BADGE_SIZE = 68
-local TITLE_BADGE_ICON_SIZE = 54
+local WINDOW_WIDTH = 980
+local WINDOW_HEIGHT = 600
+local OUTER_MARGIN = 14
+local SIDEBAR_WIDTH = 174
+local SIDEBAR_TOP = -46
+local SIDEBAR_BUTTON_HEIGHT = 25
+local SIDEBAR_BUTTON_SPACING = 27
+local CONTENT_LEFT = OUTER_MARGIN + SIDEBAR_WIDTH + 14
+local HEADER_TOP = -46
+local CONTENT_TOP = -116
+local CONTENT_RIGHT = -14
+local CONTENT_BOTTOM = 18
+local TITLE_BADGE_SIZE = 40
+local TITLE_BADGE_ICON_SIZE = 32
 
 local pageOrder = {
     { key = "general", label = "General", group = "Core", icon = "G", description = "Core ZoidsTools settings." },
@@ -49,10 +49,111 @@ end
 function UI.CreatePageFrame(parent)
     local frame = CreateFrame("Frame", nil, parent)
     frame.ZTPageKey = UI.BuildingPageKey
-    frame:SetPoint("TOPLEFT", parent.contentPanel, "TOPLEFT", 24, -22)
-    frame:SetPoint("BOTTOMRIGHT", parent.contentPanel, "BOTTOMRIGHT", -24, 22)
+    frame.ZTWindow = parent
+    frame.ZTScrollOffset = 0
+    frame:SetPoint("TOPLEFT", parent.contentPanel, "TOPLEFT", 18, -16)
+    frame:SetPoint("TOPRIGHT", parent.contentPanel, "TOPRIGHT", -18, -16)
+    frame:SetHeight(620)
     frame:Hide()
+    frame:EnableMouseWheel(true)
+    frame:SetScript("OnMouseWheel", function(_, delta)
+        UI.ScrollCurrentPage(delta)
+    end)
+
+    function frame:SetCompactScrollOffset(offset)
+        self.ZTScrollOffset = math.max(0, tonumber(offset) or 0)
+        self:ClearAllPoints()
+        self:SetPoint("TOPLEFT", parent.contentPanel, "TOPLEFT", 18, -16 + self.ZTScrollOffset)
+        self:SetPoint("TOPRIGHT", parent.contentPanel, "TOPRIGHT", -18, -16 + self.ZTScrollOffset)
+        self:SetHeight(620)
+    end
+
     return frame
+end
+
+local function FindLowestVisiblePoint(frame, lowest, depth)
+    if not frame or depth <= 0 then return lowest end
+
+    if frame.GetRegions then
+        for _, region in ipairs({ frame:GetRegions() }) do
+            if region and region.IsShown and region:IsShown() and region.GetBottom then
+                local bottom = region:GetBottom()
+                if bottom and (not lowest or bottom < lowest) then lowest = bottom end
+            end
+        end
+    end
+
+    if frame.GetChildren then
+        for _, child in ipairs({ frame:GetChildren() }) do
+            if child and child:IsShown() then
+                local bottom = child.GetBottom and child:GetBottom()
+                if bottom and (not lowest or bottom < lowest) then lowest = bottom end
+                lowest = FindLowestVisiblePoint(child, lowest, depth - 1)
+            end
+        end
+    end
+
+    return lowest
+end
+
+local function GetPageScrollMaximum(page)
+    if not page or not page.ZTWindow or not page.ZTWindow.contentPanel then
+        return 0
+    end
+
+    local pageTop = page:GetTop()
+    local lowest = FindLowestVisiblePoint(page, nil, 6)
+    local viewport = page.ZTWindow.contentPanel:GetHeight() - 32
+    local contentHeight = pageTop and lowest and (pageTop - lowest + 18) or viewport
+    return math.max(0, contentHeight - viewport)
+end
+
+local function RefreshScrollIndicator(frame, page)
+    if not frame or not frame.scrollIndicator or not page then return end
+    local maximum = GetPageScrollMaximum(page)
+
+    if maximum <= 0 then
+        frame.scrollIndicator:Hide()
+        return
+    end
+
+    local trackHeight = math.max(80, frame.contentPanel:GetHeight() - 28)
+    local thumbHeight = math.max(42, trackHeight * (trackHeight / page:GetHeight()))
+    local progress = math.min(1, (page.ZTScrollOffset or 0) / maximum)
+    local travel = math.max(0, trackHeight - thumbHeight)
+    frame.scrollIndicator:SetHeight(thumbHeight)
+    frame.scrollIndicator:ClearAllPoints()
+    frame.scrollIndicator:SetPoint("TOPRIGHT", frame.contentPanel, "TOPRIGHT", -5, -14 - (travel * progress))
+    frame.scrollIndicator:Show()
+end
+
+function UI.ScrollCurrentPage(delta)
+    local page = UI.currentPage and pages[UI.currentPage]
+    if not page or not page.SetCompactScrollOffset then return end
+
+    local maximum = GetPageScrollMaximum(page)
+    local offset = math.max(0, math.min(maximum, (page.ZTScrollOffset or 0) - ((delta or 0) * 38)))
+    page:SetCompactScrollOffset(offset)
+    RefreshScrollIndicator(UI.frame, page)
+end
+
+function UI.ScrollControlIntoView(control)
+    local page = UI.currentPage and pages[UI.currentPage]
+    if not page or not control or not control.GetTop or not control.GetBottom then return end
+
+    local controlTop, controlBottom = control:GetTop(), control:GetBottom()
+    local panelTop, panelBottom = UI.frame.contentPanel:GetTop(), UI.frame.contentPanel:GetBottom()
+    if not controlTop or not controlBottom or not panelTop or not panelBottom then return end
+
+    local offset = page.ZTScrollOffset or 0
+    if controlTop > panelTop - 12 then
+        offset = offset - (controlTop - panelTop + 18)
+    elseif controlBottom < panelBottom + 12 then
+        offset = offset + (panelBottom - controlBottom + 18)
+    end
+
+    page:SetCompactScrollOffset(math.max(0, math.min(GetPageScrollMaximum(page), offset)))
+    RefreshScrollIndicator(UI.frame, page)
 end
 
 local function SaveMainWindowPosition(frame)
@@ -171,21 +272,21 @@ end
 local function CreateSidebarButton(parent, info, yOffset)
     local label = info.label
     local key = info.key
-    local button = UI.CreateButton(parent.sidebar, label, SIDEBAR_WIDTH - 28, SIDEBAR_BUTTON_HEIGHT)
-    button:SetPoint("TOPLEFT", parent.sidebar, "TOPLEFT", 14, yOffset)
+    local button = UI.CreateButton(parent.sidebar, label, SIDEBAR_WIDTH - 18, SIDEBAR_BUTTON_HEIGHT)
+    button:SetPoint("TOPLEFT", parent.sidebar, "TOPLEFT", 9, yOffset)
     button:SetStyledTextAlign("LEFT")
-    button:SetStyledTextInset(44)
+    button:SetStyledTextInset(35)
 
     button.selectionBar = button:CreateTexture(nil, "OVERLAY")
-    button.selectionBar:SetPoint("TOPLEFT", button, "TOPLEFT", 4, -6)
-    button.selectionBar:SetPoint("BOTTOMLEFT", button, "BOTTOMLEFT", 4, 6)
-    button.selectionBar:SetWidth(3)
+    button.selectionBar:SetPoint("TOPLEFT", button, "TOPLEFT", 2, -4)
+    button.selectionBar:SetPoint("BOTTOMLEFT", button, "BOTTOMLEFT", 2, 4)
+    button.selectionBar:SetWidth(2)
     button.selectionBar:SetColorTexture(1, 0.76, 0.18, 0.92)
     button.selectionBar:Hide()
 
     button.iconBack = CreateFrame("Frame", nil, button, "BackdropTemplate")
-    button.iconBack:SetPoint("LEFT", button, "LEFT", 14, 0)
-    button.iconBack:SetSize(22, 22)
+    button.iconBack:SetPoint("LEFT", button, "LEFT", 9, 0)
+    button.iconBack:SetSize(18, 18)
     Theme.ApplySoftBackdrop(button.iconBack, 0.9)
 
     button.iconText = button.iconBack:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
@@ -205,14 +306,14 @@ end
 
 local function CreateSidebarGroupLabel(parent, text, yOffset)
     local label = parent.sidebar:CreateFontString(nil, "ARTWORK", "GameFontNormalSmall")
-    label:SetPoint("TOPLEFT", parent.sidebar, "TOPLEFT", 18, yOffset)
+    label:SetPoint("TOPLEFT", parent.sidebar, "TOPLEFT", 11, yOffset)
     label:SetText(text)
     label:SetTextColor(0.66, 0.62, 0.52)
     label:SetJustifyH("LEFT")
 
     local line = parent.sidebar:CreateTexture(nil, "ARTWORK")
     line:SetPoint("LEFT", label, "RIGHT", 8, 0)
-    line:SetPoint("RIGHT", parent.sidebar, "RIGHT", -18, 0)
+    line:SetPoint("RIGHT", parent.sidebar, "RIGHT", -11, 0)
     line:SetHeight(1)
     line:SetColorTexture(0.95, 0.72, 0.28, 0.13)
 
@@ -240,12 +341,14 @@ local function BuildPages(frame)
             pageEntry = true,
         }
     end
+
+    RefreshScrollIndicator(UI.frame, pages[pageKey])
 end
 
 local function CreateTitleBadge(frame)
     local badge = CreateFrame("Frame", nil, frame)
     badge:SetSize(TITLE_BADGE_SIZE, TITLE_BADGE_SIZE)
-    badge:SetPoint("CENTER", frame, "TOPLEFT", 25, -19)
+    badge:SetPoint("CENTER", frame, "TOPLEFT", 8, -8)
     badge:SetFrameLevel(frame:GetFrameLevel() + 8)
 
     badge.shadow = badge:CreateTexture(nil, "BACKGROUND")
@@ -256,9 +359,15 @@ local function CreateTitleBadge(frame)
 
     badge.backing = badge:CreateTexture(nil, "BORDER")
     badge.backing:SetPoint("CENTER")
-    badge.backing:SetSize(TITLE_BADGE_ICON_SIZE + 2, TITLE_BADGE_ICON_SIZE + 2)
+    badge.backing:SetSize(TITLE_BADGE_ICON_SIZE + 7, TITLE_BADGE_ICON_SIZE + 7)
     badge.backing:SetTexture("Interface\\Buttons\\WHITE8x8")
-    badge.backing:SetVertexColor(0.075, 0.068, 0.052, 1)
+    badge.backing:SetVertexColor(0.82, 0.60, 0.16, 1)
+
+    badge.innerBacking = badge:CreateTexture(nil, "BORDER", nil, 1)
+    badge.innerBacking:SetPoint("CENTER")
+    badge.innerBacking:SetSize(TITLE_BADGE_ICON_SIZE + 3, TITLE_BADGE_ICON_SIZE + 3)
+    badge.innerBacking:SetTexture("Interface\\Buttons\\WHITE8x8")
+    badge.innerBacking:SetVertexColor(0.025, 0.028, 0.034, 1)
 
     badge.icon = badge:CreateTexture(nil, "ARTWORK")
     badge.icon:SetPoint("CENTER")
@@ -278,6 +387,14 @@ local function CreateTitleBadge(frame)
 
         if type(badge.backing.AddMaskTexture) == "function" then
             badge.backing:AddMaskTexture(badge.backingMask)
+        end
+
+        badge.innerBackingMask = badge:CreateMaskTexture()
+        badge.innerBackingMask:SetTexture("Interface\\CharacterFrame\\TempPortraitAlphaMask", "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE")
+        badge.innerBackingMask:SetAllPoints(badge.innerBacking)
+
+        if type(badge.innerBacking.AddMaskTexture) == "function" then
+            badge.innerBacking:AddMaskTexture(badge.innerBackingMask)
         end
 
         badge.shadowMask = badge:CreateMaskTexture()
@@ -482,8 +599,8 @@ end
 
 local function CreateSettingsSearch(frame)
     local search = CreateFrame("EditBox", nil, frame.pageHeader, "BackdropTemplate")
-    search:SetSize(400, 32)
-    search:SetPoint("TOPRIGHT", frame.pageHeader, "TOPRIGHT", 0, -29)
+    search:SetSize(360, 30)
+    search:SetPoint("TOPRIGHT", frame.pageHeader, "TOPRIGHT", 0, -31)
     search:SetAutoFocus(false)
     search:SetMaxLetters(80)
     search:SetFont(STANDARD_TEXT_FONT or "Fonts\\FRIZQT__.TTF", 13, "")
@@ -524,7 +641,7 @@ local function CreateSettingsSearch(frame)
 
     local results = CreateFrame("Frame", nil, frame, "BackdropTemplate")
     results:SetPoint("TOPRIGHT", search, "BOTTOMRIGHT", 0, -3)
-    results:SetSize(400, 40)
+    results:SetSize(360, 40)
     results:SetFrameStrata("FULLSCREEN_DIALOG")
     results:SetFrameLevel(250)
     results:SetBackdrop({
@@ -565,8 +682,12 @@ local function CreateSettingsSearch(frame)
             results:Hide()
             search:ClearFocus()
             if C_Timer and C_Timer.After then
-                C_Timer.After(0, function() HighlightSearchControl(frame, entry.control) end)
+                C_Timer.After(0, function()
+                    UI.ScrollControlIntoView(entry.control)
+                    HighlightSearchControl(frame, entry.control)
+                end)
             else
+                UI.ScrollControlIntoView(entry.control)
                 HighlightSearchControl(frame, entry.control)
             end
         end)
@@ -660,34 +781,27 @@ local function CreateMainWindow()
     frame.TitleText:SetJustifyH("CENTER")
 
     CreateTitleBadge(frame)
-    CreateBrandPlate(frame)
-
     frame.sidebar = CreateFrame("Frame", nil, frame, "BackdropTemplate")
     frame.sidebar:SetPoint("TOPLEFT", frame, "TOPLEFT", OUTER_MARGIN, SIDEBAR_TOP)
     frame.sidebar:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT", OUTER_MARGIN, CONTENT_BOTTOM)
     frame.sidebar:SetWidth(SIDEBAR_WIDTH)
     Theme.ApplySurfaceBackdrop(frame.sidebar, 0.88)
 
-    local navTitle = frame.sidebar:CreateFontString(nil, "ARTWORK", "GameFontNormal")
-    navTitle:SetPoint("TOPLEFT", frame.sidebar, "TOPLEFT", 16, -18)
-    navTitle:SetText("Navigation")
-    navTitle:SetTextColor(1, 0.82, 0.14)
-
     frame.pageHeader = CreateFrame("Frame", nil, frame)
     frame.pageHeader:SetPoint("TOPLEFT", frame, "TOPLEFT", CONTENT_LEFT, HEADER_TOP)
     frame.pageHeader:SetPoint("TOPRIGHT", frame, "TOPRIGHT", CONTENT_RIGHT, HEADER_TOP)
-    frame.pageHeader:SetHeight(48)
+    frame.pageHeader:SetHeight(62)
 
     frame.pageTitle = frame.pageHeader:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
     frame.pageTitle:SetPoint("TOPLEFT", 0, 0)
-    frame.pageTitle:SetPoint("RIGHT", frame.pageHeader, "RIGHT", -432, 0)
+    frame.pageTitle:SetPoint("RIGHT", frame.pageHeader, "RIGHT", -378, 0)
     frame.pageTitle:SetTextColor(1, 0.82, 0)
     frame.pageTitle:SetJustifyH("LEFT")
-    frame.pageTitle:SetFont(STANDARD_TEXT_FONT or "Fonts\\FRIZQT__.TTF", 20, "OUTLINE")
+    frame.pageTitle:SetFont(STANDARD_TEXT_FONT or "Fonts\\FRIZQT__.TTF", 18, "OUTLINE")
 
     frame.pageDescription = frame.pageHeader:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
-    frame.pageDescription:SetPoint("TOPLEFT", frame.pageTitle, "BOTTOMLEFT", 0, -8)
-    frame.pageDescription:SetPoint("RIGHT", frame.pageHeader, "RIGHT", -432, 0)
+    frame.pageDescription:SetPoint("TOPLEFT", frame.pageTitle, "BOTTOMLEFT", 0, -5)
+    frame.pageDescription:SetPoint("RIGHT", frame.pageHeader, "RIGHT", -378, 0)
     frame.pageDescription:SetJustifyH("LEFT")
     frame.pageDescription:SetTextColor(0.86, 0.82, 0.72)
 
@@ -697,14 +811,24 @@ local function CreateMainWindow()
     frame.pageHeader.divider:SetHeight(1)
     frame.pageHeader.divider:SetColorTexture(0.95, 0.72, 0.28, 0.16)
 
-    CreateHeaderStatus(frame)
-    RegisterHeaderStatusEvents(frame)
     CreateSettingsSearch(frame)
 
     frame.contentPanel = CreateFrame("Frame", nil, frame, "BackdropTemplate")
     frame.contentPanel:SetPoint("TOPLEFT", frame, "TOPLEFT", CONTENT_LEFT, CONTENT_TOP)
     frame.contentPanel:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", CONTENT_RIGHT, CONTENT_BOTTOM)
     Theme.ApplySurfaceBackdrop(frame.contentPanel, 0.90)
+    if frame.contentPanel.SetClipsChildren then
+        frame.contentPanel:SetClipsChildren(true)
+    end
+    frame.contentPanel:EnableMouseWheel(true)
+    frame.contentPanel:SetScript("OnMouseWheel", function(_, delta)
+        UI.ScrollCurrentPage(delta)
+    end)
+
+    frame.scrollIndicator = frame.contentPanel:CreateTexture(nil, "OVERLAY")
+    frame.scrollIndicator:SetWidth(3)
+    frame.scrollIndicator:SetColorTexture(0.82, 0.62, 0.22, 0.72)
+    frame.scrollIndicator:Hide()
 
     frame.contentPanel.topLine = frame.contentPanel:CreateTexture(nil, "ARTWORK")
     frame.contentPanel.topLine:SetPoint("TOPLEFT", frame.contentPanel, "TOPLEFT", 18, -6)
@@ -715,13 +839,13 @@ local function CreateMainWindow()
     UI.frame = frame
 
     local currentGroup
-    local yOffset = -48
+    local yOffset = -16
 
     for _, info in ipairs(pageOrder) do
         if info.group ~= currentGroup then
             currentGroup = info.group
             CreateSidebarGroupLabel(frame, currentGroup, yOffset)
-            yOffset = yOffset - 22
+            yOffset = yOffset - 17
         end
 
         CreateSidebarButton(frame, info, yOffset)

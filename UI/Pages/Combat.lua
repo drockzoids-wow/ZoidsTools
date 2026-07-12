@@ -297,6 +297,19 @@ function ns.UI.Pages.CreateCombatPage(parent)
         boldKeybindText:Refresh()
         keybindOutline:Refresh()
 
+        local bannerActive = combatBanner:GetChecked() == true
+        UI.SetControlEnabled(combatBannerPersistent, bannerActive)
+        UI.SetControlEnabled(combatBannerLocked, bannerActive)
+
+        local keybindActive = keybindTextEnabled:GetChecked() == true
+        UI.SetControlEnabled(shortenKeybindText, keybindActive)
+        UI.SetControlEnabled(keybindFont, keybindActive)
+        UI.SetControlEnabled(keybindFontSize, keybindActive)
+        UI.SetControlEnabled(useCustomColor, keybindActive)
+        UI.SetControlEnabled(keybindColor, keybindActive and useCustomColor:GetChecked() == true)
+        UI.SetControlEnabled(boldKeybindText, keybindActive)
+        UI.SetControlEnabled(keybindOutline, keybindActive)
+
         if ns.GetCurrentCastOnKeyDownCVar and ns:GetCurrentCastOnKeyDownCVar() then
             status:SetText("Current WoW setting: key down.")
         else

@@ -8,6 +8,28 @@ local controlCounter = 0
 
 UI.SearchEntries = UI.SearchEntries or {}
 
+function UI.SetControlEnabled(control, enabled)
+    if not control then return end
+
+    enabled = enabled == true
+    control.ZTDependencyEnabled = enabled
+    control:SetAlpha(enabled and 1 or 0.42)
+
+    if enabled and control.Enable then
+        control:Enable()
+    elseif not enabled and control.Disable then
+        control:Disable()
+    end
+
+    if control.button then
+        if enabled and control.button.Enable then
+            control.button:Enable()
+        elseif not enabled and control.button.Disable then
+            control.button:Disable()
+        end
+    end
+end
+
 function UI.RegisterSearchControl(parent, control, label, tooltip)
     local pageKey = (parent and parent.ZTPageKey) or UI.BuildingPageKey
     if not pageKey or not control or not label then return end
@@ -21,21 +43,34 @@ function UI.RegisterSearchControl(parent, control, label, tooltip)
 end
 
 UI.Layout = UI.Layout or {
-    indent = 20,
-    rowGap = 12,
-    firstRowGap = 13,
-    controlGap = 18,
-    sectionGap = 38,
-    sliderIndent = 16,
-    sliderGap = 24,
-    buttonGap = 14,
-    columnGap = 44,
+    indent = 12,
+    rowGap = 7,
+    firstRowGap = 9,
+    controlGap = 12,
+    sectionGap = 24,
+    sliderIndent = 10,
+    sliderGap = 18,
+    buttonGap = 8,
+    columnGap = 24,
 }
 
 function UI.CreateCheckbox(parent, label, tooltip, getter, setter)
-    local checkbox = CreateFrame("CheckButton", nil, parent, "ChatConfigCheckButtonTemplate")
-    checkbox.Text:SetText(label)
+    local checkbox = CreateFrame("CheckButton", nil, parent)
+    checkbox:SetSize(30, 20)
     checkbox.tooltip = tooltip
+
+    checkbox.track = checkbox:CreateTexture(nil, "BACKGROUND")
+    checkbox.track:SetPoint("CENTER")
+    checkbox.track:SetSize(28, 14)
+
+    checkbox.knob = checkbox:CreateTexture(nil, "ARTWORK")
+    checkbox.knob:SetSize(10, 10)
+
+    checkbox.Text = checkbox:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
+    checkbox.Text:SetPoint("LEFT", checkbox, "RIGHT", 7, 0)
+    checkbox.Text:SetText(label)
+    checkbox.Text:SetTextColor(0.86, 0.87, 0.89)
+    checkbox:SetHitRectInsets(0, -math.min(230, checkbox.Text:GetStringWidth() + 9), 0, 0)
 
     checkbox:SetScript("OnEnter", function(self)
         if not self.tooltip then
@@ -58,10 +93,26 @@ function UI.CreateCheckbox(parent, label, tooltip, getter, setter)
         if self.Refresh then
             self:Refresh()
         end
+
+        if parent and parent.Refresh then
+            parent:Refresh()
+        end
     end)
 
     function checkbox:Refresh()
-        self:SetChecked(getter() == true)
+        local checked = getter() == true
+        self:SetChecked(checked)
+        self.knob:ClearAllPoints()
+
+        if checked then
+            self.track:SetColorTexture(0.76, 0.55, 0.12, 0.94)
+            self.knob:SetColorTexture(1, 0.90, 0.56, 1)
+            self.knob:SetPoint("RIGHT", self.track, "RIGHT", -2, 0)
+        else
+            self.track:SetColorTexture(0.18, 0.20, 0.24, 0.96)
+            self.knob:SetColorTexture(0.60, 0.62, 0.66, 1)
+            self.knob:SetPoint("LEFT", self.track, "LEFT", 2, 0)
+        end
     end
 
     checkbox:Refresh()
@@ -77,16 +128,16 @@ local function SetStyledButtonState(button)
     local pushed = button.ZTPushed == true
 
     if pushed then
-        button.bg:SetColorTexture(0.18, 0.13, 0.06, 0.96)
-        button.highlight:SetAlpha(0.18)
+        button.bg:SetColorTexture(0.14, 0.11, 0.055, 0.98)
+        button.highlight:SetAlpha(0.12)
     elseif selected then
-        button.bg:SetColorTexture(0.15, 0.105, 0.035, 0.96)
-        button.highlight:SetAlpha(0.28)
+        button.bg:SetColorTexture(0.13, 0.105, 0.052, 0.98)
+        button.highlight:SetAlpha(0.14)
     elseif hovered then
-        button.bg:SetColorTexture(0.10, 0.075, 0.035, 0.95)
-        button.highlight:SetAlpha(0.18)
+        button.bg:SetColorTexture(0.075, 0.080, 0.092, 0.98)
+        button.highlight:SetAlpha(0.08)
     else
-        button.bg:SetColorTexture(0.025, 0.020, 0.015, 0.94)
+        button.bg:SetColorTexture(0.030, 0.034, 0.042, 0.98)
         button.highlight:SetAlpha(0)
     end
 
@@ -103,20 +154,20 @@ local function SetStyledButtonState(button)
     end
 
     if selected or hovered or pushed then
-        button:SetBackdropBorderColor(0.95, 0.72, 0.28, 0.54)
-        button.topLine:SetVertexColor(0.95, 0.72, 0.28, 0.38)
-        button.bottomLine:SetVertexColor(0.95, 0.72, 0.28, 0.26)
-        button.text:SetTextColor(1, 0.86, 0.18)
+        button:SetBackdropBorderColor(0.72, 0.54, 0.18, 0.68)
+        button.topLine:SetVertexColor(0.95, 0.72, 0.28, 0.18)
+        button.bottomLine:SetVertexColor(0.95, 0.72, 0.28, 0.10)
+        button.text:SetTextColor(1, 0.84, 0.32)
     else
-        button:SetBackdropBorderColor(0.55, 0.45, 0.26, 0.34)
-        button.topLine:SetVertexColor(0.72, 0.58, 0.30, 0.20)
-        button.bottomLine:SetVertexColor(0.72, 0.58, 0.30, 0.14)
-        button.text:SetTextColor(0.92, 0.84, 0.68)
+        button:SetBackdropBorderColor(0.25, 0.28, 0.33, 0.78)
+        button.topLine:SetVertexColor(0.55, 0.58, 0.63, 0.08)
+        button.bottomLine:SetVertexColor(0.55, 0.58, 0.63, 0.05)
+        button.text:SetTextColor(0.84, 0.85, 0.87)
     end
 end
 
 function UI.CreateButton(parent, text, width, height)
-    local buttonHeight = height or 32
+    local buttonHeight = height or 27
     local button = CreateFrame("Button", nil, parent, "BackdropTemplate")
     button:SetSize(width or 132, buttonHeight)
     button:RegisterForClicks("AnyUp")
@@ -125,40 +176,38 @@ function UI.CreateButton(parent, text, width, height)
         edgeFile = Theme and Theme.panelBorder or "Interface\\Tooltips\\UI-Tooltip-Border",
         tile = true,
         tileSize = 16,
-        edgeSize = 10,
-        insets = { left = 3, right = 3, top = 3, bottom = 3 },
+        edgeSize = 7,
+        insets = { left = 1, right = 1, top = 1, bottom = 1 },
     })
 
     button.bg = button:CreateTexture(nil, "BACKGROUND")
-    button.bg:SetPoint("TOPLEFT", 4, -4)
-    button.bg:SetPoint("BOTTOMRIGHT", -4, 4)
+    button.bg:SetPoint("TOPLEFT", 2, -2)
+    button.bg:SetPoint("BOTTOMRIGHT", -2, 2)
 
     button.highlight = button:CreateTexture(nil, "BORDER")
-    button.highlight:SetPoint("TOPLEFT", 5, -5)
-    button.highlight:SetPoint("BOTTOMRIGHT", -5, 5)
+    button.highlight:SetPoint("TOPLEFT", 2, -2)
+    button.highlight:SetPoint("BOTTOMRIGHT", -2, 2)
     button.highlight:SetColorTexture(1, 0.82, 0.25, 1)
 
     button.topLine = button:CreateTexture(nil, "ARTWORK")
-    button.topLine:SetPoint("TOPLEFT", 12, -5)
-    button.topLine:SetPoint("TOPRIGHT", -12, -5)
+    button.topLine:SetPoint("TOPLEFT", 8, -2)
+    button.topLine:SetPoint("TOPRIGHT", -8, -2)
     button.topLine:SetHeight(1)
     button.topLine:SetColorTexture(1, 1, 1, 1)
 
     button.bottomLine = button:CreateTexture(nil, "ARTWORK")
-    button.bottomLine:SetPoint("BOTTOMLEFT", 12, 5)
-    button.bottomLine:SetPoint("BOTTOMRIGHT", -12, 5)
+    button.bottomLine:SetPoint("BOTTOMLEFT", 8, 2)
+    button.bottomLine:SetPoint("BOTTOMRIGHT", -8, 2)
     button.bottomLine:SetHeight(1)
     button.bottomLine:SetColorTexture(1, 1, 1, 1)
 
     button.leftCap = button:CreateTexture(nil, "ARTWORK")
-    button.leftCap:SetPoint("LEFT", 6, 0)
-    button.leftCap:SetSize(2, math.max(buttonHeight - 12, 8))
-    button.leftCap:SetColorTexture(1, 0.82, 0.25, 0.26)
+    button.leftCap:SetSize(1, 1)
+    button.leftCap:SetAlpha(0)
 
     button.rightCap = button:CreateTexture(nil, "ARTWORK")
-    button.rightCap:SetPoint("RIGHT", -6, 0)
-    button.rightCap:SetSize(2, math.max(buttonHeight - 12, 8))
-    button.rightCap:SetColorTexture(1, 0.82, 0.25, 0.26)
+    button.rightCap:SetSize(1, 1)
+    button.rightCap:SetAlpha(0)
 
     button.text = button:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     button.text:SetPoint("CENTER")
@@ -221,7 +270,7 @@ end
 
 function UI.CreateSection(parent, text, anchor, offsetY, width)
     local section = CreateFrame("Frame", nil, parent)
-    section:SetHeight(26)
+    section:SetHeight(22)
 
     if anchor then
         section:SetPoint("TOPLEFT", anchor, "BOTTOMLEFT", 0, offsetY or -20)
@@ -237,12 +286,12 @@ function UI.CreateSection(parent, text, anchor, offsetY, width)
 
     section.label = section:CreateFontString(nil, "ARTWORK", "GameFontNormal")
     section.label:SetPoint("LEFT", 0, 0)
-    section.label:SetTextColor(0.95, 0.72, 0.28)
+    section.label:SetTextColor(0.94, 0.73, 0.30)
     section.label:SetText(text)
 
     section.divider = section:CreateTexture(nil, "ARTWORK")
-    section.divider:SetColorTexture(0.95, 0.72, 0.28, 0.18)
-    section.divider:SetPoint("LEFT", section.label, "RIGHT", 12, 0)
+    section.divider:SetColorTexture(0.38, 0.40, 0.44, 0.38)
+    section.divider:SetPoint("LEFT", section.label, "RIGHT", 9, 0)
     section.divider:SetPoint("RIGHT", section, "RIGHT", 0, 0)
     section.divider:SetHeight(1)
 
@@ -302,7 +351,7 @@ function UI.CreateDropdown(parent, label, tooltip, options, getter, setter, widt
     local dropdownWidth = width or 240
     local rowHeight = 26
 
-    control:SetSize(dropdownWidth, 54)
+    control:SetSize(dropdownWidth, 48)
 
     control.label = control:CreateFontString(nil, "ARTWORK", "GameFontNormal")
     control.label:SetPoint("TOPLEFT", 0, 0)
@@ -310,19 +359,19 @@ function UI.CreateDropdown(parent, label, tooltip, options, getter, setter, widt
     control.label:SetText(label)
 
     control.button = CreateFrame("Button", nil, control, "BackdropTemplate")
-    control.button:SetPoint("TOPLEFT", control.label, "BOTTOMLEFT", 0, -6)
-    control.button:SetSize(dropdownWidth, 30)
+    control.button:SetPoint("TOPLEFT", control.label, "BOTTOMLEFT", 0, -4)
+    control.button:SetSize(dropdownWidth, 27)
     control.button:RegisterForClicks("LeftButtonUp")
     control.button:SetBackdrop({
         bgFile = Theme and Theme.panelBg or "Interface\\DialogFrame\\UI-DialogBox-Background",
         edgeFile = Theme and Theme.panelBorder or "Interface\\Tooltips\\UI-Tooltip-Border",
         tile = true,
         tileSize = 16,
-        edgeSize = 10,
-        insets = { left = 3, right = 3, top = 3, bottom = 3 },
+        edgeSize = 7,
+        insets = { left = 1, right = 1, top = 1, bottom = 1 },
     })
     control.button:SetBackdropColor(0.012, 0.014, 0.018, 0.95)
-    control.button:SetBackdropBorderColor(0.55, 0.45, 0.26, 0.38)
+    control.button:SetBackdropBorderColor(0.25, 0.28, 0.33, 0.82)
 
     control.button.text = control.button:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
     control.button.text:SetPoint("LEFT", control.button, "LEFT", 10, 0)
@@ -487,7 +536,7 @@ function UI.CreateMultiSelectDropdown(parent, label, tooltip, options, width)
     local dropdownWidth = width or 320
     local rowHeight = 26
 
-    control:SetSize(dropdownWidth, 54)
+    control:SetSize(dropdownWidth, 48)
 
     control.label = control:CreateFontString(nil, "ARTWORK", "GameFontNormal")
     control.label:SetPoint("TOPLEFT", 0, 0)
@@ -495,19 +544,19 @@ function UI.CreateMultiSelectDropdown(parent, label, tooltip, options, width)
     control.label:SetText(label)
 
     control.button = CreateFrame("Button", nil, control, "BackdropTemplate")
-    control.button:SetPoint("TOPLEFT", control.label, "BOTTOMLEFT", 0, -6)
-    control.button:SetSize(dropdownWidth, 30)
+    control.button:SetPoint("TOPLEFT", control.label, "BOTTOMLEFT", 0, -4)
+    control.button:SetSize(dropdownWidth, 27)
     control.button:RegisterForClicks("LeftButtonUp")
     control.button:SetBackdrop({
         bgFile = Theme and Theme.panelBg or "Interface\\DialogFrame\\UI-DialogBox-Background",
         edgeFile = Theme and Theme.panelBorder or "Interface\\Tooltips\\UI-Tooltip-Border",
         tile = true,
         tileSize = 16,
-        edgeSize = 10,
-        insets = { left = 3, right = 3, top = 3, bottom = 3 },
+        edgeSize = 7,
+        insets = { left = 1, right = 1, top = 1, bottom = 1 },
     })
     control.button:SetBackdropColor(0.012, 0.014, 0.018, 0.95)
-    control.button:SetBackdropBorderColor(0.55, 0.45, 0.26, 0.38)
+    control.button:SetBackdropBorderColor(0.25, 0.28, 0.33, 0.82)
 
     control.button.text = control.button:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
     control.button.text:SetPoint("LEFT", control.button, "LEFT", 10, 0)
@@ -851,11 +900,11 @@ function UI.CreateSlider(parent, label, tooltip, minValue, maxValue, step, gette
     local high = _G[name .. "High"]
 
     if low then
-        low:SetText(valueFormatter and valueFormatter(minValue) or tostring(minValue))
+        low:Hide()
     end
 
     if high then
-        high:SetText(valueFormatter and valueFormatter(maxValue) or tostring(maxValue))
+        high:Hide()
     end
 
     local function FormatValue(value)

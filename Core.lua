@@ -157,6 +157,7 @@ local defaults = {
         fontSize = 12,
         useQualityColor = true,
         statTargetContext = "mythicplus",
+        statGoalsPanelShown = true,
         character = {
             itemLevel = true,
             gems = true,

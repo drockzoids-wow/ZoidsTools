@@ -8,6 +8,8 @@ local trackedRows = {}
 local hookedFunctions = {}
 local fallbackTexts = {}
 local sourceDropdown
+local statPanel
+local statToggleButton
 
 local STAT_ORDER = { "crit", "haste", "mastery", "versatility" }
 local SOURCE_OPTIONS = {
@@ -150,6 +152,20 @@ local function SafeNumber(value)
     return nil
 end
 
+local function SafeText(value)
+    if value == nil or IsSecretValue(value) then
+        return nil
+    end
+
+    local ok, text = pcall(tostring, value)
+
+    if ok and type(text) == "string" and text ~= "" then
+        return text
+    end
+
+    return nil
+end
+
 local function NormalizeText(text)
     local ok, normalized = pcall(function()
         text = tostring(text or "")
@@ -194,6 +210,10 @@ local function EnsureDB()
 
     if ns.db.items.statTargetContext == nil then
         ns.db.items.statTargetContext = "mythicplus"
+    end
+
+    if ns.db.items.statGoalsPanelShown == nil then
+        ns.db.items.statGoalsPanelShown = true
     end
 
     return ns.db.items
@@ -623,7 +643,9 @@ local function RestoreRow(row)
 
     local valueFont = FindValueFont(row)
 
-    if valueFont and row.ZTStatTargetDefaultText then
+    if valueFont
+        and type(row.ZTStatTargetDefaultText) == "string"
+        and row.ZTStatTargetDefaultText ~= "" then
         valueFont:SetText(row.ZTStatTargetDefaultText)
     end
 
@@ -833,7 +855,13 @@ local function SetRowValueText(row, statKey, defaultText)
         return false
     end
 
-    row.ZTStatTargetDefaultText = FormatDefaultPercent(statKey) or ""
+    local defaultText = FormatDefaultPercent(statKey)
+
+    if defaultText then
+        row.ZTStatTargetDefaultText = defaultText
+    elseif type(row.ZTStatTargetDefaultText) ~= "string" or row.ZTStatTargetDefaultText == "" then
+        row.ZTStatTargetDefaultText = SafeText(valueFont.GetText and valueFont:GetText())
+    end
 
     if not IsEnabled() then
         RestoreRow(row)
@@ -941,8 +969,188 @@ local function ShowFallbackRows()
     end
 end
 
+local function PositionStatPanel(panel)
+    local characterFrame = _G.CharacterFrame
+
+    if not panel or not characterFrame then
+        return
+    end
+
+    panel:ClearAllPoints()
+
+    local frameRight = characterFrame.GetRight and characterFrame:GetRight()
+    local screenRight = UIParent and UIParent.GetRight and UIParent:GetRight()
+
+    if frameRight and screenRight and (screenRight - frameRight) >= 282 then
+        panel:SetPoint("BOTTOMLEFT", characterFrame, "BOTTOMRIGHT", 6, 0)
+    else
+        panel:SetPoint("BOTTOMRIGHT", characterFrame, "BOTTOMLEFT", -6, 0)
+    end
+end
+
+local function RefreshStatToggleButton()
+    if not statToggleButton then return end
+
+    local db = EnsureDB()
+    local shown = db and db.statGoalsPanelShown == true
+    statToggleButton:SetBackdropColor(shown and 0.14 or 0.035, shown and 0.10 or 0.038, shown and 0.035 or 0.045, 0.97)
+    statToggleButton:SetBackdropBorderColor(shown and 0.92 or 0.35, shown and 0.68 or 0.38, shown and 0.20 or 0.42, shown and 0.86 or 0.72)
+    statToggleButton.text:SetTextColor(shown and 1 or 0.72, shown and 0.82 or 0.74, shown and 0.24 or 0.78)
+end
+
+local function EnsureStatToggleButton()
+    if statToggleButton then
+        RefreshStatToggleButton()
+        return statToggleButton
+    end
+
+    local characterFrame = _G.CharacterFrame
+
+    if not characterFrame then
+        return nil
+    end
+
+    local button = CreateFrame("Button", "ZoidsToolsStatGoalsToggle", characterFrame, "BackdropTemplate")
+    button:SetSize(50, 22)
+    button:SetPoint("BOTTOMRIGHT", characterFrame, "BOTTOMRIGHT", -10, 10)
+    button:SetFrameLevel((characterFrame:GetFrameLevel() or 1) + 14)
+    button:RegisterForClicks("LeftButtonUp")
+    button:SetBackdrop({
+        bgFile = "Interface\\Buttons\\WHITE8x8",
+        edgeFile = "Interface\\Buttons\\WHITE8x8",
+        edgeSize = 1,
+    })
+
+    button.text = button:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    button.text:SetPoint("CENTER")
+    button.text:SetText("Goals")
+
+    button:SetScript("OnClick", function()
+        local db = EnsureDB()
+        if not db then return end
+        db.statGoalsPanelShown = not (db.statGoalsPanelShown == true)
+        RefreshStatToggleButton()
+
+        if ns.RefreshStatTargets then
+            ns:RefreshStatTargets()
+        end
+    end)
+
+    button:SetScript("OnEnter", function(self)
+        GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+        GameTooltip:SetText("Stat Goals")
+        GameTooltip:AddLine("Show or hide the ZoidsTools stat-goal panel.", 1, 1, 1, true)
+        GameTooltip:Show()
+    end)
+    button:SetScript("OnLeave", function() GameTooltip:Hide() end)
+
+    statToggleButton = button
+    RefreshStatToggleButton()
+    return button
+end
+
+local function EnsureStatPanel()
+    if statPanel then
+        PositionStatPanel(statPanel)
+        return statPanel
+    end
+
+    local characterFrame = _G.CharacterFrame
+
+    if not characterFrame then
+        return nil
+    end
+
+    local panel = CreateFrame("Frame", "ZoidsToolsStatGoalsPanel", UIParent, "BackdropTemplate")
+    panel:SetSize(276, 174)
+    panel:SetFrameStrata(characterFrame:GetFrameStrata() or "HIGH")
+    panel:SetFrameLevel((characterFrame:GetFrameLevel() or 1) + 12)
+    panel:SetClampedToScreen(true)
+    panel:SetBackdrop({
+        bgFile = "Interface\\Buttons\\WHITE8x8",
+        edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
+        tile = false,
+        edgeSize = 10,
+        insets = { left = 3, right = 3, top = 3, bottom = 3 },
+    })
+    panel:SetBackdropColor(0.018, 0.021, 0.028, 0.97)
+    panel:SetBackdropBorderColor(0.65, 0.50, 0.20, 0.78)
+
+    panel.title = panel:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    panel.title:SetPoint("TOPLEFT", 12, -14)
+    panel.title:SetText("Stat Goals")
+    panel.title:SetTextColor(1, 0.82, 0.20)
+
+    panel.divider = panel:CreateTexture(nil, "ARTWORK")
+    panel.divider:SetPoint("TOPLEFT", 10, -38)
+    panel.divider:SetPoint("TOPRIGHT", -10, -38)
+    panel.divider:SetHeight(1)
+    panel.divider:SetColorTexture(0.50, 0.42, 0.26, 0.40)
+
+    local headers = {
+        { text = "Stat", x = 12, width = 62, justify = "LEFT" },
+        { text = "%", x = 74, width = 38 },
+        { text = "Now", x = 112, width = 45 },
+        { text = "Goal", x = 157, width = 45 },
+        { text = "+/-", x = 202, width = 58 },
+    }
+
+    for _, info in ipairs(headers) do
+        local header = panel:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
+        header:SetPoint("TOPLEFT", info.x, -45)
+        header:SetWidth(info.width)
+        header:SetJustifyH(info.justify or "RIGHT")
+        header:SetText(info.text)
+    end
+
+    panel.rows = {}
+    local rowLabels = {
+        crit = "Critical",
+        haste = "Haste",
+        mastery = "Mastery",
+        versatility = "Versatility",
+    }
+
+    for index, statKey in ipairs(STAT_ORDER) do
+        local y = -65 - ((index - 1) * 25)
+        local row = {}
+
+        row.background = panel:CreateTexture(nil, "BACKGROUND")
+        row.background:SetPoint("TOPLEFT", 8, y + 4)
+        row.background:SetPoint("TOPRIGHT", -8, y + 4)
+        row.background:SetHeight(23)
+        row.background:SetColorTexture(1, 1, 1, index % 2 == 0 and 0.025 or 0.045)
+
+        row.label = panel:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+        row.label:SetPoint("TOPLEFT", 12, y)
+        row.label:SetWidth(62)
+        row.label:SetJustifyH("LEFT")
+        row.label:SetText(rowLabels[statKey])
+        row.label:SetTextColor(0.96, 0.76, 0.24)
+
+        local function CreateValue(x, width)
+            local text = panel:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+            text:SetPoint("TOPLEFT", x, y)
+            text:SetWidth(width)
+            text:SetJustifyH("RIGHT")
+            return text
+        end
+
+        row.percent = CreateValue(74, 38)
+        row.current = CreateValue(112, 45)
+        row.target = CreateValue(157, 45)
+        row.delta = CreateValue(202, 58)
+        panel.rows[statKey] = row
+    end
+
+    panel:Hide()
+    statPanel = panel
+    PositionStatPanel(panel)
+    return panel
+end
+
 local function GetCharacterSourceDropdownParent()
-    return _G.CharacterFrame or _G.PaperDollFrame or _G.CharacterStatsPane or _G.CharacterFrameInsetRight
+    return statPanel
 end
 
 local function AnchorCharacterSourceDropdown(control, parent)
@@ -952,11 +1160,7 @@ local function AnchorCharacterSourceDropdown(control, parent)
 
     control:ClearAllPoints()
 
-    if parent == _G.CharacterFrame then
-        control:SetPoint("TOPRIGHT", parent, "BOTTOMRIGHT", -6, -2)
-    else
-        control:SetPoint("BOTTOMRIGHT", parent, "BOTTOMRIGHT", -4, 4)
-    end
+    control:SetPoint("TOPRIGHT", parent, "TOPRIGHT", -10, -10)
 end
 
 local function PositionSourceDropdownMenu(control)
@@ -1146,6 +1350,62 @@ local function EnsureCharacterSourceDropdown()
     return control
 end
 
+local function RefreshStatPanel()
+    local panel = EnsureStatPanel()
+    local toggle = EnsureStatToggleButton()
+    local characterFrame = _G.CharacterFrame
+    local db = EnsureDB()
+
+    if not panel
+        or not IsEnabled()
+        or not characterFrame
+        or (characterFrame.IsShown and not characterFrame:IsShown()) then
+        if panel then panel:Hide() end
+        if sourceDropdown then sourceDropdown:Hide() end
+        if toggle then toggle:Hide() end
+        return
+    end
+
+    toggle:Show()
+    RefreshStatToggleButton()
+
+    if not db or db.statGoalsPanelShown ~= true then
+        panel:Hide()
+        if sourceDropdown then sourceDropdown:Hide() end
+        return
+    end
+
+    PositionStatPanel(panel)
+    panel:Show()
+    EnsureCharacterSourceDropdown()
+    RefreshCharacterSourceDropdown()
+
+    local snapshot = GetSnapshot()
+    local targets = snapshot and snapshot.targets
+
+    for _, statKey in ipairs(STAT_ORDER) do
+        local row = panel.rows and panel.rows[statKey]
+
+        if row then
+            local percent = FormatDefaultPercent(statKey)
+            local current = GetRating(statKey)
+            local target = targets and SafeNumber(targets[statKey])
+
+            row.percent:SetText(percent or "--")
+            row.current:SetText(current and FormatRating(current) or "--")
+            row.target:SetText(target and FormatRating(target) or "--")
+
+            if current and target then
+                local deltaText = FormatDelta(current, target)
+                row.delta:SetText(deltaText)
+            else
+                row.delta:SetText("--")
+                row.delta:SetTextColor(0.58, 0.60, 0.64)
+            end
+        end
+    end
+end
+
 local function UpdateTrackedRows()
     if not IsEnabled() then
         HideAllRows()
@@ -1243,7 +1503,9 @@ local function TrackStatRow(row)
     end
 
     row.ZTStatTargetKey = statKey
-    row.ZTStatTargetDefaultText = FormatDefaultPercent(statKey) or ""
+    local valueFont = FindValueFont(row)
+    row.ZTStatTargetDefaultText = FormatDefaultPercent(statKey)
+        or SafeText(valueFont and valueFont.GetText and valueFont:GetText())
     trackedRows[row] = true
     UpdateStatRow(row)
 end
@@ -1301,8 +1563,8 @@ local function QueueRefresh(delay)
     local function Run()
         pendingRefresh = false
 
-        ScanCharacterStatsPane()
-        UpdateTrackedRows()
+        HideAllRows()
+        RefreshStatPanel()
     end
 
     if C_Timer and C_Timer.After then
@@ -1327,7 +1589,7 @@ local function OnSetLabelAndText(row, label, text)
     end
 
     row.ZTStatTargetKey = statKey
-    row.ZTStatTargetDefaultText = FormatDefaultPercent(statKey) or ""
+    row.ZTStatTargetDefaultText = FormatDefaultPercent(statKey) or SafeText(text)
     trackedRows[row] = true
 
     SetRowValueText(row, statKey, row.ZTStatTargetDefaultText)
@@ -1404,6 +1666,10 @@ local function InstallShowHooks()
         CharacterFrame:HookScript("OnShow", function()
             QueueRefresh(0.12)
         end)
+        CharacterFrame:HookScript("OnHide", function()
+            if statPanel then statPanel:Hide() end
+            if sourceDropdown then sourceDropdown:Hide() end
+        end)
         installed = true
     end
 
@@ -1478,7 +1744,6 @@ end
 
 function ns:InitializeStatTargets()
     EnsureDB()
-    InstallHook()
     InstallShowHooks()
 
     if not eventFrame then
@@ -1515,7 +1780,6 @@ function ns:InitializeStatTargets()
             end
 
             if event == "ADDON_LOADED" then
-                InstallHook()
                 InstallShowHooks()
                 QueueRefresh(0.12)
                 return
@@ -1533,15 +1797,12 @@ function ns:InitializeStatTargets()
                 InstallShowHooks()
             end
 
-            InstallHook()
-
             QueueRefresh(event == "PLAYER_EQUIPMENT_CHANGED" and 0.18 or 0.08)
         end)
     end
 
     if C_Timer and C_Timer.After then
         C_Timer.After(1, function()
-            InstallHook()
             QueueRefresh(0.02)
         end)
     end

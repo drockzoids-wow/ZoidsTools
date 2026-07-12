@@ -94,13 +94,53 @@ function ns.UI.Pages.CreateMacrosPage(parent)
     )
     UI.PlaceBelow(manaCombat, manaEnabled)
 
-    local actionsSection = UI.PlaceSection(frame, "Actions", manaCombat)
+    local hearthstoneSection = UI.PlaceSection(frame, "Random Hearthstone", manaCombat)
+
+    local hearthstoneEnabled = UI.CreateCheckbox(
+        frame,
+        "Create ZT Hearth macro",
+        "Creates a macro that uses a random selected Hearthstone. The ZoidsTools keybind is always available.",
+        function()
+            return ns.GetRandomHearthstoneEnabled and ns:GetRandomHearthstoneEnabled()
+        end,
+        function(value)
+            if ns.SetRandomHearthstoneEnabled then
+                ns:SetRandomHearthstoneEnabled(value)
+            end
+        end
+    )
+    UI.PlaceFirst(hearthstoneEnabled, hearthstoneSection)
+
+    local selectHearthstones = UI.CreateButton(frame, "Select Hearthstones  v", 180)
+    UI.PlaceBelow(selectHearthstones, hearthstoneEnabled, 0, 16)
+    selectHearthstones:SetScript("OnClick", function()
+        if ns.OpenRandomHearthstoneSelector then
+            ns:OpenRandomHearthstoneSelector(selectHearthstones)
+        end
+    end)
+
+    local hearthstoneStatus = UI.CreateStatusText(frame, 420)
+    hearthstoneStatus:SetPoint("LEFT", selectHearthstones, "RIGHT", 18, 0)
+
+    local actionsSection = UI.PlaceSection(frame, "Actions", selectHearthstones)
 
     local refreshButton = UI.CreateButton(frame, "Refresh Macros", 140)
     UI.PlaceFirst(refreshButton, actionsSection)
     refreshButton:SetScript("OnClick", function()
         if ns.RefreshConsumableMacros then
-            ns:RefreshConsumableMacros()
+            ns:RefreshConsumableMacros(true)
+        end
+
+        if ns.RefreshRandomHearthstoneMacro then
+            ns:RefreshRandomHearthstoneMacro()
+        end
+
+        if ns.Print then
+            if InCombatLockdown and InCombatLockdown() then
+                ns:Print("Macro refresh queued until combat ends.")
+            else
+                ns:Print("Enabled macros checked and refreshed where needed.")
+            end
         end
 
         if frame.Refresh then
@@ -117,6 +157,7 @@ function ns.UI.Pages.CreateMacrosPage(parent)
         healthCombat:Refresh()
         manaEnabled:Refresh()
         manaCombat:Refresh()
+        hearthstoneEnabled:Refresh()
 
         local healthStatus = "Health macro disabled."
         local manaStatus = "Mana macro disabled."
@@ -126,9 +167,15 @@ function ns.UI.Pages.CreateMacrosPage(parent)
         end
 
         status:SetText((healthStatus or "") .. "\n" .. (manaStatus or ""))
+        hearthstoneStatus:SetText(ns.GetRandomHearthstoneStatus and ns:GetRandomHearthstoneStatus() or "")
     end
 
     frame:SetScript("OnShow", frame.Refresh)
+    frame:SetScript("OnHide", function()
+        if ns.CloseRandomHearthstoneSelector then
+            ns:CloseRandomHearthstoneSelector()
+        end
+    end)
 
     return frame
 end

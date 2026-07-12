@@ -4,7 +4,7 @@
 
 ZoidsToolsTalentGrimoire = ZoidsToolsTalentGrimoire or {}
 ZoidsToolsTalentGrimoire.schemaVersion = 1
-ZoidsToolsTalentGrimoire.generatedAt = "2026-07-11 15:34:02 -05:00"
+ZoidsToolsTalentGrimoire.generatedAt = "2026-07-12 09:43:45 -05:00"
 ZoidsToolsTalentGrimoire.source = "Archon + Icy Veins"
 ZoidsToolsTalentGrimoire.targets = {
     mythicplus = {
@@ -2339,7 +2339,7 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         normal = {
                             title = "Normal Raid - All Bosses",
-                            importString = "CsbBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAzMDMDzYmBMYMTzMzMNjx2MmZmZmHYmZGwMmxYmZZmZgBGDWglxox2AYGA2wAzMYYA",
+                            importString = "CsbBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAzMDMDzYmBMYMTzMzMNjx2MmZmZmHYmZGwMmxYmZbmZgBGDWglxox2AYGA2wAzMYYA",
                             difficulty = "Normal",
                         },
                         heroic = {
@@ -2654,7 +2654,7 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Nexus-Point Xenas",
-                            importString = "C0PAAAAAAAAAAAAAAAAAAAAAAAMmxwCsAzwQDbAAYGPwyMzsYGmZmZGzMMzMmhZGzMzYzMjZMDGaGAAAAAAAAwMjxAmZDgFzCYbAA",
+                            importString = "C0PAAAAAAAAAAAAAAAAAAAAAAAMmxwCsAzwQDbAAYGPwyMzsYGmZmZGzMMzMmhZGzYGbzMjZMDGaGAAAAAAAAwMjZGwMbAwsA2GA",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -5224,7 +5224,7 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Maisara Caverns",
-                            importString = "CEQAAAAAAAAAAAAAAAAAAAAAAwYAAAAAAgZzwYWGMmZmZMzMjlZmZAAAAYMWmBzMzYzYmxAmpAAzsZGmNDAMGsZMWA0MmZMGmZ2WGgBMA",
+                            importString = "CEQAAAAAAAAAAAAAAAAAAAAAAwYAAAAAAgZzwYWGMmZmZMzMjlZmZAAAAYMzyMYmZGmxMjBMTBAmZzMMbGAYMYzYsAoZYGjhZmtlBYAD",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -5241,7 +5241,7 @@ ZoidsToolsTalentGrimoire.data = {
                     builds = {
                         lowkey = {
                             title = "Low Keys - Nexus-Point Xenas",
-                            importString = "CEQAAAAAAAAAAAAAAAAAAAAAAwYAAAAAAgZzwYWGMmZmZMzMjlZmZAAAAYMWmBzMzgxMjxGmpAAzsZGmNDAMGsZMWA0MmZMGmZ2WGgBMA",
+                            importString = "CEQAAAAAAAAAAAAAAAAAAAAAAwYAAAAAAgZzwYWGMmZmZMzMjlZmZAAAAYMWmBzMzYzYmxAmpAAzsZGmNDAMGsZMWA0MmZMGmZ2WGgBMA",
                             keyRange = "Low Keys, this week",
                             difficulty = "Mythic+",
                         },
@@ -7913,7 +7913,7 @@ ZoidsToolsTalentGrimoire.data = {
                         },
                         heroic = {
                             title = "Heroic Raid - All Bosses",
-                            importString = "CkEAAAAAAAAAAAAAAAAAAAAAA0yAAAzMjZmZmZGzmxsMjxY0wMDLzMzMDGzMAAAAYZAYGDwAbwyiRjZAMbYmNYGzMY2GAMzAAwMgB",
+                            importString = "CkEAAAAAAAAAAAAAAAAAAAAAA0yAAAzMzYmZGzY2MzsMjxYmGmZYZMzMDzYmBAAAALDAzYAGYDWWMaMDgZDzsBzYmBz2AgZGAAGgB",
                             difficulty = "Heroic",
                         },
                         mythic = {

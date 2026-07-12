@@ -42,6 +42,9 @@ local defaults = {
         fastSkip = false,
         autoSkip = false,
     },
+    mythicInviteBanner = {
+        enabled = true,
+    },
     tooltips = {
         factionBackground = true,
         classColoredNames = true,
@@ -91,6 +94,8 @@ local defaults = {
         healthCombatItems = true,
         manaEnabled = false,
         manaCombatPotion = true,
+        hearthstoneEnabled = true,
+        hearthstoneExcluded = {},
     },
     unitFrames = {
         classColorHealth = false,
@@ -227,6 +232,13 @@ local defaults = {
         scale = 1,
     },
     ui = {
+        talkingHead = {
+            enabled = true,
+            opacity = 0.72,
+            background = true,
+            fontSize = 14,
+            bold = false,
+        },
         minimap = {
             show = true,
             hide = false,
@@ -331,6 +343,7 @@ local function PrintHelp()
     ns:Print("/zt coords on/off toggles the coordinates widget.")
     ns:Print("/zt coords reset resets the coordinates widget position.")
     ns:Print("/zt diag start/stop/report/reset controls performance diagnostics.")
+    ns:Print("/zt invitebanner previews the Mythic+ invitation banner.")
     ns:Print("/zt items opens item overlay options.")
     ns:Print("/zt iteminfo on/off toggles item overlays.")
     ns:Print("/zt talents opens talent build options.")
@@ -561,7 +574,15 @@ local function HandleSlash(input)
         end
     elseif input == "refreshmacros" or input == "macros refresh" or input == "macro refresh" then
         if ns.RefreshConsumableMacros then
-            ns:RefreshConsumableMacros()
+            ns:RefreshConsumableMacros(true)
+        end
+        if ns.RefreshRandomHearthstoneMacro then
+            ns:RefreshRandomHearthstoneMacro()
+        end
+        if InCombatLockdown and InCombatLockdown() then
+            ns:Print("Macro refresh queued until combat ends.")
+        else
+            ns:Print("Enabled macros checked and refreshed where needed.")
         end
     elseif input == "smartmount on" or input == "mounts on" then
         if ns.SetMountsEnabled then
@@ -611,6 +632,10 @@ local function HandleSlash(input)
         if ns.ResetDiagnostics then
             ns:ResetDiagnostics()
         end
+    elseif input == "invitebanner" or input == "invite banner" or input == "mythicinvite" then
+        if ns.PreviewMythicInviteBanner then
+            ns:PreviewMythicInviteBanner()
+        end
     elseif input == "help" then
         PrintHelp()
     else
@@ -657,8 +682,16 @@ eventFrame:SetScript("OnEvent", function(_, event, addonName)
             ns:InitializeCinematicSkip()
         end
 
+        if ns.InitializeSubtleTalkingHead then
+            ns:InitializeSubtleTalkingHead()
+        end
+
         if ns.InitializeCombatBanner then
             ns:InitializeCombatBanner()
+        end
+
+        if ns.InitializeMythicInviteBanner then
+            ns:InitializeMythicInviteBanner()
         end
 
         if ns.InitializeBuffWarnings then
@@ -671,6 +704,10 @@ eventFrame:SetScript("OnEvent", function(_, event, addonName)
 
         if ns.InitializeConsumableMacros then
             ns:InitializeConsumableMacros()
+        end
+
+        if ns.InitializeRandomHearthstone then
+            ns:InitializeRandomHearthstone()
         end
 
         if ns.InitializeMounts then

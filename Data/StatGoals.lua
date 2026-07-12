@@ -3,7 +3,7 @@
 -- Re-run the updater instead of editing this file by hand.
 
 ZoidsToolsStatGoals = ZoidsToolsStatGoals or {}
-ZoidsToolsStatGoals.generatedAt = "2026-07-11 15:35:14 -05:00"
+ZoidsToolsStatGoals.generatedAt = "2026-07-12 09:44:56 -05:00"
 ZoidsToolsStatGoals.data = {
     ["DEATHKNIGHT"] = {
         ["blood"] = {
@@ -154,7 +154,7 @@ ZoidsToolsStatGoals.data = {
         },
         ["holy"] = {
             ["Mythic+"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/holy/priest/mythic-plus/overview/high-keys/all-dungeons/this-week", targets = { crit = 838, haste = 769, mastery = 578, versatility = 316 } },
-            ["Raid"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/holy/priest/raid/overview/mythic/all-bosses", targets = { crit = 1051, haste = 542, mastery = 826, versatility = 168 } },
+            ["Raid"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/holy/priest/raid/overview/mythic/all-bosses", targets = { crit = 1051, haste = 539, mastery = 828, versatility = 168 } },
             ["PvP"] = { source = "Murlok", sourceUrl = "https://murlok.io/priest/holy/3v3", targets = { crit = 10, haste = 314, mastery = 672, versatility = 904 } },
         },
         ["shadow"] = {
@@ -188,7 +188,7 @@ ZoidsToolsStatGoals.data = {
         },
         ["enhancement"] = {
             ["Mythic+"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/enhancement/shaman/mythic-plus/overview/high-keys/all-dungeons/this-week", targets = { crit = 455, haste = 981, mastery = 1130, versatility = 56 } },
-            ["Raid"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/enhancement/shaman/raid/overview/mythic/all-bosses", targets = { crit = 404, haste = 980, mastery = 1158, versatility = 76 } },
+            ["Raid"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/enhancement/shaman/raid/overview/mythic/all-bosses", targets = { crit = 403, haste = 980, mastery = 1158, versatility = 76 } },
             ["PvP"] = { source = "Murlok", sourceUrl = "https://murlok.io/shaman/enhancement/3v3", targets = { crit = 36, haste = 668, mastery = 154, versatility = 1060 } },
         },
         ["restoration"] = {

@@ -20,10 +20,13 @@ Modules\FastLoot.lua
 Modules\VendorAutomation.lua
 Modules\Combat.lua
 Modules\CinematicSkip.lua
+Modules\TalkingHead.lua
 Modules\CombatBanner.lua
+Modules\MythicInviteBanner.lua
 Modules\BuffWarnings.lua
 Modules\UnitFrames.lua
 Modules\ConsumableMacros.lua
+Modules\RandomHearthstone.lua
 Modules\Mounts.lua
 Modules\KeybindText.lua
 Modules\PerformanceWidget.lua

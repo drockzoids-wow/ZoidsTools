@@ -86,7 +86,22 @@ function ns.UI.Pages.CreateGeneralPage(parent)
     )
     UI.PlaceBelow(collectButtons, mouseoverButtons)
 
-    local performanceSection = UI.PlaceSection(frame, "Performance", collectButtons, leftWidth)
+    local inviteBanner = UI.CreateCheckbox(
+        frame,
+        "Mythic+ invitation banner",
+        "Keeps the invited dungeon name at the top of the screen and offers its teleport when you have learned it.",
+        function()
+            return ns.IsMythicInviteBannerEnabled and ns:IsMythicInviteBannerEnabled()
+        end,
+        function(value)
+            if ns.SetMythicInviteBannerEnabled then
+                ns:SetMythicInviteBannerEnabled(value)
+            end
+        end
+    )
+    UI.PlaceBelow(inviteBanner, collectButtons)
+
+    local performanceSection = UI.PlaceSection(frame, "Performance", inviteBanner, leftWidth)
 
     local performanceDisplay = UI.CreateDropdown(
         frame,
@@ -232,6 +247,89 @@ function ns.UI.Pages.CreateGeneralPage(parent)
     )
     UI.PlaceBelow(cinematicAutoSkip, cinematicFastSkip)
 
+    local talkingHeadSection = UI.PlaceSection(frame, "Talking Head", cinematicAutoSkip, rightWidth)
+
+    local subtleTalkingHead = UI.CreateCheckbox(
+        frame,
+        "Use subtle Talking Head",
+        "Replaces Blizzard's large portrait window with a compact subtitle panel. Normal clicks pass through it; right-click dismisses the current dialogue and voice. ZoidsTools yields automatically if Plumber's replacement is enabled.",
+        function()
+            return ns.IsSubtleTalkingHeadEnabled and ns:IsSubtleTalkingHeadEnabled()
+        end,
+        function(value)
+            if ns.SetSubtleTalkingHeadEnabled then ns:SetSubtleTalkingHeadEnabled(value) end
+        end
+    )
+    UI.PlaceFirst(subtleTalkingHead, talkingHeadSection)
+
+    local talkingHeadBackground = UI.CreateCheckbox(
+        frame,
+        "Show background",
+        "Shows the subtle dark subtitle panel. Disable this for text-only dialogue.",
+        function()
+            return ns.GetSubtleTalkingHeadBackground and ns:GetSubtleTalkingHeadBackground()
+        end,
+        function(value)
+            if ns.SetSubtleTalkingHeadBackground then ns:SetSubtleTalkingHeadBackground(value) end
+        end
+    )
+    UI.PlaceBelow(talkingHeadBackground, subtleTalkingHead)
+
+    local talkingHeadBold = UI.CreateCheckbox(
+        frame,
+        "Bold text",
+        "Adds a stronger outlined treatment to the speaker and subtitle text.",
+        function()
+            return ns.GetSubtleTalkingHeadBold and ns:GetSubtleTalkingHeadBold()
+        end,
+        function(value)
+            if ns.SetSubtleTalkingHeadBold then ns:SetSubtleTalkingHeadBold(value) end
+        end
+    )
+    talkingHeadBold:SetPoint("TOPLEFT", talkingHeadBackground, "TOPLEFT", 155, 0)
+
+    local talkingHeadOpacity = UI.CreateSlider(
+        frame,
+        "Subtitle opacity",
+        "Controls how prominent the click-through Talking Head subtitle appears.",
+        0.35,
+        1,
+        0.05,
+        function()
+            return ns.GetSubtleTalkingHeadOpacity and ns:GetSubtleTalkingHeadOpacity() or 0.72
+        end,
+        function(value)
+            if ns.SetSubtleTalkingHeadOpacity then ns:SetSubtleTalkingHeadOpacity(value) end
+        end,
+        125,
+        function(value) return string.format("%d%%", (value or 0.72) * 100) end
+    )
+    UI.PlaceSlider(talkingHeadOpacity, talkingHeadBackground)
+
+    local talkingHeadFontSize = UI.CreateSlider(
+        frame,
+        "Font size",
+        "Adjusts the speaker and subtitle text size.",
+        11,
+        24,
+        1,
+        function()
+            return ns.GetSubtleTalkingHeadFontSize and ns:GetSubtleTalkingHeadFontSize() or 14
+        end,
+        function(value)
+            if ns.SetSubtleTalkingHeadFontSize then ns:SetSubtleTalkingHeadFontSize(value) end
+        end,
+        125,
+        function(value) return tostring(math.floor((value or 14) + 0.5)) end
+    )
+    talkingHeadFontSize:SetPoint("TOPLEFT", talkingHeadOpacity, "TOPLEFT", 150, 0)
+
+    local previewTalkingHead = UI.CreateButton(frame, "Preview Subtitle", 150)
+    previewTalkingHead:SetPoint("TOPLEFT", talkingHeadOpacity, "BOTTOMLEFT", -UI.Layout.sliderIndent, -22)
+    previewTalkingHead:SetScript("OnClick", function()
+        if ns.PreviewSubtleTalkingHead then ns:PreviewSubtleTalkingHead() end
+    end)
+
     local unlockPerformance = UI.CreateButton(frame, "Unlock Widget", 132)
     unlockPerformance:SetScript("OnClick", function()
         if ns.SetPerformanceWidgetLocked then
@@ -249,8 +347,14 @@ function ns.UI.Pages.CreateGeneralPage(parent)
         minimapHeader:Refresh()
         mouseoverButtons:Refresh()
         collectButtons:Refresh()
+        inviteBanner:Refresh()
         cinematicFastSkip:Refresh()
         cinematicAutoSkip:Refresh()
+        subtleTalkingHead:Refresh()
+        talkingHeadBackground:Refresh()
+        talkingHeadBold:Refresh()
+        talkingHeadOpacity:Refresh()
+        talkingHeadFontSize:Refresh()
         performanceDisplay:Refresh()
         performanceScale:Refresh()
         coordinatesWidget:Refresh()

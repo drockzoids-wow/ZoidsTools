@@ -96,7 +96,7 @@ function ns.UI.Pages.CreateQuestsPage(parent)
     local skipWarband = UI.CreateCheckbox(
         frame,
         "Skip Warband-completed quests",
-        "Prevents auto accept for quests already completed by your Warband. Completed quests are still turned in.",
+        "Prevents auto accept for quests already completed by your Warband. Allowed daily quests are an exception, and completed quests are still turned in.",
         function()
             return ns.GetQuestAutomationOption and ns:GetQuestAutomationOption("skipWarbandCompleted")
         end,

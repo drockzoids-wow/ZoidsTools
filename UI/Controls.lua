@@ -6,6 +6,20 @@ local UI = ns.UI
 local Theme = UI.Theme
 local controlCounter = 0
 
+UI.SearchEntries = UI.SearchEntries or {}
+
+function UI.RegisterSearchControl(parent, control, label, tooltip)
+    local pageKey = (parent and parent.ZTPageKey) or UI.BuildingPageKey
+    if not pageKey or not control or not label then return end
+
+    UI.SearchEntries[#UI.SearchEntries + 1] = {
+        pageKey = pageKey,
+        control = control,
+        label = tostring(label),
+        tooltip = tostring(tooltip or ""),
+    }
+end
+
 UI.Layout = UI.Layout or {
     indent = 20,
     rowGap = 12,
@@ -51,6 +65,8 @@ function UI.CreateCheckbox(parent, label, tooltip, getter, setter)
     end
 
     checkbox:Refresh()
+
+    UI.RegisterSearchControl(parent, checkbox, label, tooltip)
 
     return checkbox
 end
@@ -461,6 +477,8 @@ function UI.CreateDropdown(parent, label, tooltip, options, getter, setter, widt
 
     control:Refresh()
 
+    UI.RegisterSearchControl(parent, control, label, tooltip)
+
     return control
 end
 
@@ -677,6 +695,8 @@ function UI.CreateMultiSelectDropdown(parent, label, tooltip, options, width)
 
     control:Refresh()
 
+    UI.RegisterSearchControl(parent, control, label, tooltip)
+
     return control
 end
 
@@ -802,6 +822,8 @@ function UI.CreateColorPicker(parent, label, tooltip, getter, setter, width)
 
     control:Refresh()
 
+    UI.RegisterSearchControl(parent, control, label, tooltip)
+
     return control
 end
 
@@ -884,6 +906,8 @@ function UI.CreateSlider(parent, label, tooltip, minValue, maxValue, step, gette
     end
 
     slider:Refresh()
+
+    UI.RegisterSearchControl(parent, slider, label, tooltip)
 
     return slider
 end

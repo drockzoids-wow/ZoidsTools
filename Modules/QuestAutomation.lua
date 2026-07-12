@@ -112,6 +112,22 @@ local function IsRepeatableQuest(questID, frequency)
     return false
 end
 
+local function IsDailyQuest(frequency)
+    local dailyFrequency = LE_QUEST_FREQUENCY_DAILY or 1
+
+    if Enum and Enum.QuestFrequency and Enum.QuestFrequency.Daily then
+        dailyFrequency = Enum.QuestFrequency.Daily
+    end
+
+    local questFrequency = tonumber(frequency)
+
+    if not questFrequency and type(GetQuestFrequency) == "function" then
+        questFrequency = tonumber(SafeCall(GetQuestFrequency))
+    end
+
+    return questFrequency == tonumber(dailyFrequency)
+end
+
 local function IsWarbandCompletedQuest(questID)
     if not questID or not C_QuestLog or type(C_QuestLog.IsQuestFlaggedCompletedOnAccount) ~= "function" then
         return false
@@ -136,7 +152,9 @@ local function ShouldSkipQuest(questID, frequency, action)
     end
 
     if action ~= QUEST_ACTION_TURN_IN and db.skipWarbandCompleted and IsWarbandCompletedQuest(questID) then
-        return true
+        -- When dailies are allowed, that explicit choice takes precedence over
+        -- the account-completion filter for daily quests.
+        return db.skipDaily == true or not IsDailyQuest(frequency)
     end
 
     return false

@@ -15,6 +15,10 @@
         ZoidsToolsRideAlongMountButton:Click("LeftButton")
     </Binding>
 
+    <Binding name="CLICK ZoidsToolsRandomHearthstoneButton:LeftButton" category="ZoidsTools">
+        ZoidsToolsRandomHearthstoneButton:Click("LeftButton")
+    </Binding>
+
     <Binding name="ZOIDSTOOLS_MATCH_TARGET_MOUNT" category="ZoidsTools">
         if ZoidsToolsMounts and ZoidsToolsMounts.MatchTargetMount then
             ZoidsToolsMounts.MatchTargetMount()

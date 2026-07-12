@@ -48,6 +48,7 @@ end
 
 function UI.CreatePageFrame(parent)
     local frame = CreateFrame("Frame", nil, parent)
+    frame.ZTPageKey = UI.BuildingPageKey
     frame:SetPoint("TOPLEFT", parent.contentPanel, "TOPLEFT", 24, -22)
     frame:SetPoint("BOTTOMRIGHT", parent.contentPanel, "BOTTOMRIGHT", -24, 22)
     frame:Hide()
@@ -179,7 +180,7 @@ local function CreateSidebarButton(parent, info, yOffset)
     button.selectionBar:SetPoint("TOPLEFT", button, "TOPLEFT", 4, -6)
     button.selectionBar:SetPoint("BOTTOMLEFT", button, "BOTTOMLEFT", 4, 6)
     button.selectionBar:SetWidth(3)
-    button.selectionBar:SetColorTexture(0.36, 0.9, 0.48, 0.88)
+    button.selectionBar:SetColorTexture(1, 0.76, 0.18, 0.92)
     button.selectionBar:Hide()
 
     button.iconBack = CreateFrame("Frame", nil, button, "BackdropTemplate")
@@ -225,9 +226,19 @@ local function BuildPages(frame)
     end
 
     wipe(pages)
+    wipe(UI.SearchEntries)
 
     for _, info in ipairs(pageOrder) do
+        UI.BuildingPageKey = info.key
         pages[info.key] = CreatePage(frame, info.key)
+        UI.BuildingPageKey = nil
+        UI.SearchEntries[#UI.SearchEntries + 1] = {
+            pageKey = info.key,
+            control = pages[info.key],
+            label = info.label .. " settings",
+            tooltip = info.description or "",
+            pageEntry = true,
+        }
     end
 end
 
@@ -423,6 +434,199 @@ local function RegisterHeaderStatusEvents(frame)
     frame.statusEventFrame = eventFrame
 end
 
+local function NormalizeSearchText(value)
+    return string.lower(tostring(value or "")):gsub("[%p%s]+", " "):match("^%s*(.-)%s*$")
+end
+
+local function ScoreSearchEntry(entry, query)
+    local label = NormalizeSearchText(entry.label)
+    local tooltip = NormalizeSearchText(entry.tooltip)
+    local pageInfo = pageInfoByKey[entry.pageKey]
+    local page = NormalizeSearchText(pageInfo and (pageInfo.label .. " " .. (pageInfo.description or "")) or "")
+
+    if label == query then return 100 end
+    if label:sub(1, #query) == query then return 80 end
+    if label:find(query, 1, true) then return 60 end
+    if tooltip:find(query, 1, true) then return 35 end
+    if page:find(query, 1, true) then return 20 end
+    return 0
+end
+
+local searchHighlightToken = 0
+
+local function HighlightSearchControl(frame, control)
+    if not frame or not control then return end
+    if not frame.searchHighlight then
+        local highlight = CreateFrame("Frame", nil, frame, "BackdropTemplate")
+        highlight:SetFrameStrata("DIALOG")
+        highlight:SetBackdrop({ edgeFile = "Interface\\Buttons\\WHITE8x8", edgeSize = 2 })
+        highlight:SetBackdropBorderColor(1, 0.78, 0.18, 0.95)
+        highlight:Hide()
+        frame.searchHighlight = highlight
+    end
+
+    local highlight = frame.searchHighlight
+    highlight:ClearAllPoints()
+    highlight:SetPoint("TOPLEFT", control, "TOPLEFT", -8, 7)
+    highlight:SetPoint("BOTTOMRIGHT", control, "BOTTOMRIGHT", 8, -7)
+    highlight:SetFrameLevel((control:GetFrameLevel() or 1) + 20)
+    highlight:Show()
+    searchHighlightToken = searchHighlightToken + 1
+    local token = searchHighlightToken
+    if C_Timer and C_Timer.After then
+        C_Timer.After(1.8, function()
+            if token == searchHighlightToken then highlight:Hide() end
+        end)
+    end
+end
+
+local function CreateSettingsSearch(frame)
+    local search = CreateFrame("EditBox", nil, frame.pageHeader, "BackdropTemplate")
+    search:SetSize(400, 32)
+    search:SetPoint("TOPRIGHT", frame.pageHeader, "TOPRIGHT", 0, -29)
+    search:SetAutoFocus(false)
+    search:SetMaxLetters(80)
+    search:SetFont(STANDARD_TEXT_FONT or "Fonts\\FRIZQT__.TTF", 13, "")
+    search:SetTextInsets(30, 34, 0, 0)
+    search:SetBackdrop({
+        bgFile = "Interface\\Buttons\\WHITE8x8",
+        edgeFile = Theme.panelBorder,
+        edgeSize = 10,
+        insets = { left = 3, right = 3, top = 3, bottom = 3 },
+    })
+    search:SetBackdropColor(0.008, 0.010, 0.014, 0.98)
+    search:SetBackdropBorderColor(0.90, 0.68, 0.24, 0.66)
+
+    search.icon = search:CreateTexture(nil, "OVERLAY")
+    search.icon:SetPoint("LEFT", search, "LEFT", 9, 0)
+    search.icon:SetSize(16, 16)
+    search.icon:SetTexture("Interface\\Common\\UI-Searchbox-Icon")
+    search.icon:SetVertexColor(0.95, 0.72, 0.28)
+
+    search.placeholder = search:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
+    search.placeholder:SetPoint("LEFT", search, "LEFT", 31, 0)
+    search.placeholder:SetText("Search all ZoidsTools settings...")
+
+    search.clear = CreateFrame("Button", nil, search)
+    search.clear:SetSize(26, 26)
+    search.clear:SetPoint("RIGHT", search, "RIGHT", -4, 0)
+    search.clear.text = search.clear:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+    search.clear.text:SetPoint("CENTER", 0, 0)
+    search.clear.text:SetText("x")
+    search.clear.text:SetTextColor(0.78, 0.74, 0.66)
+    search.clear:SetScript("OnEnter", function(self) self.text:SetTextColor(1, 0.82, 0.18) end)
+    search.clear:SetScript("OnLeave", function(self) self.text:SetTextColor(0.78, 0.74, 0.66) end)
+    search.clear:SetScript("OnClick", function()
+        search:SetText("")
+        search:SetFocus()
+    end)
+    search.clear:Hide()
+
+    local results = CreateFrame("Frame", nil, frame, "BackdropTemplate")
+    results:SetPoint("TOPRIGHT", search, "BOTTOMRIGHT", 0, -3)
+    results:SetSize(400, 40)
+    results:SetFrameStrata("FULLSCREEN_DIALOG")
+    results:SetFrameLevel(250)
+    results:SetBackdrop({
+        bgFile = "Interface\\Buttons\\WHITE8x8",
+        edgeFile = Theme.panelBorder,
+        edgeSize = 10,
+        insets = { left = 3, right = 3, top = 3, bottom = 3 },
+    })
+    results:SetBackdropColor(0.008, 0.010, 0.014, 0.99)
+    results:SetBackdropBorderColor(0.85, 0.66, 0.28, 0.72)
+    results:Hide()
+    results.rows = {}
+    results.matches = {}
+
+    for index = 1, 8 do
+        local row = CreateFrame("Button", nil, results)
+        row:SetPoint("TOPLEFT", 7, -7 - ((index - 1) * 34))
+        row:SetPoint("RIGHT", -7, 0)
+        row:SetHeight(34)
+        row.highlight = row:CreateTexture(nil, "BACKGROUND")
+        row.highlight:SetAllPoints()
+        row.highlight:SetColorTexture(1, 0.78, 0.18, 0.09)
+        row.highlight:Hide()
+        row.label = row:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+        row.label:SetPoint("LEFT", 10, 5)
+        row.label:SetPoint("RIGHT", -10, 5)
+        row.label:SetJustifyH("LEFT")
+        row.page = row:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
+        row.page:SetPoint("LEFT", 10, -9)
+        row.page:SetPoint("RIGHT", -10, -9)
+        row.page:SetJustifyH("LEFT")
+        row:SetScript("OnEnter", function(self) self.highlight:Show() end)
+        row:SetScript("OnLeave", function(self) self.highlight:Hide() end)
+        row:SetScript("OnClick", function()
+            local entry = results.matches[index]
+            if not entry then return end
+            ShowPage(entry.pageKey)
+            results:Hide()
+            search:ClearFocus()
+            if C_Timer and C_Timer.After then
+                C_Timer.After(0, function() HighlightSearchControl(frame, entry.control) end)
+            else
+                HighlightSearchControl(frame, entry.control)
+            end
+        end)
+        results.rows[index] = row
+    end
+
+    local function RefreshResults()
+        local query = NormalizeSearchText(search:GetText())
+        search.placeholder:SetShown(query == "")
+        search.clear:SetShown(query ~= "")
+        wipe(results.matches)
+        if #query < 2 then results:Hide() return end
+
+        local scored = {}
+        for _, entry in ipairs(UI.SearchEntries) do
+            local score = ScoreSearchEntry(entry, query)
+            if score > 0 then scored[#scored + 1] = { entry = entry, score = score } end
+        end
+        table.sort(scored, function(a, b)
+            if a.score == b.score then return a.entry.label < b.entry.label end
+            return a.score > b.score
+        end)
+
+        local count = math.min(8, #scored)
+        for index, row in ipairs(results.rows) do
+            local match = scored[index] and scored[index].entry
+            results.matches[index] = match
+            row:SetShown(match ~= nil)
+            if match then
+                row.label:SetText(match.label)
+                row.page:SetText((pageInfoByKey[match.pageKey] and pageInfoByKey[match.pageKey].label or match.pageKey) .. "  >  setting")
+            end
+        end
+        if count > 0 then
+            results:SetHeight((count * 34) + 14)
+            results:Show()
+        else
+            results:Hide()
+        end
+    end
+
+    search:SetScript("OnTextChanged", RefreshResults)
+    search:SetScript("OnEnterPressed", function()
+        if results.rows[1]:IsShown() then results.rows[1]:Click() else search:ClearFocus() end
+    end)
+    search:SetScript("OnEscapePressed", function()
+        if search:GetText() ~= "" then search:SetText("") else search:ClearFocus() end
+        results:Hide()
+    end)
+    search:SetScript("OnEditFocusGained", function()
+        search:SetBackdropBorderColor(1, 0.80, 0.20, 0.95)
+        RefreshResults()
+    end)
+    search:SetScript("OnEditFocusLost", function()
+        search:SetBackdropBorderColor(0.90, 0.68, 0.24, 0.66)
+    end)
+    frame.settingsSearch = search
+    frame.searchResults = results
+end
+
 local function CreateMainWindow()
     if UI.frame then
         return UI.frame
@@ -479,6 +683,7 @@ local function CreateMainWindow()
     frame.pageTitle:SetPoint("RIGHT", frame.pageHeader, "RIGHT", -432, 0)
     frame.pageTitle:SetTextColor(1, 0.82, 0)
     frame.pageTitle:SetJustifyH("LEFT")
+    frame.pageTitle:SetFont(STANDARD_TEXT_FONT or "Fonts\\FRIZQT__.TTF", 20, "OUTLINE")
 
     frame.pageDescription = frame.pageHeader:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
     frame.pageDescription:SetPoint("TOPLEFT", frame.pageTitle, "BOTTOMLEFT", 0, -8)
@@ -486,8 +691,15 @@ local function CreateMainWindow()
     frame.pageDescription:SetJustifyH("LEFT")
     frame.pageDescription:SetTextColor(0.86, 0.82, 0.72)
 
+    frame.pageHeader.divider = frame.pageHeader:CreateTexture(nil, "ARTWORK")
+    frame.pageHeader.divider:SetPoint("BOTTOMLEFT", frame.pageHeader, "BOTTOMLEFT", 0, 0)
+    frame.pageHeader.divider:SetPoint("BOTTOMRIGHT", frame.pageHeader, "BOTTOMRIGHT", 0, 0)
+    frame.pageHeader.divider:SetHeight(1)
+    frame.pageHeader.divider:SetColorTexture(0.95, 0.72, 0.28, 0.16)
+
     CreateHeaderStatus(frame)
     RegisterHeaderStatusEvents(frame)
+    CreateSettingsSearch(frame)
 
     frame.contentPanel = CreateFrame("Frame", nil, frame, "BackdropTemplate")
     frame.contentPanel:SetPoint("TOPLEFT", frame, "TOPLEFT", CONTENT_LEFT, CONTENT_TOP)

@@ -128,7 +128,7 @@ function ns.UI.Pages.CreateProfessionsPage(parent)
         prospect:Refresh()
         open:Refresh()
 
-        local active = ns.GetProfessionHelperEnabled and ns:GetProfessionHelperEnabled()
+        local active = enabled:GetChecked() == true
         UI.SetControlEnabled(activation, active)
         UI.SetControlEnabled(disenchant, active)
         UI.SetControlEnabled(mill, active)

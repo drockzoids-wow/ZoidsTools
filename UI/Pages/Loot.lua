@@ -121,7 +121,7 @@ function ns.UI.Pages.CreateLootPage(parent)
         autoSellBoEGrey:Refresh()
         knownMerchantOverlay:Refresh()
         autoRepair:Refresh()
-        UI.SetControlEnabled(carefulMode, ns.GetFastLootEnabled and ns:GetFastLootEnabled())
+        UI.SetControlEnabled(carefulMode, fastLoot:GetChecked() == true)
 
         if ns.GetFastLootEnabled and ns:GetFastLootEnabled() then
             if ns.GetBlizzardAutoLootEnabled and ns:GetBlizzardAutoLootEnabled() then

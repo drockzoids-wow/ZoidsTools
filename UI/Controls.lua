@@ -12,7 +12,6 @@ function UI.SetControlEnabled(control, enabled)
     if not control then return end
 
     enabled = enabled == true
-    control.ZTDependencyEnabled = enabled
     control:SetAlpha(enabled and 1 or 0.42)
 
     if enabled and control.Enable then

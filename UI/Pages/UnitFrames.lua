@@ -195,6 +195,7 @@ function ns.UI.Pages.CreateUnitFramesPage(parent)
             UI.SetControlEnabled(dependency.width, active)
             UI.SetControlEnabled(dependency.height, active)
         end
+
     end
 
     frame:SetScript("OnShow", frame.Refresh)

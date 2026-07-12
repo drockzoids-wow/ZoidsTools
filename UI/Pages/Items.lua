@@ -165,7 +165,7 @@ function ns.UI.Pages.CreateItemsPage(parent)
         fontSize:Refresh()
         qualityColor:Refresh()
 
-        local active = ns.GetItemOverlaysEnabled and ns:GetItemOverlaysEnabled()
+        local active = enabled:GetChecked() == true
         UI.SetControlEnabled(characterOptions, active)
         UI.SetControlEnabled(bagBankOptions, active)
         UI.SetControlEnabled(statTargetContext, active)

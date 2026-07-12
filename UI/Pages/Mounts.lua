@@ -671,6 +671,7 @@ function ns.UI.Pages.CreateMountsPage(parent)
         UI.SetControlEnabled(matchEnabled, active)
         UI.SetControlEnabled(showMatchButton, active and matchEnabled:GetChecked() == true)
         UI.SetControlEnabled(matchButton, active and matchEnabled:GetChecked() == true)
+
     end
 
     frame:SetScript("OnShow", frame.Refresh)

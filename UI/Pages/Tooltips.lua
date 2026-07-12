@@ -109,9 +109,10 @@ function ns.UI.Pages.CreateTooltipsPage(parent)
         tooltipPercentile:Refresh()
         tooltipItemLevel:Refresh()
 
-        local scoreActive = ns.GetTooltipShowMythicScore and ns:GetTooltipShowMythicScore()
+        local scoreActive = tooltipScore:GetChecked() == true
         UI.SetControlEnabled(tooltipScoreColor, scoreActive)
         UI.SetControlEnabled(tooltipPercentile, scoreActive)
+
     end
 
     frame:SetScript("OnShow", frame.Refresh)

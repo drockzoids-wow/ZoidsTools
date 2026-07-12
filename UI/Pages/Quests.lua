@@ -120,12 +120,13 @@ function ns.UI.Pages.CreateQuestsPage(parent)
         skipDaily:Refresh()
         skipWarband:Refresh()
 
-        local automationActive = (ns.GetQuestAutoAccept and ns:GetQuestAutoAccept())
-            or (ns.GetQuestAutoTurnIn and ns:GetQuestAutoTurnIn())
-            or (ns.GetQuestAutoGossip and ns:GetQuestAutoGossip())
+        local acceptActive = autoAccept:GetChecked() == true
+        local turnInActive = autoTurnIn:GetChecked() == true
+        local automationActive = acceptActive or turnInActive or autoGossip:GetChecked() == true
         UI.SetControlEnabled(pauseModifier, automationActive)
-        UI.SetControlEnabled(skipDaily, ns.GetQuestAutoAccept and ns:GetQuestAutoAccept())
-        UI.SetControlEnabled(skipWarband, ns.GetQuestAutoAccept and ns:GetQuestAutoAccept())
+        UI.SetControlEnabled(skipDaily, acceptActive or turnInActive)
+        UI.SetControlEnabled(skipWarband, acceptActive)
+
     end
 
     frame:SetScript("OnShow", frame.Refresh)

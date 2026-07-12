@@ -149,9 +149,9 @@ function ns.UI.Pages.CreateWindowsPage(parent)
         savePositions:Refresh()
         scaleEnabled:Refresh()
 
-        local active = ns.GetMovableWindowsEnabled and ns:GetMovableWindowsEnabled()
+        local active = windowsEnabled:GetChecked() == true
         UI.SetControlEnabled(bagsEnabled, active)
-        UI.SetControlEnabled(bagHandles, active and ns.GetMoveBagsEnabled and ns:GetMoveBagsEnabled())
+        UI.SetControlEnabled(bagHandles, active and bagsEnabled:GetChecked() == true)
         UI.SetControlEnabled(savePositions, active)
         UI.SetControlEnabled(scaleEnabled, active)
         UI.SetControlEnabled(refreshButton, active)

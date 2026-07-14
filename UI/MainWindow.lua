@@ -31,7 +31,7 @@ local pageOrder = {
     { key = "items", label = "Items", group = "Character", icon = "I", description = "Item level, gem, enchant, and binding overlays." },
     { key = "professions", label = "Professions", group = "Character", icon = "P", description = "Molinari-style profession actions for hovered bag items." },
     { key = "builds", label = "Talents", group = "Character", icon = "B", description = "Talent build suggestions from generated local data." },
-    { key = "meters", label = "Meters", group = "Combat", icon = "M", description = "Profiles for Blizzard's built-in damage meter windows." },
+    { key = "meters", label = "Meters", group = "Combat", icon = "M", description = "ZoidsTools meter and Blizzard damage meter profiles." },
     { key = "combat", label = "Combat", group = "Combat", icon = "C", description = "Combat quality-of-life settings." },
     { key = "unitframes", label = "Unit Frames", group = "Combat", icon = "U", description = "Blizzard unit frame health, castbar, and aura settings." },
     { key = "macros", label = "Macros", group = "Combat", icon = "A", description = "Health, mana, and consumable macro settings." },

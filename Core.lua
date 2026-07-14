@@ -2,11 +2,17 @@ local ADDON_NAME, ns = ...
 
 ns.addonName = ADDON_NAME
 ns.title = "ZoidsTools"
-ns.version = "0.1.0"
-local CURRENT_MIGRATION_VERSION = 1
+local metadataVersion
+if C_AddOns and C_AddOns.GetAddOnMetadata then
+    metadataVersion = C_AddOns.GetAddOnMetadata(ADDON_NAME, "Version")
+elseif GetAddOnMetadata then
+    metadataVersion = GetAddOnMetadata(ADDON_NAME, "Version")
+end
+ns.version = metadataVersion and not metadataVersion:find("@", 1, true) and metadataVersion or "Development"
+local CURRENT_MIGRATION_VERSION = 3
 
 local defaults = {
-    migrationVersion = 1,
+    migrationVersion = 3,
     windows = {
         enabled = true,
         moveBags = true,
@@ -202,6 +208,26 @@ local defaults = {
             },
         },
     },
+    customDamageMeter = {
+        enabled = false,
+        sessionType = "current",
+        damageMeterType = "DamageDone",
+        textScale = 1,
+        snapGap = 0,
+        backgroundOpacity = 0.94,
+        classColoredBorder = true,
+        point = "BOTTOMRIGHT",
+        relativePoint = "BOTTOMRIGHT",
+        x = -18,
+        y = 210,
+        width = 300,
+        height = 143,
+        secondWindow = {
+            enabled = false,
+            sessionType = "current",
+            damageMeterType = "DamageDone",
+        },
+    },
     professions = {
         enabled = true,
         activation = "alt",
@@ -286,6 +312,19 @@ local function RunMigrations(db)
             end
             db.ui.minimap.hide = db.ui.minimap.show == false
         end
+    end
+
+    if version < 2 then
+        db.customDamageMeter = db.customDamageMeter or {}
+        if db.customDamageMeter.textScale == nil or db.customDamageMeter.textScale == 1 then
+            db.customDamageMeter.textScale = 1.2
+        end
+    end
+
+    if version < 3 then
+        db.customDamageMeter = db.customDamageMeter or {}
+        local oldScale = tonumber(db.customDamageMeter.textScale) or 1.2
+        db.customDamageMeter.textScale = math.max(0.8, math.min(1.5, oldScale / 1.2))
     end
 
     db.migrationVersion = CURRENT_MIGRATION_VERSION
@@ -741,6 +780,10 @@ eventFrame:SetScript("OnEvent", function(_, event, addonName)
 
         if ns.InitializeBlizzardDamageMeterProfiles then
             ns:InitializeBlizzardDamageMeterProfiles()
+        end
+
+        if ns.InitializeCustomDamageMeter then
+            ns:InitializeCustomDamageMeter()
         end
 
         if ns.InitializeProfessionHelper then

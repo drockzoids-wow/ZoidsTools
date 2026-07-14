@@ -1,8 +1,8 @@
-## Interface: 120007
+## Interface: 121000, 120007
 ## Title: ZoidsTools
 ## Notes: A personal WoW toolkit by Drockzoids.
 ## Author: Drockzoids
-## Version: 0.1.0
+## Version: @project-version@
 ## SavedVariables: ZoidsToolsDB
 ## IconTexture: Interface\AddOns\ZoidsTools\Media\ZoidToolsIcon.png
 ## Bindings: Bindings.xml
@@ -38,6 +38,7 @@ Data\TalentGrimoire.lua
 Modules\StatTargets.lua
 Modules\TalentGrimoire.lua
 Modules\BlizzardDamageMeterProfiles.lua
+Modules\CustomDamageMeter.lua
 Modules\QuestAutomation.lua
 Modules\MinimapTools.lua
 Modules\Tooltips.lua

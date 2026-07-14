@@ -14,6 +14,8 @@ local MAX_SNAP_GAP = 24
 local DEFAULT_WIDTH = 300
 local DEFAULT_HEIGHT = 35 + (DEFAULT_ROW_COUNT * ROW_HEIGHT) + ((DEFAULT_ROW_COUNT - 1) * ROW_SPACING)
 local MAX_HEIGHT = 35 + (MAX_ROW_COUNT * ROW_HEIGHT) + ((MAX_ROW_COUNT - 1) * ROW_SPACING)
+local SUMMARY_ROW_COUNT = 10
+local SUMMARY_ROW_HEIGHT = 24
 
 local METER_CATEGORIES = {
     {
@@ -58,6 +60,9 @@ local refreshPending = false
 local lastRefresh = 0
 local RefreshMeter
 local ScheduleRefresh
+local ScrollMeter
+local OpenSourceSummary
+local summaryFrame
 
 local sampleSources = {
     { name = "Dottindrock", classFilename = "WARLOCK", totalAmount = 128400000, amountPerSecond = 2140000, isLocalPlayer = true },
@@ -153,13 +158,13 @@ local function IsSecret(value)
 end
 
 local function FormatNumber(value)
-    if value == nil then return "0" end
-
     if IsSecret(value) then
         if AbbreviateNumbers then return AbbreviateNumbers(value) end
         if AbbreviateLargeNumbers then return AbbreviateLargeNumbers(value) end
         return ""
     end
+
+    if value == nil then return "0" end
 
     local number = tonumber(value) or 0
     if number < 1000 then
@@ -522,7 +527,7 @@ local function ApplyRowTextScale(row)
 end
 
 local function CreateRow(frame, index)
-    local row = CreateFrame("Frame", nil, frame)
+    local row = CreateFrame("Button", nil, frame)
     row:SetPoint("TOPLEFT", frame, "TOPLEFT", 5, -30 - ((index - 1) * (ROW_HEIGHT + ROW_SPACING)))
     row:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -5, -30 - ((index - 1) * (ROW_HEIGHT + ROW_SPACING)))
     row:SetHeight(ROW_HEIGHT)
@@ -530,6 +535,10 @@ local function CreateRow(frame, index)
     row.background = row:CreateTexture(nil, "BACKGROUND")
     row.background:SetAllPoints()
     row.background:SetColorTexture(0.018, 0.021, 0.027, math.min(0.92, GetBackgroundOpacity()))
+
+    row.highlight = row:CreateTexture(nil, "HIGHLIGHT")
+    row.highlight:SetAllPoints()
+    row.highlight:SetColorTexture(1, 1, 1, 0.10)
 
     row.bar = CreateFrame("StatusBar", nil, row)
     row.bar:SetAllPoints()
@@ -578,6 +587,17 @@ local function CreateRow(frame, index)
 
     row.fontPath, row.baseFontSize, row.fontFlags = row.name:GetFont()
     ApplyRowTextScale(row)
+
+    row:RegisterForClicks("LeftButtonUp")
+    row:EnableMouseWheel(true)
+    row:SetScript("OnClick", function(self)
+        if not moveMode and self.sourceData and OpenSourceSummary then
+            OpenSourceSummary(frame, self.sourceData)
+        end
+    end)
+    row:SetScript("OnMouseWheel", function(_, delta)
+        if ScrollMeter then ScrollMeter(frame, delta) end
+    end)
 
     frame.rows[index] = row
     return row
@@ -749,6 +769,7 @@ local function CreateMeterFrame(windowIndex)
     end
     frame:SetToplevel(true)
     frame:EnableMouse(true)
+    frame:EnableMouseWheel(true)
     frame:RegisterForDrag("LeftButton")
     frame:SetBackdrop({
         bgFile = "Interface\\Buttons\\WHITE8x8",
@@ -783,6 +804,8 @@ local function CreateMeterFrame(windowIndex)
     frame.moveHint:Hide()
 
     frame.rows = {}
+    frame.scrollOffset = 0
+    frame.maxScrollOffset = 0
     EnsureRows(frame, GetVisibleRowCount(frame))
     ApplyFrameAppearance(frame)
 
@@ -801,6 +824,9 @@ local function CreateMeterFrame(windowIndex)
         self:StopMovingOrSizing()
         SavePosition(self)
         TrySnapWindows(self)
+    end)
+    frame:SetScript("OnMouseWheel", function(self, delta)
+        if ScrollMeter then ScrollMeter(self, delta) end
     end)
 
     frame:SetScript("OnSizeChanged", function(self)
@@ -859,6 +885,8 @@ end
 
 local function UpdateRow(frame, row, source, index, maxAmount)
     if not source then
+        row.sourceData = nil
+        row.sourceIndex = nil
         row:Hide()
         return
     end
@@ -875,6 +903,8 @@ local function UpdateRow(frame, row, source, index, maxAmount)
     row.rank:SetText(index)
     row.name:SetText(source.name or UNKNOWN or "Unknown")
     row.value:SetText(FormatRowValue(source, frame.windowIndex))
+    row.sourceData = source
+    row.sourceIndex = index
     row:Show()
 end
 
@@ -910,10 +940,14 @@ local function RefreshMeterWindow(windowIndex)
 
     local rowCount = GetVisibleRowCount(frame)
     EnsureRows(frame, rowCount)
+    local sourceCount = sources and #sources or 0
+    frame.maxScrollOffset = math.max(0, sourceCount - rowCount)
+    frame.scrollOffset = math.max(0, math.min(frame.maxScrollOffset, tonumber(frame.scrollOffset) or 0))
     local shown = 0
-    for index = 1, rowCount do
-        local source = sources and sources[index]
-        UpdateRow(frame, frame.rows[index], source, index, maxAmount)
+    for rowIndex = 1, rowCount do
+        local sourceIndex = rowIndex + frame.scrollOffset
+        local source = sources and sources[sourceIndex]
+        UpdateRow(frame, frame.rows[rowIndex], source, sourceIndex, maxAmount)
         if source then shown = shown + 1 end
     end
     for index = rowCount + 1, #frame.rows do
@@ -960,6 +994,345 @@ ScheduleRefresh = function(immediate)
         lastRefresh = GetTime and GetTime() or 0
         RefreshMeter()
     end)
+end
+
+ScrollMeter = function(frame, delta)
+    if not frame or not delta or delta == 0 then return end
+    local maxOffset = tonumber(frame.maxScrollOffset) or 0
+    if maxOffset <= 0 then return end
+
+    local step = IsShiftKeyDown and IsShiftKeyDown() and GetVisibleRowCount(frame) or 1
+    local nextOffset = (tonumber(frame.scrollOffset) or 0) + (delta > 0 and -step or step)
+    nextOffset = math.max(0, math.min(maxOffset, nextOffset))
+    if nextOffset == frame.scrollOffset then return end
+    frame.scrollOffset = nextOffset
+    ScheduleRefresh(true)
+end
+
+local function HasSpellDetails(details)
+    return type(details) == "table" and type(details.combatSpells) == "table" and #details.combatSpells > 0
+end
+
+local function GetGroupSourceGUID(source)
+    if not source or not UnitGUID then return nil end
+
+    local sourceName = source.name
+    if not IsSecret(sourceName) and sourceName ~= nil then sourceName = tostring(sourceName) else sourceName = nil end
+    local sourceClass = type(source.classFilename) == "string" and source.classFilename or nil
+    local classMatchGUID
+    local classMatches = 0
+    local units = {}
+
+    if IsInRaid and IsInRaid() then
+        local count = GetNumGroupMembers and GetNumGroupMembers() or 0
+        for index = 1, count do units[#units + 1] = "raid" .. index end
+    else
+        units[1] = "player"
+        local count = GetNumSubgroupMembers and GetNumSubgroupMembers() or 4
+        for index = 1, count do units[#units + 1] = "party" .. index end
+    end
+
+    for _, unit in ipairs(units) do
+        if not UnitExists or UnitExists(unit) then
+            local guid = UnitGUID(unit)
+            if not IsSecret(guid) and guid ~= nil then
+                local unitName, realm
+                if UnitFullName then
+                    unitName, realm = UnitFullName(unit)
+                elseif UnitName then
+                    unitName = UnitName(unit)
+                end
+                if sourceName and not IsSecret(unitName) and unitName ~= nil and not IsSecret(realm) then
+                    unitName = tostring(unitName)
+                    local fullName = realm and realm ~= "" and (unitName .. "-" .. tostring(realm)) or unitName
+                    if sourceName == unitName or sourceName == fullName then return guid end
+                end
+
+                local _, classFilename = UnitClass(unit)
+                if sourceClass and classFilename == sourceClass then
+                    classMatches = classMatches + 1
+                    classMatchGUID = guid
+                end
+            end
+        end
+    end
+
+    return classMatches == 1 and classMatchGUID or nil
+end
+
+local function GetSourceDetails(frame, source)
+    if not frame or not source or not C_DamageMeter or not C_DamageMeter.GetCombatSessionSourceFromType then return nil end
+    if not Enum or not Enum.DamageMeterSessionType then return nil end
+
+    local sessionType = GetSessionType(frame.windowIndex) == "overall" and Enum.DamageMeterSessionType.Overall or Enum.DamageMeterSessionType.Current
+    local meterType = GetMeterEnum(GetMeterType(frame.windowIndex))
+    if sessionType == nil or meterType == nil then return nil end
+
+    local rawGUID = source.sourceGUID
+    local rawCreatureID = source.sourceCreatureID
+    local sourceGUID = not IsSecret(rawGUID) and rawGUID ~= nil and rawGUID or nil
+    local sourceCreatureID = not IsSecret(rawCreatureID) and rawCreatureID ~= nil and rawCreatureID or nil
+    local isLocalPlayer = source.isLocalPlayer == true
+    if sourceGUID == nil and sourceCreatureID == nil then
+        if isLocalPlayer and UnitGUID then
+            sourceGUID = UnitGUID("player")
+        else
+            sourceGUID = GetGroupSourceGUID(source)
+        end
+        if IsSecret(sourceGUID) then sourceGUID = nil end
+    end
+    if sourceGUID == nil and sourceCreatureID == nil and not isLocalPlayer then return nil end
+
+    local function Query(guid, creatureID)
+        return C_DamageMeter.GetCombatSessionSourceFromType(sessionType, meterType, guid, creatureID)
+    end
+
+    local details = Query(sourceGUID, sourceCreatureID)
+    if not isLocalPlayer or HasSpellDetails(details) then return details end
+
+    local playerGUID
+    if UnitGUID then playerGUID = UnitGUID("player") end
+    if not IsSecret(playerGUID) and playerGUID ~= nil then
+        local playerDetails = Query(playerGUID, nil)
+        if playerDetails then return playerDetails end
+    end
+
+    local localDetails = Query(nil, nil)
+    if HasSpellDetails(localDetails) then return localDetails end
+    return details or localDetails
+end
+
+local function GetSpellDisplay(spell)
+    local spellID = spell and spell.spellID
+    if not IsSecret(spellID) and spellID ~= nil then
+        local info = C_Spell and C_Spell.GetSpellInfo and C_Spell.GetSpellInfo(spellID)
+        if info then
+            return info.name or (UNKNOWN or "Unknown"), info.iconID or 134400
+        end
+        if GetSpellInfo then
+            local name, _, icon = GetSpellInfo(spellID)
+            if name then return name, icon or 134400 end
+        end
+    end
+
+    local name = spell and spell.creatureName
+    if not IsSecret(name) and name == nil then name = UNKNOWN or "Unknown" end
+    return name, 134400
+end
+
+local function CreateSummaryRow(parent, index)
+    local row = CreateFrame("Frame", nil, parent)
+    row:SetPoint("TOPLEFT", parent.columnHeader, "BOTTOMLEFT", 0, -4 - ((index - 1) * SUMMARY_ROW_HEIGHT))
+    row:SetPoint("TOPRIGHT", parent.columnHeader, "BOTTOMRIGHT", 0, -4 - ((index - 1) * SUMMARY_ROW_HEIGHT))
+    row:SetHeight(SUMMARY_ROW_HEIGHT - 2)
+
+    row.background = row:CreateTexture(nil, "BACKGROUND")
+    row.background:SetAllPoints()
+    row.background:SetColorTexture(1, 1, 1, index % 2 == 0 and 0.035 or 0.015)
+
+    row.bar = CreateFrame("StatusBar", nil, row)
+    row.bar:SetAllPoints()
+    row.bar:SetStatusBarTexture("Interface\\TargetingFrame\\UI-StatusBar")
+    row.bar:SetMinMaxValues(0, 1)
+    row.bar:SetValue(0)
+    row.bar:SetStatusBarColor(0.62, 0.46, 0.16, 0.58)
+
+    row.barShade = row.bar:CreateTexture(nil, "ARTWORK")
+    row.barShade:SetAllPoints()
+    row.barShade:SetColorTexture(0, 0, 0, 0.25)
+
+    row.content = CreateFrame("Frame", nil, row)
+    row.content:SetAllPoints()
+    row.content:SetFrameLevel(row.bar:GetFrameLevel() + 2)
+    row.content:EnableMouse(false)
+
+    row.icon = row.content:CreateTexture(nil, "ARTWORK")
+    row.icon:SetSize(20, 20)
+    row.icon:SetPoint("LEFT", row.content, "LEFT", 2, 0)
+    row.icon:SetTexCoord(0.08, 0.92, 0.08, 0.92)
+
+    row.name = row.content:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    row.name:SetPoint("LEFT", row.icon, "RIGHT", 6, 0)
+    row.name:SetPoint("RIGHT", row.content, "RIGHT", -188, 0)
+    row.name:SetJustifyH("LEFT")
+    row.name:SetWordWrap(false)
+
+    row.amount = row.content:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    row.amount:SetPoint("RIGHT", row.content, "RIGHT", -91, 0)
+    row.amount:SetWidth(88)
+    row.amount:SetJustifyH("RIGHT")
+
+    row.rate = row.content:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    row.rate:SetPoint("RIGHT", row.content, "RIGHT", -38, 0)
+    row.rate:SetWidth(50)
+    row.rate:SetJustifyH("RIGHT")
+
+    row.percent = row.content:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    row.percent:SetPoint("RIGHT", row.content, "RIGHT", -2, 0)
+    row.percent:SetWidth(34)
+    row.percent:SetJustifyH("RIGHT")
+    return row
+end
+
+local function CreateSourceSummary()
+    if summaryFrame then return summaryFrame end
+
+    local frame = CreateFrame("Frame", FRAME_NAME .. "Summary", UIParent, "BackdropTemplate")
+    frame:SetSize(430, 336)
+    frame:SetFrameStrata("HIGH")
+    frame:SetClampedToScreen(true)
+    frame:SetMovable(true)
+    frame:EnableMouse(true)
+    frame:EnableMouseWheel(true)
+    frame:RegisterForDrag("LeftButton")
+    frame:SetBackdrop({
+        bgFile = "Interface\\Buttons\\WHITE8x8",
+        edgeFile = "Interface\\Buttons\\WHITE8x8",
+        edgeSize = 1,
+    })
+    frame:SetBackdropColor(0.008, 0.010, 0.014, 0.97)
+    frame:SetBackdropBorderColor(0.62, 0.46, 0.16, 0.95)
+
+    frame.header = frame:CreateTexture(nil, "BACKGROUND")
+    frame.header:SetPoint("TOPLEFT", frame, "TOPLEFT", 1, -1)
+    frame.header:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -1, -1)
+    frame.header:SetHeight(50)
+    frame.header:SetColorTexture(0.055, 0.047, 0.030, 0.96)
+
+    frame.name = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+    frame.name:SetPoint("TOPLEFT", frame, "TOPLEFT", 12, -8)
+    frame.name:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -38, -8)
+    frame.name:SetJustifyH("LEFT")
+    frame.name:SetWordWrap(false)
+
+    frame.subtitle = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    frame.subtitle:SetPoint("TOPLEFT", frame.name, "BOTTOMLEFT", 0, -2)
+    frame.subtitle:SetTextColor(0.75, 0.75, 0.75)
+
+    frame.close = CreateFrame("Button", nil, frame, "UIPanelCloseButton")
+    frame.close:SetPoint("TOPRIGHT", frame, "TOPRIGHT", 1, 1)
+
+    frame.columnHeader = CreateFrame("Frame", nil, frame)
+    frame.columnHeader:SetPoint("TOPLEFT", frame, "TOPLEFT", 10, -56)
+    frame.columnHeader:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -10, -56)
+    frame.columnHeader:SetHeight(18)
+
+    local spellHeader = frame.columnHeader:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
+    spellHeader:SetPoint("LEFT", frame.columnHeader, "LEFT", 28, 0)
+    spellHeader:SetText("Spell")
+    frame.amountHeader = frame.columnHeader:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
+    frame.amountHeader:SetPoint("RIGHT", frame.columnHeader, "RIGHT", -91, 0)
+    frame.amountHeader:SetWidth(88)
+    frame.amountHeader:SetJustifyH("RIGHT")
+    frame.amountHeader:SetText("Amount")
+    frame.rateHeader = frame.columnHeader:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
+    frame.rateHeader:SetPoint("RIGHT", frame.columnHeader, "RIGHT", -38, 0)
+    frame.rateHeader:SetWidth(50)
+    frame.rateHeader:SetJustifyH("RIGHT")
+    frame.percentHeader = frame.columnHeader:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
+    frame.percentHeader:SetPoint("RIGHT", frame.columnHeader, "RIGHT", -2, 0)
+    frame.percentHeader:SetWidth(34)
+    frame.percentHeader:SetJustifyH("RIGHT")
+    frame.percentHeader:SetText("%")
+
+    frame.rows = {}
+    for index = 1, SUMMARY_ROW_COUNT do
+        frame.rows[index] = CreateSummaryRow(frame, index)
+    end
+
+    frame.empty = frame:CreateFontString(nil, "OVERLAY", "GameFontDisable")
+    frame.empty:SetPoint("CENTER", frame, "CENTER", 0, -10)
+    frame.empty:SetText("No detailed breakdown is available for this entry.")
+
+    frame.scrollHint = frame:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
+    frame.scrollHint:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -10, 7)
+
+    frame:SetScript("OnDragStart", function(self) self:StartMoving() end)
+    frame:SetScript("OnDragStop", function(self) self:StopMovingOrSizing() end)
+    frame:Hide()
+    summaryFrame = frame
+    return frame
+end
+
+local function RefreshSourceSummary()
+    local frame = summaryFrame
+    if not frame or not frame:IsShown() then return end
+    local spells = frame.details and frame.details.combatSpells
+    local count = type(spells) == "table" and #spells or 0
+    frame.maxScrollOffset = math.max(0, count - SUMMARY_ROW_COUNT)
+    frame.scrollOffset = math.max(0, math.min(frame.maxScrollOffset, tonumber(frame.scrollOffset) or 0))
+    local total = frame.details and frame.details.totalAmount
+    local safeTotal = not IsSecret(total) and total ~= nil and tonumber(total) or nil
+    local maxAmount = frame.details and frame.details.maxAmount
+    if not IsSecret(maxAmount) and maxAmount == nil and spells and spells[1] then maxAmount = spells[1].totalAmount end
+    if not IsSecret(maxAmount) and maxAmount == nil then maxAmount = 1 end
+    local r, g, b = unpack(frame.sourceColor or { 0.62, 0.46, 0.16 })
+
+    for rowIndex, row in ipairs(frame.rows) do
+        local spell = spells and spells[rowIndex + frame.scrollOffset]
+        if spell then
+            local name, icon = GetSpellDisplay(spell)
+            row.icon:SetTexture(icon)
+            row.name:SetText(name)
+            row.bar:SetStatusBarColor(r, g, b, 0.58)
+            row.bar:SetMinMaxValues(0, maxAmount)
+            row.bar:SetValue(spell.totalAmount)
+            row.amount:SetText(FormatNumber(spell.totalAmount))
+            row.rate:SetText(FormatNumber(spell.amountPerSecond))
+            local amount = spell.totalAmount
+            if safeTotal and safeTotal > 0 and not IsSecret(amount) and amount ~= nil and tonumber(amount) then
+                row.percent:SetFormattedText("%.1f%%", (tonumber(amount) / safeTotal) * 100)
+            else
+                row.percent:SetText("")
+            end
+            row:Show()
+        else
+            row.bar:SetValue(0)
+            row:Hide()
+        end
+    end
+
+    frame.empty:SetShown(count == 0)
+    if frame.maxScrollOffset > 0 then
+        frame.scrollHint:SetFormattedText("Mouse wheel  •  %d–%d of %d", frame.scrollOffset + 1, math.min(count, frame.scrollOffset + SUMMARY_ROW_COUNT), count)
+    else
+        frame.scrollHint:SetText("")
+    end
+end
+
+local function ScrollSourceSummary(delta)
+    local frame = summaryFrame
+    if not frame or not delta or delta == 0 or (frame.maxScrollOffset or 0) <= 0 then return end
+    local step = IsShiftKeyDown and IsShiftKeyDown() and SUMMARY_ROW_COUNT or 1
+    local nextOffset = (frame.scrollOffset or 0) + (delta > 0 and -step or step)
+    nextOffset = math.max(0, math.min(frame.maxScrollOffset, nextOffset))
+    if nextOffset == frame.scrollOffset then return end
+    frame.scrollOffset = nextOffset
+    RefreshSourceSummary()
+end
+
+OpenSourceSummary = function(meterFrame, source)
+    if moveMode or not meterFrame or not source then return end
+    local frame = CreateSourceSummary()
+    frame.details = GetSourceDetails(meterFrame, source)
+    frame.scrollOffset = 0
+    frame.sourceFrame = meterFrame
+
+    local sourceName = source.name
+    if not IsSecret(sourceName) and sourceName == nil then sourceName = UNKNOWN or "Unknown" end
+    frame.name:SetText(sourceName)
+    local r, g, b = GetClassColor(source.classFilename)
+    frame.sourceColor = { r, g, b }
+    frame:SetBackdropBorderColor(r, g, b, 0.95)
+    frame.subtitle:SetText(GetMeterLabel(GetMeterType(meterFrame.windowIndex)) .. "  •  " .. GetSessionLabel(GetSessionType(meterFrame.windowIndex)))
+    local meterType = GetMeterType(meterFrame.windowIndex)
+    frame.rateHeader:SetText((meterType == "HealingDone" or meterType == "Hps") and "HPS" or "DPS")
+
+    frame:ClearAllPoints()
+    frame:SetPoint("TOPLEFT", meterFrame, "TOPRIGHT", 8, 0)
+    frame:SetScript("OnMouseWheel", function(_, delta) ScrollSourceSummary(delta) end)
+    frame:Show()
+    RefreshSourceSummary()
 end
 
 local function UpdateEventRegistration()
@@ -1017,7 +1390,10 @@ function ns:SetCustomDamageMeterSessionType(value, windowIndex)
     local db = GetDB(windowIndex)
     if not db then return end
     db.sessionType = NormalizeSessionType(value)
-    if meterFrames[windowIndex] then UpdateSessionButton(meterFrames[windowIndex]) end
+    if meterFrames[windowIndex] then
+        meterFrames[windowIndex].scrollOffset = 0
+        UpdateSessionButton(meterFrames[windowIndex])
+    end
     ScheduleRefresh(true)
 end
 
@@ -1034,7 +1410,10 @@ function ns:SetCustomDamageMeterType(value, windowIndex)
     local db = GetDB(windowIndex)
     if not db then return end
     db.damageMeterType = normalized
-    if meterFrames[windowIndex] then UpdateMeterTitle(meterFrames[windowIndex]) end
+    if meterFrames[windowIndex] then
+        meterFrames[windowIndex].scrollOffset = 0
+        UpdateMeterTitle(meterFrames[windowIndex])
+    end
     ScheduleRefresh(true)
 end
 
@@ -1143,6 +1522,7 @@ end
 function ns:InitializeCustomDamageMeter()
     if eventFrame then return end
     CreateMeterFrame(1)
+    CreateSourceSummary()
     local secondDB = GetDB(2) or {}
     if secondDB.enabled == true then
         InitializeSecondWindowLayout()

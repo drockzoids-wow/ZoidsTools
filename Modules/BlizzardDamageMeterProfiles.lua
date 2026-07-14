@@ -605,9 +605,24 @@ function ns:GetBlizzardDamageMeterStatusText()
 end
 
 function ns:SetBlizzardDamageMeterEnabled(value)
-    if value == true then
-        ns:Print("Enable Blizzard's damage meter from Blizzard's Options. ZoidsTools only saves positions.")
+    local enabled = value == true
+    local setter = C_CVar and C_CVar.SetCVar or SetCVar
+    if type(setter) ~= "function" then
+        return false
     end
+
+    local ok, result = pcall(setter, "damageMeterEnabled", enabled and "1" or "0")
+    if not ok or result == false then return false end
+
+    if DamageMeter and DamageMeter.UpdateShownState then
+        SafeCall(DamageMeter.UpdateShownState, DamageMeter)
+    end
+
+    if enabled and ns.GetCustomDamageMeterEnabled and ns:GetCustomDamageMeterEnabled() and ns.SetCustomDamageMeterEnabled then
+        ns:SetCustomDamageMeterEnabled(false)
+    end
+
+    return true
 end
 
 function ns:GetBlizzardDamageMeterEnabled()

@@ -44,7 +44,7 @@ function ns.UI.Pages.CreateGeneralPage(parent)
     local minimapHeader = UI.CreateCheckbox(
         frame,
         "Move map title and time",
-        "Moves the minimap title, subzone, tracking, addon button, and clock into a larger top banner. Right-click the clock to open the calendar.",
+        "Uses a compact title and clock bar with tracking inside the title bar. The addon compartment stays inside the lower-right corner. Right-click the clock to open the calendar.",
         function()
             return ns.IsMinimapHeaderBarEnabled and ns:IsMinimapHeaderBarEnabled()
         end,
@@ -55,6 +55,43 @@ function ns.UI.Pages.CreateGeneralPage(parent)
         end
     )
     UI.PlaceBelow(minimapHeader, squareMinimap)
+
+    local hideAddonCompartment = UI.CreateCheckbox(
+        frame,
+        "Hide addon compartment",
+        "Hides Blizzard's addon-compartment button from the minimap.",
+        function()
+            return ns.IsAddonCompartmentHidden and ns:IsAddonCompartmentHidden()
+        end,
+        function(value)
+            if ns.SetAddonCompartmentHidden then
+                ns:SetAddonCompartmentHidden(value)
+            end
+        end
+    )
+    UI.PlaceBelow(hideAddonCompartment, minimapHeader)
+
+    local expansionButtonSize = UI.CreateSlider(
+        frame,
+        "Expansion button size",
+        "Adjusts Blizzard's expansion landing-page button. Drag the button itself to move it around the minimap.",
+        20,
+        48,
+        1,
+        function()
+            return ns.GetExpansionButtonSize and ns:GetExpansionButtonSize() or 32
+        end,
+        function(value)
+            if ns.SetExpansionButtonSize then
+                ns:SetExpansionButtonSize(value)
+            end
+        end,
+        controlWidth,
+        function(value)
+            return string.format("%d px", value or 32)
+        end
+    )
+    UI.PlaceSlider(expansionButtonSize, hideAddonCompartment)
 
     local mouseoverButtons = UI.CreateCheckbox(
         frame,
@@ -69,7 +106,7 @@ function ns.UI.Pages.CreateGeneralPage(parent)
             end
         end
     )
-    UI.PlaceBelow(mouseoverButtons, minimapHeader)
+    UI.PlaceBelow(mouseoverButtons, expansionButtonSize)
 
     local collectButtons = UI.CreateCheckbox(
         frame,
@@ -345,6 +382,8 @@ function ns.UI.Pages.CreateGeneralPage(parent)
         minimap:Refresh()
         squareMinimap:Refresh()
         minimapHeader:Refresh()
+        hideAddonCompartment:Refresh()
+        expansionButtonSize:Refresh()
         mouseoverButtons:Refresh()
         collectButtons:Refresh()
         inviteBanner:Refresh()

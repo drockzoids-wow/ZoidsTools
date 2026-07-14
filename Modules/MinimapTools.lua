@@ -8,6 +8,11 @@ local collectorButton
 local collectorPanel
 local collectorContent
 local collectorDragAngle
+local expansionButton
+local expansionButtonDragAngle
+local expansionButtonBaseWidth
+local expansionButtonHooksInstalled = false
+local expansionButtonPositioning = false
 local pendingRefresh = false
 local pendingCombatRefresh = false
 local mouseHooksInstalled = false
@@ -20,7 +25,9 @@ local clockCalendarScripts = {}
 local clockFontStore
 local difficultyHooks = {}
 local mailHooks = {}
+local mailPointHooks = {}
 local mailPositioningDeferred = false
+local mailPositioningActive = false
 
 local trackedButtons = {}
 local originalButtonPoints = {}
@@ -38,8 +45,14 @@ local COLLECTED_BUTTON_SIZE = 30
 local COLLECTED_BUTTON_GAP = 6
 local DEFAULT_COLLECTOR_ANGLE = -45
 local COLLECTOR_RADIUS = COLLECTOR_SIZE / 2
-local INFO_BAR_HEIGHT = 42
+local INFO_BAR_HEIGHT = 32
+local TRACKING_BUTTON_SIZE = 24
+local ADDON_COMPARTMENT_SIZE = 22
 local MAIL_ICON_SIZE = 32
+local DEFAULT_EXPANSION_BUTTON_SIZE = 32
+local MIN_EXPANSION_BUTTON_SIZE = 20
+local MAX_EXPANSION_BUTTON_SIZE = 48
+local EXPANSION_BUTTON_BORDER_INSET = 4
 
 local minimapShapes = {
     ROUND = { true, true, true, true },
@@ -85,6 +98,7 @@ end
 local ignoredButtonNames = {
     AddonCompartmentFrame = true,
     GameTimeFrame = true,
+    ExpansionLandingPageMinimapButton = true,
     GarrisonLandingPageMinimapButton = true,
     GuildInstanceDifficulty = true,
     InstanceDifficultyFrame = true,
@@ -133,6 +147,10 @@ local function EnsureMinimapDB()
         db.moveHeader = false
     end
 
+    if db.hideAddonCompartment == nil then
+        db.hideAddonCompartment = false
+    end
+
     if db.hideAddonButtons == nil then
         db.hideAddonButtons = false
     end
@@ -143,6 +161,10 @@ local function EnsureMinimapDB()
 
     if db.collectorMoved == nil then
         db.collectorMoved = false
+    end
+
+    if db.expansionButtonSize == nil then
+        db.expansionButtonSize = DEFAULT_EXPANSION_BUTTON_SIZE
     end
 
     return db
@@ -564,8 +586,8 @@ local function EnsureInfoBarText(bar)
     end
 
     bar.zoneText = bar:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    bar.zoneText:SetPoint("TOPLEFT", bar, "TOPLEFT", 58, -8)
-    bar.zoneText:SetPoint("TOPRIGHT", bar, "TOPRIGHT", -72, -8)
+    bar.zoneText:SetPoint("TOPLEFT", bar, "TOPLEFT", 72, -4)
+    bar.zoneText:SetPoint("TOPRIGHT", bar, "TOPRIGHT", -72, -4)
     bar.zoneText:SetJustifyH("CENTER")
     bar.zoneText:SetJustifyV("MIDDLE")
 
@@ -590,11 +612,11 @@ local function UpdateInfoBarText()
         infoBar.zoneText:ClearAllPoints()
 
         if subZone and subZone ~= "" then
-            infoBar.zoneText:SetPoint("TOPLEFT", infoBar, "TOPLEFT", 58, -8)
-            infoBar.zoneText:SetPoint("TOPRIGHT", infoBar, "TOPRIGHT", -72, -8)
+            infoBar.zoneText:SetPoint("TOPLEFT", infoBar, "TOPLEFT", 72, -4)
+            infoBar.zoneText:SetPoint("TOPRIGHT", infoBar, "TOPRIGHT", -72, -4)
             infoBar.zoneText:SetText(zone)
         else
-            infoBar.zoneText:SetPoint("LEFT", infoBar, "LEFT", 58, 0)
+            infoBar.zoneText:SetPoint("LEFT", infoBar, "LEFT", 72, 0)
             infoBar.zoneText:SetPoint("RIGHT", infoBar, "RIGHT", -72, 0)
             infoBar.zoneText:SetText(zone)
         end
@@ -682,6 +704,21 @@ local function MoveMinimapCornerWidget(key, frame)
     return true
 end
 
+local function PositionAddonCompartment(frame, db)
+    if not frame or not db then
+        return
+    end
+
+    SaveOriginalShown(frame)
+
+    if MoveMinimapCornerWidget("addon", frame) then
+        frame:SetSize(ADDON_COMPARTMENT_SIZE, ADDON_COMPARTMENT_SIZE)
+        frame:SetPoint("BOTTOMRIGHT", Minimap, "BOTTOMRIGHT", -5, 5)
+        frame:SetFrameLevel((Minimap:GetFrameLevel() or 0) + 14)
+        SetShown(frame, not db.hideAddonCompartment)
+    end
+end
+
 local function PositionDifficultyFrames()
     if not Minimap then
         return
@@ -749,40 +786,41 @@ PositionMailFrame = function()
         return
     end
 
-    local db = EnsureMinimapDB()
+    if IsCombatLocked() then
+        pendingCombatRefresh = true
+        return
+    end
+
     local mailFrames = GetMailFrames()
 
-    if #mailFrames == 0 or not db or db.moveHeader ~= true then
+    if #mailFrames == 0 then
         return
     end
-
-    originalWidgetPoints.mail = originalWidgetPoints.mail or {}
 
     for _, mailFrame in ipairs(mailFrames) do
-        originalWidgetPoints.mail[mailFrame] = originalWidgetPoints.mail[mailFrame] or {}
-        SaveFramePoints(mailFrame, originalWidgetPoints.mail[mailFrame])
-
         if not mailHooks[mailFrame] and mailFrame.HookScript then
             mailHooks[mailFrame] = true
-            mailFrame:HookScript("OnShow", SchedulePositionMailFrame)
+            mailFrame:HookScript("OnShow", function()
+                if PositionMailFrame then PositionMailFrame() end
+                SchedulePositionMailFrame()
+            end)
         end
 
-        local anchorFrame = squareBorder or Minimap
+        if not mailPointHooks[mailFrame] and hooksecurefunc then
+            mailPointHooks[mailFrame] = true
+            hooksecurefunc(mailFrame, "SetPoint", function()
+                if not mailPositioningActive and PositionMailFrame then
+                    PositionMailFrame()
+                end
+            end)
+        end
 
+        mailPositioningActive = true
         mailFrame:ClearAllPoints()
         mailFrame:SetSize(MAIL_ICON_SIZE, MAIL_ICON_SIZE)
-        mailFrame:SetPoint("TOPLEFT", anchorFrame, "TOPLEFT", 5, -5)
+        mailFrame:SetPoint("TOPLEFT", Minimap, "TOPLEFT", 5, -5)
         mailFrame:SetFrameLevel((Minimap:GetFrameLevel() or 0) + 14)
-    end
-end
-
-local function RestoreMailFrame()
-    if not originalWidgetPoints.mail then
-        return
-    end
-
-    for _, mailFrame in ipairs(GetMailFrames()) do
-        RestoreFramePoints(mailFrame, originalWidgetPoints.mail[mailFrame])
+        mailPositioningActive = false
     end
 end
 
@@ -868,8 +906,8 @@ local function ApplyInfoBar(enabled)
         SetHeaderDecorShown(false)
 
         if trackingButton and MoveHeaderWidget("tracking", trackingButton, bar) then
-            trackingButton:SetSize(20, 20)
-            trackingButton:SetPoint("TOPLEFT", bar, "TOPLEFT", 5, -3)
+            trackingButton:SetSize(TRACKING_BUTTON_SIZE, TRACKING_BUTTON_SIZE)
+            trackingButton:SetPoint("LEFT", bar, "LEFT", 5, 0)
             trackingButton:SetFrameLevel(bar:GetFrameLevel() + 3)
         end
 
@@ -881,16 +919,7 @@ local function ApplyInfoBar(enabled)
             StyleClockButton(clockButton, true)
         end
 
-        if addonButton and MoveHeaderWidget("addon", addonButton, bar) then
-            addonButton:SetSize(20, 20)
-            addonButton:SetPoint("BOTTOMLEFT", bar, "BOTTOMLEFT", 5, 3)
-            addonButton:SetFrameLevel(bar:GetFrameLevel() + 3)
-        end
-
         PositionDifficultyFrames()
-        PositionMailFrame()
-        SchedulePositionMailFrame()
-
         if calendarButton then
             originalWidgetPoints.calendar = originalWidgetPoints.calendar or {}
             SaveFramePoints(calendarButton, originalWidgetPoints.calendar)
@@ -921,9 +950,7 @@ local function ApplyInfoBar(enabled)
         RestoreFramePoints(clockButton, originalWidgetPoints.clock)
         RestoreFramePoints(trackingButton, originalWidgetPoints.tracking)
         RestoreFramePoints(calendarButton, originalWidgetPoints.calendar)
-        RestoreFramePoints(addonButton, originalWidgetPoints.addon)
         RestoreDifficultyFrames()
-        RestoreMailFrame()
         RestoreOriginalShown(zoneButton)
         RestoreOriginalShown(calendarButton)
 
@@ -931,6 +958,10 @@ local function ApplyInfoBar(enabled)
             SetHeaderDecorShown(true)
         end
     end
+
+    PositionAddonCompartment(addonButton, db)
+    PositionMailFrame()
+    SchedulePositionMailFrame()
 end
 
 local function GetButtonKey(button)
@@ -1418,6 +1449,188 @@ local function ShowMouseoverButtons()
     ApplyMouseoverButtonVisibility(true)
 end
 
+local function GetExpansionButton()
+    return _G.ExpansionLandingPageMinimapButton
+        or (_G.MinimapCluster and _G.MinimapCluster.ExpansionLandingPageMinimapButton)
+end
+
+local function SetExpansionButtonAngleFromCursor()
+    if not expansionButton or not Minimap or not GetCursorPosition then
+        return
+    end
+
+    local mx, my = Minimap:GetCenter()
+    local px, py = GetCursorPosition()
+    local scale = Minimap:GetEffectiveScale() or 1
+
+    if not mx or not my or not px or not py then
+        return
+    end
+
+    px, py = px / scale, py / scale
+    expansionButtonDragAngle = math.deg(Atan2(py - my, px - mx)) % 360
+end
+
+local function GetCurrentExpansionButtonAngle(button)
+    if not button or not Minimap then
+        return nil
+    end
+
+    local mx, my = Minimap:GetCenter()
+    local bx, by = button:GetCenter()
+
+    if not mx or not my or not bx or not by then
+        return nil
+    end
+
+    return math.deg(Atan2(by - my, bx - mx)) % 360
+end
+
+local function PositionExpansionButton()
+    if expansionButtonPositioning or not expansionButton or not Minimap or IsCombatLocked() then
+        return
+    end
+
+    local db = EnsureMinimapDB()
+
+    if not db then
+        return
+    end
+
+    if db.expansionButtonAngle == nil then
+        db.expansionButtonAngle = GetCurrentExpansionButtonAngle(expansionButton) or 225
+    end
+
+    local size = math.max(MIN_EXPANSION_BUTTON_SIZE, math.min(tonumber(db.expansionButtonSize) or DEFAULT_EXPANSION_BUTTON_SIZE, MAX_EXPANSION_BUTTON_SIZE))
+    local angle = math.rad((expansionButtonDragAngle or db.expansionButtonAngle) % 360)
+    local x, y = math.cos(angle), math.sin(angle)
+    local quadrant = 1
+
+    if x < 0 then
+        quadrant = quadrant + 1
+    end
+
+    if y > 0 then
+        quadrant = quadrant + 2
+    end
+
+    local minimapShape = GetMinimapShape and GetMinimapShape() or "ROUND"
+    local shape = minimapShapes[minimapShape] or minimapShapes.ROUND
+    local radius = size / 2
+    local width = (Minimap:GetWidth() / 2) + radius - EXPANSION_BUTTON_BORDER_INSET
+    local height = (Minimap:GetHeight() / 2) + radius - EXPANSION_BUTTON_BORDER_INSET
+
+    if shape[quadrant] then
+        x, y = x * width, y * height
+    else
+        local diagWidth = math.sqrt(2 * (width ^ 2)) - 10
+        local diagHeight = math.sqrt(2 * (height ^ 2)) - 10
+
+        x = math.max(-width, math.min(x * diagWidth, width))
+        y = math.max(-height, math.min(y * diagHeight, height))
+    end
+
+    expansionButtonPositioning = true
+    expansionButtonBaseWidth = expansionButtonBaseWidth or expansionButton:GetWidth()
+    local buttonScale = 1
+
+    if expansionButtonBaseWidth and expansionButtonBaseWidth > 0 then
+        buttonScale = size / expansionButtonBaseWidth
+        expansionButton:SetScale(buttonScale)
+    end
+
+    expansionButton:ClearAllPoints()
+    -- SetPoint offsets are interpreted in the anchored frame's scaled space.
+    -- Compensate here so resizing the button does not also shrink its orbit.
+    expansionButton:SetPoint("CENTER", Minimap, "CENTER", x / buttonScale, y / buttonScale)
+    expansionButton:SetFrameStrata("MEDIUM")
+    expansionButton:SetFrameLevel((Minimap:GetFrameLevel() or 0) + 14)
+    expansionButtonPositioning = false
+end
+
+local function EnsureExpansionButtonHooks()
+    local button = GetExpansionButton()
+
+    if not button then
+        return
+    end
+
+    expansionButton = button
+
+    if expansionButtonHooksInstalled then
+        return
+    end
+
+    expansionButtonHooksInstalled = true
+    button:SetMovable(true)
+    button:RegisterForDrag("LeftButton")
+
+    button:HookScript("OnDragStart", function(self)
+        if IsCombatLocked() then
+            return
+        end
+
+        local db = EnsureMinimapDB()
+        expansionButtonDragAngle = db and db.expansionButtonAngle or GetCurrentExpansionButtonAngle(self) or 225
+        self.zoidsToolsDragging = true
+    end)
+
+    button:HookScript("OnDragStop", function(self)
+        if not self.zoidsToolsDragging then
+            return
+        end
+
+        self.zoidsToolsDragging = false
+        SetExpansionButtonAngleFromCursor()
+
+        local db = EnsureMinimapDB()
+
+        if db then
+            db.expansionButtonAngle = expansionButtonDragAngle or db.expansionButtonAngle or 225
+        end
+
+        PositionExpansionButton()
+        expansionButtonDragAngle = nil
+    end)
+
+    button:HookScript("OnUpdate", function(self)
+        if not self.zoidsToolsDragging then
+            return
+        end
+
+        SetExpansionButtonAngleFromCursor()
+        PositionExpansionButton()
+    end)
+
+    button:HookScript("OnShow", function()
+        PositionExpansionButton()
+    end)
+
+    button:HookScript("OnEnter", function()
+        if GameTooltip and GameTooltip:IsOwned(button) then
+            GameTooltip:AddLine("Drag to move around the minimap.", 0.75, 0.85, 1, true)
+            GameTooltip:Show()
+        end
+    end)
+
+    if hooksecurefunc then
+        hooksecurefunc(button, "SetPoint", function()
+            if expansionButtonPositioning or IsCombatLocked() then
+                return
+            end
+
+            if C_Timer and C_Timer.After then
+                C_Timer.After(0, PositionExpansionButton)
+            end
+        end)
+    end
+end
+
+local function ApplyExpansionButton()
+    EnsureExpansionButtonHooks()
+    PositionExpansionButton()
+end
+
 local function ScheduleMouseoverButtonHide()
     if IsCombatLocked() then
         pendingCombatRefresh = true
@@ -1591,6 +1804,7 @@ local function ApplyMinimapTools()
     ScheduleMinimapUnclamp()
     ApplySquareMinimap(db.square == true)
     ApplyInfoBar(db.moveHeader == true)
+    ApplyExpansionButton()
     ApplyAddonButtons()
 end
 
@@ -1656,6 +1870,40 @@ function ns:IsMinimapHeaderBarEnabled()
     local db = EnsureMinimapDB()
 
     return db and db.moveHeader == true
+end
+
+function ns:SetAddonCompartmentHidden(value)
+    local db = EnsureMinimapDB()
+
+    if not db then
+        return
+    end
+
+    db.hideAddonCompartment = value == true
+    ApplyMinimapTools()
+end
+
+function ns:IsAddonCompartmentHidden()
+    local db = EnsureMinimapDB()
+
+    return db and db.hideAddonCompartment == true
+end
+
+function ns:SetExpansionButtonSize(value)
+    local db = EnsureMinimapDB()
+
+    if not db then
+        return
+    end
+
+    db.expansionButtonSize = math.max(MIN_EXPANSION_BUTTON_SIZE, math.min(tonumber(value) or DEFAULT_EXPANSION_BUTTON_SIZE, MAX_EXPANSION_BUTTON_SIZE))
+    ApplyMinimapTools()
+end
+
+function ns:GetExpansionButtonSize()
+    local db = EnsureMinimapDB()
+
+    return db and db.expansionButtonSize or DEFAULT_EXPANSION_BUTTON_SIZE
 end
 
 function ns:SetMinimapButtonsMouseoverEnabled(value)

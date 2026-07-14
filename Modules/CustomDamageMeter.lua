@@ -55,6 +55,7 @@ end
 
 local meterFrames = {}
 local eventFrame
+local meterChoiceEventFrame
 local moveMode = false
 local refreshPending = false
 local lastRefresh = 0
@@ -62,6 +63,7 @@ local RefreshMeter
 local ScheduleRefresh
 local ScrollMeter
 local OpenSourceSummary
+local RefreshOpenSourceSummary
 local summaryFrame
 
 local sampleSources = {
@@ -965,6 +967,7 @@ RefreshMeter = function()
     if secondDB.enabled == true or meterFrames[2] then
         RefreshMeterWindow(2)
     end
+    if RefreshOpenSourceSummary then RefreshOpenSourceSummary() end
 end
 
 if ns.WrapDiagnosticFunction then
@@ -1103,21 +1106,28 @@ local function GetSourceDetails(frame, source)
 end
 
 local function GetSpellDisplay(spell)
-    local spellID = spell and spell.spellID
-    if not IsSecret(spellID) and spellID ~= nil then
-        local info = C_Spell and C_Spell.GetSpellInfo and C_Spell.GetSpellInfo(spellID)
-        if info then
-            return info.name or (UNKNOWN or "Unknown"), info.iconID or 134400
-        end
-        if GetSpellInfo then
-            local name, _, icon = GetSpellInfo(spellID)
-            if name then return name, icon or 134400 end
+    if not spell then return UNKNOWN or "Unknown", 134400 end
+
+    local spellID = spell.spellID
+    local spellName
+    local spellIcon
+    if spellID and C_Spell then
+        if C_Spell.GetSpellName then spellName = C_Spell.GetSpellName(spellID) end
+        if C_Spell.GetSpellTexture then spellIcon = C_Spell.GetSpellTexture(spellID) end
+    end
+
+    if not spellName then
+        local creatureName = spell.creatureName
+        if IsSecret(creatureName) then
+            spellName = creatureName
+        elseif creatureName ~= nil and tostring(creatureName) ~= "" then
+            spellName = tostring(creatureName)
+        else
+            spellName = UNKNOWN or "Unknown"
         end
     end
 
-    local name = spell and spell.creatureName
-    if not IsSecret(name) and name == nil then name = UNKNOWN or "Unknown" end
-    return name, 134400
+    return spellName, spellIcon or 134400
 end
 
 local function CreateSummaryRow(parent, index)
@@ -1153,23 +1163,23 @@ local function CreateSummaryRow(parent, index)
 
     row.name = row.content:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
     row.name:SetPoint("LEFT", row.icon, "RIGHT", 6, 0)
-    row.name:SetPoint("RIGHT", row.content, "RIGHT", -188, 0)
+    row.name:SetPoint("RIGHT", row.content, "RIGHT", -222, 0)
     row.name:SetJustifyH("LEFT")
     row.name:SetWordWrap(false)
 
     row.amount = row.content:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-    row.amount:SetPoint("RIGHT", row.content, "RIGHT", -91, 0)
-    row.amount:SetWidth(88)
+    row.amount:SetPoint("RIGHT", row.content, "RIGHT", -122, 0)
+    row.amount:SetWidth(92)
     row.amount:SetJustifyH("RIGHT")
 
     row.rate = row.content:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-    row.rate:SetPoint("RIGHT", row.content, "RIGHT", -38, 0)
-    row.rate:SetWidth(50)
+    row.rate:SetPoint("RIGHT", row.content, "RIGHT", -49, 0)
+    row.rate:SetWidth(70)
     row.rate:SetJustifyH("RIGHT")
 
     row.percent = row.content:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
     row.percent:SetPoint("RIGHT", row.content, "RIGHT", -2, 0)
-    row.percent:SetWidth(34)
+    row.percent:SetWidth(44)
     row.percent:SetJustifyH("RIGHT")
     return row
 end
@@ -1178,7 +1188,7 @@ local function CreateSourceSummary()
     if summaryFrame then return summaryFrame end
 
     local frame = CreateFrame("Frame", FRAME_NAME .. "Summary", UIParent, "BackdropTemplate")
-    frame:SetSize(430, 336)
+    frame:SetSize(500, 336)
     frame:SetFrameStrata("HIGH")
     frame:SetClampedToScreen(true)
     frame:SetMovable(true)
@@ -1221,17 +1231,17 @@ local function CreateSourceSummary()
     spellHeader:SetPoint("LEFT", frame.columnHeader, "LEFT", 28, 0)
     spellHeader:SetText("Spell")
     frame.amountHeader = frame.columnHeader:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
-    frame.amountHeader:SetPoint("RIGHT", frame.columnHeader, "RIGHT", -91, 0)
-    frame.amountHeader:SetWidth(88)
+    frame.amountHeader:SetPoint("RIGHT", frame.columnHeader, "RIGHT", -122, 0)
+    frame.amountHeader:SetWidth(92)
     frame.amountHeader:SetJustifyH("RIGHT")
     frame.amountHeader:SetText("Amount")
     frame.rateHeader = frame.columnHeader:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
-    frame.rateHeader:SetPoint("RIGHT", frame.columnHeader, "RIGHT", -38, 0)
-    frame.rateHeader:SetWidth(50)
+    frame.rateHeader:SetPoint("RIGHT", frame.columnHeader, "RIGHT", -49, 0)
+    frame.rateHeader:SetWidth(70)
     frame.rateHeader:SetJustifyH("RIGHT")
     frame.percentHeader = frame.columnHeader:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
     frame.percentHeader:SetPoint("RIGHT", frame.columnHeader, "RIGHT", -2, 0)
-    frame.percentHeader:SetWidth(34)
+    frame.percentHeader:SetWidth(44)
     frame.percentHeader:SetJustifyH("RIGHT")
     frame.percentHeader:SetText("%")
 
@@ -1300,6 +1310,13 @@ local function RefreshSourceSummary()
     end
 end
 
+RefreshOpenSourceSummary = function()
+    local frame = summaryFrame
+    if not frame or not frame:IsShown() or not frame.sourceFrame or not frame.sourceData then return end
+    frame.details = GetSourceDetails(frame.sourceFrame, frame.sourceData)
+    RefreshSourceSummary()
+end
+
 local function ScrollSourceSummary(delta)
     local frame = summaryFrame
     if not frame or not delta or delta == 0 or (frame.maxScrollOffset or 0) <= 0 then return end
@@ -1317,6 +1334,7 @@ OpenSourceSummary = function(meterFrame, source)
     frame.details = GetSourceDetails(meterFrame, source)
     frame.scrollOffset = 0
     frame.sourceFrame = meterFrame
+    frame.sourceData = source
 
     local sourceName = source.name
     if not IsSecret(sourceName) and sourceName == nil then sourceName = UNKNOWN or "Unknown" end
@@ -1358,9 +1376,19 @@ end
 function ns:SetCustomDamageMeterEnabled(value)
     local db = GetDB()
     if not db then return end
-    db.enabled = value == true
+    local enabled = value == true
+    if enabled and ns.GetBlizzardDamageMeterEnabled and ns:GetBlizzardDamageMeterEnabled() then
+        if not ns.SetBlizzardDamageMeterEnabled or ns:SetBlizzardDamageMeterEnabled(false) == false then
+            ns:Print("ZoidsTools could not disable Blizzard's damage meter.")
+            return false
+        end
+    end
+    db.enabled = enabled
+    if not enabled and summaryFrame then summaryFrame:Hide() end
     UpdateEventRegistration()
     ScheduleRefresh(true)
+    if ns.UI and ns.UI.RefreshVisiblePage then ns.UI.RefreshVisiblePage() end
+    return true
 end
 
 function ns:GetCustomDamageMeterSecondWindowEnabled()
@@ -1535,6 +1563,30 @@ function ns:InitializeCustomDamageMeter()
     eventFrame:SetScript("OnEvent", function(_, event)
         ScheduleRefresh(event == "DAMAGE_METER_RESET" or event == "PLAYER_ENTERING_WORLD")
     end)
+
+    meterChoiceEventFrame = CreateFrame("Frame")
+    meterChoiceEventFrame:RegisterEvent("CVAR_UPDATE")
+    meterChoiceEventFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
+    meterChoiceEventFrame:SetScript("OnEvent", function(_, event, cvarName)
+        if event == "CVAR_UPDATE" then
+            local normalized = type(cvarName) == "string" and cvarName:lower():gsub("_", "") or ""
+            if normalized ~= "damagemeterenabled" then return end
+            if ns.GetBlizzardDamageMeterEnabled and ns:GetBlizzardDamageMeterEnabled()
+                and ns.GetCustomDamageMeterEnabled and ns:GetCustomDamageMeterEnabled() then
+                ns:SetCustomDamageMeterEnabled(false)
+            end
+        elseif ns.GetCustomDamageMeterEnabled and ns:GetCustomDamageMeterEnabled()
+            and ns.GetBlizzardDamageMeterEnabled and ns:GetBlizzardDamageMeterEnabled()
+            and ns.SetBlizzardDamageMeterEnabled then
+            ns:SetBlizzardDamageMeterEnabled(false)
+        end
+    end)
+
+    if ns.GetCustomDamageMeterEnabled and ns:GetCustomDamageMeterEnabled()
+        and ns.GetBlizzardDamageMeterEnabled and ns:GetBlizzardDamageMeterEnabled()
+        and ns.SetBlizzardDamageMeterEnabled then
+        ns:SetBlizzardDamageMeterEnabled(false)
+    end
 
     UpdateEventRegistration()
     ScheduleRefresh(true)

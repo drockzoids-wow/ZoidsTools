@@ -272,6 +272,8 @@ local defaults = {
             minimapPos = 225,
             square = false,
             moveHeader = false,
+            hideAddonCompartment = false,
+            expansionButtonSize = 32,
             hideAddonButtons = false,
             collectAddonButtons = false,
         },

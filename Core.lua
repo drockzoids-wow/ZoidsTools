@@ -187,6 +187,7 @@ local defaults = {
     },
     talentGrimoire = {
         enabled = true,
+        provider = "archon",
         contentType = "mythicplus",
         mythicPlusTarget = "all-dungeons",
         raidTarget = "all-bosses",
@@ -375,6 +376,7 @@ local function PrintHelp()
     ns:Print("/zt coords on/off toggles the coordinates widget.")
     ns:Print("/zt coords reset resets the coordinates widget position.")
     ns:Print("/zt diag start/stop/report/reset controls performance diagnostics.")
+    ns:Print("/zt talentdiag start/report/stop/reset diagnoses talent application failures.")
     ns:Print("/zt invitebanner previews the Mythic+ invitation banner.")
     ns:Print("/zt items opens item overlay options.")
     ns:Print("/zt iteminfo on/off toggles item overlays.")
@@ -663,6 +665,22 @@ local function HandleSlash(input)
     elseif input == "diag reset" then
         if ns.ResetDiagnostics then
             ns:ResetDiagnostics()
+        end
+    elseif input == "talentdiag start" or input == "talent diag start" then
+        if ns.SetTalentApplyDiagnostics then
+            ns:SetTalentApplyDiagnostics(true)
+        end
+    elseif input == "talentdiag stop" or input == "talent diag stop" then
+        if ns.SetTalentApplyDiagnostics then
+            ns:SetTalentApplyDiagnostics(false)
+        end
+    elseif input == "talentdiag report" or input == "talentdiag" or input == "talent diag report" then
+        if ns.ReportTalentApplyDiagnostics then
+            ns:ReportTalentApplyDiagnostics()
+        end
+    elseif input == "talentdiag reset" or input == "talent diag reset" then
+        if ns.ResetTalentApplyDiagnostics then
+            ns:ResetTalentApplyDiagnostics()
         end
     elseif input == "invitebanner" or input == "invite banner" or input == "mythicinvite" then
         if ns.PreviewMythicInviteBanner then

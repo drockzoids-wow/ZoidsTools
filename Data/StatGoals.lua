@@ -3,21 +3,21 @@
 -- Re-run the updater instead of editing this file by hand.
 
 ZoidsToolsStatGoals = ZoidsToolsStatGoals or {}
-ZoidsToolsStatGoals.generatedAt = "2026-07-15 13:34:31 -05:00"
+ZoidsToolsStatGoals.generatedAt = "2026-07-15 15:37:49 -05:00"
 ZoidsToolsStatGoals.data = {
     ["DEATHKNIGHT"] = {
         ["blood"] = {
-            ["Mythic+"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/blood/death-knight/mythic-plus/overview/high-keys/all-dungeons/this-week", targets = { crit = 514, haste = 418, mastery = 924, versatility = 695 } },
+            ["Mythic+"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/blood/death-knight/mythic-plus/overview/high-keys/all-dungeons/this-week", targets = { crit = 541, haste = 417, mastery = 923, versatility = 691 } },
             ["Raid"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/blood/death-knight/raid/overview/mythic/all-bosses", targets = { crit = 782, haste = 975, mastery = 666, versatility = 182 } },
             ["PvP"] = { source = "Murlok", sourceUrl = "https://murlok.io/death-knight/blood/3v3", targets = { crit = 34, haste = 648, mastery = 361, versatility = 877 } },
         },
         ["frost"] = {
-            ["Mythic+"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/frost/death-knight/mythic-plus/overview/high-keys/all-dungeons/this-week", targets = { crit = 992, haste = 417, mastery = 1178, versatility = 62 } },
+            ["Mythic+"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/frost/death-knight/mythic-plus/overview/high-keys/all-dungeons/this-week", targets = { crit = 993, haste = 419, mastery = 1177, versatility = 59 } },
             ["Raid"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/frost/death-knight/raid/overview/mythic/all-bosses", targets = { crit = 1021, haste = 361, mastery = 1205, versatility = 78 } },
             ["PvP"] = { source = "Murlok", sourceUrl = "https://murlok.io/death-knight/frost/3v3", targets = { crit = 125, haste = 277, mastery = 767, versatility = 758 } },
         },
         ["unholy"] = {
-            ["Mythic+"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/unholy/death-knight/mythic-plus/overview/high-keys/all-dungeons/this-week", targets = { crit = 1144, haste = 265, mastery = 1215, versatility = 52 } },
+            ["Mythic+"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/unholy/death-knight/mythic-plus/overview/high-keys/all-dungeons/this-week", targets = { crit = 1144, haste = 265, mastery = 1216, versatility = 52 } },
             ["Raid"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/unholy/death-knight/raid/overview/mythic/all-bosses", targets = { crit = 1048, haste = 337, mastery = 1197, versatility = 65 } },
             ["PvP"] = { source = "Murlok", sourceUrl = "https://murlok.io/death-knight/unholy/3v3", targets = { crit = 39, haste = 315, mastery = 606, versatility = 970 } },
         },
@@ -29,204 +29,204 @@ ZoidsToolsStatGoals.data = {
             ["PvP"] = { source = "Murlok", sourceUrl = "https://murlok.io/demon-hunter/devourer/3v3", targets = { crit = 30, haste = 438, mastery = 885, versatility = 559 } },
         },
         ["havoc"] = {
-            ["Mythic+"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/havoc/demon-hunter/mythic-plus/overview/high-keys/all-dungeons/this-week", targets = { crit = 1235, haste = 213, mastery = 1125, versatility = 59 } },
+            ["Mythic+"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/havoc/demon-hunter/mythic-plus/overview/high-keys/all-dungeons/this-week", targets = { crit = 1235, haste = 211, mastery = 1187, versatility = 58 } },
             ["Raid"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/havoc/demon-hunter/raid/overview/mythic/all-bosses", targets = { crit = 1184, haste = 304, mastery = 1080, versatility = 78 } },
             ["PvP"] = { source = "Murlok", sourceUrl = "https://murlok.io/demon-hunter/havoc/3v3", targets = { crit = 6, haste = 281, mastery = 858, versatility = 745 } },
         },
         ["vengeance"] = {
-            ["Mythic+"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/vengeance/demon-hunter/mythic-plus/overview/high-keys/all-dungeons/this-week", targets = { crit = 624, haste = 1151, mastery = 429, versatility = 290 } },
+            ["Mythic+"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/vengeance/demon-hunter/mythic-plus/overview/high-keys/all-dungeons/this-week", targets = { crit = 622, haste = 1153, mastery = 431, versatility = 290 } },
             ["Raid"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/vengeance/demon-hunter/raid/overview/mythic/all-bosses", targets = { crit = 670, haste = 1089, mastery = 550, versatility = 222 } },
             ["PvP"] = { source = "Murlok", sourceUrl = "https://murlok.io/demon-hunter/vengeance/3v3", targets = { crit = 63, haste = 340, mastery = 820, versatility = 690 } },
         },
     },
     ["DRUID"] = {
         ["balance"] = {
-            ["Mythic+"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/balance/druid/mythic-plus/overview/high-keys/all-dungeons/this-week", targets = { crit = 752, haste = 795, mastery = 1037, versatility = 94 } },
+            ["Mythic+"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/balance/druid/mythic-plus/overview/high-keys/all-dungeons/this-week", targets = { crit = 735, haste = 799, mastery = 1039, versatility = 98 } },
             ["Raid"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/balance/druid/raid/overview/mythic/all-bosses", targets = { crit = 803, haste = 706, mastery = 1073, versatility = 101 } },
             ["PvP"] = { source = "Murlok", sourceUrl = "https://murlok.io/druid/balance/3v3", targets = { crit = 7, haste = 835, mastery = 129, versatility = 966 } },
         },
         ["feral"] = {
-            ["Mythic+"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/feral/druid/mythic-plus/overview/high-keys/all-dungeons/this-week", targets = { crit = 504, haste = 878, mastery = 1253, versatility = 72 } },
+            ["Mythic+"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/feral/druid/mythic-plus/overview/high-keys/all-dungeons/this-week", targets = { crit = 506, haste = 879, mastery = 1249, versatility = 72 } },
             ["Raid"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/feral/druid/raid/overview/mythic/all-bosses", targets = { crit = 558, haste = 854, mastery = 1121, versatility = 146 } },
             ["PvP"] = { source = "Murlok", sourceUrl = "https://murlok.io/druid/feral/3v3", targets = { crit = 17, haste = 211, mastery = 665, versatility = 1028 } },
         },
         ["guardian"] = {
-            ["Mythic+"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/guardian/druid/mythic-plus/overview/high-keys/all-dungeons/this-week", targets = { crit = 438, haste = 1271, mastery = 543, versatility = 540 } },
+            ["Mythic+"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/guardian/druid/mythic-plus/overview/high-keys/all-dungeons/this-week", targets = { crit = 441, haste = 1272, mastery = 545, versatility = 538 } },
             ["Raid"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/guardian/druid/raid/overview/mythic/all-bosses", targets = { crit = 397, haste = 1172, mastery = 581, versatility = 423 } },
             ["PvP"] = { source = "Murlok", sourceUrl = "https://murlok.io/druid/guardian/3v3", targets = { crit = 90, haste = 689, mastery = 395, versatility = 865 } },
         },
         ["restoration"] = {
-            ["Mythic+"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/restoration/druid/mythic-plus/overview/high-keys/all-dungeons/this-week", targets = { crit = 156, haste = 1160, mastery = 1095, versatility = 186 } },
+            ["Mythic+"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/restoration/druid/mythic-plus/overview/high-keys/all-dungeons/this-week", targets = { crit = 155, haste = 1175, mastery = 1092, versatility = 187 } },
             ["Raid"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/restoration/druid/raid/overview/mythic/all-bosses", targets = { crit = 179, haste = 1265, mastery = 1146, versatility = 132 } },
             ["PvP"] = { source = "Murlok", sourceUrl = "https://murlok.io/druid/restoration/3v3", targets = { crit = 13, haste = 362, mastery = 822, versatility = 696 } },
         },
     },
     ["EVOKER"] = {
         ["augmentation"] = {
-            ["Mythic+"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/augmentation/evoker/mythic-plus/overview/high-keys/all-dungeons/this-week", targets = { crit = 1208, haste = 1078, mastery = 199, versatility = 57 } },
+            ["Mythic+"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/augmentation/evoker/mythic-plus/overview/high-keys/all-dungeons/this-week", targets = { crit = 1206, haste = 1083, mastery = 200, versatility = 57 } },
             ["Raid"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/augmentation/evoker/raid/overview/mythic/all-bosses", targets = { crit = 1284, haste = 939, mastery = 262, versatility = 78 } },
             ["PvP"] = { source = "Murlok", sourceUrl = "https://murlok.io/evoker/augmentation/3v3", targets = { crit = 106, haste = 894, mastery = 84, versatility = 821 } },
         },
         ["devastation"] = {
-            ["Mythic+"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/devastation/evoker/mythic-plus/overview/high-keys/all-dungeons/this-week", targets = { crit = 1051, haste = 881, mastery = 547, versatility = 78 } },
+            ["Mythic+"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/devastation/evoker/mythic-plus/overview/high-keys/all-dungeons/this-week", targets = { crit = 1057, haste = 881, mastery = 552, versatility = 76 } },
             ["Raid"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/devastation/evoker/raid/overview/mythic/all-bosses", targets = { crit = 1138, haste = 861, mastery = 488, versatility = 92 } },
             ["PvP"] = { source = "Murlok", sourceUrl = "https://murlok.io/evoker/devastation/3v3", targets = { crit = 125, haste = 490, mastery = 458, versatility = 852 } },
         },
         ["preservation"] = {
-            ["Mythic+"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/preservation/evoker/mythic-plus/overview/high-keys/all-dungeons/this-week", targets = { crit = 631, haste = 936, mastery = 716, versatility = 224 } },
+            ["Mythic+"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/preservation/evoker/mythic-plus/overview/high-keys/all-dungeons/this-week", targets = { crit = 651, haste = 931, mastery = 725, versatility = 231 } },
             ["Raid"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/preservation/evoker/raid/overview/mythic/all-bosses", targets = { crit = 820, haste = 512, mastery = 1329, versatility = 91 } },
             ["PvP"] = { source = "Murlok", sourceUrl = "https://murlok.io/evoker/preservation/3v3", targets = { crit = 109, haste = 736, mastery = 224, versatility = 850 } },
         },
     },
     ["HUNTER"] = {
         ["beast-mastery"] = {
-            ["Mythic+"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/beast-mastery/hunter/mythic-plus/overview/high-keys/all-dungeons/this-week", targets = { crit = 1226, haste = 297, mastery = 1107, versatility = 97 } },
+            ["Mythic+"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/beast-mastery/hunter/mythic-plus/overview/high-keys/all-dungeons/this-week", targets = { crit = 1226, haste = 298, mastery = 1109, versatility = 97 } },
             ["Raid"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/beast-mastery/hunter/raid/overview/mythic/all-bosses", targets = { crit = 963, haste = 556, mastery = 1114, versatility = 81 } },
             ["PvP"] = { source = "Murlok", sourceUrl = "https://murlok.io/hunter/beast-mastery/3v3", targets = { crit = 36, haste = 179, mastery = 745, versatility = 958 } },
         },
         ["marksmanship"] = {
-            ["Mythic+"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/marksmanship/hunter/mythic-plus/overview/high-keys/all-dungeons/this-week", targets = { crit = 1323, haste = 404, mastery = 833, versatility = 124 } },
+            ["Mythic+"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/marksmanship/hunter/mythic-plus/overview/high-keys/all-dungeons/this-week", targets = { crit = 1321, haste = 410, mastery = 833, versatility = 125 } },
             ["Raid"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/marksmanship/hunter/raid/overview/mythic/all-bosses", targets = { crit = 1359, haste = 429, mastery = 887, versatility = 100 } },
             ["PvP"] = { source = "Murlok", sourceUrl = "https://murlok.io/hunter/marksmanship/3v3", targets = { crit = 49, haste = 133, mastery = 794, versatility = 935 } },
         },
         ["survival"] = {
-            ["Mythic+"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/survival/hunter/mythic-plus/overview/high-keys/all-dungeons/this-week", targets = { crit = 808, haste = 659, mastery = 1290, versatility = 66 } },
+            ["Mythic+"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/survival/hunter/mythic-plus/overview/high-keys/all-dungeons/this-week", targets = { crit = 809, haste = 661, mastery = 1288, versatility = 71 } },
             ["Raid"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/survival/hunter/raid/overview/mythic/all-bosses", targets = { crit = 813, haste = 643, mastery = 1264, versatility = 75 } },
             ["PvP"] = { source = "Murlok", sourceUrl = "https://murlok.io/hunter/survival/3v3", targets = { crit = 53, haste = 334, mastery = 756, versatility = 814 } },
         },
     },
     ["MAGE"] = {
         ["arcane"] = {
-            ["Mythic+"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/arcane/mage/mythic-plus/overview/high-keys/all-dungeons/this-week", targets = { crit = 822, haste = 584, mastery = 983, versatility = 233 } },
+            ["Mythic+"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/arcane/mage/mythic-plus/overview/high-keys/all-dungeons/this-week", targets = { crit = 822, haste = 586, mastery = 985, versatility = 232 } },
             ["Raid"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/arcane/mage/raid/overview/mythic/all-bosses", targets = { crit = 753, haste = 637, mastery = 949, versatility = 199 } },
             ["PvP"] = { source = "Murlok", sourceUrl = "https://murlok.io/mage/arcane/3v3", targets = { crit = 24, haste = 718, mastery = 249, versatility = 929 } },
         },
         ["fire"] = {
-            ["Mythic+"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/fire/mage/mythic-plus/overview/high-keys/all-dungeons/this-week", targets = { crit = 103, haste = 1234, mastery = 1052, versatility = 118 } },
+            ["Mythic+"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/fire/mage/mythic-plus/overview/high-keys/all-dungeons/this-week", targets = { crit = 102, haste = 1234, mastery = 1053, versatility = 119 } },
             ["Raid"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/fire/mage/raid/overview/mythic/all-bosses", targets = { crit = 151, haste = 1308, mastery = 1016, versatility = 114 } },
             ["PvP"] = { source = "Murlok", sourceUrl = "https://murlok.io/mage/fire/3v3", targets = { crit = 52, haste = 782, mastery = 46, versatility = 1054 } },
         },
         ["frost"] = {
-            ["Mythic+"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/frost/mage/mythic-plus/overview/high-keys/all-dungeons/this-week", targets = { crit = 1035, haste = 602, mastery = 991, versatility = 96 } },
+            ["Mythic+"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/frost/mage/mythic-plus/overview/high-keys/all-dungeons/this-week", targets = { crit = 1034, haste = 605, mastery = 992, versatility = 92 } },
             ["Raid"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/frost/mage/raid/overview/mythic/all-bosses", targets = { crit = 1036, haste = 610, mastery = 960, versatility = 76 } },
             ["PvP"] = { source = "Murlok", sourceUrl = "https://murlok.io/mage/frost/3v3", targets = { crit = 6, haste = 846, mastery = 63, versatility = 1046 } },
         },
     },
     ["MONK"] = {
         ["brewmaster"] = {
-            ["Mythic+"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/brewmaster/monk/mythic-plus/overview/high-keys/all-dungeons/this-week", targets = { crit = 1108, haste = 217, mastery = 611, versatility = 668 } },
+            ["Mythic+"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/brewmaster/monk/mythic-plus/overview/high-keys/all-dungeons/this-week", targets = { crit = 1108, haste = 217, mastery = 612, versatility = 665 } },
             ["Raid"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/brewmaster/monk/raid/overview/mythic/all-bosses", targets = { crit = 1215, haste = 302, mastery = 514, versatility = 611 } },
             ["PvP"] = { source = "Murlok", sourceUrl = "https://murlok.io/monk/brewmaster/3v3", targets = { crit = 72, haste = 428, mastery = 568, versatility = 899 } },
         },
         ["mistweaver"] = {
-            ["Mythic+"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/mistweaver/monk/mythic-plus/overview/high-keys/all-dungeons/this-week", targets = { crit = 859, haste = 1122, mastery = 143, versatility = 499 } },
+            ["Mythic+"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/mistweaver/monk/mythic-plus/overview/high-keys/all-dungeons/this-week", targets = { crit = 859, haste = 1122, mastery = 143, versatility = 501 } },
             ["Raid"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/mistweaver/monk/raid/overview/mythic/all-bosses", targets = { crit = 925, haste = 1246, mastery = 236, versatility = 190 } },
             ["PvP"] = { source = "Murlok", sourceUrl = "https://murlok.io/monk/mistweaver/3v3", targets = { crit = 42, haste = 756, mastery = 58, versatility = 1055 } },
         },
         ["windwalker"] = {
-            ["Mythic+"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/windwalker/monk/mythic-plus/overview/high-keys/all-dungeons/this-week", targets = { crit = 749, haste = 938, mastery = 837, versatility = 110 } },
+            ["Mythic+"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/windwalker/monk/mythic-plus/overview/high-keys/all-dungeons/this-week", targets = { crit = 747, haste = 942, mastery = 846, versatility = 107 } },
             ["Raid"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/windwalker/monk/raid/overview/mythic/all-bosses", targets = { crit = 818, haste = 925, mastery = 806, versatility = 120 } },
             ["PvP"] = { source = "Murlok", sourceUrl = "https://murlok.io/monk/windwalker/3v3", targets = { crit = 110, haste = 92, mastery = 925, versatility = 770 } },
         },
     },
     ["PALADIN"] = {
         ["holy"] = {
-            ["Mythic+"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/holy/paladin/mythic-plus/overview/high-keys/all-dungeons/this-week", targets = { crit = 384, haste = 936, mastery = 973, versatility = 280 } },
+            ["Mythic+"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/holy/paladin/mythic-plus/overview/high-keys/all-dungeons/this-week", targets = { crit = 384, haste = 934, mastery = 973, versatility = 278 } },
             ["Raid"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/holy/paladin/raid/overview/mythic/all-bosses", targets = { crit = 432, haste = 877, mastery = 1245, versatility = 109 } },
             ["PvP"] = { source = "Murlok", sourceUrl = "https://murlok.io/paladin/holy/3v3", targets = { crit = 10, haste = 161, mastery = 673, versatility = 1064 } },
         },
         ["protection"] = {
-            ["Mythic+"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/protection/paladin/mythic-plus/overview/high-keys/all-dungeons/this-week", targets = { crit = 808, haste = 986, mastery = 518, versatility = 200 } },
+            ["Mythic+"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/protection/paladin/mythic-plus/overview/high-keys/all-dungeons/this-week", targets = { crit = 832, haste = 985, mastery = 523, versatility = 198 } },
             ["Raid"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/protection/paladin/raid/overview/mythic/all-bosses", targets = { crit = 719, haste = 1019, mastery = 616, versatility = 198 } },
             ["PvP"] = { source = "Murlok", sourceUrl = "https://murlok.io/paladin/protection/3v3", targets = { crit = 95, haste = 263, mastery = 631, versatility = 960 } },
         },
         ["retribution"] = {
-            ["Mythic+"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/retribution/paladin/mythic-plus/overview/high-keys/all-dungeons/this-week", targets = { crit = 960, haste = 611, mastery = 1047, versatility = 68 } },
+            ["Mythic+"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/retribution/paladin/mythic-plus/overview/high-keys/all-dungeons/this-week", targets = { crit = 959, haste = 611, mastery = 1048, versatility = 67 } },
             ["Raid"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/retribution/paladin/raid/overview/mythic/all-bosses", targets = { crit = 887, haste = 642, mastery = 1068, versatility = 67 } },
             ["PvP"] = { source = "Murlok", sourceUrl = "https://murlok.io/paladin/retribution/3v3", targets = { crit = 10, haste = 115, mastery = 611, versatility = 1225 } },
         },
     },
     ["PRIEST"] = {
         ["discipline"] = {
-            ["Mythic+"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/discipline/priest/mythic-plus/overview/high-keys/all-dungeons/this-week", targets = { crit = 777, haste = 851, mastery = 943, versatility = 95 } },
+            ["Mythic+"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/discipline/priest/mythic-plus/overview/high-keys/all-dungeons/this-week", targets = { crit = 777, haste = 853, mastery = 946, versatility = 92 } },
             ["Raid"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/discipline/priest/raid/overview/mythic/all-bosses", targets = { crit = 817, haste = 1054, mastery = 685, versatility = 87 } },
             ["PvP"] = { source = "Murlok", sourceUrl = "https://murlok.io/priest/discipline/3v3", targets = { crit = 11, haste = 518, mastery = 620, versatility = 741 } },
         },
         ["holy"] = {
-            ["Mythic+"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/holy/priest/mythic-plus/overview/high-keys/all-dungeons/this-week", targets = { crit = 812, haste = 773, mastery = 597, versatility = 334 } },
+            ["Mythic+"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/holy/priest/mythic-plus/overview/high-keys/all-dungeons/this-week", targets = { crit = 807, haste = 776, mastery = 600, versatility = 331 } },
             ["Raid"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/holy/priest/raid/overview/mythic/all-bosses", targets = { crit = 1052, haste = 539, mastery = 829, versatility = 168 } },
             ["PvP"] = { source = "Murlok", sourceUrl = "https://murlok.io/priest/holy/3v3", targets = { crit = 10, haste = 314, mastery = 672, versatility = 904 } },
         },
         ["shadow"] = {
-            ["Mythic+"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/shadow/priest/mythic-plus/overview/high-keys/all-dungeons/this-week", targets = { crit = 647, haste = 1088, mastery = 892, versatility = 67 } },
+            ["Mythic+"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/shadow/priest/mythic-plus/overview/high-keys/all-dungeons/this-week", targets = { crit = 638, haste = 1090, mastery = 892, versatility = 67 } },
             ["Raid"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/shadow/priest/raid/overview/mythic/all-bosses", targets = { crit = 563, haste = 1039, mastery = 1002, versatility = 69 } },
             ["PvP"] = { source = "Murlok", sourceUrl = "https://murlok.io/priest/shadow/3v3", targets = { crit = 39, haste = 860, mastery = 179, versatility = 863 } },
         },
     },
     ["ROGUE"] = {
         ["assassination"] = {
-            ["Mythic+"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/assassination/rogue/mythic-plus/overview/high-keys/all-dungeons/this-week", targets = { crit = 1156, haste = 750, mastery = 585, versatility = 93 } },
+            ["Mythic+"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/assassination/rogue/mythic-plus/overview/high-keys/all-dungeons/this-week", targets = { crit = 1156, haste = 748, mastery = 585, versatility = 94 } },
             ["Raid"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/assassination/rogue/raid/overview/mythic/all-bosses", targets = { crit = 1158, haste = 757, mastery = 538, versatility = 116 } },
             ["PvP"] = { source = "Murlok", sourceUrl = "https://murlok.io/rogue/assassination/3v3", targets = { crit = 80, haste = 150, mastery = 829, versatility = 842 } },
         },
         ["outlaw"] = {
-            ["Mythic+"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/outlaw/rogue/mythic-plus/overview/high-keys/all-dungeons/this-week", targets = { crit = 1365, haste = 932, mastery = 339, versatility = 152 } },
+            ["Mythic+"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/outlaw/rogue/mythic-plus/overview/high-keys/all-dungeons/this-week", targets = { crit = 1366, haste = 934, mastery = 340, versatility = 152 } },
             ["Raid"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/outlaw/rogue/raid/overview/mythic/all-bosses", targets = { crit = 1293, haste = 893, mastery = 304, versatility = 187 } },
             ["PvP"] = { source = "Murlok", sourceUrl = "https://murlok.io/rogue/outlaw/3v3", targets = { crit = 84, haste = 668, mastery = 19, versatility = 1153 } },
         },
         ["subtlety"] = {
-            ["Mythic+"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/subtlety/rogue/mythic-plus/overview/high-keys/all-dungeons/this-week", targets = { crit = 637, haste = 658, mastery = 1268, versatility = 61 } },
+            ["Mythic+"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/subtlety/rogue/mythic-plus/overview/high-keys/all-dungeons/this-week", targets = { crit = 636, haste = 659, mastery = 1273, versatility = 61 } },
             ["Raid"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/subtlety/rogue/raid/overview/mythic/all-bosses", targets = { crit = 697, haste = 707, mastery = 1141, versatility = 81 } },
             ["PvP"] = { source = "Murlok", sourceUrl = "https://murlok.io/rogue/subtlety/3v3", targets = { crit = 57, haste = 169, mastery = 831, versatility = 830 } },
         },
     },
     ["SHAMAN"] = {
         ["elemental"] = {
-            ["Mythic+"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/elemental/shaman/mythic-plus/overview/high-keys/all-dungeons/this-week", targets = { crit = 876, haste = 504, mastery = 1163, versatility = 69 } },
+            ["Mythic+"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/elemental/shaman/mythic-plus/overview/high-keys/all-dungeons/this-week", targets = { crit = 876, haste = 507, mastery = 1162, versatility = 69 } },
             ["Raid"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/elemental/shaman/raid/overview/mythic/all-bosses", targets = { crit = 874, haste = 508, mastery = 1149, versatility = 86 } },
             ["PvP"] = { source = "Murlok", sourceUrl = "https://murlok.io/shaman/elemental/3v3", targets = { crit = 84, haste = 712, mastery = 154, versatility = 966 } },
         },
         ["enhancement"] = {
-            ["Mythic+"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/enhancement/shaman/mythic-plus/overview/high-keys/all-dungeons/this-week", targets = { crit = 455, haste = 989, mastery = 1127, versatility = 54 } },
+            ["Mythic+"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/enhancement/shaman/mythic-plus/overview/high-keys/all-dungeons/this-week", targets = { crit = 454, haste = 990, mastery = 1130, versatility = 54 } },
             ["Raid"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/enhancement/shaman/raid/overview/mythic/all-bosses", targets = { crit = 405, haste = 977, mastery = 1160, versatility = 78 } },
             ["PvP"] = { source = "Murlok", sourceUrl = "https://murlok.io/shaman/enhancement/3v3", targets = { crit = 36, haste = 668, mastery = 154, versatility = 1060 } },
         },
         ["restoration"] = {
-            ["Mythic+"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/restoration/shaman/mythic-plus/overview/high-keys/all-dungeons/this-week", targets = { crit = 974, haste = 477, mastery = 404, versatility = 638 } },
+            ["Mythic+"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/restoration/shaman/mythic-plus/overview/high-keys/all-dungeons/this-week", targets = { crit = 971, haste = 476, mastery = 407, versatility = 639 } },
             ["Raid"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/restoration/shaman/raid/overview/mythic/all-bosses", targets = { crit = 1177, haste = 451, mastery = 488, versatility = 420 } },
             ["PvP"] = { source = "Murlok", sourceUrl = "https://murlok.io/shaman/restoration/3v3", targets = { crit = 98, haste = 307, mastery = 754, versatility = 763 } },
         },
     },
     ["WARLOCK"] = {
         ["affliction"] = {
-            ["Mythic+"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/affliction/warlock/mythic-plus/overview/high-keys/all-dungeons/this-week", targets = { crit = 938, haste = 952, mastery = 630, versatility = 94 } },
+            ["Mythic+"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/affliction/warlock/mythic-plus/overview/high-keys/all-dungeons/this-week", targets = { crit = 938, haste = 953, mastery = 630, versatility = 93 } },
             ["Raid"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/affliction/warlock/raid/overview/mythic/all-bosses", targets = { crit = 976, haste = 936, mastery = 617, versatility = 95 } },
             ["PvP"] = { source = "Murlok", sourceUrl = "https://murlok.io/warlock/affliction/3v3", targets = { crit = 13, haste = 799, mastery = 86, versatility = 1031 } },
         },
         ["demonology"] = {
-            ["Mythic+"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/demonology/warlock/mythic-plus/overview/high-keys/all-dungeons/this-week", targets = { crit = 1074, haste = 800, mastery = 733, versatility = 79 } },
+            ["Mythic+"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/demonology/warlock/mythic-plus/overview/high-keys/all-dungeons/this-week", targets = { crit = 1076, haste = 800, mastery = 737, versatility = 77 } },
             ["Raid"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/demonology/warlock/raid/overview/mythic/all-bosses", targets = { crit = 1106, haste = 825, mastery = 634, versatility = 75 } },
             ["PvP"] = { source = "Murlok", sourceUrl = "https://murlok.io/warlock/demonology/3v3", targets = { crit = 23, haste = 783, mastery = 89, versatility = 1025 } },
         },
         ["destruction"] = {
-            ["Mythic+"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/destruction/warlock/mythic-plus/overview/high-keys/all-dungeons/this-week", targets = { crit = 944, haste = 873, mastery = 796, versatility = 86 } },
+            ["Mythic+"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/destruction/warlock/mythic-plus/overview/high-keys/all-dungeons/this-week", targets = { crit = 942, haste = 873, mastery = 796, versatility = 80 } },
             ["Raid"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/destruction/warlock/raid/overview/mythic/all-bosses", targets = { crit = 996, haste = 855, mastery = 710, versatility = 86 } },
             ["PvP"] = { source = "Murlok", sourceUrl = "https://murlok.io/warlock/destruction/3v3", targets = { crit = 22, haste = 806, mastery = 105, versatility = 969 } },
         },
     },
     ["WARRIOR"] = {
         ["arms"] = {
-            ["Mythic+"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/arms/warrior/mythic-plus/overview/high-keys/all-dungeons/this-week", targets = { crit = 1192, haste = 1045, mastery = 429, versatility = 50 } },
+            ["Mythic+"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/arms/warrior/mythic-plus/overview/high-keys/all-dungeons/this-week", targets = { crit = 1188, haste = 1046, mastery = 429, versatility = 50 } },
             ["Raid"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/arms/warrior/raid/overview/mythic/all-bosses", targets = { crit = 1139, haste = 1032, mastery = 387, versatility = 66 } },
             ["PvP"] = { source = "Murlok", sourceUrl = "https://murlok.io/warrior/arms/3v3", targets = { crit = 3, haste = 566, mastery = 180, versatility = 1180 } },
         },
         ["fury"] = {
-            ["Mythic+"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/fury/warrior/mythic-plus/overview/high-keys/all-dungeons/this-week", targets = { crit = 536, haste = 1091, mastery = 364, versatility = 67 } },
+            ["Mythic+"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/fury/warrior/mythic-plus/overview/high-keys/all-dungeons/this-week", targets = { crit = 536, haste = 1090, mastery = 367, versatility = 67 } },
             ["Raid"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/fury/warrior/raid/overview/mythic/all-bosses", targets = { crit = 500, haste = 1096, mastery = 1171, versatility = 70 } },
             ["PvP"] = { source = "Murlok", sourceUrl = "https://murlok.io/warrior/fury/3v3", targets = { crit = 8, haste = 446, mastery = 455, versatility = 1168 } },
         },
         ["protection"] = {
-            ["Mythic+"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/protection/warrior/mythic-plus/overview/high-keys/all-dungeons/this-week", targets = { crit = 532, haste = 1183, mastery = 570, versatility = 208 } },
+            ["Mythic+"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/protection/warrior/mythic-plus/overview/high-keys/all-dungeons/this-week", targets = { crit = 531, haste = 1184, mastery = 592, versatility = 206 } },
             ["Raid"] = { source = "Archon", sourceUrl = "https://www.archon.gg/wow/builds/protection/warrior/raid/overview/mythic/all-bosses", targets = { crit = 703, haste = 1173, mastery = 557, versatility = 156 } },
             ["PvP"] = { source = "Murlok", sourceUrl = "https://murlok.io/warrior/protection/3v3", targets = { crit = 23, haste = 734, mastery = 209, versatility = 967 } },
         },

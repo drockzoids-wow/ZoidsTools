@@ -12,7 +12,7 @@ local talentCheckRefreshQueued = false
 local checkedTalentButtons = {}
 
 local PANEL_HEIGHT = 52
-local PANEL_WIDTH = 568
+local PANEL_WIDTH = 700
 local PANEL_ANCHOR_X = 8
 local PANEL_ANCHOR_Y = 8
 local CONTROL_GAP = 6
@@ -21,12 +21,19 @@ local DUNGEON_PROMPT_DIALOG = "ZOIDSTOOLS_TALENT_GRIMOIRE_DUNGEON_PROMPT"
 local BIT_WIDTH_HEADER_VERSION = 8
 local BIT_WIDTH_SPEC_ID = 16
 local BIT_WIDTH_RANKS_PURCHASED = 6
-local APPLY_BATCH_SIZE = 100
 local PENDING_APPLY_WATCHDOG_SECS = 10
 local pendingApply
 local pendingApplySeq = 0
 local applyToken = 0
 local SecureTalentCall
+local PrintTalentMessage
+local talentApplyDiagnostics = {
+    enabled = false,
+    lines = {},
+    attempt = 0,
+}
+local TALENT_DIAGNOSTIC_MAX_LINES = 240
+local TALENT_DIAGNOSTIC_ROW_DELAY = 0.65
 local dungeonPromptQueued = false
 local lastDungeonZoneSignature
 local lastDungeonPromptSignature
@@ -38,10 +45,82 @@ local DEFAULT_DROPDOWN_TEXT_RGBA = { 1, 1, 1, 1 }
 local TALENT_MATCH_COLOR = { 0.08, 1, 0.24, 1 }
 local TALENT_PENDING_COLOR = { 1, 0.82, 0.12, 1 }
 
+local function ResetTalentApplyDiagnosticLog()
+    talentApplyDiagnostics.lines = {}
+    talentApplyDiagnostics.attempt = talentApplyDiagnostics.attempt + 1
+end
+
+local function LogTalentApplyDiagnostic(message, ...)
+    if not talentApplyDiagnostics.enabled then
+        return
+    end
+
+    if select("#", ...) > 0 then
+        local ok, formatted = pcall(string.format, tostring(message), ...)
+        message = ok and formatted or tostring(message)
+    end
+
+    local elapsed = GetTime and GetTime() or 0
+    local lines = talentApplyDiagnostics.lines
+    lines[#lines + 1] = string.format("[%0.3f] %s", elapsed, tostring(message))
+
+    if #lines > TALENT_DIAGNOSTIC_MAX_LINES then
+        table.remove(lines, 1)
+    end
+end
+
+
+function ns:SetTalentApplyDiagnostics(enabled)
+    talentApplyDiagnostics.enabled = enabled == true
+
+    if talentApplyDiagnostics.enabled then
+        ResetTalentApplyDiagnosticLog()
+        LogTalentApplyDiagnostic("Diagnostic mode enabled; the next talent application will be slowed between rows.")
+        PrintTalentMessage("Talent apply diagnostics enabled. Apply the build, then run /zt talentdiag report.")
+    else
+        PrintTalentMessage("Talent apply diagnostics disabled.")
+    end
+end
+
+function ns:ResetTalentApplyDiagnostics()
+    ResetTalentApplyDiagnosticLog()
+    PrintTalentMessage("Talent apply diagnostic log cleared.")
+end
+
+function ns:ReportTalentApplyDiagnostics()
+    local lines = talentApplyDiagnostics.lines
+
+    if #lines == 0 then
+        PrintTalentMessage("No talent apply diagnostic information has been captured yet.")
+        return
+    end
+
+    PrintTalentMessage(string.format("Talent apply diagnostic report: %d line(s).", #lines))
+
+    local startIndex = math.max(1, #lines - 79)
+
+    if startIndex > 1 then
+        PrintTalentMessage(lines[1])
+        PrintTalentMessage(string.format("... %d earlier diagnostic line(s) omitted ...", startIndex - 2))
+    end
+
+    for index = startIndex, #lines do
+        PrintTalentMessage(lines[index])
+    end
+end
+
 local CONTENT_OPTIONS = {
     { value = "mythicplus", text = "Mythic+" },
     { value = "raid", text = "Raid" },
     { value = "pvp", text = "PvP" },
+}
+
+local DEFAULT_PROVIDER = "archon"
+local PROVIDER_SORT_ORDER = {
+    archon = 10,
+    icyveins = 20,
+    wowhead = 30,
+    murlok = 40,
 }
 
 local MODE_OPTIONS_BY_CONTENT = {
@@ -239,6 +318,7 @@ local function EnsureDB()
     end
 
     db.contentType = NormalizeContentType(db.contentType)
+    db.provider = db.provider or DEFAULT_PROVIDER
 
     db.mythicPlusTarget = db.mythicPlusTarget or DEFAULT_TARGET_BY_CONTENT.mythicplus
     db.raidTarget = db.raidTarget or DEFAULT_TARGET_BY_CONTENT.raid
@@ -365,6 +445,12 @@ local function GetCurrentSpecData()
         specKey
 end
 
+local TargetHasProvider
+local GetProviderOptions
+local GetProviderKey
+local GetProviderBuilds
+local GetContentOptions
+
 local function GetPvpModeSortValue(option)
     local value = string.lower(tostring(option and option.value or ""))
     local text = string.lower(tostring(option and option.text or ""))
@@ -412,27 +498,62 @@ local function GetPvpBuildsForTarget(targetKey)
     local pvpData = specData and specData.pvp
     local targetData = pvpData and pvpData[targetKey or ""]
 
-    if not targetData and pvpData then
+    if (not targetData or not TargetHasProvider(targetData, GetProviderKey())) and pvpData then
         for fallbackTargetKey, fallbackTargetData in pairs(pvpData) do
-            targetKey = fallbackTargetKey
-            targetData = fallbackTargetData
-            break
+            if TargetHasProvider(fallbackTargetData, GetProviderKey()) then
+                targetKey = fallbackTargetKey
+                targetData = fallbackTargetData
+                break
+            end
         end
     end
 
-    return targetData and targetData.builds, targetKey, targetData
+    local builds = GetProviderBuilds(targetData, GetProviderKey())
+    return builds, targetKey, targetData
 end
 
 local function GetModeOptions(contentType, targetKey)
     contentType = NormalizeContentType(contentType)
 
-    if contentType == "pvp" then
-        if not targetKey then
-            local db = ns.db and ns.db.talentGrimoire
+    if not targetKey then
+        local db = ns.db and ns.db.talentGrimoire
+        if contentType == "raid" then
+            targetKey = db and db.raidTarget or DEFAULT_TARGET_BY_CONTENT.raid
+        elseif contentType == "pvp" then
             targetKey = db and db.pvpTarget or DEFAULT_TARGET_BY_CONTENT.pvp
+        else
+            targetKey = db and db.mythicPlusTarget or DEFAULT_TARGET_BY_CONTENT.mythicplus
         end
+    end
 
-        local builds = GetPvpBuildsForTarget(targetKey)
+    local specData = GetCurrentSpecData()
+    local targetData = specData and specData[contentType] and specData[contentType][targetKey]
+    local builds = GetProviderBuilds(targetData, GetProviderKey())
+    local dynamicOptions = {}
+
+    if type(builds) == "table" then
+        for buildKey, entry in pairs(builds) do
+            dynamicOptions[#dynamicOptions + 1] = {
+                value = buildKey,
+                text = FormatPvpModeLabel(type(entry) == "table" and (entry.modeLabel or entry.title) or TitleCase(buildKey)),
+            }
+        end
+    end
+
+    if #dynamicOptions > 0 then
+        table.sort(dynamicOptions, function(left, right)
+            if contentType == "pvp" then
+                local leftOrder = GetPvpModeSortValue(left)
+                local rightOrder = GetPvpModeSortValue(right)
+                if leftOrder ~= rightOrder then return leftOrder < rightOrder end
+            end
+            return tostring(left.text) < tostring(right.text)
+        end)
+        return dynamicOptions
+    end
+
+    if contentType == "pvp" then
+        builds = GetPvpBuildsForTarget(targetKey)
         local options = {}
 
         if type(builds) == "table" then
@@ -561,12 +682,13 @@ end
 local function GetTargetOptions(contentType)
     local root = GetRoot()
     local specData = GetCurrentSpecData()
+    local providerKey = GetProviderKey()
     local labels = {}
     local options = {}
 
     contentType = NormalizeContentType(contentType)
 
-    if root and root.targets and root.targets[contentType] then
+    if root and root.targets and root.targets[contentType] and (not root.providers) then
         for key, label in pairs(root.targets[contentType]) do
             labels[key] = label
         end
@@ -574,15 +696,17 @@ local function GetTargetOptions(contentType)
 
     if specData and specData[contentType] then
         for key, targetData in pairs(specData[contentType]) do
-            labels[key] = type(targetData) == "table" and targetData.label or labels[key] or key
+            if TargetHasProvider(targetData, providerKey) then
+                labels[key] = type(targetData) == "table" and targetData.label or labels[key] or key
+            end
         end
     end
 
-    if contentType == "raid" then
+    if not next(labels) and contentType == "raid" then
         labels["all-bosses"] = labels["all-bosses"] or "All Bosses"
-    elseif contentType == "pvp" then
+    elseif not next(labels) and contentType == "pvp" then
         labels[DEFAULT_TARGET_BY_CONTENT.pvp] = labels[DEFAULT_TARGET_BY_CONTENT.pvp] or "Icy Veins"
-    else
+    elseif not next(labels) then
         labels["all-dungeons"] = labels["all-dungeons"] or "All Dungeons"
     end
 
@@ -628,16 +752,19 @@ local function GetBuildEntryForTarget(contentType, targetKey, mode)
     targetKey = targetKey or GetTargetKey(contentType)
     mode = mode or GetModeKey(contentType)
 
+    local providerKey = GetProviderKey()
     local targetData = specData and specData[contentType] and specData[contentType][targetKey]
-    if not targetData and specData and specData[contentType] then
+    if (not targetData or not TargetHasProvider(targetData, providerKey)) and specData and specData[contentType] then
         for fallbackTargetKey, fallbackTargetData in pairs(specData[contentType]) do
-            targetKey = fallbackTargetKey
-            targetData = fallbackTargetData
-            break
+            if TargetHasProvider(fallbackTargetData, providerKey) then
+                targetKey = fallbackTargetKey
+                targetData = fallbackTargetData
+                break
+            end
         end
     end
 
-    local builds = targetData and targetData.builds
+    local builds, providerData = GetProviderBuilds(targetData, providerKey)
     local preferredFallbackMode
 
     if contentType == "mythicplus" then
@@ -667,13 +794,29 @@ local function GetBuildEntryForTarget(contentType, targetKey, mode)
         mode = mode,
         modeLabel = GetOptionText(GetModeOptions(contentType, targetKey), mode),
         generatedAt = GetRoot() and GetRoot().generatedAt,
-        source = (entry and entry.source) or (GetRoot() and GetRoot().source),
+        provider = providerKey,
+        providerLabel = GetOptionText(GetProviderOptions(), providerKey),
+        source = (entry and entry.source) or (providerData and providerData.label) or (GetRoot() and GetRoot().source),
     }
 end
 
 local function GetBuildEntry()
     local db = EnsureDB()
     local contentType = db and db.contentType or "mythicplus"
+    local contentOptions = GetContentOptions()
+    local contentAvailable = false
+
+    for _, option in ipairs(contentOptions) do
+        if option.value == contentType then
+            contentAvailable = true
+            break
+        end
+    end
+
+    if not contentAvailable and contentOptions[1] then
+        contentType = contentOptions[1].value
+        if db then db.contentType = contentType end
+    end
 
     return GetBuildEntryForTarget(contentType, GetTargetKey(contentType), GetModeKey(contentType))
 end
@@ -766,6 +909,116 @@ local function RunNextFrame(callback)
     end
 end
 
+TargetHasProvider = function(targetData, providerKey)
+    if type(targetData) ~= "table" then
+        return false
+    end
+
+    if type(targetData.providers) == "table" then
+        local providerData = targetData.providers[providerKey]
+        return type(providerData) == "table" and type(providerData.builds) == "table" and next(providerData.builds) ~= nil
+    end
+
+    return type(targetData.builds) == "table" and next(targetData.builds) ~= nil
+end
+
+GetProviderOptions = function()
+    local root = GetRoot()
+    local specData = GetCurrentSpecData()
+    local available = {}
+    local options = {}
+
+    if type(specData) == "table" then
+        for _, contentData in pairs(specData) do
+            if type(contentData) == "table" then
+                for _, targetData in pairs(contentData) do
+                    if type(targetData) == "table" and type(targetData.providers) == "table" then
+                        for providerKey, providerData in pairs(targetData.providers) do
+                            if type(providerData) == "table" and type(providerData.builds) == "table" and next(providerData.builds) then
+                                available[providerKey] = providerData.label
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+
+    if not next(available) then
+        available[DEFAULT_PROVIDER] = "Generated"
+    end
+
+    for providerKey, fallbackLabel in pairs(available) do
+        local metadata = root and root.providers and root.providers[providerKey]
+        options[#options + 1] = {
+            value = providerKey,
+            text = (metadata and metadata.label) or fallbackLabel or TitleCase(providerKey),
+        }
+    end
+
+    table.sort(options, function(left, right)
+        local leftOrder = PROVIDER_SORT_ORDER[left.value] or 100
+        local rightOrder = PROVIDER_SORT_ORDER[right.value] or 100
+        if leftOrder ~= rightOrder then return leftOrder < rightOrder end
+        return tostring(left.text) < tostring(right.text)
+    end)
+
+    return options
+end
+
+GetProviderKey = function()
+    local db = EnsureDB()
+    local requested = db and db.provider or DEFAULT_PROVIDER
+    local options = GetProviderOptions()
+
+    for _, option in ipairs(options) do
+        if option.value == requested then
+            return requested
+        end
+    end
+
+    return options[1] and options[1].value or DEFAULT_PROVIDER
+end
+
+GetProviderBuilds = function(targetData, providerKey)
+    if type(targetData) ~= "table" then
+        return nil
+    end
+
+    if type(targetData.providers) == "table" then
+        local providerData = targetData.providers[providerKey]
+        return providerData and providerData.builds, providerData
+    end
+
+    return targetData.builds, targetData
+end
+
+GetContentOptions = function()
+    local specData = GetCurrentSpecData()
+    local providerKey = GetProviderKey()
+    local options = {}
+
+    for _, option in ipairs(CONTENT_OPTIONS) do
+        local contentData = specData and specData[option.value]
+        local available = false
+
+        if type(contentData) == "table" then
+            for _, targetData in pairs(contentData) do
+                if TargetHasProvider(targetData, providerKey) then
+                    available = true
+                    break
+                end
+            end
+        end
+
+        if available then
+            options[#options + 1] = option
+        end
+    end
+
+    return #options > 0 and options or CONTENT_OPTIONS
+end
+
 function SecureTalentCall(func, ...)
     if type(func) ~= "function" then
         return nil
@@ -778,7 +1031,7 @@ function SecureTalentCall(func, ...)
     return func(...)
 end
 
-local function PrintTalentMessage(message)
+PrintTalentMessage = function(message)
     if ns.Print then
         ns:Print(message)
     elseif DEFAULT_CHAT_FRAME then
@@ -1041,9 +1294,22 @@ local function ReadLoadoutHeader(importStream)
     return true, serializationVersion, specID
 end
 
+local function GetSortedTreeNodes(treeID)
+    local treeNodes = {}
+
+    for _, nodeID in ipairs(C_Traits.GetTreeNodes(treeID) or {}) do
+        treeNodes[#treeNodes + 1] = nodeID
+    end
+
+    -- Blizzard serializes loadouts by numeric node ID, not by the order
+    -- returned from GetTreeNodes.
+    table.sort(treeNodes)
+    return treeNodes
+end
+
 local function ReadLoadoutContent(importStream, treeID)
     local results = {}
-    local treeNodes = C_Traits.GetTreeNodes(treeID) or {}
+    local treeNodes = GetSortedTreeNodes(treeID)
 
     for index, nodeID in ipairs(treeNodes) do
         local isNodeSelected = importStream:ExtractValue(1) == 1
@@ -1086,7 +1352,7 @@ end
 
 local function ConvertLoadoutToEntryInfo(configID, treeID, loadoutContent)
     local results = {}
-    local treeNodes = C_Traits.GetTreeNodes(treeID) or {}
+    local treeNodes = GetSortedTreeNodes(treeID)
 
     for index, treeNodeID in ipairs(treeNodes) do
         local indexInfo = loadoutContent[index]
@@ -1349,30 +1615,16 @@ end
 local function ResetAndPurchaseDeferred(configID, treeID, entryInfo, onComplete)
     applyToken = applyToken + 1
     local token = applyToken
+    local diagnosticStage = "setup"
+    local diagnosticRow = 0
+    local playerLevel = UnitLevel and UnitLevel("player") or 0
+    local maxPlayerLevel = GetMaxLevelForPlayerExpansion and GetMaxLevelForPlayerExpansion() or playerLevel
+    local isLevelingCharacter = playerLevel > 0 and maxPlayerLevel > playerLevel
+    local levelDeferredNodes = 0
+
+    LogTalentApplyDiagnostic("Resetting config=%s tree=%s applyToken=%d.", tostring(configID), tostring(treeID), token)
 
     SecureTalentCall(C_Traits.ResetTree, configID, treeID)
-
-    local orderedNodes = {}
-
-    for _, nodeID in ipairs(C_Traits.GetTreeNodes(treeID) or {}) do
-        orderedNodes[#orderedNodes + 1] = nodeID
-    end
-
-    table.sort(orderedNodes, function(leftNodeID, rightNodeID)
-        local leftInfo = C_Traits.GetNodeInfo(configID, leftNodeID)
-        local rightInfo = C_Traits.GetNodeInfo(configID, rightNodeID)
-        local leftY = (leftInfo and leftInfo.posY) or 0
-        local rightY = (rightInfo and rightInfo.posY) or 0
-
-        if leftY ~= rightY then
-            return leftY < rightY
-        end
-
-        return ((leftInfo and leftInfo.posX) or 0) < ((rightInfo and rightInfo.posX) or 0)
-    end)
-
-    local index = 1
-    local passProgress = 0
 
     local function EntryStateMatches(nodeInfo, entry)
         if not nodeInfo or not entry then
@@ -1396,74 +1648,388 @@ local function ResetAndPurchaseDeferred(configID, treeID, entryInfo, onComplete)
         return ((nodeInfo.ranksPurchased or 0) >= (entry.ranksPurchased or 0))
     end
 
-    local function Step()
+    local function GetDiagnosticNodeLabel(nodeID, entry, nodeInfo)
+        local entryID = entry and entry.selectionEntryID
+
+        if not entryID and nodeInfo and nodeInfo.activeEntry then
+            entryID = nodeInfo.activeEntry.entryID
+        end
+
+        if entryID and C_Traits.GetEntryInfo and C_Traits.GetDefinitionInfo then
+            local okEntry, traitEntry = pcall(C_Traits.GetEntryInfo, configID, entryID)
+
+            if okEntry and traitEntry and traitEntry.definitionID then
+                local okDefinition, definition = pcall(C_Traits.GetDefinitionInfo, traitEntry.definitionID)
+
+                if okDefinition and definition and definition.spellID and C_Spell and C_Spell.GetSpellName then
+                    local spellName = C_Spell.GetSpellName(definition.spellID)
+
+                    if spellName and spellName ~= "" then
+                        return string.format("%s (node %d)", spellName, nodeID)
+                    end
+                end
+            end
+        end
+
+        return string.format("node %d", nodeID)
+    end
+
+    local function TryApplyEntry(nodeID, allowSubTreeSelection)
+        local entry = entryInfo[nodeID]
+
+        if not entry then
+            return true, false
+        end
+
+        local nodeInfo = C_Traits.GetNodeInfo(configID, nodeID)
+        local label = GetDiagnosticNodeLabel(nodeID, entry, nodeInfo)
+        local beforeRanks = nodeInfo and nodeInfo.ranksPurchased or 0
+        local beforeEntryID = nodeInfo and nodeInfo.activeEntry and nodeInfo.activeEntry.entryID or 0
+
+        LogTalentApplyDiagnostic(
+            "TRY stage=%s row=%d %s targetRanks=%s targetEntry=%s beforeRanks=%s beforeEntry=%s canPurchase=%s available=%s visible=%s edgeOK=%s subtree=%s.",
+            diagnosticStage,
+            diagnosticRow,
+            label,
+            tostring(entry.ranksPurchased),
+            tostring(entry.selectionEntryID),
+            tostring(beforeRanks),
+            tostring(beforeEntryID),
+            tostring(nodeInfo and nodeInfo.canPurchaseRank == true),
+            tostring(nodeInfo and nodeInfo.isAvailable),
+            tostring(nodeInfo and nodeInfo.isVisible),
+            tostring(nodeInfo and nodeInfo.meetsEdgeRequirements),
+            tostring(entry.isSubTreeSelection == true)
+        )
+
+        if EntryStateMatches(nodeInfo, entry) then
+            entryInfo[nodeID] = nil
+            LogTalentApplyDiagnostic("OK %s already matched.", label)
+            return true, true
+        end
+
+        local madeProgress = false
+
+        if entry.isChoiceNode and entry.selectionEntryID then
+            local activeEntryID = nodeInfo and nodeInfo.activeEntry and nodeInfo.activeEntry.entryID
+            local canSetSelection = allowSubTreeSelection and entry.isSubTreeSelection
+                or (nodeInfo and nodeInfo.canPurchaseRank == true)
+
+            -- A choice node can already display the requested entry while still
+            -- having zero purchased ranks. SetSelection does nothing in that
+            -- state, so purchase the rank after confirming the correct choice.
+            if activeEntryID ~= entry.selectionEntryID and canSetSelection then
+                madeProgress = SecureTalentCall(
+                    C_Traits.SetSelection,
+                    configID,
+                    entry.nodeID,
+                    entry.selectionEntryID
+                ) or false
+                nodeInfo = C_Traits.GetNodeInfo(configID, nodeID)
+                activeEntryID = nodeInfo and nodeInfo.activeEntry and nodeInfo.activeEntry.entryID
+            end
+
+            if not entry.isSubTreeSelection and activeEntryID == entry.selectionEntryID then
+                local currentRanks = nodeInfo and nodeInfo.ranksPurchased or 0
+                local neededRanks = math.max(0, (entry.ranksPurchased or 1) - currentRanks)
+
+                for _ = 1, neededRanks do
+                    nodeInfo = C_Traits.GetNodeInfo(configID, nodeID)
+
+                    if not nodeInfo or nodeInfo.canPurchaseRank ~= true then
+                        break
+                    end
+
+                    local rankOK = SecureTalentCall(C_Traits.PurchaseRank, configID, entry.nodeID)
+
+                    if not rankOK then
+                        break
+                    end
+
+                    madeProgress = true
+                end
+
+                nodeInfo = C_Traits.GetNodeInfo(configID, nodeID)
+            end
+        elseif entry.ranksPurchased and nodeInfo then
+            local currentRanks = nodeInfo.ranksPurchased or 0
+            local neededRanks = math.max(0, entry.ranksPurchased - currentRanks)
+
+            for _ = 1, neededRanks do
+                nodeInfo = C_Traits.GetNodeInfo(configID, nodeID)
+
+                if not nodeInfo or nodeInfo.canPurchaseRank ~= true then
+                    break
+                end
+
+                local rankOK = SecureTalentCall(C_Traits.PurchaseRank, configID, entry.nodeID)
+
+                if not rankOK then
+                    break
+                end
+
+                madeProgress = true
+            end
+
+            nodeInfo = C_Traits.GetNodeInfo(configID, nodeID)
+        end
+
+        if EntryStateMatches(nodeInfo, entry) then
+            entryInfo[nodeID] = nil
+            LogTalentApplyDiagnostic(
+                "OK %s afterRanks=%s afterEntry=%s.",
+                label,
+                tostring(nodeInfo and nodeInfo.ranksPurchased or 0),
+                tostring(nodeInfo and nodeInfo.activeEntry and nodeInfo.activeEntry.entryID or 0)
+            )
+            return true, true
+        end
+
+        LogTalentApplyDiagnostic(
+            "BLOCKED %s afterRanks=%s afterEntry=%s canPurchase=%s available=%s visible=%s edgeOK=%s progress=%s.",
+            label,
+            tostring(nodeInfo and nodeInfo.ranksPurchased or 0),
+            tostring(nodeInfo and nodeInfo.activeEntry and nodeInfo.activeEntry.entryID or 0),
+            tostring(nodeInfo and nodeInfo.canPurchaseRank == true),
+            tostring(nodeInfo and nodeInfo.isAvailable),
+            tostring(nodeInfo and nodeInfo.isVisible),
+            tostring(nodeInfo and nodeInfo.meetsEdgeRequirements),
+            tostring(madeProgress)
+        )
+
+        return false, madeProgress
+    end
+
+    local heroSelectionNodeID
+    local mainNodes = {}
+    local heroNodes = {}
+
+    for nodeID, entry in pairs(entryInfo) do
+        if entry.isSubTreeSelection then
+            heroSelectionNodeID = nodeID
+        end
+    end
+
+    for nodeID, entry in pairs(entryInfo) do
+        if nodeID ~= heroSelectionNodeID then
+            local nodeInfo = C_Traits.GetNodeInfo(configID, nodeID)
+
+            if nodeInfo and nodeInfo.subTreeID then
+                heroNodes[#heroNodes + 1] = nodeID
+            else
+                mainNodes[#mainNodes + 1] = nodeID
+            end
+        end
+    end
+
+    local function BuildRows(nodeIDs)
+        table.sort(nodeIDs, function(leftNodeID, rightNodeID)
+            local leftInfo = C_Traits.GetNodeInfo(configID, leftNodeID)
+            local rightInfo = C_Traits.GetNodeInfo(configID, rightNodeID)
+            local leftY = (leftInfo and leftInfo.posY) or 0
+            local rightY = (rightInfo and rightInfo.posY) or 0
+
+            if leftY ~= rightY then
+                return leftY < rightY
+            end
+
+            local leftX = (leftInfo and leftInfo.posX) or 0
+            local rightX = (rightInfo and rightInfo.posX) or 0
+
+            if leftX ~= rightX then
+                return leftX < rightX
+            end
+
+            return leftNodeID < rightNodeID
+        end)
+
+        local rows = {}
+        local currentRow
+        local currentY
+
+        for _, nodeID in ipairs(nodeIDs) do
+            local nodeInfo = C_Traits.GetNodeInfo(configID, nodeID)
+            local nodeY = (nodeInfo and nodeInfo.posY) or 0
+
+            if not currentRow or math.abs(nodeY - currentY) > 0.001 then
+                currentRow = {}
+                rows[#rows + 1] = currentRow
+                currentY = nodeY
+            end
+
+            currentRow[#currentRow + 1] = nodeID
+        end
+
+        return rows
+    end
+
+    local stages = {
+        { name = "main", rows = BuildRows(mainNodes) },
+        { name = "hero", rows = BuildRows(heroNodes) },
+    }
+    local mainTargetRanks = 0
+    local heroTargetRanks = 0
+
+    for _, nodeID in ipairs(mainNodes) do
+        mainTargetRanks = mainTargetRanks + math.max(0, tonumber(entryInfo[nodeID] and entryInfo[nodeID].ranksPurchased) or 0)
+    end
+
+    for _, nodeID in ipairs(heroNodes) do
+        heroTargetRanks = heroTargetRanks + math.max(0, tonumber(entryInfo[nodeID] and entryInfo[nodeID].ranksPurchased) or 0)
+    end
+
+    LogTalentApplyDiagnostic(
+        "Parsed targets: mainNodes=%d mainRanks=%d mainRows=%d heroSelector=%s heroNodes=%d heroRanks=%d heroRows=%d.",
+        #mainNodes,
+        mainTargetRanks,
+        #stages[1].rows,
+        tostring(heroSelectionNodeID),
+        #heroNodes,
+        heroTargetRanks,
+        #stages[2].rows
+    )
+    local stageIndex = 1
+    local rowIndex = 1
+    local ProcessNext
+
+    local function QueueProcessNext(delay)
+        if talentApplyDiagnostics.enabled and C_Timer and C_Timer.After then
+            C_Timer.After(delay or TALENT_DIAGNOSTIC_ROW_DELAY, ProcessNext)
+        else
+            RunNextFrame(ProcessNext)
+        end
+    end
+
+    local function Finish()
+        if token == applyToken and onComplete then
+            local remaining = 0
+            for _ in pairs(entryInfo) do remaining = remaining + 1 end
+            LogTalentApplyDiagnostic("Finished staging loop with %d unresolved node(s).", remaining)
+            onComplete({
+                levelDeferredNodes = levelDeferredNodes,
+                playerLevel = playerLevel,
+                maxPlayerLevel = maxPlayerLevel,
+            })
+        end
+    end
+
+    local function ProcessHeroSelection()
+        if not heroSelectionNodeID or not entryInfo[heroSelectionNodeID] then
+            return true
+        end
+
+        local resolved = TryApplyEntry(heroSelectionNodeID, true)
+        return resolved == true
+    end
+
+    ProcessNext = function()
         if token ~= applyToken then
             return
         end
 
-        local processed = 0
+        local stage = stages[stageIndex]
 
-        while index <= #orderedNodes and processed < APPLY_BATCH_SIZE do
-            local nodeID = orderedNodes[index]
-            local entry = entryInfo[nodeID]
+        if not stage then
+            Finish()
+            return
+        end
 
-            if entry then
-                local madeProgress = false
-                local nodeInfo = C_Traits.GetNodeInfo(configID, nodeID)
+        diagnosticStage = stage.name
+        diagnosticRow = rowIndex
 
-                if entry.isChoiceNode and entry.selectionEntryID then
-                    local activeEntryID = nodeInfo and nodeInfo.activeEntry and nodeInfo.activeEntry.entryID
-                    local hasNeededRanks = entry.isSubTreeSelection
-                        or ((nodeInfo and nodeInfo.ranksPurchased) or 0) >= (entry.ranksPurchased or 1)
+        -- Select the requested hero tree only after every class and
+        -- specialization row is completely finished.
+        if stage.name == "hero" and not ProcessHeroSelection() then
+            if isLevelingCharacter then
+                if heroSelectionNodeID and entryInfo[heroSelectionNodeID] then
+                    entryInfo[heroSelectionNodeID] = nil
+                    levelDeferredNodes = levelDeferredNodes + 1
+                end
 
-                    if activeEntryID ~= entry.selectionEntryID or not hasNeededRanks then
-                        madeProgress = SecureTalentCall(C_Traits.SetSelection, configID, entry.nodeID, entry.selectionEntryID) or madeProgress
-                        nodeInfo = C_Traits.GetNodeInfo(configID, nodeID)
+                for _, heroNodeID in ipairs(heroNodes) do
+                    if entryInfo[heroNodeID] then
+                        entryInfo[heroNodeID] = nil
+                        levelDeferredNodes = levelDeferredNodes + 1
                     end
                 end
 
-                if not entry.isChoiceNode and entry.ranksPurchased then
-                    local currentRanks = (nodeInfo and nodeInfo.ranksPurchased) or 0
-                    local neededRanks = math.max(0, entry.ranksPurchased - currentRanks)
+                LogTalentApplyDiagnostic(
+                    "Deferred the hero tree at level %d/%d because its selector is not yet usable.",
+                    playerLevel,
+                    maxPlayerLevel
+                )
+                Finish()
+                return
+            end
 
-                    if neededRanks > 0 then
-                        for _ = 1, neededRanks do
-                            local rankOK = SecureTalentCall(C_Traits.PurchaseRank, configID, entry.nodeID)
-                            madeProgress = rankOK or madeProgress
+            LogTalentApplyDiagnostic("Hero-tree selector could not be changed; stopping before hero talents.")
+            Finish()
+            return
+        end
 
-                            if not rankOK then
-                                break
-                            end
-                        end
+        local row = stage.rows[rowIndex]
 
-                        nodeInfo = C_Traits.GetNodeInfo(configID, nodeID)
-                    end
+        if not row then
+            LogTalentApplyDiagnostic("Completed %s stage.", stage.name)
+            stageIndex = stageIndex + 1
+            rowIndex = 1
+            QueueProcessNext(TALENT_DIAGNOSTIC_ROW_DELAY)
+            return
+        end
+
+
+        LogTalentApplyDiagnostic("Starting %s row %d with %d target node(s).", stage.name, rowIndex, #row)
+
+        local unresolved = 0
+        local madeProgress = false
+
+        for _, nodeID in ipairs(row) do
+            if entryInfo[nodeID] then
+                local resolved, progressed = TryApplyEntry(nodeID, false)
+                madeProgress = madeProgress or progressed
+
+                if not resolved then
+                    unresolved = unresolved + 1
                 end
+            end
+        end
 
-                if EntryStateMatches(nodeInfo, entry) then
+        if unresolved == 0 then
+            LogTalentApplyDiagnostic("Completed %s row %d.", stage.name, rowIndex)
+            rowIndex = rowIndex + 1
+            QueueProcessNext(TALENT_DIAGNOSTIC_ROW_DELAY)
+        elseif madeProgress then
+            -- Stay on this exact row until every requested talent on it
+            -- is purchased; never move downward while a row is incomplete.
+            QueueProcessNext(0.25)
+        elseif isLevelingCharacter then
+            local deferredThisRow = 0
+
+            for _, nodeID in ipairs(row) do
+                if entryInfo[nodeID] then
                     entryInfo[nodeID] = nil
-                    passProgress = passProgress + 1
-                elseif madeProgress then
-                    passProgress = passProgress + 1
+                    levelDeferredNodes = levelDeferredNodes + 1
+                    deferredThisRow = deferredThisRow + 1
                 end
             end
 
-            index = index + 1
-            processed = processed + 1
-        end
-
-        if index <= #orderedNodes then
-            RunNextFrame(Step)
-        elseif passProgress > 0 then
-            index = 1
-            passProgress = 0
-            RunNextFrame(Step)
-        elseif onComplete then
-            onComplete()
+            LogTalentApplyDiagnostic(
+                "Deferred %d unavailable target(s) from %s row %d for level %d/%d; continuing.",
+                deferredThisRow,
+                stage.name,
+                rowIndex,
+                playerLevel,
+                maxPlayerLevel
+            )
+            rowIndex = rowIndex + 1
+            QueueProcessNext(TALENT_DIAGNOSTIC_ROW_DELAY)
+        else
+            LogTalentApplyDiagnostic("No progress was possible on %s row %d; stopping.", stage.name, rowIndex)
+            Finish()
         end
     end
 
-    RunNextFrame(Step)
+    QueueProcessNext(0.25)
 end
 
 local function EnsureApplyFrame()
@@ -1535,7 +2101,17 @@ local function EnsureApplyFrame()
                     SecureTalentCall(C_ClassTalents.RenameConfig, configID, BuildLoadoutName(applyState.buildLabel))
                 end
 
-                PrintTalentMessage("Talents applied: " .. tostring(applyState.buildLabel or "Build"))
+                local appliedMessage = "Talents applied: " .. tostring(applyState.buildLabel or "Build")
+
+                if (tonumber(applyState.levelDeferredNodes) or 0) > 0 then
+                    appliedMessage = appliedMessage .. string.format(
+                        " (level %d; %d max-level talent(s) deferred)",
+                        tonumber(applyState.playerLevel) or 0,
+                        tonumber(applyState.levelDeferredNodes) or 0
+                    )
+                end
+
+                PrintTalentMessage(appliedMessage)
                 ClearPendingApply()
 
                 RunNextFrame(function()
@@ -1657,17 +2233,41 @@ function ns:ApplyTalentImportString(importString, buildLabel, isContinuation)
         originalNodeCount = originalNodeCount + 1
     end
 
+    if talentApplyDiagnostics.enabled then
+        ResetTalentApplyDiagnosticLog()
+        LogTalentApplyDiagnostic(
+            "Starting build='%s' spec=%s config=%s tree=%s importLength=%d decodedNodes=%d.",
+            tostring(buildLabel),
+            tostring(specID),
+            tostring(activeConfigID),
+            tostring(treeID),
+            #importString,
+            originalNodeCount
+        )
+    end
+
     SetPendingApply({ importString = importString, buildLabel = buildLabel, staging = true })
     ns._talentApplyInProgress = true
 
-    ResetAndPurchaseDeferred(activeConfigID, treeID, entryInfo, function()
+    ResetAndPurchaseDeferred(activeConfigID, treeID, entryInfo, function(applyResult)
+        applyResult = applyResult or {}
+        local levelDeferredNodes = tonumber(applyResult.levelDeferredNodes) or 0
+
         if not C_Traits.ConfigHasStagedChanges(activeConfigID) then
             if C_ClassTalents.RenameConfig and zoidsConfigID then
                 SecureTalentCall(C_ClassTalents.RenameConfig, zoidsConfigID, BuildLoadoutName(buildLabel))
             end
 
             ns._talentApplyInProgress = false
-            PrintTalentMessage("Already using this talent build.")
+            if levelDeferredNodes > 0 then
+                PrintTalentMessage(string.format(
+                    "Already using the available level-%d portion of this build; %d max-level talent(s) remain deferred.",
+                    tonumber(applyResult.playerLevel) or 0,
+                    levelDeferredNodes
+                ))
+            else
+                PrintTalentMessage("Already using this talent build.")
+            end
             ClearPendingApply()
             QueueRefresh(0)
             return
@@ -1681,11 +2281,19 @@ function ns:ApplyTalentImportString(importString, buildLabel, isContinuation)
 
         if remainingNodes > 0 then
             local appliedNodes = originalNodeCount - remainingNodes
+            RollbackTalentConfig(activeConfigID)
+            ns._talentApplyInProgress = false
+            ClearPendingApply()
             PrintTalentMessage(string.format(
-                "Applying %d of %d talent nodes. Your current level or tree state could not fit the rest.",
+                "Could only stage %d of %d talent nodes. Discarded the partial build instead of saving it.",
                 appliedNodes,
                 originalNodeCount
             ))
+            if talentApplyDiagnostics.enabled then
+                PrintTalentMessage("Talent diagnostics captured. Run /zt talentdiag report.")
+            end
+            QueueRefresh(0)
+            return
         end
 
         if not C_ClassTalents.CommitConfig or not SecureTalentCall(C_ClassTalents.CommitConfig, zoidsConfigID) then
@@ -1698,7 +2306,12 @@ function ns:ApplyTalentImportString(importString, buildLabel, isContinuation)
         end
 
         EnsureApplyFrame()
-        SetPendingApply({ buildLabel = buildLabel, renameOnly = true })
+        SetPendingApply({
+            buildLabel = buildLabel,
+            renameOnly = true,
+            levelDeferredNodes = levelDeferredNodes,
+            playerLevel = applyResult.playerLevel,
+        })
         applyFrame:RegisterEvent("TRAIT_CONFIG_UPDATED")
 
         if C_ClassTalents.UpdateLastSelectedSavedConfigID then
@@ -2404,7 +3017,10 @@ local function RefreshPanel()
     local copyValue = importString ~= "" and importString or (entry and entry.sourceUrl or "")
     local targetOptions = GetTargetDropdownOptions(contentType, mode, targetKey)
 
-    panel.contentDropdown:SetOptions(CONTENT_OPTIONS, contentType, function(value)
+    panel.providerDropdown:SetOptions(GetProviderOptions(), GetProviderKey(), function(value)
+        ns:SetTalentGrimoireProvider(value)
+    end)
+    panel.contentDropdown:SetOptions(GetContentOptions(), contentType, function(value)
         ns:SetTalentGrimoireContentType(value)
     end)
     panel.modeDropdown:SetOptions(GetModeOptions(contentType, targetKey), mode, function(value)
@@ -2453,10 +3069,13 @@ local function CreatePanel()
         panel.bg:SetColorTexture(0.035, 0.03, 0.025, 0.94)
     end
 
-    panel.contentDropdown = CreateOptionDropdown("ZoidsToolsTalentContentDropdown", panel, 104)
-    panel.contentDropdown:SetPoint("LEFT", panel, "LEFT", 8, 0)
+    panel.providerDropdown = CreateOptionDropdown("ZoidsToolsTalentProviderDropdown", panel, 112)
+    panel.providerDropdown:SetPoint("LEFT", panel, "LEFT", 8, 0)
 
-    panel.modeDropdown = CreateOptionDropdown("ZoidsToolsTalentModeDropdown", panel, 120)
+    panel.contentDropdown = CreateOptionDropdown("ZoidsToolsTalentContentDropdown", panel, 94)
+    panel.contentDropdown:SetPoint("LEFT", panel.providerDropdown, "RIGHT", CONTROL_GAP, 0)
+
+    panel.modeDropdown = CreateOptionDropdown("ZoidsToolsTalentModeDropdown", panel, 132)
     panel.modeDropdown:SetPoint("LEFT", panel.contentDropdown, "RIGHT", CONTROL_GAP, 0)
 
     panel.targetDropdown = CreateOptionDropdown("ZoidsToolsTalentTargetDropdown", panel, 220)
@@ -2484,7 +3103,7 @@ local function CreatePanel()
     end)
 
     panel.statusText = panel:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-    panel.statusText:SetPoint("TOPLEFT", panel.contentDropdown, "BOTTOMLEFT", 2, -1)
+    panel.statusText:SetPoint("TOPLEFT", panel.providerDropdown, "BOTTOMLEFT", 2, -1)
     panel.statusText:SetPoint("RIGHT", panel.copyButton, "RIGHT", 0, 0)
     panel.statusText:SetJustifyH("LEFT")
     panel.statusText:SetTextColor(0.75, 0.82, 0.9)
@@ -2520,6 +3139,7 @@ local function AnchorPanel(talentFrame)
 
     for _, control in ipairs({
         panel.contentDropdown,
+        panel.providerDropdown,
         panel.modeDropdown,
         panel.targetDropdown,
         panel.copyButton,
@@ -2638,6 +3258,32 @@ function ns:GetTalentGrimoireContentType()
     return db and db.contentType or "mythicplus"
 end
 
+function ns:GetTalentGrimoireProvider()
+    return GetProviderKey()
+end
+
+function ns:SetTalentGrimoireProvider(value)
+    local db = EnsureDB()
+    if not db then return end
+
+    for _, option in ipairs(GetProviderOptions()) do
+        if option.value == value then
+            db.provider = value
+            break
+        end
+    end
+
+    local contentOptions = GetContentOptions()
+    local found = false
+    for _, option in ipairs(contentOptions) do
+        if option.value == db.contentType then found = true break end
+    end
+    if not found and contentOptions[1] then db.contentType = contentOptions[1].value end
+
+    QueueRefresh(0)
+    if ns.UI and ns.UI.RefreshVisiblePage then ns.UI.RefreshVisiblePage() end
+end
+
 function ns:SetTalentGrimoireContentType(value)
     local db = EnsureDB()
 
@@ -2697,7 +3343,7 @@ function ns:CycleTalentGrimoireContent()
         return
     end
 
-    ns:SetTalentGrimoireContentType(SelectNextOption(CONTENT_OPTIONS, db.contentType))
+    ns:SetTalentGrimoireContentType(SelectNextOption(GetContentOptions(), db.contentType))
 end
 
 function ns:CycleTalentGrimoireTarget()
@@ -2723,11 +3369,11 @@ function ns:GetTalentGrimoireStatusText()
 
     if entry then
         return string.format(
-            "Showing %s %s for %s. Data source: %s. Updated: %s.",
+            "Showing %s %s for %s from %s. Updated: %s.",
             tostring(GetContentLabel(context.contentType)),
             tostring(context.modeLabel or "build"),
             tostring(context.targetLabel or "selection"),
-            tostring(context.source or "generated data"),
+            tostring(context.providerLabel or context.source or "generated data"),
             tostring(context.generatedAt or "unknown")
         )
     end

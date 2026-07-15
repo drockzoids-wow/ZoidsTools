@@ -3,7 +3,6 @@ local _, ns = ...
 local MAX_PROFILE_WINDOWS = 2
 local RESET_BUTTON_MAX_WINDOWS = 3
 local RESET_BUTTON_SIZE = 18
-local DEFAULT_PROFILE_KEY = "profile1"
 local AUTO_APPLY_DELAYS = { 0.4, 1.2, 2.5, 5.0 }
 local SETTLE_APPLY_DELAYS = { 0.1, 0.6, 1.6, 3.0 }
 local resetButtonTicker
@@ -17,10 +16,6 @@ local settleApplyGeneration = 0
 local damageMeterHooksInstalled = false
 local applyingProfileDepth = 0
 local hookedDamageMeterFrames = {}
-local PROFILE_OPTIONS = {
-    { value = "profile1", text = "Profile 1" },
-    { value = "profile2", text = "Profile 2" },
-}
 
 local TYPE_LABELS = {
     DamageDone = "Damage Done",
@@ -65,18 +60,44 @@ local function EnsureDB()
 
     local db = ns.db.damageMeterProfiles
 
-    db.activeProfile = db.activeProfile or DEFAULT_PROFILE_KEY
-    db.lastAppliedProfile = db.lastAppliedProfile or db.activeProfile or DEFAULT_PROFILE_KEY
     db.profiles = db.profiles or {}
 
-    for _, option in ipairs(PROFILE_OPTIONS) do
-        db.profiles[option.value] = db.profiles[option.value] or {
-            name = option.text,
-            windows = {},
-        }
-        db.profiles[option.value].name = db.profiles[option.value].name or option.text
-        db.profiles[option.value].windows = db.profiles[option.value].windows or {}
+    if db.namedProfilesMigrated ~= true then
+        for _, key in ipairs({ "profile1", "profile2" }) do
+            local profile = db.profiles[key]
+            local hasSavedLayout = type(profile) == "table"
+                and profile.savedAt ~= nil
+                and type(profile.windows) == "table"
+                and type(profile.windows[1]) == "table"
+                and type(profile.windows[1].geometry) == "table"
+
+            if not hasSavedLayout then
+                db.profiles[key] = nil
+                if db.activeProfile == key then db.activeProfile = nil end
+                if db.lastAppliedProfile == key then db.lastAppliedProfile = nil end
+            end
+        end
+        db.namedProfilesMigrated = true
     end
+
+    if db.activeProfile and not db.profiles[db.activeProfile] then
+        db.activeProfile = nil
+    end
+
+    if db.lastAppliedProfile and not db.profiles[db.lastAppliedProfile] then
+        db.lastAppliedProfile = nil
+    end
+
+    for key, profile in pairs(db.profiles) do
+        if type(profile) ~= "table" then
+            db.profiles[key] = nil
+        else
+            profile.name = type(profile.name) == "string" and profile.name or tostring(key)
+            profile.windows = type(profile.windows) == "table" and profile.windows or {}
+        end
+    end
+
+    db.nextProfileID = math.max(1, tonumber(db.nextProfileID) or 1)
 
     return db
 end
@@ -88,11 +109,8 @@ local function GetProfile(key)
         return nil
     end
 
-    key = key or db.activeProfile or DEFAULT_PROFILE_KEY
-
-    if not db.profiles[key] then
-        db.profiles[key] = { name = key, windows = {} }
-    end
+    key = key or db.activeProfile
+    if not key or not db.profiles[key] then return nil end
 
     db.profiles[key].windows = db.profiles[key].windows or {}
 
@@ -100,20 +118,31 @@ local function GetProfile(key)
 end
 
 local function ProfileHasSavedLayout(profile)
-    return type(profile) == "table"
-        and type(profile.windows) == "table"
-        and type(profile.windows[1]) == "table"
-        and type(profile.windows[1].geometry) == "table"
+    if type(profile) ~= "table" then return false end
+
+    if type(profile.customLayout) == "table"
+        and type(profile.customLayout.windows) == "table"
+        and type(profile.customLayout.windows[1]) == "table" then
+        return true
+    end
+
+    if type(profile.windows) ~= "table" then return false end
+
+    for index = 1, MAX_PROFILE_WINDOWS do
+        if type(profile.windows[index]) == "table" and type(profile.windows[index].geometry) == "table" then
+            return true
+        end
+    end
+
+    return false
 end
 
 local function GetLastAppliedProfileKey()
     local db = EnsureDB()
 
-    if not db then
-        return DEFAULT_PROFILE_KEY
-    end
+    if not db then return nil end
 
-    return db.lastAppliedProfile or db.activeProfile or DEFAULT_PROFILE_KEY
+    return db.lastAppliedProfile
 end
 
 local function BumpAutoApplyGeneration()
@@ -205,7 +234,20 @@ local function GetDamageMeterWindow(index)
         return nil
     end
 
-    return DamageMeter and DamageMeter.GetSessionWindow and DamageMeter:GetSessionWindow(index)
+    local window = DamageMeter and DamageMeter.GetSessionWindow and SafeCall(DamageMeter.GetSessionWindow, DamageMeter, index)
+    if window then return window end
+
+    window = _G["DamageMeterSessionWindow" .. tostring(index)]
+    if window then return window end
+
+    for _, collectionName in ipairs({ "sessionWindows", "SessionWindows", "windows", "Windows" }) do
+        local collection = DamageMeter and DamageMeter[collectionName]
+        if type(collection) == "table" and collection[index] then
+            return collection[index]
+        end
+    end
+
+    return nil
 end
 
 local function GetFrameForWindow(index, window)
@@ -396,6 +438,7 @@ local function QueueDamageMeterProfileSettleApply(profileKey)
                 ns:ApplyDamageMeterProfile(profileKey, true, {
                     keepAutoApplyGeneration = true,
                     skipSettleApply = true,
+                    skipCustomLayout = true,
                 })
             end
         end)
@@ -407,12 +450,19 @@ local function TryAutoApplyLastProfile(generation)
         return false
     end
 
+    if not GetLastAppliedProfileKey() then
+        pendingAutoApply = nil
+        return false
+    end
+
     if InCombatLockdown and InCombatLockdown() then
         pendingAutoApply = true
         return false
     end
 
-    if not TryLoadBlizzardDamageMeter() then
+    local profile = GetProfile(GetLastAppliedProfileKey())
+    local hasCustomLayout = profile and type(profile.customLayout) == "table"
+    if not hasCustomLayout and not TryLoadBlizzardDamageMeter() then
         pendingAutoApply = true
         return false
     end
@@ -429,6 +479,11 @@ local function TryAutoApplyLastProfile(generation)
 end
 
 local function QueueDamageMeterProfileAutoApply()
+    if not GetLastAppliedProfileKey() then
+        pendingAutoApply = nil
+        return
+    end
+
     pendingAutoApply = true
 
     if InCombatLockdown and InCombatLockdown() then
@@ -545,13 +600,33 @@ local function StartProfileAutoApplyWatcher()
 end
 
 function ns:GetDamageMeterProfileOptions()
-    return PROFILE_OPTIONS
+    local db = EnsureDB()
+    local options = {}
+
+    if not db then return options end
+
+    for key, profile in pairs(db.profiles) do
+        options[#options + 1] = {
+            value = key,
+            text = profile.name,
+            createdAt = tonumber(profile.createdAt) or 0,
+        }
+    end
+
+    table.sort(options, function(left, right)
+        local leftName = string.lower(left.text or "")
+        local rightName = string.lower(right.text or "")
+        if leftName == rightName then return left.createdAt < right.createdAt end
+        return leftName < rightName
+    end)
+
+    return options
 end
 
 function ns:GetActiveDamageMeterProfileKey()
     local db = EnsureDB()
 
-    return db and db.activeProfile or DEFAULT_PROFILE_KEY
+    return db and db.activeProfile or nil
 end
 
 function ns:SetActiveDamageMeterProfileKey(key)
@@ -570,22 +645,107 @@ function ns:GetDamageMeterProfileName(key)
     return profile and profile.name or key or ""
 end
 
+local function NormalizeProfileName(name)
+    name = type(name) == "string" and name:match("^%s*(.-)%s*$") or ""
+    if name == "" then return nil end
+    return name:sub(1, 40)
+end
+
+function ns:CreateDamageMeterProfile(name)
+    if InCombatLockdown and InCombatLockdown() then
+        return false, "Damage meter profiles cannot be created during combat."
+    end
+
+    name = NormalizeProfileName(name)
+    if not name then return false, "Enter a profile name first." end
+
+    local db = EnsureDB()
+    if not db then return false, "Could not access damage meter profiles." end
+
+    for _, profile in pairs(db.profiles) do
+        if string.lower(profile.name or "") == string.lower(name) then
+            return false, "A damage meter profile with that name already exists."
+        end
+    end
+
+    local key
+    repeat
+        key = "layout" .. tostring(db.nextProfileID)
+        db.nextProfileID = db.nextProfileID + 1
+    until not db.profiles[key]
+
+    local previousActiveProfile = db.activeProfile
+    db.profiles[key] = {
+        name = name,
+        windows = {},
+        createdAt = time and time() or db.nextProfileID,
+    }
+    db.activeProfile = key
+
+    local ok, message = ns:SaveDamageMeterProfile(key)
+    if not ok then
+        db.profiles[key] = nil
+        db.activeProfile = previousActiveProfile
+        return false, message
+    end
+
+    db.lastAppliedProfile = key
+    return true, key
+end
+
+function ns:DeleteDamageMeterProfile(key)
+    local db = EnsureDB()
+    key = key or (db and db.activeProfile)
+    if not db or not key or not db.profiles[key] then
+        return false, "Select a profile to delete."
+    end
+
+    db.profiles[key] = nil
+    if db.activeProfile == key then db.activeProfile = nil end
+    if db.lastAppliedProfile == key then db.lastAppliedProfile = nil end
+    BumpAutoApplyGeneration()
+    pendingAutoApply = nil
+    return true
+end
+
 function ns:GetDamageMeterProfileSummary(key)
     local profile = GetProfile(key)
+
+    if not profile then
+        return "No profile selected. Create one to save the current meter layout."
+    end
 
     if not profile or not profile.savedAt then
         return "No saved layout yet."
     end
 
-    local windowCount = 0
+    local customWindowCount = 0
+    local blizzardWindowCount = 0
 
-    for index = 1, MAX_PROFILE_WINDOWS do
-        if profile.windows and profile.windows[index] and profile.windows[index].geometry then
-            windowCount = windowCount + 1
+    if profile.customLayout and profile.customLayout.windows then
+        for index = 1, MAX_PROFILE_WINDOWS do
+            if type(profile.customLayout.windows[index]) == "table"
+                and profile.customLayout.windows[index].enabled ~= false then
+                customWindowCount = customWindowCount + 1
+            end
         end
     end
 
-    return string.format("%d saved window position%s. Shared across all characters.", windowCount, windowCount == 1 and "" or "s")
+    for index = 1, MAX_PROFILE_WINDOWS do
+        if profile.windows and profile.windows[index] and profile.windows[index].geometry then
+            blizzardWindowCount = blizzardWindowCount + 1
+        end
+    end
+
+    local parts = {}
+    if customWindowCount > 0 then
+        parts[#parts + 1] = string.format("%d ZoidsTools window%s", customWindowCount, customWindowCount == 1 and "" or "s")
+    end
+    if blizzardWindowCount > 0 then
+        parts[#parts + 1] = string.format("%d Blizzard window%s", blizzardWindowCount, blizzardWindowCount == 1 and "" or "s")
+    end
+
+    return table.concat(parts, " and ") .. " saved. Shared across all characters."
 end
 
 function ns:GetBlizzardDamageMeterStatusText()
@@ -630,12 +790,6 @@ function ns:GetBlizzardDamageMeterEnabled()
 end
 
 function ns:SaveDamageMeterProfile(key)
-    local isAvailable, reason = IsBlizzardDamageMeterAvailable()
-
-    if not isAvailable then
-        return false, reason
-    end
-
     if InCombatLockdown and InCombatLockdown() then
         return false, "Damage meter profiles cannot be saved during combat."
     end
@@ -643,14 +797,25 @@ function ns:SaveDamageMeterProfile(key)
     local profile, resolvedKey = GetProfile(key)
 
     if not profile then
-        return false, "Could not access the selected profile."
+        return false, "Select or create a profile first."
     end
 
+    local previousWindows = profile.windows
+    local previousCustomLayout = profile.customLayout
     profile.sharedSettings = nil
     profile.windows = {}
+    profile.customLayout = ns.CaptureCustomDamageMeterLayout and ns:CaptureCustomDamageMeterLayout() or nil
 
-    for index = 1, MAX_PROFILE_WINDOWS do
-        profile.windows[index] = SaveWindowState(index)
+    if TryLoadBlizzardDamageMeter() then
+        for index = 1, MAX_PROFILE_WINDOWS do
+            profile.windows[index] = SaveWindowState(index)
+        end
+    end
+
+    if not ProfileHasSavedLayout(profile) then
+        profile.windows = previousWindows or {}
+        profile.customLayout = previousCustomLayout
+        return false, "No damage meter windows were found to save."
     end
 
     profile.savedAt = time and time() or true
@@ -659,6 +824,7 @@ function ns:SaveDamageMeterProfile(key)
 
     if db then
         db.activeProfile = resolvedKey
+        db.lastAppliedProfile = resolvedKey
     end
 
     return true
@@ -669,16 +835,6 @@ function ns:ApplyDamageMeterProfile(key, silent, options)
 
     if not options.keepAutoApplyGeneration then
         BumpAutoApplyGeneration()
-    end
-
-    local isAvailable, reason = IsBlizzardDamageMeterAvailable()
-
-    if not isAvailable then
-        if not silent then
-            ns:Print(reason)
-        end
-
-        return false, reason
     end
 
     if InCombatLockdown and InCombatLockdown() then
@@ -697,11 +853,26 @@ function ns:ApplyDamageMeterProfile(key, silent, options)
 
     applyingProfileDepth = applyingProfileDepth + 1
 
-    for index = 1, MAX_PROFILE_WINDOWS do
-        ApplyWindowState(index, profile.windows[index])
+    local appliedCustomLayout = false
+    if not options.skipCustomLayout and type(profile.customLayout) == "table" and ns.ApplyCustomDamageMeterLayout then
+        appliedCustomLayout = ns:ApplyCustomDamageMeterLayout(profile.customLayout) == true
+    end
+
+    local appliedBlizzardLayout = false
+    if TryLoadBlizzardDamageMeter() and type(profile.windows) == "table" then
+        for index = 1, MAX_PROFILE_WINDOWS do
+            if profile.windows[index] and profile.windows[index].geometry then
+                ApplyWindowState(index, profile.windows[index])
+                appliedBlizzardLayout = true
+            end
+        end
     end
 
     applyingProfileDepth = applyingProfileDepth - 1
+
+    if not appliedCustomLayout and not appliedBlizzardLayout then
+        return false, "The saved meter windows are not currently available."
+    end
 
     local db = EnsureDB()
 
@@ -710,7 +881,7 @@ function ns:ApplyDamageMeterProfile(key, silent, options)
         db.lastAppliedProfile = resolvedKey
     end
 
-    if not options.skipSettleApply then
+    if appliedBlizzardLayout and not options.skipSettleApply then
         QueueDamageMeterProfileSettleApply(resolvedKey)
     end
 
@@ -724,6 +895,7 @@ function ns:ApplyActiveDamageMeterProfile(silent, options)
         return false
     end
 
+    if not db.activeProfile then return false end
     local profile = GetProfile(db.activeProfile)
 
     if not ProfileHasSavedLayout(profile) then
@@ -735,6 +907,7 @@ end
 
 function ns:ApplyLastDamageMeterProfile(silent, options)
     local key = GetLastAppliedProfileKey()
+    if not key then return false end
     local profile = GetProfile(key)
 
     if not ProfileHasSavedLayout(profile) then
@@ -752,7 +925,7 @@ function ns:GetBlizzardDamageMeterWindowSummary(index)
     local window = GetDamageMeterWindow(index)
 
     if not window then
-        return "Window " .. tostring(index) .. ": not created."
+        return "Blizzard window " .. tostring(index) .. ": not created."
     end
 
     local damageMeterType = window.GetDamageMeterType and window:GetDamageMeterType()
@@ -761,7 +934,7 @@ function ns:GetBlizzardDamageMeterWindowSummary(index)
     local sessionName = GetEnumName(Enum and Enum.DamageMeterSessionType, sessionType)
 
     return string.format(
-        "Window %d: %s, %s, %s.",
+        "Blizzard window %d: %s, %s, %s.",
         index,
         TYPE_LABELS[typeName] or typeName or "Blizzard type",
         SESSION_LABELS[sessionName] or sessionName or "Blizzard session",

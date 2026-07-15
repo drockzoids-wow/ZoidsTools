@@ -1801,6 +1801,88 @@ function ns:ToggleCustomDamageMeterMoveMode()
     return moveMode
 end
 
+local function CaptureCustomWindowLayout(windowIndex)
+    local db = GetDB(windowIndex)
+    if not db then return nil end
+
+    local frame = meterFrames[windowIndex]
+    if frame then
+        SavePosition(frame)
+        SaveSize(frame)
+    end
+
+    return {
+        point = db.point,
+        relativePoint = db.relativePoint,
+        x = tonumber(db.x),
+        y = tonumber(db.y),
+        width = tonumber(db.width),
+        height = tonumber(db.height),
+        enabled = windowIndex == 1 or db.enabled == true,
+        snapSide = windowIndex == 2 and db.snapSide or nil,
+        layoutInitialized = windowIndex == 2 and db.layoutInitialized == true or nil,
+    }
+end
+
+function ns:CaptureCustomDamageMeterLayout()
+    local root = GetDB(1)
+    if not root then return nil end
+
+    return {
+        snapGap = tonumber(root.snapGap) or 0,
+        windows = {
+            [1] = CaptureCustomWindowLayout(1),
+            [2] = CaptureCustomWindowLayout(2),
+        },
+    }
+end
+
+local function RestoreCustomWindowLayout(windowIndex, state)
+    if type(state) ~= "table" then return end
+    local db = GetDB(windowIndex)
+    if not db then return end
+
+    db.point = state.point or db.point
+    db.relativePoint = state.relativePoint or state.point or db.relativePoint
+    db.x = tonumber(state.x) or db.x
+    db.y = tonumber(state.y) or db.y
+    db.width = tonumber(state.width) or db.width
+    db.height = tonumber(state.height) or db.height
+
+    if windowIndex == 2 then
+        db.enabled = state.enabled == true
+        db.snapSide = state.snapSide
+        db.layoutInitialized = state.layoutInitialized == true
+    end
+
+    local frame = CreateMeterFrame(windowIndex)
+    RestoreSize(frame)
+    RestorePosition(frame)
+end
+
+function ns:ApplyCustomDamageMeterLayout(layout)
+    if type(layout) ~= "table" or type(layout.windows) ~= "table" then
+        return false
+    end
+
+    local root = GetDB(1)
+    if not root then return false end
+    root.snapGap = math.max(0, math.min(MAX_SNAP_GAP, tonumber(layout.snapGap) or tonumber(root.snapGap) or 0))
+
+    RestoreCustomWindowLayout(1, layout.windows[1])
+    RestoreCustomWindowLayout(2, layout.windows[2])
+
+    local secondDB = GetDB(2) or {}
+    if secondDB.enabled == true and secondDB.snapSide then
+        ApplySecondWindowSnap()
+    end
+
+    UpdateInteractionState()
+    ScheduleRefresh(true)
+    if ns.UI and ns.UI.RefreshVisiblePage then ns.UI.RefreshVisiblePage() end
+    return true
+end
+
 function ns:ResetCustomDamageMeterPosition()
     local primaryDB = GetDB(1)
     if not primaryDB then return end

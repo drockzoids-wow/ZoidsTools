@@ -349,6 +349,7 @@ function UI.CreateDropdown(parent, label, tooltip, options, getter, setter, widt
     local control = CreateFrame("Frame", nil, parent)
     local dropdownWidth = width or 240
     local rowHeight = 26
+    options = type(options) == "table" and options or {}
 
     control:SetSize(dropdownWidth, 48)
 
@@ -434,8 +435,11 @@ function UI.CreateDropdown(parent, label, tooltip, options, getter, setter, widt
 
     control.rows = {}
 
-    for index, option in ipairs(options) do
-        local row = CreateFrame("Button", nil, control.menu, "BackdropTemplate")
+    local function GetOrCreateRow(index)
+        local row = control.rows[index]
+        if row then return row end
+
+        row = CreateFrame("Button", nil, control.menu, "BackdropTemplate")
         row:SetPoint("TOPLEFT", control.menu, "TOPLEFT", 8, -6 - ((index - 1) * rowHeight))
         row:SetSize(dropdownWidth - 16, rowHeight)
         row:RegisterForClicks("LeftButtonUp")
@@ -456,15 +460,10 @@ function UI.CreateDropdown(parent, label, tooltip, options, getter, setter, widt
         row.text:SetPoint("LEFT", row, "LEFT", 28, 0)
         row.text:SetPoint("RIGHT", row, "RIGHT", -8, 0)
         row.text:SetJustifyH("LEFT")
-        row.text:SetText(option.text)
 
-        row:SetScript("OnClick", function()
-            setter(option.value)
-
-            if control.Refresh then
-                control:Refresh()
-            end
-
+        row:SetScript("OnClick", function(self)
+            if self.option then setter(self.option.value) end
+            if control.Refresh then control:Refresh() end
             control.menu:Hide()
             control.button.arrow:SetText("v")
         end)
@@ -484,6 +483,26 @@ function UI.CreateDropdown(parent, label, tooltip, options, getter, setter, widt
         end)
 
         control.rows[index] = row
+        return row
+    end
+
+    function control:SetOptions(newOptions)
+        options = type(newOptions) == "table" and newOptions or {}
+        self.menu:SetHeight(math.max(12, (#options * rowHeight) + 12))
+
+        for index, option in ipairs(options) do
+            local row = GetOrCreateRow(index)
+            row.option = option
+            row.text:SetText(option.text or tostring(option.value or ""))
+            row:Show()
+        end
+
+        for index = #options + 1, #self.rows do
+            self.rows[index].option = nil
+            self.rows[index]:Hide()
+        end
+
+        if self.Refresh then self:Refresh() end
     end
 
     control.button:SetScript("OnClick", function()
@@ -523,7 +542,7 @@ function UI.CreateDropdown(parent, label, tooltip, options, getter, setter, widt
         end
     end
 
-    control:Refresh()
+    control:SetOptions(options)
 
     UI.RegisterSearchControl(parent, control, label, tooltip)
 

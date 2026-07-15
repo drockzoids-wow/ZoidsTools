@@ -3,6 +3,66 @@ local _, ns = ...
 ns.UI = ns.UI or {}
 ns.UI.Pages = ns.UI.Pages or {}
 
+local createProfilePopup = "ZOIDSTOOLS_CREATE_DAMAGE_METER_PROFILE"
+local deleteProfilePopup = "ZOIDSTOOLS_DELETE_DAMAGE_METER_PROFILE"
+
+if StaticPopupDialogs then
+    StaticPopupDialogs[createProfilePopup] = StaticPopupDialogs[createProfilePopup] or {
+        text = "Name this damage meter layout:",
+        button1 = SAVE or "Save",
+        button2 = CANCEL or "Cancel",
+        hasEditBox = true,
+        maxLetters = 40,
+        OnShow = function(self)
+            local editBox = self.EditBox or self.editBox
+            if editBox then
+                editBox:SetText("")
+                editBox:SetFocus()
+            end
+        end,
+        OnAccept = function(self, data)
+            local editBox = self.EditBox or self.editBox
+            local ok, message = ns:CreateDamageMeterProfile(editBox and editBox:GetText() or "")
+            if ok then
+                ns:Print("Damage meter profile created and saved.")
+            elseif message then
+                ns:Print(message)
+            end
+            if data and data.page and data.page.Refresh then data.page:Refresh() end
+        end,
+        EditBoxOnEnterPressed = function(self)
+            local popup = self:GetParent()
+            if popup and popup.button1 then popup.button1:Click() end
+        end,
+        EditBoxOnEscapePressed = function(self)
+            self:GetParent():Hide()
+        end,
+        timeout = 0,
+        whileDead = true,
+        hideOnEscape = true,
+        preferredIndex = 3,
+    }
+
+    StaticPopupDialogs[deleteProfilePopup] = StaticPopupDialogs[deleteProfilePopup] or {
+        text = "Delete the damage meter profile |cffffd24a%s|r?",
+        button1 = DELETE or "Delete",
+        button2 = CANCEL or "Cancel",
+        OnAccept = function(_, data)
+            local ok, message = ns:DeleteDamageMeterProfile(data and data.key)
+            if ok then
+                ns:Print("Damage meter profile deleted.")
+            elseif message then
+                ns:Print(message)
+            end
+            if data and data.page and data.page.Refresh then data.page:Refresh() end
+        end,
+        timeout = 0,
+        whileDead = true,
+        hideOnEscape = true,
+        preferredIndex = 3,
+    }
+end
+
 function ns.UI.Pages.CreateMetersPage(parent)
     local UI = ns.UI
     local frame = UI.CreatePageFrame(parent)
@@ -149,14 +209,14 @@ function ns.UI.Pages.CreateMetersPage(parent)
 
     local customNote = UI.CreateStatusText(frame, leftWidth - textInset)
     UI.PlaceFirst(customNote, customNoteSection)
-    customNote:SetText("Each window has its own title and C/O session. Unlock to move or resize; bring any edge near the other meter to snap them together.")
+    customNote:SetText("Each window has its own meter type and Current, Overall, or recent-segment menu. Unlock to move or resize; bring any edge near the other meter to snap them together.")
 
     local columnDivider = frame:CreateTexture(nil, "ARTWORK")
     columnDivider:SetColorTexture(0.38, 0.40, 0.44, 0.22)
     columnDivider:SetPoint("TOPLEFT", frame, "TOPLEFT", rightX - 24, -2)
     columnDivider:SetSize(1, 360)
 
-    local generalSection = UI.CreateSection(frame, "Blizzard Damage Meter", nil, 0, rightWidth)
+    local generalSection = UI.CreateSection(frame, "Damage Meter Profiles", nil, 0, rightWidth)
     generalSection:ClearAllPoints()
     generalSection:SetPoint("TOPLEFT", frame, "TOPLEFT", rightX, 0)
 
@@ -168,10 +228,10 @@ function ns.UI.Pages.CreateMetersPage(parent)
     local profileDropdown = UI.CreateDropdown(
         frame,
         "Active Profile",
-        "Choose which account-wide Blizzard damage meter layout ZoidsTools should save or apply.",
+        "Choose which account-wide ZoidsTools and Blizzard damage meter layout to save or apply.",
         ns.GetDamageMeterProfileOptions and ns:GetDamageMeterProfileOptions() or {},
         function()
-            return ns.GetActiveDamageMeterProfileKey and ns:GetActiveDamageMeterProfileKey() or "profile1"
+            return ns.GetActiveDamageMeterProfileKey and ns:GetActiveDamageMeterProfileKey() or nil
         end,
         function(value)
             if ns.SetActiveDamageMeterProfileKey then
@@ -182,12 +242,38 @@ function ns.UI.Pages.CreateMetersPage(parent)
                 frame:Refresh()
             end
         end,
-        220
+        280
     )
     UI.PlaceFirst(profileDropdown, profileSection)
 
-    local applyButton = UI.CreateButton(frame, "Apply Profile", 140)
-    applyButton:SetPoint("TOPLEFT", profileDropdown, "BOTTOMLEFT", 0, -14)
+    local createButton = UI.CreateButton(frame, "Save New Profile", 140)
+    createButton:SetPoint("TOPLEFT", profileDropdown, "BOTTOMLEFT", 0, -14)
+    createButton:SetScript("OnClick", function()
+        if StaticPopup_Show then
+            StaticPopup_Show(createProfilePopup, nil, nil, { page = frame })
+        end
+    end)
+
+    local saveButton = UI.CreateButton(frame, "Update Selected", 140)
+    saveButton:SetPoint("LEFT", createButton, "RIGHT", UI.Layout.buttonGap, 0)
+    saveButton:SetScript("OnClick", function()
+        local ok, message
+
+        if ns.SaveDamageMeterProfile and ns.GetActiveDamageMeterProfileKey then
+            ok, message = ns:SaveDamageMeterProfile(ns:GetActiveDamageMeterProfileKey())
+        end
+
+        if ok then
+            ns:Print("Damage meter profile updated.")
+        elseif message then
+            ns:Print(message)
+        end
+
+        if frame.Refresh then frame:Refresh() end
+    end)
+
+    local applyButton = UI.CreateButton(frame, "Apply Selected", 140)
+    applyButton:SetPoint("TOPLEFT", createButton, "BOTTOMLEFT", 0, -10)
     applyButton:SetScript("OnClick", function()
         local ok, message
 
@@ -206,30 +292,21 @@ function ns.UI.Pages.CreateMetersPage(parent)
         end
     end)
 
-    local saveButton = UI.CreateButton(frame, "Save Current", 140)
-    saveButton:SetPoint("LEFT", applyButton, "RIGHT", UI.Layout.buttonGap, 0)
-    saveButton:SetScript("OnClick", function()
-        local ok, message
-
-        if ns.SaveDamageMeterProfile and ns.GetActiveDamageMeterProfileKey then
-            ok, message = ns:SaveDamageMeterProfile(ns:GetActiveDamageMeterProfileKey())
-        end
-
-        if ok then
-            ns:Print("Damage meter profile saved.")
-        elseif message then
-            ns:Print(message)
-        end
-
-        if frame.Refresh then
-            frame:Refresh()
+    local deleteButton = UI.CreateButton(frame, "Delete Selected", 140)
+    deleteButton:SetPoint("LEFT", applyButton, "RIGHT", UI.Layout.buttonGap, 0)
+    deleteButton:SetScript("OnClick", function()
+        local key = ns.GetActiveDamageMeterProfileKey and ns:GetActiveDamageMeterProfileKey()
+        if not key then return end
+        local name = ns.GetDamageMeterProfileName and ns:GetDamageMeterProfileName(key) or key
+        if StaticPopup_Show then
+            StaticPopup_Show(deleteProfilePopup, name, nil, { key = key, page = frame })
         end
     end)
 
     local profileStatus = UI.CreateStatusText(frame, rightWidth - textInset)
     UI.PlaceBelow(profileStatus, applyButton, 0, 14)
 
-    local currentSection = UI.PlaceSection(frame, "Current Windows", profileStatus, rightWidth)
+    local currentSection = UI.PlaceSection(frame, "Current Blizzard Windows", profileStatus, rightWidth)
 
     local currentWindow1 = UI.CreateStatusText(frame, rightWidth - textInset)
     UI.PlaceFirst(currentWindow1, currentSection)
@@ -254,7 +331,17 @@ function ns.UI.Pages.CreateMetersPage(parent)
         UI.SetControlEnabled(classColoredBorder, customEnabled:GetChecked() == true)
         customStatus:SetText(ns.GetCustomDamageMeterStatusText and ns:GetCustomDamageMeterStatusText() or "")
         previewButton:SetText(ns.IsCustomDamageMeterMoveMode and ns:IsCustomDamageMeterMoveMode() and "Lock Meter" or "Preview / Move")
+        local profileOptions = ns.GetDamageMeterProfileOptions and ns:GetDamageMeterProfileOptions() or {}
+        if profileDropdown.SetOptions then
+            profileDropdown:SetOptions(profileOptions)
+        end
         profileDropdown:Refresh()
+
+        local activeProfile = ns.GetActiveDamageMeterProfileKey and ns:GetActiveDamageMeterProfileKey()
+        UI.SetControlEnabled(profileDropdown, #profileOptions > 0)
+        UI.SetControlEnabled(applyButton, activeProfile ~= nil)
+        UI.SetControlEnabled(saveButton, activeProfile ~= nil)
+        UI.SetControlEnabled(deleteButton, activeProfile ~= nil)
 
         if ns.GetBlizzardDamageMeterStatusText then
             status:SetText(ns:GetBlizzardDamageMeterStatusText())

@@ -195,18 +195,8 @@ local defaults = {
         mode = "popular",
     },
     damageMeterProfiles = {
-        activeProfile = "profile1",
-        lastAppliedProfile = "profile1",
-        profiles = {
-            profile1 = {
-                name = "Profile 1",
-                windows = {},
-            },
-            profile2 = {
-                name = "Profile 2",
-                windows = {},
-            },
-        },
+        profiles = {},
+        nextProfileID = 1,
     },
     customDamageMeter = {
         enabled = false,

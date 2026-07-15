@@ -65,6 +65,10 @@ local ScrollMeter
 local OpenSourceSummary
 local RefreshOpenSourceSummary
 local summaryFrame
+local sessionMenuFrame
+local retainedCurrentSessions = {}
+local waitingForNewCurrentSession = false
+local selectedRecentSessions = {}
 
 local sampleSources = {
     { name = "Dottindrock", classFilename = "WARLOCK", totalAmount = 128400000, amountPerSecond = 2140000, isLocalPlayer = true },
@@ -110,6 +114,15 @@ end
 
 local function GetSessionLabel(value)
     return NormalizeSessionType(value) == "overall" and "Overall" or "Current Segment"
+end
+
+local function GetSelectedRecentSession(windowIndex)
+    return selectedRecentSessions[windowIndex == 2 and 2 or 1]
+end
+
+local function GetEffectiveSessionLabel(windowIndex)
+    local selected = GetSelectedRecentSession(windowIndex)
+    return selected and selected.name or GetSessionLabel(GetSessionType(windowIndex))
 end
 
 local function NormalizeMeterType(value)
@@ -266,14 +279,73 @@ local function ApplyFrameAppearance(frame)
 end
 
 local function GetDamageSession(windowIndex)
-    if not C_DamageMeter or not C_DamageMeter.GetCombatSessionFromType then return nil end
+    if not C_DamageMeter then return nil end
     if not Enum or not Enum.DamageMeterSessionType or not Enum.DamageMeterType then return nil end
 
-    local sessionType = GetSessionType(windowIndex) == "overall" and Enum.DamageMeterSessionType.Overall or Enum.DamageMeterSessionType.Current
     local meterType = GetMeterEnum(GetMeterType(windowIndex))
-    if sessionType == nil or meterType == nil then return nil end
+    if meterType == nil then return nil end
+
+    local selected = GetSelectedRecentSession(windowIndex)
+    if selected then
+        if not C_DamageMeter.GetCombatSessionFromID then return nil end
+        return C_DamageMeter.GetCombatSessionFromID(selected.sessionID, meterType)
+    end
+
+    if not C_DamageMeter.GetCombatSessionFromType then return nil end
+    local sessionType = GetSessionType(windowIndex) == "overall" and Enum.DamageMeterSessionType.Overall or Enum.DamageMeterSessionType.Current
+    if sessionType == nil then return nil end
 
     return C_DamageMeter.GetCombatSessionFromType(sessionType, meterType)
+end
+
+local function CopyCombatSession(session)
+    if not session or type(session.combatSources) ~= "table" or #session.combatSources == 0 then
+        return nil
+    end
+
+    local snapshot = {
+        maxAmount = session.maxAmount,
+        combatSources = {},
+    }
+
+    for index, source in ipairs(session.combatSources) do
+        local sourceCopy = {}
+
+        if type(source) == "table" then
+            for key, value in pairs(source) do
+                sourceCopy[key] = value
+            end
+        end
+
+        snapshot.combatSources[index] = sourceCopy
+    end
+
+    return snapshot
+end
+
+local function GetDisplayDamageSession(windowIndex)
+    local session = GetDamageSession(windowIndex)
+
+    if GetSelectedRecentSession(windowIndex) then
+        return session
+    end
+
+    if GetSessionType(windowIndex) ~= "current" then
+        return session
+    end
+
+    local meterType = GetMeterType(windowIndex)
+
+    if waitingForNewCurrentSession then
+        return nil
+    end
+
+    if session and type(session.combatSources) == "table" and #session.combatSources > 0 then
+        retainedCurrentSessions[meterType] = CopyCombatSession(session)
+        return session
+    end
+
+    return retainedCurrentSessions[meterType]
 end
 
 local function IsDamageMeterAvailable()
@@ -409,9 +481,218 @@ end
 
 local function UpdateSessionButton(frame)
     if not frame or not frame.sessionButton then return end
-    local overall = GetSessionType(frame.windowIndex) == "overall"
-    frame.sessionButton.text:SetText(overall and "O" or "C")
+    local selected = GetSelectedRecentSession(frame.windowIndex)
+    local overall = not selected and GetSessionType(frame.windowIndex) == "overall"
+    frame.sessionButton.text:SetText(selected and "H" or (overall and "O" or "C"))
     frame.sessionButton.text:SetTextColor(0.96, 0.76, 0.22)
+end
+
+local function FormatSessionDuration(value)
+    if IsSecret(value) then return nil end
+    local seconds = tonumber(value)
+    if not seconds or seconds < 0 then return nil end
+    seconds = math.floor(seconds + 0.5)
+    if SecondsToClock then return SecondsToClock(seconds) end
+    return string.format("%d:%02d", math.floor(seconds / 60), seconds % 60)
+end
+
+local function GetAvailableRecentSessions()
+    if not C_DamageMeter or not C_DamageMeter.GetAvailableCombatSessions then return {} end
+    local sessions = C_DamageMeter.GetAvailableCombatSessions()
+    return type(sessions) == "table" and sessions or {}
+end
+
+local function SelectRecentSession(windowIndex, sessionID, name, durationSeconds)
+    windowIndex = windowIndex == 2 and 2 or 1
+    if IsSecret(sessionID) then return end
+    sessionID = tonumber(sessionID)
+    if not sessionID then return end
+
+    selectedRecentSessions[windowIndex] = {
+        sessionID = sessionID,
+        name = name,
+        durationSeconds = durationSeconds,
+    }
+    if summaryFrame and summaryFrame:IsShown() then summaryFrame:Hide() end
+
+    local frame = meterFrames[windowIndex]
+    if frame then
+        frame.scrollOffset = 0
+        UpdateSessionButton(frame)
+    end
+    ScheduleRefresh(true)
+end
+
+local function StyleSessionMenuButton(button)
+    if not button then return end
+    local selected = button.isSelected == true
+    button.dot:SetText(selected and "●" or "○")
+    button.dot:SetTextColor(selected and 1 or 0.52, selected and 0.76 or 0.52, selected and 0.18 or 0.52)
+    button.label:SetTextColor(selected and 1 or 0.92, selected and 0.82 or 0.92, selected and 0.30 or 0.92)
+end
+
+local function EnsureSessionMenu()
+    if sessionMenuFrame then return sessionMenuFrame end
+
+    local menu = CreateFrame("Frame", "ZoidsToolsCustomDamageMeterSessionMenu", UIParent, "BackdropTemplate")
+    menu:SetFrameStrata("DIALOG")
+    menu:SetFrameLevel(60)
+    menu:SetClampedToScreen(true)
+    menu:EnableMouse(true)
+    menu:SetBackdrop({
+        bgFile = "Interface\\Buttons\\WHITE8x8",
+        edgeFile = "Interface\\Buttons\\WHITE8x8",
+        edgeSize = 1,
+    })
+    menu.buttons = {}
+
+    menu.divider = menu:CreateTexture(nil, "ARTWORK")
+    menu.divider:SetHeight(1)
+    menu.divider:SetColorTexture(0.62, 0.46, 0.16, 0.65)
+
+    menu.catcher = CreateFrame("Button", nil, UIParent)
+    menu.catcher:SetAllPoints(UIParent)
+    menu.catcher:SetFrameStrata("DIALOG")
+    menu.catcher:SetFrameLevel(59)
+    menu.catcher:RegisterForClicks("LeftButtonUp", "RightButtonUp")
+    menu.catcher:SetScript("OnClick", function() menu:Hide() end)
+    menu.catcher:Hide()
+
+    menu:SetScript("OnHide", function(self)
+        self.catcher:Hide()
+        self.owner = nil
+    end)
+    menu:Hide()
+
+    if UISpecialFrames then
+        table.insert(UISpecialFrames, "ZoidsToolsCustomDamageMeterSessionMenu")
+    end
+
+    sessionMenuFrame = menu
+    return menu
+end
+
+local function GetSessionMenuButton(menu, index)
+    local button = menu.buttons[index]
+    if button then return button end
+
+    button = CreateFrame("Button", nil, menu)
+    button:SetHeight(23)
+
+    button.highlight = button:CreateTexture(nil, "HIGHLIGHT")
+    button.highlight:SetAllPoints()
+    button.highlight:SetColorTexture(0.72, 0.53, 0.12, 0.18)
+
+    button.dot = button:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    button.dot:SetPoint("LEFT", button, "LEFT", 7, 0)
+    button.dot:SetWidth(14)
+    button.dot:SetJustifyH("CENTER")
+
+    button.label = button:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+    button.label:SetPoint("LEFT", button.dot, "RIGHT", 5, 0)
+    button.label:SetPoint("RIGHT", button, "RIGHT", -8, 0)
+    button.label:SetJustifyH("LEFT")
+    button.label:SetWordWrap(false)
+
+    button:SetScript("OnEnter", function(self)
+        self.label:SetTextColor(1, 0.88, 0.42)
+    end)
+    button:SetScript("OnLeave", StyleSessionMenuButton)
+
+    menu.buttons[index] = button
+    return button
+end
+
+local function OpenSessionMenu(owner, frame)
+    local menu = EnsureSessionMenu()
+    if menu:IsShown() and menu.owner == owner then
+        menu:Hide()
+        return
+    end
+
+    local windowIndex = frame.windowIndex
+    local selected = GetSelectedRecentSession(windowIndex)
+    local availableSessions = GetAvailableRecentSessions()
+    local entries = {}
+
+    for _, availableSession in ipairs(availableSessions) do
+        local rawID = availableSession.sessionID
+        local sessionID = not IsSecret(rawID) and tonumber(rawID) or nil
+        if sessionID then
+            local rawName = availableSession.name
+            local sessionName = not IsSecret(rawName) and type(rawName) == "string" and rawName ~= "" and rawName or nil
+            sessionName = sessionName or ((DAMAGE_METER_COMBAT_NUMBER and DAMAGE_METER_COMBAT_NUMBER:format(sessionID)) or ("Combat " .. sessionID))
+            local duration = FormatSessionDuration(availableSession.durationSeconds)
+            entries[#entries + 1] = {
+                label = duration and string.format("%s [%s]", sessionName, duration) or sessionName,
+                selected = selected and selected.sessionID == sessionID,
+                sessionID = sessionID,
+                name = sessionName,
+                durationSeconds = availableSession.durationSeconds,
+            }
+        end
+    end
+
+    local recentCount = #entries
+    entries[#entries + 1] = {
+        label = "Current Segment",
+        selected = not selected and GetSessionType(windowIndex) == "current",
+        sessionType = "current",
+    }
+    entries[#entries + 1] = {
+        label = "Overall",
+        selected = not selected and GetSessionType(windowIndex) == "overall",
+        sessionType = "overall",
+    }
+
+    local y = -5
+    local widest = 190
+    for index, entry in ipairs(entries) do
+        if recentCount > 0 and index == recentCount + 1 then
+            menu.divider:ClearAllPoints()
+            menu.divider:SetPoint("TOPLEFT", menu, "TOPLEFT", 7, y - 3)
+            menu.divider:SetPoint("TOPRIGHT", menu, "TOPRIGHT", -7, y - 3)
+            menu.divider:Show()
+            y = y - 7
+        end
+
+        local button = GetSessionMenuButton(menu, index)
+        button:ClearAllPoints()
+        button:SetPoint("TOPLEFT", menu, "TOPLEFT", 4, y)
+        button:SetPoint("TOPRIGHT", menu, "TOPRIGHT", -4, y)
+        button.label:SetText(entry.label)
+        button.isSelected = entry.selected == true
+        StyleSessionMenuButton(button)
+        local entryData = entry
+        button:SetScript("OnClick", function()
+            menu:Hide()
+            if entryData.sessionID then
+                SelectRecentSession(windowIndex, entryData.sessionID, entryData.name, entryData.durationSeconds)
+            else
+                ns:SetCustomDamageMeterSessionType(entryData.sessionType, windowIndex)
+            end
+        end)
+        button:Show()
+        widest = math.max(widest, math.ceil((button.label:GetStringWidth() or 0) + 42))
+        y = y - 23
+    end
+
+    for index = #entries + 1, #menu.buttons do
+        menu.buttons[index]:Hide()
+    end
+
+    if recentCount == 0 then menu.divider:Hide() end
+
+    local r, g, b = 0.62, 0.46, 0.16
+    if GetClassColoredBorder() then r, g, b = GetPlayerClassColor() end
+    menu:SetBackdropColor(0.008, 0.010, 0.014, math.max(0.92, GetBackgroundOpacity()))
+    menu:SetBackdropBorderColor(r, g, b, 0.95)
+    menu:SetSize(math.min(340, widest), math.abs(y) + 5)
+    menu:ClearAllPoints()
+    menu:SetPoint("BOTTOMRIGHT", owner, "TOPRIGHT", 0, 4)
+    menu.owner = owner
+    menu.catcher:Show()
+    menu:Show()
 end
 
 local function CreateSessionButton(frame, resetButton)
@@ -428,7 +709,7 @@ local function CreateSessionButton(frame, resetButton)
     button.text:SetShadowOffset(1, -1)
 
     local function RefreshTooltip(self)
-        ShowTooltip(self, "Session: " .. GetSessionLabel(GetSessionType(frame.windowIndex)), "Click to switch between Current Segment and Overall data.")
+        ShowTooltip(self, "Session: " .. GetEffectiveSessionLabel(frame.windowIndex), "Choose Current, Overall, or a recent combat segment.")
     end
 
     button:SetScript("OnEnter", function(self)
@@ -439,12 +720,9 @@ local function CreateSessionButton(frame, resetButton)
         UpdateSessionButton(frame)
         GameTooltip:Hide()
     end)
-    button:SetScript("OnClick", function()
-        local nextType = GetSessionType(frame.windowIndex) == "overall" and "current" or "overall"
-        if ns.SetCustomDamageMeterSessionType then
-            ns:SetCustomDamageMeterSessionType(nextType, frame.windowIndex)
-        end
-        if button:IsMouseOver() then RefreshTooltip(button) end
+    button:SetScript("OnClick", function(self)
+        GameTooltip:Hide()
+        OpenSessionMenu(self, frame)
     end)
 
     return button
@@ -924,7 +1202,9 @@ local function RefreshMeterWindow(windowIndex)
 
     UpdateSessionButton(frame)
     UpdateMeterTitle(frame)
-    frame.empty:SetText((GetSessionType(windowIndex) == "overall" and "No overall " or "No current ") .. GetMeterLabel(GetMeterType(windowIndex)) .. " data")
+    local selectedSession = GetSelectedRecentSession(windowIndex)
+    local emptyPrefix = selectedSession and "No selected segment " or (GetSessionType(windowIndex) == "overall" and "No overall " or "No current ")
+    frame.empty:SetText(emptyPrefix .. GetMeterLabel(GetMeterType(windowIndex)) .. " data")
 
     local sources
     local maxAmount
@@ -932,7 +1212,7 @@ local function RefreshMeterWindow(windowIndex)
         sources = sampleSources
         maxAmount = GetSourceBarValue(sampleSources[1], windowIndex)
     elseif IsDamageMeterAvailable() then
-        local session = GetDamageSession(windowIndex)
+        local session = GetDisplayDamageSession(windowIndex)
         sources = session and type(session.combatSources) == "table" and session.combatSources or nil
         maxAmount = session and session.maxAmount or nil
     end
@@ -1064,12 +1344,11 @@ local function GetGroupSourceGUID(source)
 end
 
 local function GetSourceDetails(frame, source)
-    if not frame or not source or not C_DamageMeter or not C_DamageMeter.GetCombatSessionSourceFromType then return nil end
+    if not frame or not source or not C_DamageMeter then return nil end
     if not Enum or not Enum.DamageMeterSessionType then return nil end
 
-    local sessionType = GetSessionType(frame.windowIndex) == "overall" and Enum.DamageMeterSessionType.Overall or Enum.DamageMeterSessionType.Current
     local meterType = GetMeterEnum(GetMeterType(frame.windowIndex))
-    if sessionType == nil or meterType == nil then return nil end
+    if meterType == nil then return nil end
 
     local rawGUID = source.sourceGUID
     local rawCreatureID = source.sourceCreatureID
@@ -1086,7 +1365,15 @@ local function GetSourceDetails(frame, source)
     end
     if sourceGUID == nil and sourceCreatureID == nil and not isLocalPlayer then return nil end
 
+    local selected = GetSelectedRecentSession(frame.windowIndex)
+    local sessionType = not selected and (GetSessionType(frame.windowIndex) == "overall" and Enum.DamageMeterSessionType.Overall or Enum.DamageMeterSessionType.Current) or nil
+    if not selected and (sessionType == nil or not C_DamageMeter.GetCombatSessionSourceFromType) then return nil end
+    if selected and not C_DamageMeter.GetCombatSessionSourceFromID then return nil end
+
     local function Query(guid, creatureID)
+        if selected then
+            return C_DamageMeter.GetCombatSessionSourceFromID(selected.sessionID, meterType, guid, creatureID)
+        end
         return C_DamageMeter.GetCombatSessionSourceFromType(sessionType, meterType, guid, creatureID)
     end
 
@@ -1342,7 +1629,7 @@ OpenSourceSummary = function(meterFrame, source)
     local r, g, b = GetClassColor(source.classFilename)
     frame.sourceColor = { r, g, b }
     frame:SetBackdropBorderColor(r, g, b, 0.95)
-    frame.subtitle:SetText(GetMeterLabel(GetMeterType(meterFrame.windowIndex)) .. "  •  " .. GetSessionLabel(GetSessionType(meterFrame.windowIndex)))
+    frame.subtitle:SetText(GetMeterLabel(GetMeterType(meterFrame.windowIndex)) .. "  •  " .. GetEffectiveSessionLabel(meterFrame.windowIndex))
     local meterType = GetMeterType(meterFrame.windowIndex)
     frame.rateHeader:SetText((meterType == "HealingDone" or meterType == "Hps") and "HPS" or "DPS")
 
@@ -1365,6 +1652,7 @@ local function UpdateEventRegistration()
     eventFrame:RegisterEvent("DAMAGE_METER_RESET")
     eventFrame:RegisterEvent("ADDON_RESTRICTION_STATE_CHANGED")
     eventFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
+    eventFrame:RegisterEvent("PLAYER_REGEN_DISABLED")
     eventFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
 end
 
@@ -1417,7 +1705,9 @@ function ns:SetCustomDamageMeterSessionType(value, windowIndex)
     windowIndex = windowIndex == 2 and 2 or 1
     local db = GetDB(windowIndex)
     if not db then return end
+    selectedRecentSessions[windowIndex] = nil
     db.sessionType = NormalizeSessionType(value)
+    if summaryFrame and summaryFrame:IsShown() then summaryFrame:Hide() end
     if meterFrames[windowIndex] then
         meterFrames[windowIndex].scrollOffset = 0
         UpdateSessionButton(meterFrames[windowIndex])
@@ -1561,6 +1851,22 @@ function ns:InitializeCustomDamageMeter()
 
     eventFrame = CreateFrame("Frame")
     eventFrame:SetScript("OnEvent", function(_, event)
+        if event == "PLAYER_REGEN_DISABLED" then
+            retainedCurrentSessions = {}
+            waitingForNewCurrentSession = true
+            ScheduleRefresh(true)
+            return
+        end
+
+        if event == "DAMAGE_METER_RESET" then
+            retainedCurrentSessions = {}
+            selectedRecentSessions = {}
+            waitingForNewCurrentSession = false
+        elseif waitingForNewCurrentSession
+            and (event == "DAMAGE_METER_CURRENT_SESSION_UPDATED" or event == "DAMAGE_METER_COMBAT_SESSION_UPDATED") then
+            waitingForNewCurrentSession = false
+        end
+
         ScheduleRefresh(event == "DAMAGE_METER_RESET" or event == "PLAYER_ENTERING_WORLD")
     end)
 

@@ -16,6 +16,17 @@ local DEFAULT_HEIGHT = 35 + (DEFAULT_ROW_COUNT * ROW_HEIGHT) + ((DEFAULT_ROW_COU
 local MAX_HEIGHT = 35 + (MAX_ROW_COUNT * ROW_HEIGHT) + ((MAX_ROW_COUNT - 1) * ROW_SPACING)
 local SUMMARY_ROW_COUNT = 10
 local SUMMARY_ROW_HEIGHT = 24
+local shortNumberAbbreviationOptions
+
+local FALLBACK_NUMBER_BREAKPOINTS = {
+    { breakpoint = 10000000000, abbreviation = "B", significandDivisor = 1000000000, fractionDivisor = 1, abbreviationIsGlobal = false },
+    { breakpoint = 1000000000, abbreviation = "B", significandDivisor = 100000000, fractionDivisor = 10, abbreviationIsGlobal = false },
+    { breakpoint = 10000000, abbreviation = "M", significandDivisor = 1000000, fractionDivisor = 1, abbreviationIsGlobal = false },
+    { breakpoint = 1000000, abbreviation = "M", significandDivisor = 100000, fractionDivisor = 10, abbreviationIsGlobal = false },
+    { breakpoint = 10000, abbreviation = "K", significandDivisor = 1000, fractionDivisor = 1, abbreviationIsGlobal = false },
+    { breakpoint = 1000, abbreviation = "K", significandDivisor = 100, fractionDivisor = 10, abbreviationIsGlobal = false },
+    { breakpoint = 1, abbreviation = "", significandDivisor = 1, fractionDivisor = 1, abbreviationIsGlobal = false },
+}
 
 local METER_CATEGORIES = {
     {
@@ -172,9 +183,51 @@ local function IsSecret(value)
     return issecretvalue and issecretvalue(value) == true
 end
 
+local function GetShortNumberAbbreviationOptions()
+    if shortNumberAbbreviationOptions then return shortNumberAbbreviationOptions end
+
+    local source = C_StringUtil and C_StringUtil.GetDefaultAbbreviationBreakpoints
+        and C_StringUtil.GetDefaultAbbreviationBreakpoints()
+    local breakpoints = {}
+
+    if type(source) == "table" then
+        for _, entry in ipairs(source) do
+            if type(entry) == "table" then
+                breakpoints[#breakpoints + 1] = {
+                    breakpoint = entry.breakpoint,
+                    abbreviation = entry.abbreviation,
+                    significandDivisor = entry.significandDivisor,
+                    fractionDivisor = entry.fractionDivisor,
+                    abbreviationIsGlobal = entry.abbreviationIsGlobal ~= false,
+                }
+            end
+        end
+    end
+
+    if #breakpoints == 0 then
+        for _, entry in ipairs(FALLBACK_NUMBER_BREAKPOINTS) do
+            breakpoints[#breakpoints + 1] = entry
+        end
+    elseif not breakpoints[#breakpoints] or breakpoints[#breakpoints].breakpoint ~= 1 then
+        breakpoints[#breakpoints + 1] = {
+            breakpoint = 1,
+            abbreviation = "",
+            significandDivisor = 1,
+            fractionDivisor = 1,
+            abbreviationIsGlobal = false,
+        }
+    end
+
+    shortNumberAbbreviationOptions = { breakpointData = breakpoints }
+    if CreateAbbreviateConfig then
+        shortNumberAbbreviationOptions.config = CreateAbbreviateConfig(breakpoints)
+    end
+    return shortNumberAbbreviationOptions
+end
+
 local function FormatNumber(value)
     if IsSecret(value) then
-        if AbbreviateNumbers then return AbbreviateNumbers(value) end
+        if AbbreviateNumbers then return AbbreviateNumbers(value, GetShortNumberAbbreviationOptions()) end
         if AbbreviateLargeNumbers then return AbbreviateLargeNumbers(value) end
         return ""
     end

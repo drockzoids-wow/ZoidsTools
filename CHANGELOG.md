@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- Expanded talent recommendations with Archon, Icy Veins, Wowhead, and reconstructed Murlok.io PvP builds.
+- Added alternate-specialization suggestions when the selected PvP bracket has no build for the active specialization.
+- Improved talent application for leveling characters, including deferred max-level talents and recovery from stalled Blizzard commits.
+- Refreshed generated talent and stat data across all 13 classes and 40 specializations.
+- Isolated module initialization failures so one optional feature cannot prevent the remaining addon from loading.
+- Preserved nil return values in diagnostic wrappers and stopped reseeding WoW's shared random-number generator.
 - Removed an unused legacy ZoidsTools damage meter module that was no longer loaded.
 - Refreshed project documentation to match the current addon features.
 - Updated visible talent helper wording to use Talents instead of Grimoire.

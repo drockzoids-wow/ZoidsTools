@@ -2017,10 +2017,6 @@ function ns:InitializeMounts()
 
     initialized = true
 
-    if math and math.randomseed and time then
-        math.randomseed(time())
-    end
-
     eventFrame = CreateFrame("Frame")
     eventFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
     eventFrame:RegisterEvent("ZONE_CHANGED")

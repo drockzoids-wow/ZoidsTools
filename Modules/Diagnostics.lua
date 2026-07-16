@@ -5,6 +5,10 @@ local frame
 local unpack = unpack or table.unpack
 local GetBlizzardMetric
 
+local function Pack(...)
+    return { n = select("#", ...), ... }
+end
+
 local function NowMS()
     return debugprofilestop and debugprofilestop() or ((GetTime and GetTime() or 0) * 1000)
 end
@@ -29,7 +33,7 @@ function ns:WrapDiagnosticFunction(label, func)
     return function(...)
         if not diagnostic.active then return func(...) end
         local started = NowMS()
-        local results = { func(...) }
+        local results = Pack(func(...))
         local elapsed = NowMS() - started
         local sample = diagnostic.samples[label]
         if not sample then
@@ -42,7 +46,7 @@ function ns:WrapDiagnosticFunction(label, func)
         sample.over1 = sample.over1 + (elapsed >= 1 and 1 or 0)
         sample.over5 = sample.over5 + (elapsed >= 5 and 1 or 0)
         sample.over10 = sample.over10 + (elapsed >= 10 and 1 or 0)
-        return unpack(results)
+        return unpack(results, 1, results.n)
     end
 end
 

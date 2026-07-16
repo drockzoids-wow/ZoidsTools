@@ -21,12 +21,14 @@ local DUNGEON_PROMPT_DIALOG = "ZOIDSTOOLS_TALENT_GRIMOIRE_DUNGEON_PROMPT"
 local BIT_WIDTH_HEADER_VERSION = 8
 local BIT_WIDTH_SPEC_ID = 16
 local BIT_WIDTH_RANKS_PURCHASED = 6
-local PENDING_APPLY_WATCHDOG_SECS = 10
+local PENDING_APPLY_WATCHDOG_SECS = 30
 local pendingApply
 local pendingApplySeq = 0
 local applyToken = 0
 local SecureTalentCall
 local PrintTalentMessage
+local RollbackTalentConfig
+local ConfigHasStagedChanges
 local talentApplyDiagnostics = {
     enabled = false,
     lines = {},
@@ -39,6 +41,7 @@ local lastDungeonZoneSignature
 local lastDungeonPromptSignature
 local ACTIVE_TARGET_TEXT_COLOR = "ff8fdc8f"
 local PENDING_TARGET_TEXT_COLOR = "ffffd36a"
+local ALTERNATE_SPEC_TARGET_PREFIX = "__alternate_spec__:"
 local ACTIVE_TARGET_TEXT_RGBA = { 0.56, 0.86, 0.56, 1 }
 local PENDING_TARGET_TEXT_RGBA = { 1, 0.83, 0.42, 1 }
 local DEFAULT_DROPDOWN_TEXT_RGBA = { 1, 1, 1, 1 }
@@ -431,6 +434,37 @@ local function GetSpecLabel(specKey)
     return SPEC_LABELS[specKey] or TitleCase(specKey)
 end
 
+local function EncodeAlternateSpecTarget(specKey, targetKey)
+    return ALTERNATE_SPEC_TARGET_PREFIX .. tostring(specKey or "") .. ":" .. tostring(targetKey or "")
+end
+
+local function DecodeAlternateSpecTarget(value)
+    value = tostring(value or "")
+
+    if value:sub(1, #ALTERNATE_SPEC_TARGET_PREFIX) ~= ALTERNATE_SPEC_TARGET_PREFIX then
+        return nil, value
+    end
+
+    local remainder = value:sub(#ALTERNATE_SPEC_TARGET_PREFIX + 1)
+    local separator = remainder:find(":", 1, true)
+
+    if not separator then
+        return nil, value
+    end
+
+    return remainder:sub(1, separator - 1), remainder:sub(separator + 1)
+end
+
+local function GetSpecIndexForKey(classToken, specKey)
+    for specIndex, candidateKey in ipairs(SPEC_KEYS[classToken] or {}) do
+        if candidateKey == specKey then
+            return specIndex
+        end
+    end
+
+    return nil
+end
+
 local function GetCurrentSpecData()
     local root = GetRoot()
     local classToken, specKey = GetClassAndSpec()
@@ -537,6 +571,42 @@ local function GetModeOptions(contentType, targetKey)
                 value = buildKey,
                 text = FormatPvpModeLabel(type(entry) == "table" and (entry.modeLabel or entry.title) or TitleCase(buildKey)),
             }
+        end
+    end
+
+    -- Keep a requested PvP bracket visible when the active specialization has no
+    -- build for it but another specialization of the same class does. The final
+    -- dropdown will identify which specialization can supply the build.
+    if contentType == "pvp" then
+        local root = GetRoot()
+        local classToken = select(1, GetClassAndSpec())
+        local _, actualTargetKey = DecodeAlternateSpecTarget(targetKey)
+        local seenModes = {}
+
+        for _, option in ipairs(dynamicOptions) do
+            seenModes[option.value] = true
+        end
+
+        local classData = root and root.data and classToken and root.data[classToken]
+        if type(classData) == "table" then
+            for _, alternateSpecData in pairs(classData) do
+                local alternateTargetData = type(alternateSpecData) == "table"
+                    and alternateSpecData.pvp
+                    and alternateSpecData.pvp[actualTargetKey]
+                local alternateBuilds = GetProviderBuilds(alternateTargetData, GetProviderKey())
+
+                if type(alternateBuilds) == "table" then
+                    for buildKey, entry in pairs(alternateBuilds) do
+                        if not seenModes[buildKey] then
+                            seenModes[buildKey] = true
+                            dynamicOptions[#dynamicOptions + 1] = {
+                                value = buildKey,
+                                text = FormatPvpModeLabel(type(entry) == "table" and (entry.modeLabel or entry.title) or TitleCase(buildKey)),
+                            }
+                        end
+                    end
+                end
+            end
         end
     end
 
@@ -652,13 +722,32 @@ local function GetTargetKey(contentType)
         return DEFAULT_TARGET_BY_CONTENT.mythicplus
     end
 
+    local value
     if contentType == "raid" then
-        return db.raidTarget or DEFAULT_TARGET_BY_CONTENT.raid
+        value = db.raidTarget or DEFAULT_TARGET_BY_CONTENT.raid
     elseif contentType == "pvp" then
-        return db.pvpTarget or DEFAULT_TARGET_BY_CONTENT.pvp
+        value = db.pvpTarget or DEFAULT_TARGET_BY_CONTENT.pvp
+    else
+        value = db.mythicPlusTarget or DEFAULT_TARGET_BY_CONTENT.mythicplus
     end
 
-    return db.mythicPlusTarget or DEFAULT_TARGET_BY_CONTENT.mythicplus
+    local alternateSpecKey, actualTargetKey = DecodeAlternateSpecTarget(value)
+    local _, activeSpecKey = GetClassAndSpec()
+
+    -- Once the requested specialization switch has completed, restore the normal
+    -- target key so the dropdown returns to its standard entries.
+    if alternateSpecKey and alternateSpecKey == activeSpecKey then
+        if contentType == "raid" then
+            db.raidTarget = actualTargetKey
+        elseif contentType == "pvp" then
+            db.pvpTarget = actualTargetKey
+        else
+            db.mythicPlusTarget = actualTargetKey
+        end
+        return actualTargetKey
+    end
+
+    return value
 end
 
 local function SetTargetKey(contentType, value)
@@ -746,17 +835,30 @@ local function GetTargetLabel(contentType, targetKey)
 end
 
 local function GetBuildEntryForTarget(contentType, targetKey, mode)
-    local specData, classToken, specKey = GetCurrentSpecData()
+    local specData, classToken, activeSpecKey = GetCurrentSpecData()
 
     contentType = NormalizeContentType(contentType)
     targetKey = targetKey or GetTargetKey(contentType)
     mode = mode or GetModeKey(contentType)
 
+    local alternateSpecKey, actualTargetKey = DecodeAlternateSpecTarget(targetKey)
+    local specKey = alternateSpecKey or activeSpecKey
+    local root = GetRoot()
+
+    if alternateSpecKey then
+        specData = root
+            and root.data
+            and classToken
+            and root.data[classToken]
+            and root.data[classToken][alternateSpecKey]
+    end
+
     local providerKey = GetProviderKey()
-    local targetData = specData and specData[contentType] and specData[contentType][targetKey]
-    if (not targetData or not TargetHasProvider(targetData, providerKey)) and specData and specData[contentType] then
+    local targetData = specData and specData[contentType] and specData[contentType][actualTargetKey]
+    if not alternateSpecKey and (not targetData or not TargetHasProvider(targetData, providerKey)) and specData and specData[contentType] then
         for fallbackTargetKey, fallbackTargetData in pairs(specData[contentType]) do
             if TargetHasProvider(fallbackTargetData, providerKey) then
+                actualTargetKey = fallbackTargetKey
                 targetKey = fallbackTargetKey
                 targetData = fallbackTargetData
                 break
@@ -774,8 +876,15 @@ local function GetBuildEntryForTarget(contentType, targetKey, mode)
     end
 
     local fallbackMode = GetFirstBuildKey(builds)
-    local entry = builds and (builds[mode] or builds.popular or (preferredFallbackMode and builds[preferredFallbackMode]) or (fallbackMode and builds[fallbackMode]))
-    if entry and (not builds or not builds[mode]) then
+    local entry = builds and builds[mode]
+
+    -- PvP brackets are distinct data sets. Never silently substitute Solo, 2v2,
+    -- or another bracket when the selected one is missing.
+    if not entry and contentType ~= "pvp" then
+        entry = builds and (builds.popular or (preferredFallbackMode and builds[preferredFallbackMode]) or (fallbackMode and builds[fallbackMode]))
+    end
+
+    if entry and contentType ~= "pvp" and (not builds or not builds[mode]) then
         if builds and preferredFallbackMode and builds[preferredFallbackMode] == entry then
             mode = preferredFallbackMode
         elseif builds and builds.popular == entry then
@@ -785,12 +894,21 @@ local function GetBuildEntryForTarget(contentType, targetKey, mode)
         end
     end
 
+    local targetLabel = type(targetData) == "table" and targetData.label or GetTargetLabel(contentType, actualTargetKey)
+    if alternateSpecKey then
+        targetLabel = GetSpecLabel(alternateSpecKey) .. " - " .. tostring(targetLabel or actualTargetKey)
+    end
+
     return entry, {
         classToken = classToken,
         specKey = specKey,
+        activeSpecKey = activeSpecKey,
+        requiresSpecSwitch = alternateSpecKey ~= nil and alternateSpecKey ~= activeSpecKey,
+        alternateSpecIndex = alternateSpecKey and GetSpecIndexForKey(classToken, alternateSpecKey) or nil,
         contentType = contentType,
         targetKey = targetKey,
-        targetLabel = GetTargetLabel(contentType, targetKey),
+        actualTargetKey = actualTargetKey,
+        targetLabel = targetLabel,
         mode = mode,
         modeLabel = GetOptionText(GetModeOptions(contentType, targetKey), mode),
         generatedAt = GetRoot() and GetRoot().generatedAt,
@@ -1197,8 +1315,43 @@ local function SetPendingApply(value)
     if C_Timer and C_Timer.After then
         C_Timer.After(PENDING_APPLY_WATCHDOG_SECS, function()
             if pendingApplySeq == sequence then
+                local expiredApply = pendingApply
                 pendingApply = nil
                 ns._talentApplyInProgress = false
+                applyToken = applyToken + 1
+
+                if applyFrame then
+                    applyFrame:UnregisterEvent("TRAIT_CONFIG_CREATED")
+                    applyFrame:UnregisterEvent("TRAIT_CONFIG_UPDATED")
+                end
+
+                local configID = expiredApply and expiredApply.configID or GetActiveConfigID()
+                if expiredApply and expiredApply.rollbackOnTimeout == true and configID and RollbackTalentConfig then
+                    local rolledBack = RollbackTalentConfig(configID)
+
+                    if not rolledBack and C_Timer and C_Timer.After then
+                        C_Timer.After(1, function()
+                            if pendingApplySeq == sequence and ConfigHasStagedChanges(configID) then
+                                RollbackTalentConfig(configID)
+                                if QueueRefresh then
+                                    QueueRefresh(0)
+                                end
+                            end
+                        end)
+                    end
+                end
+
+                if PrintTalentMessage then
+                    if expiredApply and expiredApply.rollbackOnTimeout == true then
+                        PrintTalentMessage("Talent application timed out. Pending changes were discarded; please try Apply again.")
+                    else
+                        PrintTalentMessage("Talent application timed out; please try Apply again.")
+                    end
+                end
+
+                if QueueRefresh then
+                    QueueRefresh(0)
+                end
             end
         end)
     end
@@ -1233,14 +1386,14 @@ local function ContinuePendingApplyAfterLoad(applyState)
     end)
 end
 
-local function ConfigHasStagedChanges(configID)
+ConfigHasStagedChanges = function(configID)
     return configID
         and C_Traits
         and C_Traits.ConfigHasStagedChanges
         and C_Traits.ConfigHasStagedChanges(configID)
 end
 
-local function RollbackTalentConfig(configID)
+RollbackTalentConfig = function(configID)
     if not ConfigHasStagedChanges(configID) then
         return true
     end
@@ -1596,6 +1749,49 @@ local function GetActiveTargetKeys(contentType, mode)
 end
 
 local function GetTargetDropdownOptions(contentType, mode, selectedTargetKey)
+    local alternateSpecKey, actualTargetKey = DecodeAlternateSpecTarget(selectedTargetKey)
+    local currentEntry = GetBuildEntryForTarget(contentType, actualTargetKey, mode)
+
+    if contentType == "pvp" and not currentEntry then
+        local root = GetRoot()
+        local _, classToken, activeSpecKey = GetCurrentSpecData()
+        local classData = root and root.data and classToken and root.data[classToken]
+        local providerKey = GetProviderKey()
+        local modeLabel = GetOptionText(GetModeOptions(contentType, actualTargetKey), mode)
+        local compactModeLabel = mode == "rbg" and "RBG" or modeLabel
+        local options = {
+            {
+                value = actualTargetKey,
+                text = GetSpecLabel(activeSpecKey) .. " - no " .. tostring(compactModeLabel) .. " build",
+            },
+        }
+
+        if type(classData) == "table" then
+            for specKey, specData in pairs(classData) do
+                if specKey ~= activeSpecKey and type(specData) == "table" then
+                    local targetData = specData.pvp and specData.pvp[actualTargetKey]
+                    local builds = GetProviderBuilds(targetData, providerKey)
+                    local entry = builds and builds[mode]
+
+                    if entry then
+                        options[#options + 1] = {
+                            value = EncodeAlternateSpecTarget(specKey, actualTargetKey),
+                            text = GetSpecLabel(specKey) .. " - " .. tostring(compactModeLabel),
+                        }
+                    end
+                end
+            end
+        end
+
+        table.sort(options, function(left, right)
+            if left.value == actualTargetKey then return true end
+            if right.value == actualTargetKey then return false end
+            return tostring(left.text) < tostring(right.text)
+        end)
+
+        return options, {}, alternateSpecKey ~= nil
+    end
+
     local options = GetTargetOptions(contentType)
     local activeTargetKeys, hasActiveTarget = GetActiveTargetKeys(contentType, mode)
 
@@ -2032,6 +2228,42 @@ local function ResetAndPurchaseDeferred(configID, treeID, entryInfo, onComplete)
     QueueProcessNext(0.25)
 end
 
+local function CompleteCommittedApply(applyState)
+    if not applyState or not applyState.renameOnly or pendingApply ~= applyState then
+        return false
+    end
+
+    local configID = applyState.configID or GetStoredConfigID(GetCurrentSpecID())
+
+    if configID and ConfigHasStagedChanges(configID) then
+        return false
+    end
+
+    if applyFrame then
+        applyFrame:UnregisterEvent("TRAIT_CONFIG_UPDATED")
+    end
+
+    if configID and C_ClassTalents and C_ClassTalents.RenameConfig then
+        SecureTalentCall(C_ClassTalents.RenameConfig, configID, BuildLoadoutName(applyState.buildLabel))
+    end
+
+    local appliedMessage = "Talents applied: " .. tostring(applyState.buildLabel or "Build")
+
+    if (tonumber(applyState.levelDeferredNodes) or 0) > 0 then
+        appliedMessage = appliedMessage .. string.format(
+            " (level %d; %d max-level talent(s) deferred)",
+            tonumber(applyState.playerLevel) or 0,
+            tonumber(applyState.levelDeferredNodes) or 0
+        )
+    end
+
+    PrintTalentMessage(appliedMessage)
+    ClearPendingApply()
+    ns._talentApplyInProgress = false
+    QueueRefresh(0)
+    return true
+end
+
 local function EnsureApplyFrame()
     if applyFrame then
         return
@@ -2095,29 +2327,7 @@ local function EnsureApplyFrame()
             self:UnregisterEvent("TRAIT_CONFIG_UPDATED")
 
             if applyState.renameOnly then
-                local configID = GetStoredConfigID(GetCurrentSpecID())
-
-                if configID and C_ClassTalents and C_ClassTalents.RenameConfig then
-                    SecureTalentCall(C_ClassTalents.RenameConfig, configID, BuildLoadoutName(applyState.buildLabel))
-                end
-
-                local appliedMessage = "Talents applied: " .. tostring(applyState.buildLabel or "Build")
-
-                if (tonumber(applyState.levelDeferredNodes) or 0) > 0 then
-                    appliedMessage = appliedMessage .. string.format(
-                        " (level %d; %d max-level talent(s) deferred)",
-                        tonumber(applyState.playerLevel) or 0,
-                        tonumber(applyState.levelDeferredNodes) or 0
-                    )
-                end
-
-                PrintTalentMessage(appliedMessage)
-                ClearPendingApply()
-
-                RunNextFrame(function()
-                    ns._talentApplyInProgress = false
-                    QueueRefresh(0)
-                end)
+                CompleteCommittedApply(applyState)
             else
                 RunNextFrame(function()
                     ns:ApplyTalentImportString(applyState.importString, applyState.buildLabel, true)
@@ -2246,7 +2456,13 @@ function ns:ApplyTalentImportString(importString, buildLabel, isContinuation)
         )
     end
 
-    SetPendingApply({ importString = importString, buildLabel = buildLabel, staging = true })
+    SetPendingApply({
+        importString = importString,
+        buildLabel = buildLabel,
+        staging = true,
+        configID = activeConfigID,
+        rollbackOnTimeout = true,
+    })
     ns._talentApplyInProgress = true
 
     ResetAndPurchaseDeferred(activeConfigID, treeID, entryInfo, function(applyResult)
@@ -2296,7 +2512,7 @@ function ns:ApplyTalentImportString(importString, buildLabel, isContinuation)
             return
         end
 
-        if not C_ClassTalents.CommitConfig or not SecureTalentCall(C_ClassTalents.CommitConfig, zoidsConfigID) then
+        if not C_ClassTalents.CommitConfig then
             RollbackTalentConfig(activeConfigID)
             ns._talentApplyInProgress = false
             ClearPendingApply()
@@ -2306,25 +2522,97 @@ function ns:ApplyTalentImportString(importString, buildLabel, isContinuation)
         end
 
         EnsureApplyFrame()
-        SetPendingApply({
+        local commitState = {
             buildLabel = buildLabel,
             renameOnly = true,
             levelDeferredNodes = levelDeferredNodes,
             playerLevel = applyResult.playerLevel,
-        })
+            configID = zoidsConfigID,
+            rollbackOnTimeout = true,
+        }
+        SetPendingApply(commitState)
+
+        -- Arm the listener before committing. Some partial/level-limited builds
+        -- can update immediately, and registering afterward can miss the event.
         applyFrame:RegisterEvent("TRAIT_CONFIG_UPDATED")
+
+        if not SecureTalentCall(C_ClassTalents.CommitConfig, zoidsConfigID) then
+            applyFrame:UnregisterEvent("TRAIT_CONFIG_UPDATED")
+            RollbackTalentConfig(activeConfigID)
+            ns._talentApplyInProgress = false
+            ClearPendingApply()
+            PrintTalentMessage("Commit failed. Discarded partial talent changes.")
+            QueueRefresh(0)
+            return
+        end
 
         if C_ClassTalents.UpdateLastSelectedSavedConfigID then
             RememberSavedConfigID(specID, zoidsConfigID)
+        end
+
+        -- If the update event was synchronous or omitted, poll the committed
+        -- state briefly instead of leaving the talent UI locked indefinitely.
+        if C_Timer and C_Timer.After then
+            local checksRemaining = 20
+            local function VerifyCommitCompleted()
+                if pendingApply ~= commitState then
+                    return
+                end
+
+                if not ConfigHasStagedChanges(zoidsConfigID) then
+                    CompleteCommittedApply(commitState)
+                    return
+                end
+
+                checksRemaining = checksRemaining - 1
+                if checksRemaining > 0 then
+                    C_Timer.After(0.25, VerifyCommitCompleted)
+                end
+            end
+
+            C_Timer.After(0.25, VerifyCommitCompleted)
         end
     end)
 
     return true
 end
 
+local function RequestAlternateSpecialization(context)
+    if not context or not context.requiresSpecSwitch then
+        return nil, "No alternate specialization is selected."
+    end
+
+    if InCombatLockdown and InCombatLockdown() then
+        return nil, "Cannot switch specializations in combat."
+    end
+
+    local specIndex = tonumber(context.alternateSpecIndex)
+    local setter = C_SpecializationInfo and C_SpecializationInfo.SetSpecialization or SetSpecialization
+
+    if not specIndex or type(setter) ~= "function" then
+        return nil, "Switch to " .. GetSpecLabel(context.specKey) .. " before applying this build."
+    end
+
+    local result = SecureTalentCall(setter, specIndex)
+    if result == false then
+        return nil, "The game could not switch to " .. GetSpecLabel(context.specKey) .. " right now."
+    end
+
+    PrintTalentMessage("Switching to " .. GetSpecLabel(context.specKey) .. ". Click Apply after the specialization change completes.")
+    return true
+end
+
 function ns:ApplyTalentGrimoireCurrentBuild()
     local entry, context = GetBuildEntry()
     local importString = entry and entry.importString or ""
+
+    if entry and context and context.requiresSpecSwitch then
+        local switched, switchError = RequestAlternateSpecialization(context)
+        if not switched and switchError then
+            PrintTalentMessage(switchError)
+        end
+        return switched, switchError
+    end
 
     if importString == "" then
         local sourceValue = entry and entry.sourceUrl or ""
@@ -3030,10 +3318,14 @@ local function RefreshPanel()
         ns:SetTalentGrimoireTarget(value)
     end)
 
-    panel.copyButton:SetText(importString ~= "" and "Apply" or "Source")
+    panel.copyButton:SetText(context.requiresSpecSwitch and "Switch Spec" or (importString ~= "" and "Apply" or "Source"))
     panel.copyButton:SetEnabled(copyValue ~= "")
     panel.copyButton:SetAlpha(copyValue ~= "" and 1 or 0.45)
-    panel.statusText:SetText(FormatBuildUsage(entry))
+    if context.requiresSpecSwitch then
+        panel.statusText:SetText(GetSpecLabel(context.specKey) .. " build available. Switch specialization, then apply it.")
+    else
+        panel.statusText:SetText(FormatBuildUsage(entry))
+    end
 
     if panel.importPopup then
         panel.importPopup.editBox:SetText(copyValue)
@@ -3081,11 +3373,11 @@ local function CreatePanel()
     panel.targetDropdown = CreateOptionDropdown("ZoidsToolsTalentTargetDropdown", panel, 220)
     panel.targetDropdown:SetPoint("LEFT", panel.modeDropdown, "RIGHT", CONTROL_GAP, 0)
 
-    panel.copyButton = CreateButton(panel, "Apply", 74)
+    panel.copyButton = CreateButton(panel, "Apply", 88)
     panel.copyButton:SetPoint("LEFT", panel.targetDropdown, "RIGHT", 8, 0)
     panel.copyButton:RegisterForClicks("LeftButtonUp", "RightButtonUp")
     panel.copyButton:SetScript("OnClick", function(_, button)
-        local entry = ns:GetTalentGrimoireCurrentBuild()
+        local entry, context = ns:GetTalentGrimoireCurrentBuild()
         local importString = entry and entry.importString or ""
         local copyValue = importString ~= "" and importString or (entry and entry.sourceUrl or "")
 
@@ -3095,6 +3387,8 @@ local function CreatePanel()
 
         if button == "RightButton" then
             ShowCopyPopup(copyValue)
+        elseif context and context.requiresSpecSwitch then
+            ns:ApplyTalentGrimoireCurrentBuild()
         elseif importString ~= "" then
             ns:ApplyTalentGrimoireCurrentBuild()
         else
@@ -3368,6 +3662,16 @@ function ns:GetTalentGrimoireStatusText()
     local entry, context = GetBuildEntry()
 
     if entry then
+        if context.requiresSpecSwitch then
+            return string.format(
+                "%s has a %s %s build from %s. Switch specialization to use it.",
+                tostring(GetSpecLabel(context.specKey)),
+                tostring(GetContentLabel(context.contentType)),
+                tostring(context.modeLabel or "selected"),
+                tostring(context.providerLabel or context.source or "generated data")
+            )
+        end
+
         return string.format(
             "Showing %s %s for %s from %s. Updated: %s.",
             tostring(GetContentLabel(context.contentType)),

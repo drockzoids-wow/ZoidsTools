@@ -701,123 +701,87 @@ SlashCmdList.ZOIDSTOOLS = HandleSlash
 local eventFrame = CreateFrame("Frame")
 eventFrame:RegisterEvent("ADDON_LOADED")
 eventFrame:RegisterEvent("PLAYER_LOGIN")
+
+local moduleInitializers = {
+    "InitializeDiagnostics",
+    "InitializeMovableWindows",
+    "InitializeFastLoot",
+    "InitializeVendorAutomation",
+    "InitializeCombatSettings",
+    "InitializeCinematicSkip",
+    "InitializeSubtleTalkingHead",
+    "InitializeCombatBanner",
+    "InitializeMythicInviteBanner",
+    "InitializeBuffWarnings",
+    "InitializeUnitFrames",
+    "InitializeConsumableMacros",
+    "InitializeRandomHearthstone",
+    "InitializeMounts",
+    "InitializeKeybindText",
+    "InitializePerformanceWidget",
+    "InitializeCoordinates",
+    "InitializeItemOverlays",
+    "InitializeStatTargets",
+    "InitializeTalentGrimoire",
+    "InitializeBlizzardDamageMeterProfiles",
+    "InitializeCustomDamageMeter",
+    "InitializeProfessionHelper",
+    "InitializeQuestAutomation",
+}
+
+local function RunInitializer(label, callback)
+    local errorHandler = geterrorhandler and geterrorhandler() or function(message)
+        return message
+    end
+    local ok = xpcall(callback, errorHandler)
+
+    if not ok then
+        ns:Print(string.format("%s failed to initialize; the remaining modules will continue loading.", label))
+    end
+
+    return ok
+end
+
 eventFrame:SetScript("OnEvent", function(_, event, addonName)
     if event == "ADDON_LOADED" and addonName == ADDON_NAME then
+        eventFrame:UnregisterEvent("ADDON_LOADED")
         ZoidsToolsDB = ZoidsToolsDB or {}
         RunMigrations(ZoidsToolsDB)
         CopyDefaults(defaults, ZoidsToolsDB)
         ns.db = ZoidsToolsDB
     elseif event == "PLAYER_LOGIN" then
-        if ns.InitializeDiagnostics then
-            ns:InitializeDiagnostics()
-        end
+        eventFrame:UnregisterEvent("PLAYER_LOGIN")
 
-        if ns.InitializeMovableWindows then
-            ns:InitializeMovableWindows()
-        end
+        for _, methodName in ipairs(moduleInitializers) do
+            local initializer = ns[methodName]
 
-        if ns.InitializeFastLoot then
-            ns:InitializeFastLoot()
-        end
-
-        if ns.InitializeVendorAutomation then
-            ns:InitializeVendorAutomation()
-        end
-
-        if ns.InitializeCombatSettings then
-            ns:InitializeCombatSettings()
-        end
-
-        if ns.InitializeCinematicSkip then
-            ns:InitializeCinematicSkip()
-        end
-
-        if ns.InitializeSubtleTalkingHead then
-            ns:InitializeSubtleTalkingHead()
-        end
-
-        if ns.InitializeCombatBanner then
-            ns:InitializeCombatBanner()
-        end
-
-        if ns.InitializeMythicInviteBanner then
-            ns:InitializeMythicInviteBanner()
-        end
-
-        if ns.InitializeBuffWarnings then
-            ns:InitializeBuffWarnings()
-        end
-
-        if ns.InitializeUnitFrames then
-            ns:InitializeUnitFrames()
-        end
-
-        if ns.InitializeConsumableMacros then
-            ns:InitializeConsumableMacros()
-        end
-
-        if ns.InitializeRandomHearthstone then
-            ns:InitializeRandomHearthstone()
-        end
-
-        if ns.InitializeMounts then
-            ns:InitializeMounts()
-        end
-
-        if ns.InitializeKeybindText then
-            ns:InitializeKeybindText()
-        end
-
-        if ns.InitializePerformanceWidget then
-            ns:InitializePerformanceWidget()
-        end
-
-        if ns.InitializeCoordinates then
-            ns:InitializeCoordinates()
-        end
-
-        if ns.InitializeItemOverlays then
-            ns:InitializeItemOverlays()
-        end
-
-        if ns.InitializeStatTargets then
-            ns:InitializeStatTargets()
-        end
-
-        if ns.InitializeTalentGrimoire then
-            ns:InitializeTalentGrimoire()
-        end
-
-        if ns.InitializeBlizzardDamageMeterProfiles then
-            ns:InitializeBlizzardDamageMeterProfiles()
-        end
-
-        if ns.InitializeCustomDamageMeter then
-            ns:InitializeCustomDamageMeter()
-        end
-
-        if ns.InitializeProfessionHelper then
-            ns:InitializeProfessionHelper()
-        end
-
-        if ns.InitializeQuestAutomation then
-            ns:InitializeQuestAutomation()
+            if type(initializer) == "function" then
+                RunInitializer(methodName, function()
+                    initializer(ns)
+                end)
+            end
         end
 
         if ns.UI and ns.UI.Initialize then
-            ns.UI.Initialize()
+            RunInitializer("UI.Initialize", ns.UI.Initialize)
         end
 
         if ns.InitializeMinimapButton then
-            ns:InitializeMinimapButton()
+            RunInitializer("InitializeMinimapButton", function()
+                ns:InitializeMinimapButton()
+            end)
         end
 
         if ns.InitializeMinimapTools then
-            ns:InitializeMinimapTools()
+            RunInitializer("InitializeMinimapTools", function()
+                ns:InitializeMinimapTools()
+            end)
         end
 
         if ns.InitializeTooltips then
-            ns:InitializeTooltips()
+            RunInitializer("InitializeTooltips", function()
+                ns:InitializeTooltips()
+            end)
         end
     end
 end)

@@ -15,6 +15,9 @@ Libs\LibDBIcon-1.0\LibDBIcon-1.0.lua
 Bindings.lua
 Core.lua
 Modules\Diagnostics.lua
+Modules\ChatEnhancements.lua
+Modules\ChatHistory.lua
+Modules\ChatProfiles.lua
 Modules\MovableWindows.lua
 Modules\FastLoot.lua
 Modules\VendorAutomation.lua
@@ -47,6 +50,7 @@ UI\Controls.lua
 UI\Pages\General.lua
 UI\Pages\Tooltips.lua
 UI\Pages\Windows.lua
+UI\Pages\Chat.lua
 UI\Pages\Items.lua
 UI\Pages\Professions.lua
 UI\Pages\Builds.lua

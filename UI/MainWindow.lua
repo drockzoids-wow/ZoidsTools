@@ -28,6 +28,7 @@ local pageOrder = {
     { key = "general", label = "General", group = "Core", icon = "G", description = "Core ZoidsTools settings." },
     { key = "tooltips", label = "Tooltips", group = "Core", icon = "T", description = "Unit tooltip appearance and player detail settings." },
     { key = "windows", label = "Windows", group = "Core", icon = "W", description = "Move Blizzard UI windows and default bags." },
+    { key = "chat", label = "Chat", group = "Core", icon = "H", description = "Copy, search, scroll, and subtly customize Blizzard chat." },
     { key = "items", label = "Items", group = "Character", icon = "I", description = "Item level, gem, enchant, and binding overlays." },
     { key = "professions", label = "Professions", group = "Character", icon = "P", description = "Molinari-style profession actions for hovered bag items." },
     { key = "builds", label = "Talents", group = "Character", icon = "B", description = "Talent build suggestions from generated local data." },
@@ -141,6 +142,8 @@ function UI.ScrollControlIntoView(control)
     local page = UI.currentPage and pages[UI.currentPage]
     if not page or not control or not control.GetTop or not control.GetBottom then return end
 
+    if control.ZTRevealForSearch then control:ZTRevealForSearch() end
+
     local controlTop, controlBottom = control:GetTop(), control:GetBottom()
     local panelTop, panelBottom = UI.frame.contentPanel:GetTop(), UI.frame.contentPanel:GetBottom()
     if not controlTop or not controlBottom or not panelTop or not panelBottom then return end
@@ -190,6 +193,8 @@ local function CreatePage(parent, key)
         return UI.Pages.CreateTooltipsPage(parent)
     elseif key == "windows" and UI.Pages.CreateWindowsPage then
         return UI.Pages.CreateWindowsPage(parent)
+    elseif key == "chat" and UI.Pages.CreateChatPage then
+        return UI.Pages.CreateChatPage(parent)
     elseif key == "items" and UI.Pages.CreateItemsPage then
         return UI.Pages.CreateItemsPage(parent)
     elseif key == "professions" and UI.Pages.CreateProfessionsPage then

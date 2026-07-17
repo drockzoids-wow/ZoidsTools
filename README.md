@@ -11,6 +11,7 @@ A personal World of Warcraft Retail quality-of-life addon by Drockzoids.
 - Adds Molinari-style profession actions for modifier-click disenchanting, milling, prospecting, and lockboxes.
 - Adds generated Archon, Icy Veins, Wowhead, and Murlok.io talent recommendations directly to Blizzard's talent window for Mythic+, Raid, and PvP.
 - Adds lightweight damage meter windows with current, overall, and recent segments, multiple meter types, drill-down details, scrolling, snapping, resizing, and profiles.
+- Adds lightweight Blizzard chat enhancements with searchable copying, clickable URLs, unread and mention alerts, optional saved history, reusable layouts, improved typing controls, and appearance options.
 - Retains optional account-wide position profiles for Blizzard's built-in damage meter windows.
 - Adds fast looting, grey item selling, repair automation, and quest/gossip automation with filters.
 - Adds missing buff warnings, consumable macros, coordinates, performance, minimap, and UI cleanup tools.
@@ -18,7 +19,8 @@ A personal World of Warcraft Retail quality-of-life addon by Drockzoids.
 ## Commands
 
 - `/zt` opens the ZoidsTools window.
-- `/zt tooltips`, `/zt windows`, `/zt items`, `/zt professions`, `/zt talents`, `/zt meters`, `/zt combat`, `/zt unitframes`, `/zt macros`, `/zt mounts`, `/zt loot`, or `/zt quests` opens that page.
+- `/zt tooltips`, `/zt windows`, `/zt chat`, `/zt items`, `/zt professions`, `/zt talents`, `/zt meters`, `/zt combat`, `/zt unitframes`, `/zt macros`, `/zt mounts`, `/zt loot`, or `/zt quests` opens that page.
+- `/zt chatcopy` opens a searchable copy window for the active chat tab.
 - `/zt windows on/off` toggles movable Blizzard windows.
 - `/zt bags on/off` toggles default bag movement.
 - `/zt talents on/off` toggles the Blizzard talent-frame controls.

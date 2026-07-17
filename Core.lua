@@ -59,6 +59,44 @@ local defaults = {
         showMythicPercentile = true,
         showItemLevel = true,
     },
+    chat = {
+        enabled = true,
+        copyButton = true,
+        urlCopy = true,
+        enhancedScroll = true,
+        mouseoverControls = false,
+        backgroundEnabled = false,
+        backgroundMouseover = true,
+        backgroundOpacity = 0.28,
+        customFont = false,
+        fontSize = 14,
+        fontOutline = false,
+        disableFading = false,
+        fadeDelay = 120,
+        newMessageIndicator = true,
+        mentionHighlight = false,
+        mentionSound = false,
+        historyEnabled = false,
+        historyLimit = 250,
+        historyRestore = true,
+        historyPublic = true,
+        historyGroup = true,
+        historyGuild = true,
+        historySystem = false,
+        historyWhispers = false,
+        historyByCharacter = {},
+        layoutProfiles = {
+            profiles = {},
+            nextProfileID = 1,
+            selected = nil,
+        },
+        editBoxPosition = "bottom",
+        styledEditBox = true,
+        editBoxFont = "default",
+        editBoxFontSize = 14,
+        arrowKeyHistory = false,
+        channelIndicator = true,
+    },
     combat = {
         actionButtonRangeTint = true,
         combatBanner = {
@@ -360,6 +398,8 @@ local function PrintHelp()
     ns:Print("/zt opens ZoidsTools.")
     ns:Print("/zt windows on/off toggles movable Blizzard windows.")
     ns:Print("/zt tooltips opens tooltip options.")
+    ns:Print("/zt chat opens chat enhancement options.")
+    ns:Print("/zt chatcopy opens a searchable copy window for the active chat tab.")
     ns:Print("/zt bags on/off toggles default bag movement.")
     ns:Print("/zt combat opens combat options.")
     ns:Print("/zt unitframes opens unit frame options.")
@@ -377,6 +417,7 @@ local function PrintHelp()
     ns:Print("/zt coords reset resets the coordinates widget position.")
     ns:Print("/zt diag start/stop/report/reset controls performance diagnostics.")
     ns:Print("/zt talentdiag start/report/stop/reset diagnoses talent application failures.")
+    ns:Print("/zt chatdiag reports Blizzard chat-link interaction state.")
     ns:Print("/zt invitebanner previews the Mythic+ invitation banner.")
     ns:Print("/zt items opens item overlay options.")
     ns:Print("/zt iteminfo on/off toggles item overlays.")
@@ -405,6 +446,12 @@ local function HandleSlash(input)
         ns:OpenConfig("windows")
     elseif input == "tooltips" or input == "tooltip" then
         ns:OpenConfig("tooltips")
+    elseif input == "chat" or input == "chat settings" then
+        ns:OpenConfig("chat")
+    elseif input == "chatcopy" or input == "chat copy" or input == "copychat" then
+        if ns.ShowChatCopy then
+            ns:ShowChatCopy(SELECTED_CHAT_FRAME or DEFAULT_CHAT_FRAME)
+        end
     elseif input == "loot" then
         ns:OpenConfig("loot")
     elseif input == "combat" then
@@ -682,6 +729,10 @@ local function HandleSlash(input)
         if ns.ResetTalentApplyDiagnostics then
             ns:ResetTalentApplyDiagnostics()
         end
+    elseif input == "chatdiag" or input == "chat diag" then
+        if ns.ReportChatDiagnostics then
+            ns:ReportChatDiagnostics()
+        end
     elseif input == "invitebanner" or input == "invite banner" or input == "mythicinvite" then
         if ns.PreviewMythicInviteBanner then
             ns:PreviewMythicInviteBanner()
@@ -704,6 +755,9 @@ eventFrame:RegisterEvent("PLAYER_LOGIN")
 
 local moduleInitializers = {
     "InitializeDiagnostics",
+    "InitializeChatEnhancements",
+    "InitializeChatHistory",
+    "InitializeChatProfiles",
     "InitializeMovableWindows",
     "InitializeFastLoot",
     "InitializeVendorAutomation",

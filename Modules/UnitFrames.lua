@@ -577,6 +577,18 @@ local function GetHealthBarFrames(info)
     return frames
 end
 
+local function PlayerFrameIsShowingVehicle()
+    if UnitHasVehicleUI and UnitHasVehicleUI("player") then
+        return true
+    end
+
+    if UnitInVehicle and UnitInVehicle("player") then
+        return true
+    end
+
+    return false
+end
+
 local function ApplyHealthBar(info)
     local db = EnsureDB()
 
@@ -584,7 +596,10 @@ local function ApplyHealthBar(info)
         return
     end
 
-    if db.classColorHealth then
+    local allowClassColor = db.classColorHealth
+        and not (info.unit == "player" and PlayerFrameIsShowingVehicle())
+
+    if allowClassColor then
         local r, g, b = GetClassColor(info.unit)
 
         for _, bar in ipairs(GetHealthBarFrames(info)) do
@@ -1482,6 +1497,11 @@ function ns:InitializeUnitFrames()
 
     eventFrame = CreateFrame("Frame")
     eventFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
+    eventFrame:RegisterEvent("UNIT_ENTERED_VEHICLE")
+    eventFrame:RegisterEvent("UNIT_EXITED_VEHICLE")
+    eventFrame:RegisterEvent("VEHICLE_UPDATE")
+    eventFrame:RegisterEvent("PLAYER_CONTROL_GAINED")
+    eventFrame:RegisterEvent("PLAYER_CONTROL_LOST")
     eventFrame:RegisterEvent("PLAYER_TARGET_CHANGED")
     eventFrame:RegisterEvent("PLAYER_FOCUS_CHANGED")
     RegisterUnitEventSafe(eventFrame, "UNIT_TARGET", "player", "target")
@@ -1499,6 +1519,25 @@ function ns:InitializeUnitFrames()
                 ScheduleRefresh(0.05)
             end
 
+            return
+        end
+
+        if event == "UNIT_ENTERED_VEHICLE" or event == "UNIT_EXITED_VEHICLE" then
+            if unit == nil or unit == "player" then
+                if PlayerFrameIsShowingVehicle() then
+                    ApplyHealthBar(healthBars.player)
+                    ScheduleHealthBars(0.12)
+                else
+                    ScheduleHealthBars(0.30)
+                end
+            end
+
+            return
+        elseif event == "VEHICLE_UPDATE" or event == "PLAYER_CONTROL_GAINED" or event == "PLAYER_CONTROL_LOST" then
+            if PlayerFrameIsShowingVehicle() then
+                ApplyHealthBar(healthBars.player)
+            end
+            ScheduleHealthBars(0.20)
             return
         end
 

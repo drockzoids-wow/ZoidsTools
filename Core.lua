@@ -43,6 +43,26 @@ local defaults = {
         pauseModifier = "shift",
         skipDaily = true,
         skipWarbandCompleted = true,
+        questItemButtonEnabled = true,
+        questItemButton = {
+            point = "CENTER",
+            relativePoint = "CENTER",
+            x = 280,
+            y = -80,
+        },
+        trackerAppearance = {
+            enabled = false,
+            scale = 1,
+            width = 280,
+            textScale = 1,
+            outlineText = false,
+            fitHeight = true,
+            backgroundOpacity = 0,
+            borderEnabled = false,
+            classColoredBorder = true,
+            mouseoverControls = false,
+            minimizeToButton = false,
+        },
     },
     cinematics = {
         fastSkip = false,
@@ -780,6 +800,8 @@ local moduleInitializers = {
     "InitializeBlizzardDamageMeterProfiles",
     "InitializeCustomDamageMeter",
     "InitializeProfessionHelper",
+    "InitializeQuestItemButton",
+    "InitializeObjectiveTrackerAppearance",
     "InitializeQuestAutomation",
 }
 

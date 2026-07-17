@@ -16,6 +16,10 @@ local blockedFrames = {
     ChatFrame1 = true,
     CompactRaidFrameManager = true,
     ContainerFrameCombinedBags = true,
+    -- Blizzard's flight map is a MapCanvas. Modifying its parent frame taints
+    -- protected quest-pin mouse setup (SetPassThroughButtons), so it must stay
+    -- entirely under Blizzard's control.
+    FlightMapFrame = true,
     HouseEditorFrame = true,
     LossOfControlFrame = true,
     MainMenuBar = true,

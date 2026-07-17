@@ -65,6 +65,11 @@ local function SortedSamples()
 end
 
 function ns:ReportDiagnostics()
+    if not diagnostic.startedAt or diagnostic.startedAt <= 0 then
+        Print("No diagnostic run is available. Run /zt diag start after your last /reload, reproduce the issue without reloading, then run /zt diag stop.")
+        return
+    end
+
     local duration = math.max(0, (GetTime and GetTime() or 0) - diagnostic.startedAt)
     Print(string.format("Diagnostics %s after %.1fs; frames %d; hitches >=25/50/100ms: %d/%d/%d; worst %.1fms.", diagnostic.active and "running" or "stopped", duration, diagnostic.frameCount, diagnostic.hitch25, diagnostic.hitch50, diagnostic.hitch100, diagnostic.maxFrameMS))
     local recent, peak = GetBlizzardMetric("RecentAverageTime"), GetBlizzardMetric("PeakTime")
@@ -90,6 +95,11 @@ function ns:StartDiagnostics()
 end
 
 function ns:StopDiagnostics()
+    if not diagnostic.active then
+        Print("Diagnostics are not running. Run /zt diag start after your last /reload, then test without reloading before using /zt diag stop.")
+        return
+    end
+
     diagnostic.active = false
     if frame then frame:Hide() end
     self:ReportDiagnostics()
@@ -97,6 +107,7 @@ end
 
 function ns:ResetDiagnostics()
     Reset()
+    diagnostic.startedAt = 0
     Print("Diagnostics reset.")
 end
 

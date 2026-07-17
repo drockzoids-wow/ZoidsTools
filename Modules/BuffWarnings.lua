@@ -1,10 +1,10 @@
 local _, ns = ...
 
 local WARNING_FRAME_NAME = "ZoidsToolsMissingBuffWarningFrame"
-local WARNING_FRAME_MIN_WIDTH = 150
-local WARNING_FRAME_HEIGHT = 74
-local WARNING_ICON_SIZE = 32
-local WARNING_ICON_GAP = 6
+local WARNING_FRAME_MIN_WIDTH = 174
+local WARNING_FRAME_HEIGHT = 88
+local WARNING_ICON_SIZE = 40
+local WARNING_ICON_GAP = 8
 local MISSING_ICON_FALLBACK = "Interface\\Icons\\INV_Misc_QuestionMark"
 
 local GROUP_BUFFS_BY_CLASS = {
@@ -232,6 +232,54 @@ local function SafeAPICall(func, ...)
     end
 
     return nil
+end
+
+local function GetBuffChatLink(spellID, fallbackName)
+    if C_Spell and C_Spell.GetSpellLink then
+        local link = SafeAPICall(C_Spell.GetSpellLink, spellID)
+        if link then return link end
+    end
+
+    if GetSpellLink then
+        local link = SafeAPICall(GetSpellLink, spellID)
+        if link then return link end
+    end
+
+    return "[" .. tostring(fallbackName or "Unknown buff") .. "]"
+end
+
+local function GetGroupChatType()
+    if IsInGroup and LE_PARTY_CATEGORY_INSTANCE
+        and IsInGroup(LE_PARTY_CATEGORY_INSTANCE) then
+        return "INSTANCE_CHAT"
+    end
+    if IsInRaid and IsInRaid() then
+        return "RAID"
+    end
+    if IsInGroup and IsInGroup() then
+        return "PARTY"
+    end
+    return nil
+end
+
+local function AnnounceMissingBuff(spellID, buffName)
+    local chatType = GetGroupChatType()
+    if not chatType then
+        ns:Print("Unable to announce the missing buff because you are not in a group.")
+        return
+    end
+
+    local message = "Missing group buff: " .. GetBuffChatLink(spellID, buffName)
+    local sender = C_ChatInfo and C_ChatInfo.SendChatMessage or SendChatMessage
+    if type(sender) ~= "function" then
+        ns:Print(message)
+        return
+    end
+
+    local ok = pcall(sender, message, chatType)
+    if not ok then
+        ns:Print("Unable to post the missing buff to group chat.")
+    end
 end
 
 local function GetSpellName(spellID, fallbackName)
@@ -493,6 +541,7 @@ local function GetWarningIconButton(frame, index)
             GameTooltip:AddLine("Left-click to cast.", 0.8, 1, 0.8, true)
         else
             GameTooltip:AddLine("Someone in your group can provide this buff.", 1, 0.85, 0.55, true)
+            GameTooltip:AddLine("Left-click to ask the group for it.", 0.8, 1, 0.8, true)
         end
 
         GameTooltip:AddLine("Drag the popup by the empty space.", 0.8, 0.8, 0.8, true)
@@ -500,6 +549,11 @@ local function GetWarningIconButton(frame, index)
     end)
     button:SetScript("OnLeave", function()
         GameTooltip:Hide()
+    end)
+    button:SetScript("PostClick", function(self, mouseButton)
+        if mouseButton == "LeftButton" and not self.canCastBuff then
+            AnnounceMissingBuff(self.spellID, self.buffName)
+        end
     end)
 
     frame.buffIcons[index] = button
@@ -524,7 +578,7 @@ local function UpdateWarningIcons(frame, missing)
         local button = GetWarningIconButton(frame, index)
 
         button:ClearAllPoints()
-        button:SetPoint("TOPLEFT", frame, "TOPLEFT", rowLeft + (index - 1) * (WARNING_ICON_SIZE + WARNING_ICON_GAP), -34)
+        button:SetPoint("TOPLEFT", frame, "TOPLEFT", rowLeft + (index - 1) * (WARNING_ICON_SIZE + WARNING_ICON_GAP), -36)
         button.buffName = buff.name
         button.spellID = buff.spellID
         button.canCastBuff = buff.canCast == true

@@ -6,4 +6,5 @@ _G["BINDING_NAME_CLICK ZoidsToolsRepairMountButton:LeftButton"] = "Summon Repair
 _G["BINDING_NAME_CLICK ZoidsToolsAuctionHouseMountButton:LeftButton"] = "Summon Auction House Mount"
 _G["BINDING_NAME_CLICK ZoidsToolsRideAlongMountButton:LeftButton"] = "Summon Ride-Along Mount"
 _G["BINDING_NAME_CLICK ZoidsToolsRandomHearthstoneButton:LeftButton"] = "Use Random Hearthstone"
+_G["BINDING_NAME_CLICK ZoidsToolsQuestItemButton:LeftButton"] = "Use Smart Quest Item"
 _G["BINDING_NAME_ZOIDSTOOLS_MATCH_TARGET_MOUNT"] = "Match Target Mount"

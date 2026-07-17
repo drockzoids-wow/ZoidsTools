@@ -7,6 +7,10 @@ local CAPTURE_VERSION = 5
 local RESTORE_HEADER = "ZoidsTools saved chat (most recent messages):"
 local hookedFrames = setmetatable({}, { __mode = "k" })
 
+local function IsSecretValue(value)
+    return type(issecretvalue) == "function" and issecretvalue(value) == true
+end
+
 local function GetDB()
     return ns.db and ns.db.chat
 end
@@ -66,6 +70,11 @@ local function FormatRestoredLine(message)
 end
 
 local function SaveRenderedLine(frame, message)
+    -- Some Blizzard chat events now render protected strings. They may be
+    -- displayed by Blizzard but cannot be compared, converted, or persisted
+    -- by addon code without causing a secret-value/taint error.
+    if IsSecretValue(message) then return end
+
     local db = GetDB()
     if restoring or not db or not db.enabled or not db.historyEnabled then return end
     if frame ~= GetSelectedVisibleFrame() then return end

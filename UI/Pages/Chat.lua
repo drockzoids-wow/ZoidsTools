@@ -338,7 +338,7 @@ function ns.UI.Pages.CreateChatPage(parent)
     local editBoxFontSize = UI.CreateSlider(
         frame,
         "Typing font size",
-        "Changes the typed-text size and adjusts the attached typing box height to fit.",
+        "Scales typed text and the active-channel label while adjusting the attached typing box height to fit.",
         10,
         20,
         1,

@@ -43,11 +43,15 @@ local originalEditBoxFonts = setmetatable({}, { __mode = "k" })
 local originalEditModeSelectionPoints = setmetatable({}, { __mode = "k" })
 local originalArrowModes = setmetatable({}, { __mode = "k" })
 local originalHeaderColors = setmetatable({}, { __mode = "k" })
+local originalEditBoxRegionFonts = setmetatable({}, { __mode = "k" })
 local originalEditBoxArtwork = setmetatable({}, { __mode = "k" })
 local lastMentionKey
 local lastMentionTime = 0
+local copyScrollRestoreGeneration = 0
+local copyRefreshPending = false
 
 local EDIT_BOX_GAP = 6
+local EDIT_BOX_HORIZONTAL_SHIFT = 2
 local EDIT_MODE_SELECTION_PADDING = 2
 local editBoxFontPaths = {
     friz = function() return STANDARD_TEXT_FONT or "Fonts\\FRIZQT__.TTF" end,
@@ -66,6 +70,10 @@ local function GetDB()
     return ns.db and ns.db.chat
 end
 
+local function IsSecretValue(value)
+    return type(issecretvalue) == "function" and issecretvalue(value) == true
+end
+
 local function Clamp(value, minimum, maximum)
     value = tonumber(value) or minimum
     return math.max(minimum, math.min(maximum, value))
@@ -82,6 +90,7 @@ local function MarkUnread(frame)
 end
 
 local function StripFormatting(text)
+    if IsSecretValue(text) then return "" end
     text = tostring(text or "")
     text = text:gsub("|H.-|h(.-)|h", "%1")
     text = text:gsub("|T.-|t", "")
@@ -96,6 +105,7 @@ end
 ns.StripChatFormatting = StripFormatting
 
 local function FormatCopyDisplayLine(text)
+    if IsSecretValue(text) then return "" end
     text = tostring(text or "")
     -- EditBoxes can render color escapes but do not need the clickable-link
     -- wrapper. Preserve the colored link label while removing non-text art.
@@ -161,6 +171,7 @@ local function LinkifyToken(token)
 end
 
 local function FormatURLs(message)
+    if IsSecretValue(message) then return message end
     if type(message) ~= "string" or message:find("|Hzturl:", 1, true) then
         return message
     end
@@ -170,7 +181,13 @@ end
 
 local function IsMention(message)
     local db = GetDB()
-    if not db or not db.mentionHighlight or type(message) ~= "string" then return false end
+    if IsSecretValue(message)
+        or not db
+        or not db.mentionHighlight
+        or type(message) ~= "string"
+    then
+        return false
+    end
 
     local playerName = UnitName and UnitName("player")
     playerName = playerName and playerName:match("^[^-]+")
@@ -193,6 +210,10 @@ end
 local function URLMessageFilter(chatFrame, event, message, author, ...)
     local db = GetDB()
     if not db or not db.enabled then return false end
+
+    -- Protected chat payloads must pass through byte-for-byte. Even comparing
+    -- one with another string is forbidden by Blizzard's secret-value rules.
+    if IsSecretValue(message) or IsSecretValue(author) then return false end
 
     if db.newMessageIndicator and IsScrolledBack(chatFrame) then
         MarkUnread(chatFrame)
@@ -321,12 +342,12 @@ local function GetChatBackground(frame)
     return frame.Background or _G[(GetChatFrameName(frame) or "") .. "Background"]
 end
 
-local function GetAttachedEditBoxWidth(frame)
-    if not frame then return 1 end
+local function GetAttachedEditBoxOffsets(frame)
+    if not frame then return 0, 0 end
 
-    local width = tonumber(frame:GetWidth()) or 1
-    local left = frame.GetLeft and frame:GetLeft()
-    local right = frame.GetRight and frame:GetRight()
+    local frameLeft = frame.GetLeft and frame:GetLeft()
+    local frameRight = frame.GetRight and frame:GetRight()
+    local left, right = frameLeft, frameRight
     local name = GetChatFrameName(frame)
     local candidates = {}
     local function AddCandidate(region)
@@ -337,20 +358,24 @@ local function GetAttachedEditBoxWidth(frame)
     AddCandidate(frame.scrollBar)
     AddCandidate(name and _G[name .. "ScrollBar"])
 
-    -- The scrolling-message frame excludes Blizzard's scrollbar gutter, while
-    -- the visible chat window includes it. Extend to the furthest nearby right
-    -- edge so the attached edit box matches what the player sees as the window.
-    if left and right then
+    -- The scrolling-message frame excludes parts of Blizzard's visible
+    -- background and scrollbar gutter. Measure both nearby visual edges so the
+    -- attached edit box lines up with what the player actually sees.
+    if frameLeft and frameRight then
         for _, region in ipairs(candidates) do
+            local regionLeft = region and region.GetLeft and region:GetLeft()
             local regionRight = region and region.GetRight and region:GetRight()
+            if regionLeft and regionLeft < left and left - regionLeft <= 40 then
+                left = regionLeft
+            end
             if regionRight and regionRight > right and regionRight - right <= 40 then
                 right = regionRight
             end
         end
-        width = math.max(width, right - left)
+        return left - frameLeft, right - frameRight
     end
 
-    return math.max(1, width)
+    return 0, 0
 end
 
 local function RememberAlpha(region)
@@ -581,7 +606,7 @@ local function CollectMessages(frame)
 
     for index = first, count do
         local message = frame:GetMessageInfo(index)
-        if message and message ~= "" then
+        if not IsSecretValue(message) and message and message ~= "" then
             lines[#lines + 1] = message
         end
     end
@@ -598,8 +623,22 @@ local function LoadCopySource()
     end
 end
 
-local function RefreshCopyWindow()
+local function RefreshCopyWindow(preserveScroll)
     if not copyWindow then return end
+
+    local previousScroll
+    local previousScrollRange
+    local wasAtBottom = false
+    local previousHistoryOffset = 0
+    if preserveScroll then
+        if copySourceMode == "history" and copyWindow.historyOutput then
+            previousHistoryOffset = tonumber(copyWindow.historyOutput:GetScrollOffset()) or 0
+        elseif copyWindow.scroll then
+            previousScroll = tonumber(copyWindow.scroll:GetVerticalScroll()) or 0
+            previousScrollRange = tonumber(copyWindow.scroll:GetVerticalScrollRange()) or 0
+            wasAtBottom = previousScrollRange > 0 and previousScroll >= (previousScrollRange - 2)
+        end
+    end
 
     local query = copyWindow.search:GetText():lower()
     local filtered = {}
@@ -629,6 +668,15 @@ local function RefreshCopyWindow()
             end
         end
         copyWindow.historyOutput:ScrollToBottom()
+        if preserveScroll and previousHistoryOffset > 0 then
+            if copyWindow.historyOutput.SetScrollOffset then
+                copyWindow.historyOutput:SetScrollOffset(previousHistoryOffset)
+            else
+                for _ = 1, previousHistoryOffset do
+                    copyWindow.historyOutput:ScrollUp()
+                end
+            end
+        end
     else
         local displayLines = {}
         for _, line in ipairs(filtered) do
@@ -640,7 +688,25 @@ local function RefreshCopyWindow()
         copyWindow.output:SetCursorPosition(0)
         copyWindow.output.ZTRefreshing = nil
         copyWindow:UpdateOutputSize(text)
-        copyWindow.scroll:SetVerticalScroll(0)
+        if preserveScroll and previousScroll ~= nil then
+            copyScrollRestoreGeneration = copyScrollRestoreGeneration + 1
+            local generation = copyScrollRestoreGeneration
+            local function RestoreScrollPosition()
+                if generation ~= copyScrollRestoreGeneration or not copyWindow then return end
+                local newRange = tonumber(copyWindow.scroll:GetVerticalScrollRange()) or 0
+                copyWindow.scroll:SetVerticalScroll(
+                    wasAtBottom and newRange or math.min(previousScroll, newRange)
+                )
+            end
+            if C_Timer and C_Timer.After then
+                C_Timer.After(0, RestoreScrollPosition)
+            else
+                RestoreScrollPosition()
+            end
+        else
+            copyScrollRestoreGeneration = copyScrollRestoreGeneration + 1
+            copyWindow.scroll:SetVerticalScroll(0)
+        end
     end
 
     if copyWindow.selectAll then
@@ -933,8 +999,21 @@ end
 
 function ns:RefreshOpenChatCopy()
     if not copyWindow or not copyWindow:IsShown() then return end
-    LoadCopySource()
-    RefreshCopyWindow()
+    if copyRefreshPending then return end
+
+    copyRefreshPending = true
+    local function Refresh()
+        copyRefreshPending = false
+        if not copyWindow or not copyWindow:IsShown() then return end
+        LoadCopySource()
+        RefreshCopyWindow(true)
+    end
+
+    if C_Timer and C_Timer.After then
+        C_Timer.After(0.05, Refresh)
+    else
+        Refresh()
+    end
 end
 
 local function CreateCopyButton(frame)
@@ -1117,10 +1196,26 @@ local function GetEditBoxArtwork(editBox)
 
     local artwork, seen = {}, {}
     local name = editBox.GetName and editBox:GetName()
-    local function Add(region)
+    local function IsSkinRegion(region)
+        local skin = editBox.ZTChatSkin
+        return skin and (region == skin.background
+            or region == skin.borderMask
+            or region == skin.top
+            or region == skin.bottom
+            or region == skin.left
+            or region == skin.right)
+    end
+
+    local function Add(region, isFocus)
         if region and region.SetShown and not seen[region] then
+            if IsSkinRegion(region) then return end
             seen[region] = true
-            artwork[#artwork + 1] = { region = region, shown = region:IsShown() }
+            artwork[#artwork + 1] = {
+                region = region,
+                shown = region:IsShown(),
+                height = region.GetHeight and region:GetHeight() or nil,
+                isFocus = isFocus == true,
+            }
         end
     end
 
@@ -1128,17 +1223,41 @@ local function GetEditBoxArtwork(editBox)
         "Left", "Mid", "Middle", "Right", "FocusLeft", "FocusMid", "FocusMiddle", "FocusRight",
         "left", "mid", "middle", "right", "focusLeft", "focusMid", "focusMiddle", "focusRight",
     }) do
-        Add(editBox[key])
-        if name then Add(_G[name .. key]) end
+        local isFocus = key:lower():find("focus", 1, true) ~= nil
+        Add(editBox[key], isFocus)
+        if name then Add(_G[name .. key], isFocus) end
+    end
+
+    -- Include any anonymous native slices as a compatibility fallback. Named
+    -- regions above are de-duplicated, and ZoidsTools' own skin is excluded.
+    if editBox.GetRegions then
+        local focusRegions = {}
+        if editBox.focusLeft then focusRegions[editBox.focusLeft] = true end
+        if editBox.focusMid then focusRegions[editBox.focusMid] = true end
+        if editBox.focusMiddle then focusRegions[editBox.focusMiddle] = true end
+        if editBox.focusRight then focusRegions[editBox.focusRight] = true end
+        for _, region in ipairs({ editBox:GetRegions() }) do
+            if region.GetObjectType and region:GetObjectType() == "Texture" then
+                Add(region, focusRegions[region])
+            end
+        end
     end
 
     originalEditBoxArtwork[editBox] = artwork
     return artwork
 end
 
-local function SetBlizzardEditBoxArtworkShown(editBox, shown)
+local function UpdateBlizzardEditBoxArtwork(editBox, styled)
     for _, info in ipairs(GetEditBoxArtwork(editBox)) do
-        info.region:SetShown(shown and info.shown or false)
+        local region = info.region
+        if styled then
+            region:SetShown(false)
+        else
+            if region.SetHeight and info.height and info.height > 0 then
+                region:SetHeight(info.height)
+            end
+            region:SetShown(info.shown)
+        end
     end
 end
 
@@ -1163,6 +1282,14 @@ local function CreateEditBoxSkin(editBox)
     skin.background = editBox:CreateTexture(nil, "BACKGROUND", nil, 7)
     skin.background:SetAllPoints()
     skin.background:SetColorTexture(0.012, 0.014, 0.020, 0.96)
+
+    -- Blizzard re-shows its focused input-border textures after chat
+    -- activation. Cover the native BORDER layer from the inside while leaving
+    -- ZoidsTools' class-colored two-pixel outline visible above it.
+    skin.borderMask = editBox:CreateTexture(nil, "BORDER", nil, 6)
+    skin.borderMask:SetPoint("TOPLEFT", 2, -2)
+    skin.borderMask:SetPoint("BOTTOMRIGHT", -2, 2)
+    skin.borderMask:SetColorTexture(0.012, 0.014, 0.020, 1)
 
     local function Border()
         local texture = editBox:CreateTexture(nil, "BORDER", nil, 7)
@@ -1189,7 +1316,9 @@ local function CreateEditBoxSkin(editBox)
     skin.right:SetWidth(2)
 
     function skin:SetShown(shown)
+        self.shown = shown
         self.background:SetShown(shown)
+        self.borderMask:SetShown(shown)
         self.top:SetShown(shown)
         self.bottom:SetShown(shown)
         self.left:SetShown(shown)
@@ -1211,10 +1340,67 @@ local function CreateEditBoxSkin(editBox)
         self.right:SetColorTexture(red, green, blue, alpha)
     end
 
-    editBox:HookScript("OnEditFocusGained", function() skin:SetFocused(true) end)
+    editBox:HookScript("OnEditFocusGained", function()
+        skin:SetFocused(true)
+        if skin.shown then UpdateBlizzardEditBoxArtwork(editBox, true) end
+    end)
     editBox:HookScript("OnEditFocusLost", function() skin:SetFocused(false) end)
     editBox.ZTChatSkin = skin
     return skin
+end
+
+local function GetEditBoxTextRegions(editBox)
+    local regions, seen = {}, {}
+    local name = editBox and editBox.GetName and editBox:GetName()
+
+    local function Add(region)
+        if region and region.SetFont and not seen[region] then
+            seen[region] = true
+            regions[#regions + 1] = region
+        end
+    end
+
+    for _, key in ipairs({
+        "header", "Header",
+        "headerSuffix", "HeaderSuffix",
+        "languageHeader", "LanguageHeader",
+        "prompt", "Prompt",
+        "NewcomerHint", "newcomerHint",
+    }) do
+        Add(editBox and editBox[key])
+        if name then Add(_G[name .. key]) end
+    end
+
+    return regions
+end
+
+
+local function ApplyEditBoxTextRegionFonts(editBox, enabled, fontPath, fontSize, fontFlags)
+    local changed = false
+
+    for _, region in ipairs(GetEditBoxTextRegions(editBox)) do
+        local original = originalEditBoxRegionFonts[region]
+        if not original and region.GetFont then
+            local path, size, flags = region:GetFont()
+            original = {
+                path = path,
+                size = size,
+                flags = flags,
+                height = region.GetHeight and region:GetHeight() or nil,
+            }
+            originalEditBoxRegionFonts[region] = original
+        end
+
+        if enabled and fontPath then
+            changed = ApplyFontIfChanged(region, fontPath, fontSize, fontFlags) or changed
+            if region.SetHeight then region:SetHeight(fontSize + 4) end
+        elseif original and original.path then
+            changed = ApplyFontIfChanged(region, original.path, original.size, original.flags) or changed
+            if region.SetHeight and original.height then region:SetHeight(original.height) end
+        end
+    end
+
+    return changed
 end
 
 local function RefreshEditBox(frame)
@@ -1249,23 +1435,27 @@ local function RefreshEditBox(frame)
     local originalFont = originalEditBoxFonts[editBox]
     local typingFontSize = Clamp(db.editBoxFontSize or (originalFont and originalFont.size) or 14, 10, 20)
     local typingBoxHeight = math.max(24, typingFontSize + 14)
+    local leftOffset, rightOffset = GetAttachedEditBoxOffsets(frame)
+    leftOffset = leftOffset + EDIT_BOX_HORIZONTAL_SHIFT
+    rightOffset = rightOffset + EDIT_BOX_HORIZONTAL_SHIFT
     if position == "default" then position = "bottom" end
     if position == "top" then
         editBox:ClearAllPoints()
-        editBox:SetPoint("BOTTOMLEFT", frame, "TOPLEFT", -1, EDIT_BOX_GAP)
-        editBox:SetWidth(GetAttachedEditBoxWidth(frame) + 2)
+        editBox:SetPoint("BOTTOMLEFT", frame, "TOPLEFT", leftOffset, EDIT_BOX_GAP)
+        editBox:SetPoint("BOTTOMRIGHT", frame, "TOPRIGHT", rightOffset, EDIT_BOX_GAP)
         editBox:SetHeight(typingBoxHeight)
     elseif position == "bottom" then
         editBox:ClearAllPoints()
-        editBox:SetPoint("TOPLEFT", frame, "BOTTOMLEFT", -1, -EDIT_BOX_GAP)
-        editBox:SetWidth(GetAttachedEditBoxWidth(frame) + 2)
+        editBox:SetPoint("TOPLEFT", frame, "BOTTOMLEFT", leftOffset, -EDIT_BOX_GAP)
+        editBox:SetPoint("TOPRIGHT", frame, "BOTTOMRIGHT", rightOffset, -EDIT_BOX_GAP)
         editBox:SetHeight(typingBoxHeight)
     else
         RestoreEditBoxPoints(editBox)
     end
 
+    local fontPath = originalFont and originalFont.path
+    local fontFlags = originalFont and originalFont.flags
     if db.enabled and originalFont then
-        local fontPath = originalFont.path
         local fontChoice = db.editBoxFont or "default"
         local pathProvider = editBoxFontPaths[fontChoice]
         if pathProvider then fontPath = pathProvider() end
@@ -1282,7 +1472,18 @@ local function RefreshEditBox(frame)
     local skin = CreateEditBoxSkin(editBox)
     skin:SetShown(styled)
     skin:SetFocused(styled and editBox.HasFocus and editBox:HasFocus())
-    SetBlizzardEditBoxArtworkShown(editBox, not styled)
+    UpdateBlizzardEditBoxArtwork(editBox, styled)
+
+    local textRegionsChanged = ApplyEditBoxTextRegionFonts(
+        editBox,
+        db.enabled == true,
+        fontPath,
+        typingFontSize,
+        fontFlags
+    )
+    if textRegionsChanged and type(ChatEdit_UpdateHeader) == "function" then
+        pcall(ChatEdit_UpdateHeader, editBox)
+    end
 
     local header = editBox.header or (editBox.GetName and _G[(editBox:GetName() or "") .. "Header"])
     if header and header.GetTextColor and header.SetTextColor then

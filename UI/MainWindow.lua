@@ -23,6 +23,10 @@ local CONTENT_RIGHT = -14
 local CONTENT_BOTTOM = 18
 local TITLE_BADGE_SIZE = 40
 local TITLE_BADGE_ICON_SIZE = 32
+local HEADER_TOOLS_WIDTH = 420
+local SETTINGS_SEARCH_WIDTH = 300
+local EDIT_MODE_BUTTON_WIDTH = 112
+local HEADER_TOOL_GAP = 8
 
 local pageOrder = {
     { key = "general", label = "General", group = "Core", icon = "G", description = "Core ZoidsTools settings." },
@@ -48,12 +52,17 @@ for _, info in ipairs(pageOrder) do
 end
 
 function UI.CreatePageFrame(parent)
-    local frame = CreateFrame("Frame", nil, parent)
+    -- Pages must be actual children of the clipped content panel. Merely
+    -- anchoring them to it leaves them parented to the main window, allowing
+    -- scrolled controls and section dividers to render above the panel's top
+    -- border and underneath the fixed title/search header.
+    local contentParent = parent.contentViewport or parent.contentPanel
+    local frame = CreateFrame("Frame", nil, contentParent)
     frame.ZTPageKey = UI.BuildingPageKey
     frame.ZTWindow = parent
     frame.ZTScrollOffset = 0
-    frame:SetPoint("TOPLEFT", parent.contentPanel, "TOPLEFT", 18, -16)
-    frame:SetPoint("TOPRIGHT", parent.contentPanel, "TOPRIGHT", -18, -16)
+    frame:SetPoint("TOPLEFT", contentParent, "TOPLEFT", 18, -8)
+    frame:SetPoint("TOPRIGHT", contentParent, "TOPRIGHT", -18, -8)
     frame:SetHeight(620)
     frame:Hide()
     frame:EnableMouseWheel(true)
@@ -64,8 +73,8 @@ function UI.CreatePageFrame(parent)
     function frame:SetCompactScrollOffset(offset)
         self.ZTScrollOffset = math.max(0, tonumber(offset) or 0)
         self:ClearAllPoints()
-        self:SetPoint("TOPLEFT", parent.contentPanel, "TOPLEFT", 18, -16 + self.ZTScrollOffset)
-        self:SetPoint("TOPRIGHT", parent.contentPanel, "TOPRIGHT", -18, -16 + self.ZTScrollOffset)
+        self:SetPoint("TOPLEFT", contentParent, "TOPLEFT", 18, -8 + self.ZTScrollOffset)
+        self:SetPoint("TOPRIGHT", contentParent, "TOPRIGHT", -18, -8 + self.ZTScrollOffset)
         self:SetHeight(620)
     end
 
@@ -525,7 +534,7 @@ end
 local function CreateHeaderStatus(frame)
     frame.statusStrip = CreateFrame("Frame", nil, frame.pageHeader)
     frame.statusStrip:SetPoint("TOPRIGHT", frame.pageHeader, "TOPRIGHT", 0, -1)
-    frame.statusStrip:SetSize(420, 24)
+    frame.statusStrip:SetSize(HEADER_TOOLS_WIDTH, 24)
 
     frame.statusCombat = CreateStatusPill(frame.statusStrip, 116)
     frame.statusCombat:SetPoint("RIGHT", frame.statusStrip, "RIGHT", 0, 0)
@@ -603,9 +612,48 @@ local function HighlightSearchControl(frame, control)
 end
 
 local function CreateSettingsSearch(frame)
+    local editModeButton = UI.CreateButton(frame.pageHeader, "Blizzard Edit", EDIT_MODE_BUTTON_WIDTH, 30)
+    editModeButton:SetPoint("TOPRIGHT", frame.pageHeader, "TOPRIGHT", 0, -31)
+    editModeButton:SetScript("OnClick", function()
+        if InCombatLockdown and InCombatLockdown() then
+            ns:Print("Blizzard Edit Mode cannot be opened during combat.")
+            return
+        end
+
+        if not _G.EditModeManagerFrame then
+            if C_AddOns and C_AddOns.LoadAddOn then
+                pcall(C_AddOns.LoadAddOn, "Blizzard_EditMode")
+            elseif UIParentLoadAddOn then
+                pcall(UIParentLoadAddOn, "Blizzard_EditMode")
+            end
+        end
+
+        local manager = _G.EditModeManagerFrame
+        if not manager then
+            ns:Print("Blizzard Edit Mode is not available right now.")
+            return
+        end
+
+        frame:Hide()
+        if ShowUIPanel then
+            ShowUIPanel(manager)
+        elseif manager.Show then
+            manager:Show()
+        end
+    end)
+    editModeButton:HookScript("OnEnter", function(self)
+        GameTooltip:SetOwner(self, "ANCHOR_TOP")
+        GameTooltip:SetText("Blizzard Edit Mode")
+        GameTooltip:AddLine("Open Blizzard's interface layout editor.", 1, 1, 1, true)
+        GameTooltip:Show()
+    end)
+    editModeButton:HookScript("OnLeave", function()
+        GameTooltip:Hide()
+    end)
+
     local search = CreateFrame("EditBox", nil, frame.pageHeader, "BackdropTemplate")
-    search:SetSize(360, 30)
-    search:SetPoint("TOPRIGHT", frame.pageHeader, "TOPRIGHT", 0, -31)
+    search:SetSize(SETTINGS_SEARCH_WIDTH, 30)
+    search:SetPoint("TOPRIGHT", editModeButton, "TOPLEFT", -HEADER_TOOL_GAP, 0)
     search:SetAutoFocus(false)
     search:SetMaxLetters(80)
     search:SetFont(STANDARD_TEXT_FONT or "Fonts\\FRIZQT__.TTF", 13, "")
@@ -646,7 +694,7 @@ local function CreateSettingsSearch(frame)
 
     local results = CreateFrame("Frame", nil, frame, "BackdropTemplate")
     results:SetPoint("TOPRIGHT", search, "BOTTOMRIGHT", 0, -3)
-    results:SetSize(360, 40)
+    results:SetSize(SETTINGS_SEARCH_WIDTH, 40)
     results:SetFrameStrata("FULLSCREEN_DIALOG")
     results:SetFrameLevel(250)
     results:SetBackdrop({
@@ -751,6 +799,7 @@ local function CreateSettingsSearch(frame)
     end)
     frame.settingsSearch = search
     frame.searchResults = results
+    frame.editModeButton = editModeButton
 end
 
 local function CreateMainWindow()
@@ -799,14 +848,14 @@ local function CreateMainWindow()
 
     frame.pageTitle = frame.pageHeader:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
     frame.pageTitle:SetPoint("TOPLEFT", 0, 0)
-    frame.pageTitle:SetPoint("RIGHT", frame.pageHeader, "RIGHT", -378, 0)
+    frame.pageTitle:SetPoint("RIGHT", frame.pageHeader, "RIGHT", -(HEADER_TOOLS_WIDTH + 10), 0)
     frame.pageTitle:SetTextColor(1, 0.82, 0)
     frame.pageTitle:SetJustifyH("LEFT")
     frame.pageTitle:SetFont(STANDARD_TEXT_FONT or "Fonts\\FRIZQT__.TTF", 18, "OUTLINE")
 
     frame.pageDescription = frame.pageHeader:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
     frame.pageDescription:SetPoint("TOPLEFT", frame.pageTitle, "BOTTOMLEFT", 0, -5)
-    frame.pageDescription:SetPoint("RIGHT", frame.pageHeader, "RIGHT", -378, 0)
+    frame.pageDescription:SetPoint("RIGHT", frame.pageHeader, "RIGHT", -(HEADER_TOOLS_WIDTH + 10), 0)
     frame.pageDescription:SetJustifyH("LEFT")
     frame.pageDescription:SetTextColor(0.86, 0.82, 0.72)
 
@@ -840,6 +889,16 @@ local function CreateMainWindow()
     frame.contentPanel.topLine:SetPoint("TOPRIGHT", frame.contentPanel, "TOPRIGHT", -18, -6)
     frame.contentPanel.topLine:SetHeight(1)
     frame.contentPanel.topLine:SetColorTexture(0.95, 0.72, 0.28, 0.18)
+
+    -- Clip scrolling pages below the decorative top line, not merely to the
+    -- outer edge of the content panel. This prevents the first few pixels of
+    -- controls and dividers from peeking through above the inner border.
+    frame.contentViewport = CreateFrame("Frame", nil, frame.contentPanel)
+    frame.contentViewport:SetPoint("TOPLEFT", frame.contentPanel, "TOPLEFT", 0, -8)
+    frame.contentViewport:SetPoint("BOTTOMRIGHT", frame.contentPanel, "BOTTOMRIGHT", 0, 0)
+    if frame.contentViewport.SetClipsChildren then
+        frame.contentViewport:SetClipsChildren(true)
+    end
 
     UI.frame = frame
 

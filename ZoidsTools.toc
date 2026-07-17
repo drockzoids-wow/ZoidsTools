@@ -42,6 +42,8 @@ Modules\StatTargets.lua
 Modules\TalentGrimoire.lua
 Modules\BlizzardDamageMeterProfiles.lua
 Modules\CustomDamageMeter.lua
+Modules\QuestItemButton.lua
+Modules\ObjectiveTrackerAppearance.lua
 Modules\QuestAutomation.lua
 Modules\MinimapTools.lua
 Modules\Tooltips.lua

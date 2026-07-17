@@ -2,6 +2,7 @@ local _, ns = ...
 
 local eventFrame
 local hooksInstalled = false
+local refreshPending = false
 
 local DEFAULT_ENABLED = true
 local DEFAULT_SHORTEN = true
@@ -645,10 +646,18 @@ end
 RefreshAllActionButtons = ns:WrapDiagnosticFunction("KeybindText.RefreshAll", RefreshAllActionButtons)
 
 local function ScheduleRefresh()
-    if C_Timer and C_Timer.After then
-        C_Timer.After(0, RefreshAllActionButtons)
-    else
+    if refreshPending then return end
+    refreshPending = true
+
+    local function Run()
+        refreshPending = false
         RefreshAllActionButtons()
+    end
+
+    if C_Timer and C_Timer.After then
+        C_Timer.After(0, Run)
+    else
+        Run()
     end
 end
 

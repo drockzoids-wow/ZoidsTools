@@ -13,7 +13,7 @@ A personal World of Warcraft Retail quality-of-life addon by Drockzoids.
 - Adds lightweight damage meter windows with current, overall, and recent segments, multiple meter types, drill-down details, scrolling, snapping, resizing, and profiles.
 - Adds lightweight Blizzard chat enhancements with searchable copying, clickable URLs, unread and mention alerts, optional saved history, reusable layouts, improved typing controls, and appearance options.
 - Retains optional account-wide position profiles for Blizzard's built-in damage meter windows.
-- Adds fast looting, grey item selling, repair automation, and quest/gossip automation with filters.
+- Adds fast looting, grey item selling, repair automation, quest/gossip automation with filters, a smart key-bindable quest-item button, and optional Blizzard objective-tracker appearance controls.
 - Adds missing buff warnings, consumable macros, coordinates, performance, minimap, and UI cleanup tools.
 
 ## Commands

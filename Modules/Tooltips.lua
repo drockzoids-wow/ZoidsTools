@@ -170,6 +170,8 @@ local function ResetTooltipState(tooltip)
 
     tooltip.ZoidsToolsUnitGuid = nil
     tooltip.ZoidsToolsDetailsKey = nil
+    tooltip.ZoidsToolsMythicScoreLine = nil
+    tooltip.ZoidsToolsItemLevelLine = nil
 end
 
 local function IsSecretValue(value)
@@ -1062,6 +1064,30 @@ local function FormatItemLevel(itemLevel)
     return tostring(math.floor(itemLevel + 0.5))
 end
 
+local function SetOrAddDetailLine(tooltip, lineKey, label, value, leftR, leftG, leftB, rightR, rightG, rightB)
+    if not tooltip or not label or not value then
+        return false
+    end
+
+    local tooltipName = tooltip.GetName and tooltip:GetName()
+    local lineIndex = tooltip[lineKey]
+    local leftLine = lineIndex and tooltipName and _G[tooltipName .. "TextLeft" .. lineIndex]
+    local rightLine = lineIndex and tooltipName and _G[tooltipName .. "TextRight" .. lineIndex]
+
+    if leftLine and rightLine then
+        leftLine:SetText(label)
+        leftLine:SetTextColor(leftR, leftG, leftB)
+        rightLine:SetText(value)
+        rightLine:SetTextColor(rightR, rightG, rightB)
+        return false
+    end
+
+    lineIndex = (tooltip.NumLines and tooltip:NumLines() or 0) + 1
+    tooltip:AddDoubleLine(label, value, leftR, leftG, leftB, rightR, rightG, rightB)
+    tooltip[lineKey] = lineIndex
+    return true
+end
+
 local function AddTooltipDetails(tooltip, unit, guid)
     local db = EnsureDB()
 
@@ -1106,21 +1132,70 @@ local function AddTooltipDetails(tooltip, unit, guid)
             r, g, b = mythicScore.r, mythicScore.g, mythicScore.b
         end
 
-        tooltip:AddDoubleLine("Mythic+ Score", mythicScoreText, 0.75, 0.85, 1, r, g, b)
-        addedDetails = true
+        addedDetails = SetOrAddDetailLine(
+            tooltip,
+            "ZoidsToolsMythicScoreLine",
+            "Mythic+ Score",
+            mythicScoreText,
+            0.75,
+            0.85,
+            1,
+            r,
+            g,
+            b
+        ) or addedDetails
     end
 
     if itemLevel then
-        tooltip:AddDoubleLine("Item Level", itemLevel, 1, 0.82, 0, 1, 1, 1)
-        addedDetails = true
+        addedDetails = SetOrAddDetailLine(
+            tooltip,
+            "ZoidsToolsItemLevelLine",
+            "Item Level",
+            itemLevel,
+            1,
+            0.82,
+            0,
+            1,
+            1,
+            1
+        ) or addedDetails
     elseif itemLevelPending then
-        tooltip:AddDoubleLine("Item Level", "Inspecting...", 1, 0.82, 0, 0.65, 0.65, 0.65)
-        addedDetails = true
+        addedDetails = SetOrAddDetailLine(
+            tooltip,
+            "ZoidsToolsItemLevelLine",
+            "Item Level",
+            "Inspecting...",
+            1,
+            0.82,
+            0,
+            0.65,
+            0.65,
+            0.65
+        ) or addedDetails
     end
 
     if addedDetails and tooltip.Show then
         tooltip:Show()
     end
+end
+
+local function ApplyUnitTooltipAppearance(tooltip, unit)
+    if tooltip ~= GameTooltip or not unit then
+        return
+    end
+
+    local db = EnsureDB()
+    local faction = UnitIsPlayerSafe(unit) and GetFaction(unit) or GetFaction("player")
+    local color = db and db.factionBackground and faction and FACTION_COLORS[faction]
+
+    if color then
+        SetBackdropColors(tooltip, color.bg, color.border)
+        SetFactionTint(tooltip, color.tint)
+    else
+        ResetTooltipBackdrop(tooltip)
+    end
+
+    ColorTooltipName(tooltip, unit)
 end
 
 local function ApplyUnitTooltipStyleUnsafe(tooltip)
@@ -1135,25 +1210,16 @@ local function ApplyUnitTooltipStyleUnsafe(tooltip)
         return
     end
 
-    local db = EnsureDB()
     local guid = GetUnitGUIDSafe(unit)
 
     if guid ~= tooltip.ZoidsToolsUnitGuid then
         tooltip.ZoidsToolsUnitGuid = guid
         tooltip.ZoidsToolsDetailsKey = nil
+        tooltip.ZoidsToolsMythicScoreLine = nil
+        tooltip.ZoidsToolsItemLevelLine = nil
     end
 
-    local faction = UnitIsPlayerSafe(unit) and GetFaction(unit) or GetFaction("player")
-    local color = db and db.factionBackground and faction and FACTION_COLORS[faction]
-
-    if color then
-        SetBackdropColors(tooltip, color.bg, color.border)
-        SetFactionTint(tooltip, color.tint)
-    else
-        ResetTooltipBackdrop(tooltip)
-    end
-
-    ColorTooltipName(tooltip, unit)
+    ApplyUnitTooltipAppearance(tooltip, unit)
     AddTooltipDetails(tooltip, unit, guid)
 end
 
@@ -1162,7 +1228,7 @@ local function ApplyUnitTooltipStyle(tooltip)
 end
 
 RefreshCurrentTooltipForGUID = function(guid)
-    if not guid or IsSecretValue(guid) or not GameTooltip or not GameTooltip:IsShown() or not UnitGUID then
+    if not guid or IsSecretValue(guid) or not GameTooltip or not GameTooltip:IsShown() then
         return
     end
 
@@ -1170,19 +1236,17 @@ RefreshCurrentTooltipForGUID = function(guid)
         return
     end
 
-    local ok, mouseoverGuid = pcall(UnitGUID, "mouseover")
+    local unit = GetDisplayedUnit(GameTooltip)
 
-    if not ok or IsSecretValue(mouseoverGuid) or mouseoverGuid ~= guid then
+    if not unit or GetUnitGUIDSafe(unit) ~= guid then
         return
     end
 
+    -- The inspect result only changes ZoidsTools' detail row. Updating that
+    -- row in place avoids rebuilding the entire visible GameTooltip, which
+    -- otherwise briefly redraws Blizzard's default tooltip first.
     GameTooltip.ZoidsToolsDetailsKey = nil
-
-    if type(GameTooltip.SetUnit) == "function" then
-        pcall(GameTooltip.SetUnit, GameTooltip, "mouseover")
-    else
-        ApplyUnitTooltipStyle(GameTooltip)
-    end
+    pcall(AddTooltipDetails, GameTooltip, unit, guid)
 end
 
 local function OnInspectReady(guid)
@@ -1214,6 +1278,14 @@ local function HookTooltipScript(scriptName, handler)
     local ok = pcall(GameTooltip.HookScript, GameTooltip, scriptName, handler)
 
     return ok
+end
+
+local function ApplyDisplayedUnitTooltipAppearance(tooltip)
+    local unit = GetDisplayedUnit(tooltip)
+
+    if unit then
+        pcall(ApplyUnitTooltipAppearance, tooltip, unit)
+    end
 end
 
 local function RefreshCurrentTooltip()
@@ -1351,6 +1423,11 @@ function ns:InitializeTooltips()
             OnInspectReady(guid)
         elseif event == "UPDATE_MOUSEOVER_UNIT" then
             if not IsCombatLocked() then
+                -- Prime the persistent GameTooltip backdrop as soon as the
+                -- mouseover unit changes, before Blizzard displays its text.
+                if GetUnitGUIDSafe("mouseover") then
+                    pcall(ApplyUnitTooltipAppearance, GameTooltip, "mouseover")
+                end
                 PrefetchUnitItemLevel("mouseover")
             end
         end
@@ -1364,9 +1441,12 @@ function ns:InitializeTooltips()
         end)
     end
 
+    -- Unit data is available here before the usual owner calls Show(). Keep
+    -- appearance separate from the post-call that appends optional details.
+    HookTooltipScript("OnTooltipSetUnit", ApplyDisplayedUnitTooltipAppearance)
+
     if not hasUnitPostCall then
         HookTooltipScript("OnShow", ApplyUnitTooltipStyle)
-        HookTooltipScript("OnTooltipSetUnit", ApplyUnitTooltipStyle)
     end
 
     HookTooltipScript("OnTooltipCleared", ResetTooltipState)

@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Added source-ordered secondary-stat priorities to generated stat goals and displayed them in a taller, better-aligned Character Stats Goals header.
+- Normalized Scenario and Dungeon tracker header widths so their titles, bars, and collapse buttons align with Campaign and Quest sections.
+- Recalculated objective-tracker module line and block heights after text scaling so enlarged outlined multiline objectives no longer overlap the following quest.
+- Applied unit-tooltip appearance before display and updated inspected item level in place, eliminating the visible default-to-custom tooltip redraw.
+- Inset Dungeon, Scenario, and other objective-tracker section collapse buttons so they remain inside the customized tracker border.
 - Shifted attached chat typing boxes two pixels right for cleaner alignment with Blizzard's visible chat edge.
 - Prevented stopped or reload-cleared diagnostic sessions from reporting WoW's client uptime as a zero-frame test result.
 - Shifted Blizzard's Objective Tracker Edit Mode selection outline to match the customized tracker's visible horizontal bounds.

@@ -13,6 +13,7 @@ local TRACKER_RIGHT_EXTENSION = 8
 local TRACKER_TOP_EXTENSION = 3
 local TRACKER_BOTTOM_PADDING = 6
 local EDIT_MODE_SELECTION_X_OFFSET = 10
+local MODULE_HEADER_BUTTON_INSET = 18
 
 local tracker
 local skin
@@ -22,6 +23,8 @@ local originalFonts = setmetatable({}, { __mode = "k" })
 local originalModuleWidths = setmetatable({}, { __mode = "k" })
 local originalElementWidths = setmetatable({}, { __mode = "k" })
 local originalModuleMargins = setmetatable({}, { __mode = "k" })
+local originalModuleHeaderButtonPoints = setmetatable({}, { __mode = "k" })
+local adjustedModuleHeaderButtons = setmetatable({}, { __mode = "k" })
 local appliedTextScale
 local appliedTextEnabled
 local appliedTextOutline
@@ -303,14 +306,101 @@ local function ApplyTextScale(enabled, scale, outlineText, force)
         end
     end)
 
-    -- Blizzard measures line and block heights during its native layout pass.
-    -- Marking the container dirty lets it recalculate those heights using the
-    -- adjusted fonts instead of leaving enlarged text inside old row bounds.
-    if changed and frame.MarkDirty then pcall(frame.MarkDirty, frame) end
+    -- Blizzard caches each module's block and line heights. Marking only the
+    -- container dirty allows otherwise-complete modules to reuse those cached
+    -- measurements, leaving enlarged multiline text inside the old row height.
+    -- Dirty every module so its native SetStringText/AddObjective layout pass
+    -- measures the scaled font before positioning the following quest.
+    if changed then
+        local function MarkModuleDirty(module)
+            if module and module.MarkDirty then
+                pcall(module.MarkDirty, module)
+            end
+        end
+
+        if frame.ForEachModule then
+            pcall(frame.ForEachModule, frame, MarkModuleDirty)
+        elseif type(frame.modules) == "table" then
+            for _, module in ipairs(frame.modules) do
+                MarkModuleDirty(module)
+            end
+        end
+
+        if frame.MarkDirty then pcall(frame.MarkDirty, frame) end
+    end
 end
 
 local function ApplyModuleWidths(frame, enabled, width)
     if not frame then return end
+
+    local function AdjustModuleHeaderButtons(header)
+        if not header then return end
+
+        local buttons = {}
+        local seen = {}
+        local function AddButton(button)
+            if not button or seen[button] or not button.GetObjectType
+                or button:GetObjectType() ~= "Button" then
+                return
+            end
+            seen[button] = true
+            buttons[#buttons + 1] = button
+        end
+
+        AddButton(header.MinimizeButton)
+        AddButton(header.CollapseButton)
+        AddButton(header.Button)
+        if header.GetChildren then
+            for _, child in ipairs({ header:GetChildren() }) do
+                AddButton(child)
+            end
+        end
+
+        for _, button in ipairs(buttons) do
+            local points = originalModuleHeaderButtonPoints[button]
+            if not points then
+                points = CapturePoints(button)
+                originalModuleHeaderButtonPoints[button] = points
+            end
+
+            if points and enabled and not adjustedModuleHeaderButtons[button] then
+                local hasRightAnchor = false
+                for _, anchor in ipairs(points) do
+                    local point = tostring(anchor.point or "")
+                    local relativePoint = tostring(anchor.relativePoint or "")
+                    if point:find("RIGHT", 1, true)
+                        or relativePoint:find("RIGHT", 1, true) then
+                        hasRightAnchor = true
+                        break
+                    end
+                end
+
+                if hasRightAnchor and button.ClearAllPoints and button.SetPoint then
+                    button:ClearAllPoints()
+                    for _, anchor in ipairs(points) do
+                        local offsetX = anchor.offsetX or 0
+                        local point = tostring(anchor.point or "")
+                        local relativePoint = tostring(anchor.relativePoint or "")
+                        if point:find("RIGHT", 1, true)
+                            or relativePoint:find("RIGHT", 1, true) then
+                            offsetX = offsetX - MODULE_HEADER_BUTTON_INSET
+                        end
+                        button:SetPoint(
+                            anchor.point,
+                            anchor.relativeTo,
+                            anchor.relativePoint,
+                            offsetX,
+                            anchor.offsetY or 0
+                        )
+                    end
+                    adjustedModuleHeaderButtons[button] = true
+                end
+            elseif points and not enabled and adjustedModuleHeaderButtons[button] then
+                SetPoints(button, points, 0)
+                adjustedModuleHeaderButtons[button] = nil
+            end
+        end
+    end
 
     local function ResizeElement(element, targetWidth)
         if not element or not element.GetWidth or not element.SetWidth then return end
@@ -320,7 +410,7 @@ local function ApplyModuleWidths(frame, enabled, width)
         pcall(element.SetWidth, element, enabled and targetWidth or originalElementWidths[element])
     end
 
-    local function ResizeHeader(header, targetWidth)
+    local function ResizeHeader(header, targetWidth, adjustModuleButtons)
         if not header then return end
 
         if originalElementWidths[header] == nil and header.GetWidth then
@@ -342,6 +432,10 @@ local function ApplyModuleWidths(frame, enabled, width)
             local originalTextWidth = originalElementWidths[header.Text] or targetWidth
             local rightSideSpacing = math.max(0, originalHeaderWidth - originalTextWidth)
             ResizeElement(header.Text, math.max(1, targetWidth - rightSideSpacing))
+        end
+
+        if adjustModuleButtons then
+            AdjustModuleHeaderButtons(header)
         end
     end
 
@@ -368,10 +462,30 @@ local function ApplyModuleWidths(frame, enabled, width)
         end
 
         pcall(module.SetWidth, module, targetWidth)
-        ResizeHeader(module.Header, targetWidth)
+
+        local headerWidth = targetWidth
+        local header = module.Header
+        if enabled and header and header.GetNumPoints then
+            -- Scenario/Dungeon modules move their header 20 px right inside a
+            -- parent that Blizzard also widens by 20 px. Subtract that native
+            -- header offset so its visible right edge matches ordinary modules
+            -- such as Campaign and Quests instead of extending past them.
+            for pointIndex = 1, header:GetNumPoints() do
+                local point, relativeTo, relativePoint, offsetX = header:GetPoint(pointIndex)
+                local anchoredToModule = relativeTo == module or relativeTo == nil
+                local leftAnchored = tostring(point or ""):find("LEFT", 1, true)
+                    and tostring(relativePoint or ""):find("LEFT", 1, true)
+                if anchoredToModule and leftAnchored and (tonumber(offsetX) or 0) > 0 then
+                    headerWidth = math.max(1, targetWidth - offsetX)
+                    break
+                end
+            end
+        end
+
+        ResizeHeader(header, headerWidth, true)
     end
 
-    ResizeHeader(frame.Header, width)
+    ResizeHeader(frame.Header, width, false)
 
     if frame.ForEachModule then
         pcall(frame.ForEachModule, frame, ResizeModule)

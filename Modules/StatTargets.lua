@@ -12,6 +12,12 @@ local statPanel
 local statToggleButton
 
 local STAT_ORDER = { "crit", "haste", "mastery", "versatility" }
+local PRIORITY_STAT_LABELS = {
+    crit = "Crit",
+    haste = "Haste",
+    mastery = "Mastery",
+    versatility = "Vers",
+}
 local SOURCE_OPTIONS = {
     { value = "mythicplus", text = "M+" },
     { value = "raid", text = "Raid" },
@@ -306,6 +312,30 @@ local function GetSnapshot()
     end
 
     return nil, classToken, specKey, context
+end
+
+local function FormatStatPriority(snapshot)
+    if not snapshot or type(snapshot.priority) ~= "table" then
+        return "Priority: --"
+    end
+
+    local labels = {}
+    local seen = {}
+
+    for _, statKey in ipairs(snapshot.priority) do
+        local label = PRIORITY_STAT_LABELS[statKey]
+
+        if label and not seen[statKey] then
+            seen[statKey] = true
+            labels[#labels + 1] = label
+        end
+    end
+
+    if #labels == 0 then
+        return "Priority: --"
+    end
+
+    return "Priority: " .. table.concat(labels, " > ")
 end
 
 local function GetRating(statKey)
@@ -1062,7 +1092,7 @@ local function EnsureStatPanel()
     end
 
     local panel = CreateFrame("Frame", "ZoidsToolsStatGoalsPanel", UIParent, "BackdropTemplate")
-    panel:SetSize(276, 174)
+    panel:SetSize(276, 190)
     panel:SetFrameStrata(characterFrame:GetFrameStrata() or "HIGH")
     panel:SetFrameLevel((characterFrame:GetFrameLevel() or 1) + 12)
     panel:SetClampedToScreen(true)
@@ -1077,13 +1107,21 @@ local function EnsureStatPanel()
     panel:SetBackdropBorderColor(0.65, 0.50, 0.20, 0.78)
 
     panel.title = panel:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    panel.title:SetPoint("TOPLEFT", 12, -14)
+    panel.title:SetPoint("TOPLEFT", 12, -11)
     panel.title:SetText("Stat Goals")
     panel.title:SetTextColor(1, 0.82, 0.20)
 
+    panel.priority = panel:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    panel.priority:SetPoint("TOPLEFT", 12, -31)
+    panel.priority:SetPoint("TOPRIGHT", -12, -31)
+    panel.priority:SetJustifyH("LEFT")
+    panel.priority:SetWordWrap(false)
+    panel.priority:SetText("Priority: --")
+    panel.priority:SetTextColor(0.72, 0.74, 0.78)
+
     panel.divider = panel:CreateTexture(nil, "ARTWORK")
-    panel.divider:SetPoint("TOPLEFT", 10, -38)
-    panel.divider:SetPoint("TOPRIGHT", -10, -38)
+    panel.divider:SetPoint("TOPLEFT", 10, -54)
+    panel.divider:SetPoint("TOPRIGHT", -10, -54)
     panel.divider:SetHeight(1)
     panel.divider:SetColorTexture(0.50, 0.42, 0.26, 0.40)
 
@@ -1097,7 +1135,7 @@ local function EnsureStatPanel()
 
     for _, info in ipairs(headers) do
         local header = panel:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
-        header:SetPoint("TOPLEFT", info.x, -45)
+        header:SetPoint("TOPLEFT", info.x, -61)
         header:SetWidth(info.width)
         header:SetJustifyH(info.justify or "RIGHT")
         header:SetText(info.text)
@@ -1112,7 +1150,7 @@ local function EnsureStatPanel()
     }
 
     for index, statKey in ipairs(STAT_ORDER) do
-        local y = -65 - ((index - 1) * 25)
+        local y = -81 - ((index - 1) * 25)
         local row = {}
 
         row.background = panel:CreateTexture(nil, "BACKGROUND")
@@ -1160,7 +1198,7 @@ local function AnchorCharacterSourceDropdown(control, parent)
 
     control:ClearAllPoints()
 
-    control:SetPoint("TOPRIGHT", parent, "TOPRIGHT", -10, -10)
+    control:SetPoint("TOPRIGHT", parent, "TOPRIGHT", -10, -9)
 end
 
 local function PositionSourceDropdownMenu(control)
@@ -1250,11 +1288,11 @@ local function EnsureCharacterSourceDropdown()
     control:SetFrameLevel((parent:GetFrameLevel() or 1) + 20)
 
     control.label = control:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    control.label:SetPoint("LEFT", control, "LEFT", 0, 0)
+    control.label:SetPoint("RIGHT", control, "RIGHT", -64, 0)
     control.label:SetText("Goals")
 
     control.button = CreateFrame("Button", nil, control, "BackdropTemplate")
-    control.button:SetPoint("LEFT", control.label, "RIGHT", 6, 0)
+    control.button:SetPoint("RIGHT", control, "RIGHT", 0, 0)
     control.button:SetSize(58, 20)
     control.button:RegisterForClicks("LeftButtonUp")
     control.button:SetBackdrop({
@@ -1382,6 +1420,10 @@ local function RefreshStatPanel()
 
     local snapshot = GetSnapshot()
     local targets = snapshot and snapshot.targets
+
+    if panel.priority then
+        panel.priority:SetText(FormatStatPriority(snapshot))
+    end
 
     for _, statKey in ipairs(STAT_ORDER) do
         local row = panel.rows and panel.rows[statKey]

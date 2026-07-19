@@ -1212,12 +1212,13 @@ local function ApplyUnitTooltipStyleUnsafe(tooltip)
 
     local guid = GetUnitGUIDSafe(unit)
 
-    if guid ~= tooltip.ZoidsToolsUnitGuid then
-        tooltip.ZoidsToolsUnitGuid = guid
-        tooltip.ZoidsToolsDetailsKey = nil
-        tooltip.ZoidsToolsMythicScoreLine = nil
-        tooltip.ZoidsToolsItemLevelLine = nil
-    end
+    -- TooltipDataProcessor runs after Blizzard has rebuilt the unit tooltip.
+    -- Its lines may have been cleared even when the same unit is shown again,
+    -- so never carry line indexes across separate tooltip builds.
+    tooltip.ZoidsToolsUnitGuid = guid
+    tooltip.ZoidsToolsDetailsKey = nil
+    tooltip.ZoidsToolsMythicScoreLine = nil
+    tooltip.ZoidsToolsItemLevelLine = nil
 
     ApplyUnitTooltipAppearance(tooltip, unit)
     AddTooltipDetails(tooltip, unit, guid)
@@ -1260,32 +1261,6 @@ local function OnInspectReady(guid)
     end
 
     RetryInspectResult(guid, 0)
-end
-
-local function HookTooltipScript(scriptName, handler)
-    if not GameTooltip or type(GameTooltip.HookScript) ~= "function" then
-        return false
-    end
-
-    if type(GameTooltip.HasScript) == "function" then
-        local ok, hasScript = pcall(GameTooltip.HasScript, GameTooltip, scriptName)
-
-        if ok and not hasScript then
-            return false
-        end
-    end
-
-    local ok = pcall(GameTooltip.HookScript, GameTooltip, scriptName, handler)
-
-    return ok
-end
-
-local function ApplyDisplayedUnitTooltipAppearance(tooltip)
-    local unit = GetDisplayedUnit(tooltip)
-
-    if unit then
-        pcall(ApplyUnitTooltipAppearance, tooltip, unit)
-    end
 end
 
 local function RefreshCurrentTooltip()
@@ -1423,32 +1398,17 @@ function ns:InitializeTooltips()
             OnInspectReady(guid)
         elseif event == "UPDATE_MOUSEOVER_UNIT" then
             if not IsCombatLocked() then
-                -- Prime the persistent GameTooltip backdrop as soon as the
-                -- mouseover unit changes, before Blizzard displays its text.
-                if GetUnitGUIDSafe("mouseover") then
-                    pcall(ApplyUnitTooltipAppearance, GameTooltip, "mouseover")
-                end
+                -- Cache inspect data here, but never alter the shared
+                -- GameTooltip from this event. It may currently belong to a
+                -- map quest or embedded reward even when mouseover changed.
                 PrefetchUnitItemLevel("mouseover")
             end
         end
     end)
 
-    local hasUnitPostCall = false
-
     if TooltipDataProcessor and Enum and Enum.TooltipDataType and Enum.TooltipDataType.Unit then
-        hasUnitPostCall = pcall(TooltipDataProcessor.AddTooltipPostCall, Enum.TooltipDataType.Unit, function(tooltip)
+        TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Unit, function(tooltip)
             ApplyUnitTooltipStyle(tooltip)
         end)
     end
-
-    -- Unit data is available here before the usual owner calls Show(). Keep
-    -- appearance separate from the post-call that appends optional details.
-    HookTooltipScript("OnTooltipSetUnit", ApplyDisplayedUnitTooltipAppearance)
-
-    if not hasUnitPostCall then
-        HookTooltipScript("OnShow", ApplyUnitTooltipStyle)
-    end
-
-    HookTooltipScript("OnTooltipCleared", ResetTooltipState)
-    HookTooltipScript("OnHide", ResetTooltipState)
 end

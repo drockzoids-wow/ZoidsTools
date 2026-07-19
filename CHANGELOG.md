@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Isolated unit-tooltip styling from Blizzard's shared quest-reward and map-POI construction, preventing secret-value sizing taint in embedded reward and widget tooltips.
 - Added source-ordered secondary-stat priorities to generated stat goals and displayed them in a taller, better-aligned Character Stats Goals header.
 - Normalized Scenario and Dungeon tracker header widths so their titles, bars, and collapse buttons align with Campaign and Quest sections.
 - Recalculated objective-tracker module line and block heights after text scaling so enlarged outlined multiline objectives no longer overlap the following quest.

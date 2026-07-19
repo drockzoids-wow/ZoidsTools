@@ -387,11 +387,16 @@ function UI.CreateDropdown(parent, label, tooltip, options, getter, setter, widt
     control.button.arrow:SetPoint("RIGHT", control.button, "RIGHT", -10, 0)
     control.button.arrow:SetText("v")
 
-    control.menu = CreateFrame("Frame", nil, control, "BackdropTemplate")
-    control.menu:SetPoint("TOPLEFT", control.button, "BOTTOMLEFT", 0, -2)
+    -- Parent popup menus to the main window rather than the scrolling page.
+    -- The content viewport deliberately clips its children, which otherwise
+    -- cuts off dropdown rows near the bottom of a settings page.
+    local menuParent = UI.frame or UIParent or parent
+    control.menu = CreateFrame("Frame", nil, menuParent, "BackdropTemplate")
     control.menu:SetSize(dropdownWidth, (#options * rowHeight) + 12)
-    control.menu:SetFrameStrata("DIALOG")
+    control.menu:SetFrameStrata("TOOLTIP")
+    control.menu:SetFrameLevel(math.max(100, ((menuParent.GetFrameLevel and menuParent:GetFrameLevel()) or 0) + 50))
     control.menu:SetToplevel(true)
+    control.menu:SetClampedToScreen(true)
     control.menu:SetBackdrop({
         bgFile = "Interface\\Buttons\\WHITE8x8",
         edgeFile = Theme and Theme.panelBorder or "Interface\\Tooltips\\UI-Tooltip-Border",
@@ -399,9 +404,22 @@ function UI.CreateDropdown(parent, label, tooltip, options, getter, setter, widt
         edgeSize = 10,
         insets = { left = 3, right = 3, top = 3, bottom = 3 },
     })
-    control.menu:SetBackdropColor(0.012, 0.014, 0.018, 0.98)
+    control.menu:SetBackdropColor(0.012, 0.014, 0.018, 1)
     control.menu:SetBackdropBorderColor(0.75, 0.60, 0.30, 0.58)
     control.menu:Hide()
+
+    local function PositionMenu()
+        control.menu:ClearAllPoints()
+
+        local buttonBottom = control.button:GetBottom()
+        local menuHeight = control.menu:GetHeight() or 0
+
+        if buttonBottom and buttonBottom < (menuHeight + 12) then
+            control.menu:SetPoint("BOTTOMLEFT", control.button, "TOPLEFT", 0, 2)
+        else
+            control.menu:SetPoint("TOPLEFT", control.button, "BOTTOMLEFT", 0, -2)
+        end
+    end
 
     if tooltip then
         control.button:SetScript("OnEnter", function(self)
@@ -430,6 +448,12 @@ function UI.CreateDropdown(parent, label, tooltip, options, getter, setter, widt
         if not control.button:IsMouseOver() and not control.menu:IsMouseOver() then
             control.menu:Hide()
             control.button.arrow:SetText("v")
+        end
+    end
+
+    local function ScheduleMouseAwayHide()
+        if C_Timer and C_Timer.After then
+            C_Timer.After(0.8, HideIfMouseAway)
         end
     end
 
@@ -477,9 +501,7 @@ function UI.CreateDropdown(parent, label, tooltip, options, getter, setter, widt
             self.highlight:Hide()
             self.text:SetTextColor(1, 1, 1)
 
-            if C_Timer and C_Timer.After then
-                C_Timer.After(0.12, HideIfMouseAway)
-            end
+            ScheduleMouseAwayHide()
         end)
 
         control.rows[index] = row
@@ -511,22 +533,29 @@ function UI.CreateDropdown(parent, label, tooltip, options, getter, setter, widt
             control.button.arrow:SetText("v")
         else
             control:Refresh()
+            PositionMenu()
             control.menu:Show()
             control.button.arrow:SetText("^")
         end
     end)
 
     control.button:HookScript("OnLeave", function()
-        if C_Timer and C_Timer.After then
-            C_Timer.After(0.12, HideIfMouseAway)
-        end
+        ScheduleMouseAwayHide()
     end)
 
     control.menu:SetScript("OnLeave", function()
-        if C_Timer and C_Timer.After then
-            C_Timer.After(0.12, HideIfMouseAway)
-        end
+        ScheduleMouseAwayHide()
     end)
+
+    local function CloseMenu()
+        control.menu:Hide()
+        control.button.arrow:SetText("v")
+    end
+
+    control:HookScript("OnHide", CloseMenu)
+    if parent and parent.HookScript then
+        parent:HookScript("OnHide", CloseMenu)
+    end
 
     function control:Refresh()
         local value = getter()
@@ -590,11 +619,15 @@ function UI.CreateMultiSelectDropdown(parent, label, tooltip, options, width)
     control.button.arrow:SetPoint("RIGHT", control.button, "RIGHT", -10, 0)
     control.button.arrow:SetText("v")
 
-    control.menu = CreateFrame("Frame", nil, control, "BackdropTemplate")
-    control.menu:SetPoint("TOPLEFT", control.button, "BOTTOMLEFT", 0, -2)
+    -- Keep the popup outside the clipped scrolling viewport so every option
+    -- remains visible even when this control sits near the page boundary.
+    local menuParent = UI.frame or UIParent or parent
+    control.menu = CreateFrame("Frame", nil, menuParent, "BackdropTemplate")
     control.menu:SetSize(dropdownWidth, (#options * rowHeight) + 12)
-    control.menu:SetFrameStrata("DIALOG")
+    control.menu:SetFrameStrata("TOOLTIP")
+    control.menu:SetFrameLevel(math.max(100, ((menuParent.GetFrameLevel and menuParent:GetFrameLevel()) or 0) + 50))
     control.menu:SetToplevel(true)
+    control.menu:SetClampedToScreen(true)
     control.menu:SetBackdrop({
         bgFile = "Interface\\Buttons\\WHITE8x8",
         edgeFile = Theme and Theme.panelBorder or "Interface\\Tooltips\\UI-Tooltip-Border",
@@ -602,9 +635,22 @@ function UI.CreateMultiSelectDropdown(parent, label, tooltip, options, width)
         edgeSize = 10,
         insets = { left = 3, right = 3, top = 3, bottom = 3 },
     })
-    control.menu:SetBackdropColor(0.012, 0.014, 0.018, 0.98)
+    control.menu:SetBackdropColor(0.012, 0.014, 0.018, 1)
     control.menu:SetBackdropBorderColor(0.75, 0.60, 0.30, 0.58)
     control.menu:Hide()
+
+    local function PositionMenu()
+        control.menu:ClearAllPoints()
+
+        local buttonBottom = control.button:GetBottom()
+        local menuHeight = control.menu:GetHeight() or 0
+
+        if buttonBottom and buttonBottom < (menuHeight + 12) then
+            control.menu:SetPoint("BOTTOMLEFT", control.button, "TOPLEFT", 0, 2)
+        else
+            control.menu:SetPoint("TOPLEFT", control.button, "BOTTOMLEFT", 0, -2)
+        end
+    end
 
     if tooltip then
         control.button:SetScript("OnEnter", function(self)
@@ -643,6 +689,12 @@ function UI.CreateMultiSelectDropdown(parent, label, tooltip, options, width)
         if not control.button:IsMouseOver() and not control.menu:IsMouseOver() then
             control.menu:Hide()
             control.button.arrow:SetText("v")
+        end
+    end
+
+    local function ScheduleMouseAwayHide()
+        if C_Timer and C_Timer.After then
+            C_Timer.After(0.8, HideIfMouseAway)
         end
     end
 
@@ -717,9 +769,7 @@ function UI.CreateMultiSelectDropdown(parent, label, tooltip, options, width)
             self.text:SetTextColor(1, 1, 1)
             GameTooltip:Hide()
 
-            if C_Timer and C_Timer.After then
-                C_Timer.After(0.12, HideIfMouseAway)
-            end
+            ScheduleMouseAwayHide()
         end)
 
         control.rows[index] = row
@@ -731,22 +781,29 @@ function UI.CreateMultiSelectDropdown(parent, label, tooltip, options, width)
             control.button.arrow:SetText("v")
         else
             control:Refresh()
+            PositionMenu()
             control.menu:Show()
             control.button.arrow:SetText("^")
         end
     end)
 
     control.button:HookScript("OnLeave", function()
-        if C_Timer and C_Timer.After then
-            C_Timer.After(0.12, HideIfMouseAway)
-        end
+        ScheduleMouseAwayHide()
     end)
 
     control.menu:SetScript("OnLeave", function()
-        if C_Timer and C_Timer.After then
-            C_Timer.After(0.12, HideIfMouseAway)
-        end
+        ScheduleMouseAwayHide()
     end)
+
+    local function CloseMenu()
+        control.menu:Hide()
+        control.button.arrow:SetText("v")
+    end
+
+    control:HookScript("OnHide", CloseMenu)
+    if parent and parent.HookScript then
+        parent:HookScript("OnHide", CloseMenu)
+    end
 
     function control:Refresh()
         self.button.text:SetText(GetSummaryText())

@@ -20,6 +20,10 @@ local blockedFrames = {
     -- protected quest-pin mouse setup (SetPassThroughButtons), so it must stay
     -- entirely under Blizzard's control.
     FlightMapFrame = true,
+    -- The World Map uses the same protected MapCanvas data-provider system.
+    -- Making or scaling the parent frame contaminates secret POI/widget
+    -- dimensions later used by Blizzard's tooltip and pin layout code.
+    WorldMapFrame = true,
     HouseEditorFrame = true,
     LossOfControlFrame = true,
     MainMenuBar = true,
@@ -74,7 +78,6 @@ local commonFrames = {
     "TransmogrifyFrame",
     "WardrobeFrame",
     "WeeklyRewardsFrame",
-    "WorldMapFrame",
     "ClassTalentFrame",
     "MajorFactionRenownFrame",
     "GenericTraitFrame",

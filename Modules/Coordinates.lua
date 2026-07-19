@@ -455,6 +455,14 @@ end
 local function UpdateMapOverlay()
     local db = EnsureDB()
 
+    if IsCombatLocked() then
+        if mapOverlay then
+            mapOverlay:Hide()
+        end
+
+        return
+    end
+
     if not mapOverlay or not db or db.mapEnabled ~= true or not WorldMapFrame or not WorldMapFrame:IsShown() then
         if mapOverlay then
             mapOverlay:Hide()
@@ -529,11 +537,15 @@ local function CreateMapOverlay()
 
     mapOverlay:SetScript("OnUpdate", OnMapUpdate)
 
-    WorldMapFrame:HookScript("OnShow", UpdateMapOverlay)
-    WorldMapFrame:HookScript("OnHide", UpdateMapOverlay)
-
     if type(ToggleWorldMap) == "function" then
-        hooksecurefunc("ToggleWorldMap", RefreshCoordinates)
+        hooksecurefunc("ToggleWorldMap", function()
+            -- ToggleWorldMap refreshes protected MapCanvas providers before
+            -- returning. Defer all ZoidsTools work until the next frame so it
+            -- cannot contaminate pin acquisition or mouse propagation.
+            if C_Timer and C_Timer.After then
+                C_Timer.After(0, RefreshCoordinates)
+            end
+        end)
     end
 
     ApplyClassColor()
@@ -575,6 +587,7 @@ RefreshCoordinates = function()
         UpdateMapOverlay()
     elseif mapOverlay then
         mapOverlay:SetScript("OnUpdate", nil)
+        mapOverlay:Hide()
     end
 end
 

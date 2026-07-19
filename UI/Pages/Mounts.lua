@@ -428,7 +428,7 @@ function ns.UI.Pages.CreateMountsPage(parent)
     UI.PlaceFirst(classOptions, classSection)
     controls[#controls + 1] = classOptions
 
-    local resetRecent = UI.CreateButton(frame, "Reset Recent", 128)
+    local resetRecent = UI.CreateButton(frame, "Reset Rotation", 128)
     resetRecent:SetPoint("TOPLEFT", classOptions, "BOTTOMLEFT", 0, -16)
     resetRecent:SetScript("OnClick", function()
         if ns.ClearMountRecentHistory then

@@ -3,6 +3,13 @@
 ## Unreleased
 
 - Isolated unit-tooltip styling from Blizzard's shared quest-reward and map-POI construction, preventing secret-value sizing taint in embedded reward and widget tooltips.
+- Excluded Blizzard's protected World Map canvas from movable-window and scaling hooks, preventing quest-pin and POI layout taint.
+- Deferred World Map coordinate-overlay refreshes until after protected MapCanvas updates and disabled the overlay during combat.
+- Reworked smart-mount pool refreshes to discard temporary post-combat usability snapshots, use Blizzard's current mount usability and steady-flight data, and record each keypress only once.
+- Forced the smart-mount binding to fire once on key-down and refresh its live mounted state immediately before every click, preventing stale actions from missing dismounts.
+- Prioritized dismounting over falling-rescue spells so the smart-mount key can dismount immediately while jumping or airborne.
+- Added live Ground, Flying, Water, and active smart-mount pool counts to Mount settings, plus a full rotation-history reset.
+- Allowed setting menus such as Mount Class Utilities to extend beyond the scrolling content border, render above all settings content, and close less abruptly when the mouse leaves.
 - Added source-ordered secondary-stat priorities to generated stat goals and displayed them in a taller, better-aligned Character Stats Goals header.
 - Normalized Scenario and Dungeon tracker header widths so their titles, bars, and collapse buttons align with Campaign and Quest sections.
 - Recalculated objective-tracker module line and block heights after text scaling so enlarged outlined multiline objectives no longer overlap the following quest.

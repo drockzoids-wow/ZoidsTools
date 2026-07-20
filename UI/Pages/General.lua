@@ -361,10 +361,22 @@ function ns.UI.Pages.CreateGeneralPage(parent)
     )
     talkingHeadFontSize:SetPoint("TOPLEFT", talkingHeadOpacity, "TOPLEFT", 150, 0)
 
-    local previewTalkingHead = UI.CreateButton(frame, "Preview Subtitle", 150)
+    local previewTalkingHead = UI.CreateButton(frame, "Preview Subtitle", 132)
     previewTalkingHead:SetPoint("TOPLEFT", talkingHeadOpacity, "BOTTOMLEFT", -UI.Layout.sliderIndent, -12)
     previewTalkingHead:SetScript("OnClick", function()
         if ns.PreviewSubtleTalkingHead then ns:PreviewSubtleTalkingHead() end
+    end)
+
+    local moveTalkingHead = UI.CreateButton(frame, "Move Subtitle", 132)
+    moveTalkingHead:SetPoint("LEFT", previewTalkingHead, "RIGHT", 12, 0)
+    moveTalkingHead:SetScript("OnClick", function()
+        if ns.ToggleSubtleTalkingHeadMoveMode then
+            ns:ToggleSubtleTalkingHeadMoveMode()
+        end
+
+        if frame.Refresh then
+            frame:Refresh()
+        end
     end)
 
     local unlockPerformance = UI.CreateButton(frame, "Unlock Widget", 132)
@@ -394,6 +406,7 @@ function ns.UI.Pages.CreateGeneralPage(parent)
         talkingHeadBold:Refresh()
         talkingHeadOpacity:Refresh()
         talkingHeadFontSize:Refresh()
+        moveTalkingHead:SetText(ns.IsSubtleTalkingHeadMoveMode and ns:IsSubtleTalkingHeadMoveMode() and "Lock Subtitle" or "Move Subtitle")
         performanceDisplay:Refresh()
         performanceScale:Refresh()
         coordinatesWidget:Refresh()
@@ -410,6 +423,7 @@ function ns.UI.Pages.CreateGeneralPage(parent)
         UI.SetControlEnabled(talkingHeadOpacity, talkingHeadActive)
         UI.SetControlEnabled(talkingHeadFontSize, talkingHeadActive)
         UI.SetControlEnabled(previewTalkingHead, talkingHeadActive)
+        UI.SetControlEnabled(moveTalkingHead, talkingHeadActive)
 
         resetCoordinates:ClearAllPoints()
         unlockPerformance:ClearAllPoints()

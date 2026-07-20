@@ -7,7 +7,14 @@ local blizzardWasRegistered = false
 local lineToken = 0
 local voiceHandle
 local dismissed = false
+local moveMode = false
 local ApplyAppearance
+
+local DEFAULT_POINT = "BOTTOM"
+local DEFAULT_RELATIVE_POINT = "BOTTOM"
+local DEFAULT_X = 0
+local DEFAULT_Y = 300
+local CENTER_SNAP_THRESHOLD = 24
 
 local function EnsureDB()
     if not ns.db then return nil end
@@ -22,16 +29,64 @@ local function EnsureDB()
     return db
 end
 
+local function RestorePosition(frame)
+    local db = EnsureDB()
+    frame:ClearAllPoints()
+
+    local position = db and db.position
+    if type(position) == "table" and tonumber(position.x) and tonumber(position.y) then
+        frame:SetPoint("CENTER", UIParent, "CENTER", tonumber(position.x) or 0, tonumber(position.y) or 0)
+    else
+        frame:SetPoint(DEFAULT_POINT, UIParent, DEFAULT_RELATIVE_POINT, DEFAULT_X, DEFAULT_Y)
+    end
+end
+
+local function SavePosition(frame)
+    local db = EnsureDB()
+    if not db or not frame then return end
+
+    local frameX, frameY = frame:GetCenter()
+    local parentX, parentY = UIParent:GetCenter()
+    if not frameX or not frameY or not parentX or not parentY then return end
+
+    local x = frameX - parentX
+    local y = frameY - parentY
+    if math.abs(x) <= CENTER_SNAP_THRESHOLD then
+        x = 0
+    end
+
+    db.position = {
+        x = math.floor(x + 0.5),
+        y = math.floor(y + 0.5),
+    }
+
+    RestorePosition(frame)
+end
+
+local function UpdateMoveMode()
+    local frame = subtitleFrame
+    if not frame then return end
+
+    frame:SetMovable(moveMode)
+    if frame.moveOverlay then
+        frame.moveOverlay:SetShown(moveMode)
+    end
+end
+
 local function CreateSubtitleFrame()
     if subtitleFrame then return subtitleFrame end
     local frame = CreateFrame("Frame", "ZoidsToolsTalkingHead", UIParent, "BackdropTemplate")
     frame:SetSize(560, 76)
-    frame:SetPoint("BOTTOM", UIParent, "BOTTOM", 0, 300)
+    RestorePosition(frame)
     frame:SetFrameStrata("FULLSCREEN")
     frame:SetFrameLevel(980)
+    frame:SetClampedToScreen(true)
+    frame:SetMovable(false)
     frame:EnableMouse(true)
     if frame.SetPropagateMouseMotion then frame:SetPropagateMouseMotion(true) end
-    if frame.SetPropagateMouseClicks then frame:SetPropagateMouseClicks(true) end
+    if frame.SetPropagateMouseClicks then
+        pcall(frame.SetPropagateMouseClicks, frame, true)
+    end
     frame:SetBackdrop({
         bgFile = "Interface\\Buttons\\WHITE8x8",
         edgeFile = "Interface\\Buttons\\WHITE8x8",
@@ -57,31 +112,44 @@ local function CreateSubtitleFrame()
     frame.line:SetSpacing(2)
     frame.line:SetWordWrap(true)
 
-    frame:SetScript("OnMouseDown", function(self, button)
-        if button == "RightButton" and self.SetPropagateMouseClicks then
-            -- Keep normal clicks click-through, but reserve this right-click
-            -- for dismissing the current Talking Head sequence.
-            self:SetPropagateMouseClicks(false)
-        end
-    end)
     frame:SetScript("OnMouseUp", function(self, button)
+        if moveMode then return end
         if button ~= "RightButton" then return end
         dismissed = true
         lineToken = lineToken + 1
         if voiceHandle and StopSound then StopSound(voiceHandle) end
         voiceHandle = nil
         self:Hide()
-        if self.SetPropagateMouseClicks then
-            if C_Timer and C_Timer.After then
-                C_Timer.After(0, function() self:SetPropagateMouseClicks(true) end)
-            else
-                self:SetPropagateMouseClicks(true)
-            end
-        end
     end)
+
+    frame.moveOverlay = CreateFrame("Frame", nil, frame, "BackdropTemplate")
+    frame.moveOverlay:SetAllPoints(frame)
+    frame.moveOverlay:EnableMouse(true)
+    frame.moveOverlay:RegisterForDrag("LeftButton")
+    frame.moveOverlay:SetBackdrop({
+        bgFile = "Interface\\Buttons\\WHITE8x8",
+        edgeFile = "Interface\\Buttons\\WHITE8x8",
+        edgeSize = 1,
+        insets = { left = 1, right = 1, top = 1, bottom = 1 },
+    })
+    frame.moveOverlay:SetBackdropColor(0.05, 0.08, 0.12, 0.16)
+    frame.moveOverlay:SetBackdropBorderColor(0.95, 0.72, 0.24, 0.85)
+    frame.moveOverlay.text = frame.moveOverlay:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    frame.moveOverlay.text:SetPoint("BOTTOM", frame.moveOverlay, "TOP", 0, 4)
+    frame.moveOverlay.text:SetText("Drag to move. Release near center to snap horizontally.")
+    frame.moveOverlay.text:SetTextColor(1, 0.82, 0.25)
+    frame.moveOverlay:SetScript("OnDragStart", function()
+        if moveMode then frame:StartMoving() end
+    end)
+    frame.moveOverlay:SetScript("OnDragStop", function()
+        frame:StopMovingOrSizing()
+        SavePosition(frame)
+    end)
+    frame.moveOverlay:Hide()
 
     frame:Hide()
     subtitleFrame = frame
+    UpdateMoveMode()
     return frame
 end
 
@@ -95,6 +163,9 @@ ApplyAppearance = function()
     frame.line:SetFont(STANDARD_TEXT_FONT or "Fonts\\FRIZQT__.TTF", size, flags)
     if frame:IsShown() then
         frame:SetHeight(math.max(68, (frame.line:GetStringHeight() or 20) + 51))
+        if frame.moveOverlay then
+            frame.moveOverlay:SetAllPoints(frame)
+        end
     end
     if db.background then
         frame:SetBackdropColor(0.008, 0.010, 0.014, 0.78)
@@ -136,7 +207,7 @@ local function ShowLine(name, text, duration)
     frame:SetAlpha(db and db.opacity or 0.72)
     frame:Show()
     if UIFrameFadeIn then UIFrameFadeIn(frame, 0.18, 0, db and db.opacity or 0.72) end
-    if C_Timer and C_Timer.After then
+    if not moveMode and C_Timer and C_Timer.After then
         C_Timer.After(math.max(2, tonumber(duration) or 5) + 0.5, function() FadeOut(token) end)
     end
 end
@@ -253,6 +324,31 @@ end
 
 function ns:PreviewSubtleTalkingHead()
     ShowLine("ZoidsTools", "A quieter, click-through Talking Head preview.", 4)
+end
+
+function ns:IsSubtleTalkingHeadMoveMode()
+    return moveMode == true
+end
+
+function ns:ToggleSubtleTalkingHeadMoveMode()
+    moveMode = not moveMode
+    local frame = CreateSubtitleFrame()
+    UpdateMoveMode()
+
+    if moveMode then
+        ShowLine("ZoidsTools", "Drag this subtitle panel to move it. Release near the screen center to snap it horizontally.", 3600)
+    elseif frame then
+        SavePosition(frame)
+        frame:Hide()
+    end
+
+    return moveMode
+end
+
+function ns:ResetSubtleTalkingHeadPosition()
+    local db = EnsureDB()
+    if db then db.position = nil end
+    if subtitleFrame then RestorePosition(subtitleFrame) end
 end
 
 function ns:InitializeSubtleTalkingHead()

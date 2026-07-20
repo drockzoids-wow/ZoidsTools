@@ -10,6 +10,7 @@
 - Prioritized dismounting over falling-rescue spells so the smart-mount key can dismount immediately while jumping or airborne.
 - Added live Ground, Flying, Water, and active smart-mount pool counts to Mount settings, plus a full rotation-history reset.
 - Allowed setting menus such as Mount Class Utilities to extend beyond the scrolling content border, render above all settings content, and close less abruptly when the mouse leaves.
+- Added a movable subtle Talking Head subtitle mode with saved placement and horizontal center-snap assistance.
 - Added source-ordered secondary-stat priorities to generated stat goals and displayed them in a taller, better-aligned Character Stats Goals header.
 - Normalized Scenario and Dungeon tracker header widths so their titles, bars, and collapse buttons align with Campaign and Quest sections.
 - Recalculated objective-tracker module line and block heights after text scaling so enlarged outlined multiline objectives no longer overlap the following quest.

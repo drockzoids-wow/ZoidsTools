@@ -985,6 +985,12 @@ local function UpdateBagButton(button, kind, frame)
         return
     end
 
+    if IsCombatLocked() and (not button.ZTBagItemLevelText or not button.ZTBagBindText) then
+        pendingCombatBagRefresh = true
+        pendingCombatBagForceClear = true
+        return
+    end
+
     EnsureBagOverlays(button)
 
     button.ZTBagCacheKey = nil
@@ -1195,12 +1201,6 @@ local function QueueCharacterSettleRefresh()
 end
 
 local function QueueBagRefresh(forceClear)
-    if IsCombatLocked() then
-        pendingCombatBagRefresh = true
-        pendingCombatBagForceClear = pendingCombatBagForceClear or forceClear == true
-        return
-    end
-
     pendingBagForceClear = pendingBagForceClear or forceClear == true
 
     if pendingBagRefresh then
@@ -1208,6 +1208,7 @@ local function QueueBagRefresh(forceClear)
     end
 
     pendingBagRefresh = true
+    local delay = IsCombatLocked() and 0.16 or 0.10
 
     local function Run()
         local shouldForceClear = pendingBagForceClear
@@ -1218,7 +1219,7 @@ local function QueueBagRefresh(forceClear)
     end
 
     if C_Timer and C_Timer.After then
-        C_Timer.After(0.10, Run)
+        C_Timer.After(delay, Run)
     else
         Run()
     end
@@ -1496,8 +1497,6 @@ function ns:InitializeItemOverlays()
             QueueBankRefresh()
         elseif event == "PLAYER_REGEN_DISABLED" then
             pendingCombatCharacterRefresh = true
-            pendingCombatBagRefresh = true
-            UnregisterItemOverlayWorkEvents()
         elseif event == "PLAYER_REGEN_ENABLED" then
             local db = EnsureDB()
             if db and db.enabled == true then
@@ -1535,7 +1534,8 @@ function ns:InitializeItemOverlays()
             then
                 pendingCombatCharacterRefresh = true
             elseif event == "BAG_UPDATE_DELAYED" then
-                pendingCombatBagRefresh = true
+                HookContainerFrames()
+                QueueBagRefresh(true)
                 pendingCombatCharacterRefresh = true
             elseif event == "PLAYERBANKSLOTS_CHANGED"
                 or event == "BANKFRAME_OPENED"

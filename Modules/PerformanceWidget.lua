@@ -373,18 +373,13 @@ local function RefreshWidget()
         return
     end
 
-    local inCombat = IsCombatLocked()
-
     ApplyClassColor()
     ApplyWidgetSize()
     ApplyMouseBehavior()
-
-    if not inCombat then
-        UpdatePerformanceText()
-    end
+    UpdatePerformanceText()
 
     if db.displayMode ~= "disabled" then
-        frame:SetScript("OnUpdate", inCombat and nil or OnUpdate)
+        frame:SetScript("OnUpdate", OnUpdate)
         frame:Show()
     else
         frame:SetScript("OnUpdate", nil)

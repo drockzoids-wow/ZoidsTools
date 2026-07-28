@@ -4,6 +4,7 @@ local frame = CreateFrame("Frame")
 local initialized = false
 local activeLoot = false
 local sweepQueued = false
+local delayedSweepsQueued = false
 local lootCycle = 0
 local AUTO_LOOT_DEFAULT = "autoLootDefault"
 
@@ -90,7 +91,7 @@ local function LootSlotSafely(slot)
         return
     end
 
-    LootSlot(slot)
+    pcall(LootSlot, slot)
 end
 
 local function FastLootSlots(cycle)
@@ -100,7 +101,9 @@ local function FastLootSlots(cycle)
 
     sweepQueued = false
 
-    if not activeLoot or not ns.db or not ns.db.loot.fastLoot or not GetNumLootItems then
+    local db = GetLootDB()
+
+    if not activeLoot or not db.fastLoot or not GetNumLootItems then
         return
     end
 
@@ -129,11 +132,29 @@ local function QueueSweep(delay, cycle)
     end
 end
 
+local function QueueCarefulSweeps(cycle)
+    local db = GetLootDB()
+
+    if delayedSweepsQueued or not db.carefulMode then
+        return
+    end
+
+    delayedSweepsQueued = true
+
+    local baseDelay = math.max(0.05, tonumber(db.carefulDelay) or 0.12)
+
+    QueueSweep(baseDelay, cycle)
+    QueueSweep(baseDelay + 0.12, cycle)
+    QueueSweep(baseDelay + 0.28, cycle)
+end
+
 local function QueueFastLoot(eventAutoLoot)
     local db = GetLootDB()
 
     if not db.fastLoot or not GetAutoLootIntent(eventAutoLoot) then
-        activeLoot = false
+        if not db.fastLoot then
+            activeLoot = false
+        end
         return
     end
 
@@ -141,10 +162,7 @@ local function QueueFastLoot(eventAutoLoot)
     local cycle = lootCycle
 
     QueueSweep(0, cycle)
-
-    if db.carefulMode then
-        QueueSweep(math.max(0.05, tonumber(db.carefulDelay) or 0.12), cycle)
-    end
+    QueueCarefulSweeps(cycle)
 end
 
 function ns:SetFastLootEnabled(value)
@@ -181,12 +199,20 @@ function ns:InitializeFastLoot()
     initialized = true
 
     frame:RegisterEvent("LOOT_READY")
+    frame:RegisterEvent("LOOT_OPENED")
+    frame:RegisterEvent("LOOT_SLOT_CLEARED")
     frame:RegisterEvent("LOOT_CLOSED")
     frame:SetScript("OnEvent", function(_, event, eventAutoLoot)
         if event == "LOOT_CLOSED" then
             lootCycle = lootCycle + 1
             activeLoot = false
             sweepQueued = false
+            delayedSweepsQueued = false
+        elseif event == "LOOT_SLOT_CLEARED" then
+            if activeLoot then
+                QueueSweep(0, lootCycle)
+                QueueCarefulSweeps(lootCycle)
+            end
         else
             QueueFastLoot(eventAutoLoot)
         end

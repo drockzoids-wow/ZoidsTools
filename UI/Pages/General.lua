@@ -138,7 +138,22 @@ function ns.UI.Pages.CreateGeneralPage(parent)
     )
     UI.PlaceBelow(inviteBanner, collectButtons)
 
-    local performanceSection = UI.PlaceSection(frame, "Performance", inviteBanner, leftWidth)
+    local audioSync = UI.CreateCheckbox(
+        frame,
+        "Keep audio device synced",
+        "Keeps WoW on the Windows default audio device when your output device changes.",
+        function()
+            return ns.IsAudioSyncEnabled and ns:IsAudioSyncEnabled()
+        end,
+        function(value)
+            if ns.SetAudioSyncEnabled then
+                ns:SetAudioSyncEnabled(value)
+            end
+        end
+    )
+    UI.PlaceBelow(audioSync, inviteBanner)
+
+    local performanceSection = UI.PlaceSection(frame, "Performance", audioSync, leftWidth)
 
     local performanceDisplay = UI.CreateDropdown(
         frame,
@@ -399,6 +414,7 @@ function ns.UI.Pages.CreateGeneralPage(parent)
         mouseoverButtons:Refresh()
         collectButtons:Refresh()
         inviteBanner:Refresh()
+        audioSync:Refresh()
         cinematicFastSkip:Refresh()
         cinematicAutoSkip:Refresh()
         subtleTalkingHead:Refresh()

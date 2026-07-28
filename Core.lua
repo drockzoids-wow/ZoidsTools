@@ -315,6 +315,9 @@ local defaults = {
             fontSize = 14,
             bold = false,
         },
+        audioSync = {
+            enabled = false,
+        },
         minimap = {
             show = true,
             hide = false,
@@ -784,6 +787,7 @@ local moduleInitializers = {
     "InitializeCombatSettings",
     "InitializeCinematicSkip",
     "InitializeSubtleTalkingHead",
+    "InitializeAudioSync",
     "InitializeCombatBanner",
     "InitializeMythicInviteBanner",
     "InitializeBuffWarnings",

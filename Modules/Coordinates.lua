@@ -562,24 +562,19 @@ RefreshCoordinates = function()
         return
     end
 
-    local inCombat = IsCombatLocked()
-
     ApplyClassColor()
     ApplyWidgetSize()
-
-    if not inCombat then
-        UpdateWidgetText()
-    end
+    UpdateWidgetText()
 
     if db.enabled then
-        frame:SetScript("OnUpdate", inCombat and nil or OnWidgetUpdate)
+        frame:SetScript("OnUpdate", OnWidgetUpdate)
         frame:Show()
     else
         frame:SetScript("OnUpdate", nil)
         frame:Hide()
     end
 
-    if not inCombat then
+    if not IsCombatLocked() then
         CreateMapOverlay()
         if mapOverlay then
             mapOverlay:SetScript("OnUpdate", OnMapUpdate)

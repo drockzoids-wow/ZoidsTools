@@ -68,6 +68,18 @@ local defaults = {
         fastSkip = false,
         autoSkip = false,
     },
+    autoConfirm = {
+        enabled = false,
+        deleteItems = false,
+        deleteGoodItems = false,
+        disenchantRolls = false,
+        bindPrompts = false,
+        replaceEnchant = false,
+        replaceSockets = false,
+        merchantTradeTimers = false,
+        tokenPurchases = false,
+        highCostPurchases = false,
+    },
     mythicInviteBanner = {
         enabled = true,
     },
@@ -397,11 +409,15 @@ function ns:GetDB()
 end
 
 function ns:OpenConfig(pageKey)
-    if self.UI and self.UI.Show then
-        self.UI.Show(pageKey)
+    if self.UI2 and self.UI2.Show then
+        self.UI2.Show(pageKey)
     else
         self:Print("The control window is not ready yet.")
     end
+end
+
+function ns:OpenModernConfig(pageKey)
+    self:OpenConfig(pageKey)
 end
 
 function ns:SetMinimapShown(value)
@@ -419,6 +435,7 @@ end
 
 local function PrintHelp()
     ns:Print("/zt opens ZoidsTools.")
+    ns:Print("/zt2 also opens ZoidsTools.")
     ns:Print("/zt windows on/off toggles movable Blizzard windows.")
     ns:Print("/zt tooltips opens tooltip options.")
     ns:Print("/zt chat opens chat enhancement options.")
@@ -465,6 +482,8 @@ local function HandleSlash(input)
 
     if input == "" or input == "config" or input == "options" or input == "open" then
         ns:OpenConfig()
+    elseif input == "newui" or input == "new ui" or input == "modern" or input == "next" then
+        ns:OpenModernConfig()
     elseif input == "windows" then
         ns:OpenConfig("windows")
     elseif input == "tooltips" or input == "tooltip" then
@@ -772,6 +791,12 @@ SLASH_ZOIDSTOOLS2 = "/zoids"
 SLASH_ZOIDSTOOLS3 = "/zoidstools"
 SlashCmdList.ZOIDSTOOLS = HandleSlash
 
+SLASH_ZOIDSTOOLSNEW1 = "/zt2"
+SlashCmdList.ZOIDSTOOLSNEW = function(input)
+    input = string.lower(Trim(input))
+    ns:OpenModernConfig(input ~= "" and input or nil)
+end
+
 local eventFrame = CreateFrame("Frame")
 eventFrame:RegisterEvent("ADDON_LOADED")
 eventFrame:RegisterEvent("PLAYER_LOGIN")
@@ -786,6 +811,7 @@ local moduleInitializers = {
     "InitializeVendorAutomation",
     "InitializeCombatSettings",
     "InitializeCinematicSkip",
+    "InitializeAutoConfirm",
     "InitializeSubtleTalkingHead",
     "InitializeAudioSync",
     "InitializeCombatBanner",

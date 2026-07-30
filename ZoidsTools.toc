@@ -23,6 +23,7 @@ Modules\FastLoot.lua
 Modules\VendorAutomation.lua
 Modules\Combat.lua
 Modules\CinematicSkip.lua
+Modules\AutoConfirm.lua
 Modules\TalkingHead.lua
 Modules\AudioSync.lua
 Modules\CombatBanner.lua
@@ -65,5 +66,5 @@ UI\Pages\Mounts.lua
 UI\Pages\Loot.lua
 UI\Pages\Quests.lua
 UI\Pages\About.lua
-UI\MainWindow.lua
+UI\ModernWindow.lua
 UI\Minimap.lua

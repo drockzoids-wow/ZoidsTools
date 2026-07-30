@@ -130,10 +130,20 @@ function ns.UI.Pages.CreateUnitFramesPage(parent)
         )
         UI.PlaceBelow(castbarHeight, castbarWidth, 0, 26)
         controls[#controls + 1] = castbarHeight
+
+        local previewCastbar = UI.CreateButton(frame, "Preview Castbar", 130)
+        UI.PlaceBelow(previewCastbar, castbarHeight, -14, 18)
+        previewCastbar:SetScript("OnClick", function()
+            if ns.PreviewUnitFrameCastbar then
+                ns:PreviewUnitFrameCastbar(info.key)
+            end
+        end)
+
         castbarDependencies[#castbarDependencies + 1] = {
             enabled = resizeCastbar,
             width = castbarWidth,
             height = castbarHeight,
+            preview = previewCastbar,
         }
 
         if info.key ~= "player" then
@@ -150,7 +160,7 @@ function ns.UI.Pages.CreateUnitFramesPage(parent)
                     end
                 end
             )
-            hideBuffs:SetPoint("TOPLEFT", castbarHeight, "BOTTOMLEFT", -14, -24)
+            hideBuffs:SetPoint("TOPLEFT", previewCastbar, "BOTTOMLEFT", 0, -18)
             controls[#controls + 1] = hideBuffs
 
             local hideDebuffs = UI.CreateCheckbox(
@@ -194,11 +204,17 @@ function ns.UI.Pages.CreateUnitFramesPage(parent)
             local active = dependency.enabled:GetChecked() == true
             UI.SetControlEnabled(dependency.width, active)
             UI.SetControlEnabled(dependency.height, active)
+            UI.SetControlEnabled(dependency.preview, active)
         end
 
     end
 
     frame:SetScript("OnShow", frame.Refresh)
+    frame:SetScript("OnHide", function()
+        if ns.HideUnitFrameCastbarPreview then
+            ns:HideUnitFrameCastbarPreview()
+        end
+    end)
 
     return frame
 end

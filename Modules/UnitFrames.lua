@@ -9,6 +9,9 @@ local auraFrameCache = {}
 local originalHealthColors = {}
 local originalCastbarState = {}
 local originalAuraState = {}
+local castbarPreviewFrame
+local castbarPreviewKey
+local castbarPreviewToken = 0
 local pendingProtectedRefresh = false
 local refreshQueued = false
 local healthRefreshQueued = false
@@ -18,6 +21,10 @@ local HasAuraVisibilityOverrides
 
 local DEFAULT_CASTBAR_WIDTH = 195
 local DEFAULT_CASTBAR_HEIGHT = 16
+local CASTBAR_PREVIEW_OUTER_PAD_X = 28
+local CASTBAR_PREVIEW_OUTER_PAD_Y = 14
+local CASTBAR_PREVIEW_INSET_X = 14
+local CASTBAR_PREVIEW_INSET_Y = 6
 
 local frameOrder = { "player", "target", "focus" }
 local auraFrameOrder = { "target", "focus" }
@@ -835,6 +842,132 @@ local function ApplyCastbars()
     end
 end
 
+local function GetFrameLabel(key)
+    if key == "player" then
+        return "Player"
+    elseif key == "target" then
+        return "Target"
+    elseif key == "focus" then
+        return "Focus"
+    end
+
+    return "Castbar"
+end
+
+local function EnsureCastbarPreviewFrame()
+    if castbarPreviewFrame then
+        return castbarPreviewFrame
+    end
+
+    local frame = CreateFrame("Frame", "ZoidsToolsCastbarPreview", UIParent, "BackdropTemplate")
+    frame:SetFrameStrata("TOOLTIP")
+    frame:SetFrameLevel(900)
+    frame:SetBackdrop({
+        bgFile = "Interface\\Buttons\\WHITE8x8",
+        edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
+        edgeSize = 8,
+        insets = { left = 2, right = 2, top = 2, bottom = 2 },
+    })
+    frame:SetBackdropColor(0.10, 0.10, 0.10, 0.86)
+    frame:SetBackdropBorderColor(0.36, 0.34, 0.28, 0.96)
+    frame:EnableMouse(false)
+
+    frame.background = frame:CreateTexture(nil, "BACKGROUND")
+    frame.background:SetPoint("TOPLEFT", frame, "TOPLEFT", 3, -3)
+    frame.background:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -3, 3)
+    frame.background:SetColorTexture(0.18, 0.18, 0.16, 0.88)
+
+    frame.fill = frame:CreateTexture(nil, "ARTWORK")
+    frame.fill:SetPoint("TOPLEFT", frame, "TOPLEFT", CASTBAR_PREVIEW_INSET_X, -CASTBAR_PREVIEW_INSET_Y)
+    frame.fill:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT", CASTBAR_PREVIEW_INSET_X, CASTBAR_PREVIEW_INSET_Y)
+    frame.fill:SetWidth(80)
+    frame.fill:SetColorTexture(1, 0.82, 0.12, 0.90)
+
+    frame.spark = frame:CreateTexture(nil, "OVERLAY")
+    frame.spark:SetPoint("LEFT", frame.fill, "RIGHT", -1, 0)
+    frame.spark:SetSize(2, 18)
+    frame.spark:SetColorTexture(1, 0.95, 0.60, 0.85)
+
+    frame.text = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    frame.text:SetPoint("TOPLEFT", frame, "BOTTOMLEFT", 8, -1)
+    frame.text:SetPoint("TOPRIGHT", frame, "BOTTOMRIGHT", -8, -1)
+    frame.text:SetJustifyH("CENTER")
+    frame.text:SetTextColor(1, 1, 1)
+
+    frame:Hide()
+    castbarPreviewFrame = frame
+
+    return frame
+end
+
+local function PositionCastbarPreview(key)
+    local frame = EnsureCastbarPreviewFrame()
+    local info = key and castbars[key]
+    local bar = info and ResolveFirst(info.paths)
+    local selection = bar and bar.Selection
+
+    frame:ClearAllPoints()
+    frame:SetParent(UIParent)
+    frame:SetFrameStrata("TOOLTIP")
+    frame:SetFrameLevel(900)
+
+    if selection and selection.GetObjectType then
+        frame:SetPoint("TOPLEFT", selection, "TOPLEFT", 0, 0)
+        frame:SetPoint("BOTTOMRIGHT", selection, "BOTTOMRIGHT", 0, 0)
+    elseif bar and bar.GetCenter then
+        frame:SetPoint("CENTER", bar, "CENTER", 0, 0)
+    elseif key == "player" and PlayerFrame then
+        frame:SetPoint("TOP", PlayerFrame, "BOTTOM", 42, -18)
+    elseif key == "target" and TargetFrame then
+        frame:SetPoint("TOP", TargetFrame, "BOTTOM", 42, -18)
+    elseif key == "focus" and FocusFrame then
+        frame:SetPoint("TOP", FocusFrame, "BOTTOM", 42, -18)
+    else
+        frame:SetPoint("CENTER", UIParent, "CENTER", 0, 120)
+    end
+end
+
+local function UpdateCastbarPreview(key, keepVisible)
+    if not key or not castbars[key] then
+        return
+    end
+
+    local db = EnsureDB()
+    local frameDB = db and EnsureFrameDB(db, key)
+    if not frameDB then
+        return
+    end
+
+    local frame = EnsureCastbarPreviewFrame()
+    local width = frameDB.castbar.width or DEFAULT_CASTBAR_WIDTH
+    local height = frameDB.castbar.height or DEFAULT_CASTBAR_HEIGHT
+    local outerWidth = width + CASTBAR_PREVIEW_OUTER_PAD_X
+    local outerHeight = height + CASTBAR_PREVIEW_OUTER_PAD_Y
+    local info = castbars[key]
+    local bar = info and ResolveFirst(info.paths)
+    local selection = bar and bar.Selection
+
+    if not selection then
+        frame:SetSize(outerWidth, outerHeight)
+    end
+    frame.fill:SetWidth(math.max(8, width * 0.66))
+    frame.spark:ClearAllPoints()
+    frame.spark:SetPoint("LEFT", frame.fill, "RIGHT", -1, 0)
+    frame.spark:SetHeight(math.max(12, height + 8))
+    frame.text:SetText(string.format("%s Castbar Preview", GetFrameLabel(key)))
+    PositionCastbarPreview(key)
+
+    if keepVisible ~= false then
+        frame:Show()
+    end
+end
+
+local function RefreshActiveCastbarPreview(key)
+    if castbarPreviewFrame and castbarPreviewFrame:IsShown() and castbarPreviewKey == key then
+        UpdateCastbarPreview(key, true)
+    end
+end
+
 local function HookCastbar(key)
     local info = key and castbars[key]
     local bar = info and ResolveFirst(info.paths)
@@ -1145,6 +1278,16 @@ local function GetAuraFrames(info, auraType, unit)
     return frames
 end
 
+local function ClearAuraFrameCache(unit)
+    if not unit then
+        auraFrameCache = {}
+        return
+    end
+
+    auraFrameCache[tostring(unit) .. ":buffs"] = nil
+    auraFrameCache[tostring(unit) .. ":debuffs"] = nil
+end
+
 local function ShouldHideAuraType(key, auraType)
     local db = EnsureDB()
     local frameDB = db and db.frames and db.frames[key]
@@ -1291,6 +1434,7 @@ end
 
 local function RefreshUnitFrames()
     local db = EnsureDB()
+    ClearAuraFrameCache()
 
     if db and db.classColorHealth == true then
         for _, info in pairs(healthBars) do
@@ -1368,6 +1512,11 @@ function ns:SetUnitFrameCastbarResizeEnabled(key, value)
 
     EnsureFrameDB(db, key).castbar.enabled = value == true
     RefreshUnitFrames()
+    if value == true then
+        ns:PreviewUnitFrameCastbar(key)
+    elseif castbarPreviewKey == key then
+        ns:HideUnitFrameCastbarPreview()
+    end
 end
 
 function ns:GetUnitFrameCastbarResizeEnabled(key)
@@ -1391,6 +1540,7 @@ function ns:SetUnitFrameCastbarWidth(key, value)
 
     EnsureFrameDB(db, key).castbar.width = Clamp(value, 120, 420, DEFAULT_CASTBAR_WIDTH)
     RefreshUnitFrames()
+    RefreshActiveCastbarPreview(key)
 end
 
 function ns:GetUnitFrameCastbarWidth(key)
@@ -1414,6 +1564,7 @@ function ns:SetUnitFrameCastbarHeight(key, value)
 
     EnsureFrameDB(db, key).castbar.height = Clamp(value, 8, 40, DEFAULT_CASTBAR_HEIGHT)
     RefreshUnitFrames()
+    RefreshActiveCastbarPreview(key)
 end
 
 function ns:GetUnitFrameCastbarHeight(key)
@@ -1445,6 +1596,7 @@ function ns:SetUnitFrameAuraHidden(key, auraType, value)
         frameDB.hideDebuffs = value == true
     end
 
+    ClearAuraFrameCache(key)
     UpdateAuraEventRegistration()
     RefreshUnitFrames()
 end
@@ -1470,6 +1622,39 @@ end
 
 function ns:RefreshUnitFrames()
     RefreshUnitFrames()
+end
+
+function ns:PreviewUnitFrameCastbar(key)
+    key = key or "player"
+
+    if not castbars[key] then
+        return false
+    end
+
+    castbarPreviewKey = key
+    castbarPreviewToken = castbarPreviewToken + 1
+    local token = castbarPreviewToken
+
+    UpdateCastbarPreview(key, true)
+
+    if C_Timer and C_Timer.After then
+        C_Timer.After(10, function()
+            if token == castbarPreviewToken then
+                ns:HideUnitFrameCastbarPreview()
+            end
+        end)
+    end
+
+    return true
+end
+
+function ns:HideUnitFrameCastbarPreview()
+    castbarPreviewToken = castbarPreviewToken + 1
+    castbarPreviewKey = nil
+
+    if castbarPreviewFrame then
+        castbarPreviewFrame:Hide()
+    end
 end
 
 function ns:InitializeUnitFrames()
@@ -1542,9 +1727,11 @@ function ns:InitializeUnitFrames()
         end
 
         if event == "PLAYER_TARGET_CHANGED" then
+            ClearAuraFrameCache("target")
             ScheduleUnitFrameState("target", 0.03)
             return
         elseif event == "PLAYER_FOCUS_CHANGED" then
+            ClearAuraFrameCache("focus")
             ScheduleUnitFrameState("focus", 0.03)
             return
         end
@@ -1568,6 +1755,11 @@ function ns:InitializeUnitFrames()
 
         if event == "UNIT_AURA" then
             if HasAuraVisibilityOverrides() then
+                if unit == "target" or unit == "focus" then
+                    ClearAuraFrameCache(unit)
+                else
+                    ClearAuraFrameCache()
+                end
                 ScheduleAuraVisibility(0.08)
             end
 

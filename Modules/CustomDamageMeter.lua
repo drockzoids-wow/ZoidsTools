@@ -1748,6 +1748,7 @@ function ns:SetCustomDamageMeterSecondWindowEnabled(value)
     end
     UpdateInteractionState()
     ScheduleRefresh(true)
+    if ns.UI and ns.UI.RefreshVisiblePage then ns.UI.RefreshVisiblePage() end
 end
 
 function ns:GetCustomDamageMeterSessionType(windowIndex)

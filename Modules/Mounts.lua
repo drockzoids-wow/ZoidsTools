@@ -1922,7 +1922,7 @@ function ns:GetMountServiceOptions(serviceType)
         local details = GetMountDetails(mountID)
         local name = details and details.name
 
-        if name and details.isCollected and IsMountUsable(details) and IsMountAllowedForCharacter(details) then
+        if name and details.isCollected and IsMountAllowedForCharacter(details) then
             local normalized = NormalizeMountName(name)
             local matchesService = false
 

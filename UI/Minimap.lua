@@ -99,10 +99,10 @@ function ns:InitializeMinimapButton()
         iconCoords = { 0, 1, 0, 1 },
 
         OnClick = function(_, button)
-            if button == "RightButton" and ns.UI and ns.UI.Show then
-                ns.UI.Show("windows")
-            elseif ns.UI and ns.UI.Toggle then
-                ns.UI.Toggle()
+            if button == "RightButton" and ns.UI2 and ns.UI2.Show then
+                ns.UI2.Show("windows")
+            elseif ns.UI2 and ns.UI2.Toggle then
+                ns.UI2.Toggle()
             end
         end,
 

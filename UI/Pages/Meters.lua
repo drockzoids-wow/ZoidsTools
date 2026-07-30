@@ -84,6 +84,9 @@ function ns.UI.Pages.CreateMetersPage(parent)
             if ns.SetCustomDamageMeterEnabled then
                 ns:SetCustomDamageMeterEnabled(value)
             end
+            if frame.Refresh then
+                frame:Refresh()
+            end
         end
     )
     UI.PlaceFirst(customEnabled, customSection)
@@ -98,6 +101,9 @@ function ns.UI.Pages.CreateMetersPage(parent)
         function(value)
             if ns.SetCustomDamageMeterSecondWindowEnabled then
                 ns:SetCustomDamageMeterSecondWindowEnabled(value)
+            end
+            if frame.Refresh then
+                frame:Refresh()
             end
         end
     )
@@ -326,7 +332,7 @@ function ns.UI.Pages.CreateMetersPage(parent)
         classColoredBorder:Refresh()
         textScale:Refresh()
         UI.SetControlEnabled(secondWindowEnabled, customEnabled:GetChecked() == true)
-        UI.SetControlEnabled(snapGap, customEnabled:GetChecked() == true and secondWindowEnabled:GetChecked() == true)
+        UI.SetControlEnabled(snapGap, customEnabled:GetChecked() == true)
         UI.SetControlEnabled(backgroundOpacity, customEnabled:GetChecked() == true)
         UI.SetControlEnabled(classColoredBorder, customEnabled:GetChecked() == true)
         customStatus:SetText(ns.GetCustomDamageMeterStatusText and ns:GetCustomDamageMeterStatusText() or "")

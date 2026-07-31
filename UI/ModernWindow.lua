@@ -3352,23 +3352,14 @@ local function CreateDialogsPage(parent)
     )
     PlaceFirst(enabled, main)
 
-    local deleteItems = UI.CreateCheckbox(
-        main,
-        "Delete ordinary items",
-        "Automatically confirms simple item-delete prompts.",
-        function() return ns.GetAutoConfirmOption and ns:GetAutoConfirmOption("deleteItems") end,
-        function(value) if ns.SetAutoConfirmOption then ns:SetAutoConfirmOption("deleteItems", value) end end
-    )
-    PlaceBelow(deleteItems, enabled)
-
     local deleteGoodItems = UI.CreateCheckbox(
         main,
-        "Type DELETE for good items",
-        "Automatically types DELETE and confirms high-quality item and quest-item delete prompts.",
+        "Fill DELETE for protected items",
+        "Types DELETE for high-quality item and quest-item deletion prompts. You must click the confirmation button yourself.",
         function() return ns.GetAutoConfirmOption and ns:GetAutoConfirmOption("deleteGoodItems") end,
         function(value) if ns.SetAutoConfirmOption then ns:SetAutoConfirmOption("deleteGoodItems", value) end end
     )
-    PlaceBelow(deleteGoodItems, deleteItems)
+    PlaceBelow(deleteGoodItems, enabled)
 
     local disenchantRolls = UI.CreateCheckbox(
         main,
@@ -3455,7 +3446,6 @@ local function CreateDialogsPage(parent)
 
     function page:Refresh()
         enabled:Refresh()
-        deleteItems:Refresh()
         deleteGoodItems:Refresh()
         disenchantRolls:Refresh()
         bindPrompts:Refresh()
@@ -3466,7 +3456,6 @@ local function CreateDialogsPage(parent)
         highCostPurchases:Refresh()
 
         local active = enabled:GetChecked() == true
-        UI.SetControlEnabled(deleteItems, active)
         UI.SetControlEnabled(deleteGoodItems, active)
         UI.SetControlEnabled(disenchantRolls, active)
         UI.SetControlEnabled(bindPrompts, active)

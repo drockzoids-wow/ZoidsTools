@@ -19,8 +19,6 @@ local BUTTON_ONLY_OPTIONS = {
 }
 
 local TYPED_DELETE_OPTIONS = {
-    DELETE_ITEM = "deleteItems",
-    DELETE_QUEST_ITEM = "deleteItems",
     DELETE_GOOD_ITEM = "deleteGoodItems",
     DELETE_GOOD_QUEST_ITEM = "deleteGoodItems",
 }
@@ -63,15 +61,9 @@ end
 
 local function FillDeleteText(popup)
     local editBox = GetPopupEditBox(popup)
-    if not editBox then
-        return true
-    end
+    if not editBox then return false end
 
-    local text = DELETE_ITEM_CONFIRM_STRING or DELETE or "DELETE"
-    editBox:SetText(text)
-    if editBox.ClearFocus then editBox:ClearFocus() end
-    if editBox.SetAutoFocus then editBox:SetAutoFocus(false) end
-
+    editBox:SetText(DELETE_ITEM_CONFIRM_STRING or DELETE or "DELETE")
     return true
 end
 
@@ -97,6 +89,7 @@ local function ConfirmPopup(popup)
     if typedOption then
         if not IsOptionEnabled(typedOption) then return end
         FillDeleteText(popup)
+        return -- Deleting an item is protected; the user must perform the final click.
     elseif buttonOption then
         if not IsOptionEnabled(buttonOption) then return end
     else
@@ -107,13 +100,6 @@ local function ConfirmPopup(popup)
         return
     end
 
-    if typedOption and C_Timer and C_Timer.After then
-        C_Timer.After(0.05, function()
-            if popup and popup:IsShown() and popup.which == which then
-                ClickPrimaryButton(popup)
-            end
-        end)
-    end
 end
 
 local function ScheduleConfirm(popup)

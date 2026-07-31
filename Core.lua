@@ -70,7 +70,6 @@ local defaults = {
     },
     autoConfirm = {
         enabled = false,
-        deleteItems = false,
         deleteGoodItems = false,
         disenchantRolls = false,
         bindPrompts = false,

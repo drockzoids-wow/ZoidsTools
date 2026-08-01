@@ -6,12 +6,20 @@ local ICON_INSET = 4
 local DEFAULT_ICON = 134400
 local UPDATE_DELAY = 0.08
 
+-- Blizzard exposes most usable quest items through the quest log. A smaller
+-- group only exists in the player's bags; Data/QuestItems.lua holds verified
+-- quest-to-item associations for those exceptions.
+local INVENTORY_QUEST_ITEMS = ns.QuestItemData or {}
+
 local button
 local eventFrame
 local updateQueued = false
 local moveMode = false
 local pendingCombatUpdate = false
 local rangeTicker
+local cachedBagItemIndex
+local cachedUsableQuestItems
+local bagItemIndexDirty = true
 
 local function IsInCombat()
     return InCombatLockdown and InCombatLockdown()
@@ -86,25 +94,134 @@ local function QuestShowsItem(questLogIndex, isComplete)
     return itemLink ~= nil and (not isComplete or showItemWhenComplete == true)
 end
 
-local function GetQuestCandidate(questID, watchOrder, superTrackedQuestID)
+local function BuildBagItemIndex()
+    local index = {}
+    local usableQuestItems = {}
+    if not C_Container then
+        return index, usableQuestItems
+    end
+
+    local lastBag = NUM_TOTAL_EQUIPPED_BAG_SLOTS or NUM_BAG_SLOTS or 4
+    for bag = 0, lastBag do
+        local numSlots = C_Container.GetContainerNumSlots and C_Container.GetContainerNumSlots(bag) or 0
+        for slot = 1, numSlots do
+            local itemID = C_Container.GetContainerItemID and C_Container.GetContainerItemID(bag, slot)
+            if itemID then
+                local info = C_Container.GetContainerItemInfo and C_Container.GetContainerItemInfo(bag, slot)
+                local entry = index[itemID]
+                if not entry then
+                    entry = {
+                        itemID = itemID,
+                        itemLink = (info and info.hyperlink) or ("item:" .. itemID),
+                        itemTexture = (info and info.iconFileID)
+                            or (C_Item and C_Item.GetItemIconByID and C_Item.GetItemIconByID(itemID)),
+                        charges = 0,
+                        bag = bag,
+                        slot = slot,
+                    }
+                    index[itemID] = entry
+                end
+                entry.charges = entry.charges + (info and tonumber(info.stackCount) or 1)
+
+                local questInfo
+                if C_Container.GetContainerItemQuestInfo then
+                    local ok, result = pcall(C_Container.GetContainerItemQuestInfo, bag, slot)
+                    if ok then
+                        questInfo = result
+                    end
+                end
+
+                if questInfo and questInfo.isQuestItem == true and not entry.usableQuestItem then
+                    local spellName
+                    if C_Item and C_Item.GetItemSpell then
+                        local ok, result = pcall(C_Item.GetItemSpell, itemID)
+                        if ok then
+                            spellName = result
+                        end
+                    end
+
+                    if spellName then
+                        entry.usableQuestItem = true
+                        usableQuestItems[#usableQuestItems + 1] = entry
+                    end
+                end
+            end
+        end
+    end
+
+    return index, usableQuestItems
+end
+
+local function GetBagItemIndex()
+    if bagItemIndexDirty or not cachedBagItemIndex or not cachedUsableQuestItems then
+        cachedBagItemIndex, cachedUsableQuestItems = BuildBagItemIndex()
+        bagItemIndexDirty = false
+    end
+    return cachedBagItemIndex, cachedUsableQuestItems
+end
+
+local function GetMappedItemIDs(questID)
+    local mapped = INVENTORY_QUEST_ITEMS[questID]
+    if type(mapped) == "number" then
+        return { mapped }
+    end
+    if type(mapped) == "table" then
+        return mapped
+    end
+    return nil
+end
+
+local function GetInventoryQuestItemInfo(questID, bagItemIndex)
+    local itemIDs = GetMappedItemIDs(questID)
+    if not itemIDs then
+        return nil
+    end
+
+    for _, itemID in ipairs(itemIDs) do
+        local entry = bagItemIndex[itemID]
+        if entry then
+            return entry.itemLink, entry.itemTexture, entry.charges, itemID, entry.bag, entry.slot
+        end
+    end
+
+    return nil
+end
+
+local function IsQuestActive(questID)
+    if C_TaskQuest and C_TaskQuest.IsActive then
+        local ok, active = pcall(C_TaskQuest.IsActive, questID)
+        if ok and active == true then
+            return true
+        end
+    end
+
+    if C_QuestLog and C_QuestLog.IsOnQuest then
+        local ok, active = pcall(C_QuestLog.IsOnQuest, questID)
+        if ok and active == true then
+            return true
+        end
+    end
+
+    return false
+end
+
+local function GetQuestRelevance(questID, watchOrder, superTrackedQuestID)
     questID = tonumber(questID)
     if not questID or questID <= 0 or not C_QuestLog then
         return nil
     end
 
-    local questLogIndex = tonumber(C_QuestLog.GetLogIndexForQuestID(questID))
-    if not questLogIndex or questLogIndex <= 0 then
+    local questLogIndex = tonumber(C_QuestLog.GetLogIndexForQuestID(questID)) or 0
+    if questLogIndex <= 0 and not IsQuestActive(questID) then
         return nil
     end
 
-    local isComplete = C_QuestLog.IsComplete and C_QuestLog.IsComplete(questID) == true
-    if not QuestShowsItem(questLogIndex, isComplete) then
-        return nil
-    end
-
-    local itemLink, itemTexture, charges = GetQuestLogSpecialItemInfo(questLogIndex)
-    if not itemLink then
-        return nil
+    local title = C_QuestLog.GetTitleForQuestID and C_QuestLog.GetTitleForQuestID(questID)
+    if not title and C_TaskQuest and C_TaskQuest.GetQuestInfoByQuestID then
+        local ok, taskTitle = pcall(C_TaskQuest.GetQuestInfoByQuestID, questID)
+        if ok then
+            title = taskTitle
+        end
     end
 
     local insideQuestArea = false
@@ -126,16 +243,43 @@ local function GetQuestCandidate(questID, watchOrder, superTrackedQuestID)
     return {
         questID = questID,
         questLogIndex = questLogIndex,
-        title = C_QuestLog.GetTitleForQuestID and C_QuestLog.GetTitleForQuestID(questID) or ("Quest " .. questID),
-        itemLink = itemLink,
-        itemTexture = itemTexture,
-        charges = charges,
+        title = title or ("Quest " .. questID),
         insideQuestArea = insideQuestArea,
         superTracked = superTrackedQuestID == questID,
         distanceSq = distanceSq,
         onContinent = onContinent,
         watchOrder = watchOrder or math.huge,
     }
+end
+
+local function GetQuestCandidate(candidate, bagItemIndex)
+    if not candidate then
+        return nil
+    end
+
+    local isComplete = C_QuestLog.IsComplete and C_QuestLog.IsComplete(candidate.questID) == true
+    local itemLink, itemTexture, charges, itemID, bag, slot
+    local inventoryItem = false
+
+    if candidate.questLogIndex > 0 and QuestShowsItem(candidate.questLogIndex, isComplete) then
+        itemLink, itemTexture, charges = GetQuestLogSpecialItemInfo(candidate.questLogIndex)
+    elseif not isComplete then
+        itemLink, itemTexture, charges, itemID, bag, slot = GetInventoryQuestItemInfo(candidate.questID, bagItemIndex)
+        inventoryItem = itemLink ~= nil
+    end
+
+    if not itemLink then
+        return nil
+    end
+
+    candidate.itemLink = itemLink
+    candidate.itemTexture = itemTexture
+    candidate.charges = charges
+    candidate.itemID = itemID
+    candidate.bag = bag
+    candidate.slot = slot
+    candidate.inventoryItem = inventoryItem
+    return candidate
 end
 
 local function CandidateIsBetter(candidate, current)
@@ -170,8 +314,10 @@ local function FindBestQuestItem()
     end
 
     local best
+    local bestRelevantQuest
     local seen = {}
     local order = 0
+    local bagItemIndex, usableQuestItems = GetBagItemIndex()
     local superTrackedQuestID = C_SuperTrack
         and C_SuperTrack.GetSuperTrackedQuestID
         and C_SuperTrack.GetSuperTrackedQuestID()
@@ -184,7 +330,12 @@ local function FindBestQuestItem()
 
         seen[questID] = true
         order = order + 1
-        local candidate = GetQuestCandidate(questID, order, superTrackedQuestID)
+        local relevance = GetQuestRelevance(questID, order, superTrackedQuestID)
+        if relevance and CandidateIsBetter(relevance, bestRelevantQuest) then
+            bestRelevantQuest = relevance
+        end
+
+        local candidate = GetQuestCandidate(relevance, bagItemIndex)
         if candidate and CandidateIsBetter(candidate, best) then
             best = candidate
         end
@@ -200,6 +351,42 @@ local function FindBestQuestItem()
     local numWorldQuestWatches = C_QuestLog.GetNumWorldQuestWatches and C_QuestLog.GetNumWorldQuestWatches() or 0
     for index = 1, numWorldQuestWatches do
         Consider(C_QuestLog.GetQuestIDForWorldQuestWatchIndex(index))
+    end
+
+    -- Also consider active but untracked quests. This lets an item follow the
+    -- player's actual quest area without requiring the quest to be pinned.
+    local numQuestLogEntries = C_QuestLog.GetNumQuestLogEntries and C_QuestLog.GetNumQuestLogEntries() or 0
+    for index = 1, numQuestLogEntries do
+        local info = C_QuestLog.GetInfo and C_QuestLog.GetInfo(index)
+        if info and not info.isHeader and not info.isHidden then
+            Consider(info.questID)
+        end
+    end
+
+    -- Task/world quests can be active without a normal quest-log index. Check
+    -- the small verified exception catalog directly so those items still work
+    -- even when the quest is not pinned in Blizzard's tracker.
+    for questID in pairs(INVENTORY_QUEST_ITEMS) do
+        if IsQuestActive(questID) then
+            Consider(questID)
+        end
+    end
+
+    -- Some bag-only quest items have no quest ID in Blizzard's API and are not
+    -- present in the offline exception catalog. When there is exactly one
+    -- usable quest item and one clearly relevant quest, selecting it is safe.
+    if not best and #usableQuestItems == 1 and bestRelevantQuest
+        and (bestRelevantQuest.insideQuestArea or bestRelevantQuest.superTracked) then
+        local entry = usableQuestItems[1]
+        best = bestRelevantQuest
+        best.itemLink = entry.itemLink
+        best.itemTexture = entry.itemTexture
+        best.charges = entry.charges
+        best.itemID = entry.itemID
+        best.bag = entry.bag
+        best.slot = entry.slot
+        best.inventoryItem = true
+        best.inferredInventoryItem = true
     end
 
     return best
@@ -225,8 +412,14 @@ local function UpdateCooldownAndRange()
         return
     end
 
-    local questLogIndex = button.candidate.questLogIndex
-    local start, duration, enabled = GetQuestLogSpecialItemCooldown(questLogIndex)
+    local candidate = button.candidate
+    local questLogIndex = candidate.questLogIndex
+    local start, duration, enabled
+    if candidate.inventoryItem and C_Container and C_Container.GetItemCooldown then
+        start, duration, enabled = C_Container.GetItemCooldown(candidate.bag, candidate.slot)
+    else
+        start, duration, enabled = GetQuestLogSpecialItemCooldown(questLogIndex)
+    end
     if start then
         CooldownFrame_Set(button.cooldown, start, duration, enabled)
         button.icon:SetDesaturated(duration and duration > 0 and enabled == 0)
@@ -235,7 +428,12 @@ local function UpdateCooldownAndRange()
         button.icon:SetDesaturated(false)
     end
 
-    local inRange = IsQuestLogSpecialItemInRange and IsQuestLogSpecialItemInRange(questLogIndex)
+    local inRange
+    if candidate.inventoryItem and IsItemInRange then
+        inRange = IsItemInRange(candidate.itemID, "target")
+    elseif IsQuestLogSpecialItemInRange then
+        inRange = IsQuestLogSpecialItemInRange(questLogIndex)
+    end
     if inRange == 0 then
         button.icon:SetVertexColor(1, 0.30, 0.30)
     else
@@ -389,7 +587,11 @@ local function CreateButton()
     button:SetScript("OnEnter", function(self)
         GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
         if self.candidate then
-            GameTooltip:SetQuestLogSpecialItem(self.candidate.questLogIndex)
+            if self.candidate.inventoryItem and self.candidate.bag and self.candidate.slot then
+                GameTooltip:SetBagItem(self.candidate.bag, self.candidate.slot)
+            else
+                GameTooltip:SetQuestLogSpecialItem(self.candidate.questLogIndex)
+            end
             GameTooltip:AddLine(" ")
             GameTooltip:AddLine(self.candidate.title or "Tracked quest item", 1, 0.82, 0.28, true)
             GameTooltip:AddLine("ZoidsTools selected the most relevant tracked quest item.", 0.78, 0.78, 0.78, true)
@@ -487,6 +689,10 @@ function ns:InitializeQuestItemButton()
         if event == "BAG_UPDATE_COOLDOWN" then
             UpdateCooldownAndRange()
             return
+        end
+
+        if event == "BAG_UPDATE_DELAYED" or event == "PLAYER_ENTERING_WORLD" then
+            bagItemIndexDirty = true
         end
 
         if event == "PLAYER_REGEN_DISABLED" then

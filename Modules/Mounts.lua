@@ -340,19 +340,9 @@ local function SpellUsable(spellID)
         return false
     end
 
-    if C_Spell and C_Spell.GetSpellCooldown then
-        local cooldown = C_Spell.GetSpellCooldown(spellID)
-
-        if cooldown and cooldown.startTime and cooldown.duration and cooldown.duration > 0 then
-            return false
-        end
-    elseif GetSpellCooldown then
-        local start, duration = GetSpellCooldown(spellName)
-
-        if start and duration and duration > 0 then
-            return false
-        end
-    end
+    -- Midnight can return protected numeric cooldown values here. Comparing
+    -- those values taints Blizzard execution, so rely on the supported usable
+    -- state and let the secure spell action enforce any remaining cooldown.
 
     return true
 end
@@ -1166,6 +1156,24 @@ local function GetFallingRescueAction()
 
     if not db or db.useFallingRescue == false or not IsFalling or not IsFalling() then
         return nil
+    end
+
+    -- Travel Form is a Druid's safest first response when falling from caster
+    -- form. Keep existing shapeshifts intact so a Druid already in a form can
+    -- continue to the normal form-specific rescue list (for example, Flap).
+    if PlayerClass() == "DRUID" and db.useDruidTravelForm ~= false then
+        local shapeshiftForm = GetShapeshiftForm and GetShapeshiftForm() or 0
+        if shapeshiftForm == 0 and not IsPlayerUnderwaterForMounts() then
+            local travelFormName = GetSpellName(DRUID_TRAVEL_FORM_SPELL_ID)
+            if travelFormName
+                and IsSpellKnownByPlayer(DRUID_TRAVEL_FORM_SPELL_ID)
+                and SpellUsable(DRUID_TRAVEL_FORM_SPELL_ID) then
+                return {
+                    type = "spell",
+                    spell = travelFormName,
+                }
+            end
+        end
     end
 
     local rescues = FALLING_RESCUE_BY_CLASS[PlayerClass()]

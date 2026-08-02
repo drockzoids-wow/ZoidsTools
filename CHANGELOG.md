@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Detached addon-owned World Map and objective-tracker cosmetic layers from Blizzard's protected frame hierarchies and replaced tracker method hooks with read-only state polling, preventing quest and super-tracking updates from tainting protected pin mouse propagation.
 - Isolated unit-tooltip styling from Blizzard's shared quest-reward and map-POI construction, preventing secret-value sizing taint in embedded reward and widget tooltips.
 - Excluded Blizzard's protected World Map canvas from movable-window and scaling hooks, preventing quest-pin and POI layout taint.
 - Deferred World Map coordinate-overlay refreshes until after protected MapCanvas updates and disabled the overlay during combat.

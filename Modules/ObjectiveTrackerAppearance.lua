@@ -47,13 +47,11 @@ local originalNineSliceTopLeft
 local originalNineSliceTopRight
 local originalHeaderBackgroundAlpha
 local originalHeaderTextAlpha
-local collapseHooked = false
-local headerCollapseHooked = false
-local selectionAnchorHooked = false
 local knownCollapsed
 local lastHeaderControlsAlpha
 local originalSelectionPoints
 local selectionShiftApplied = false
+local ScheduleRefresh
 
 local function Clamp(value, minimum, maximum)
     value = tonumber(value) or minimum
@@ -104,7 +102,13 @@ local function CreateSkin()
     local frame = FindTracker()
     if not frame or skin then return skin end
 
-    skin = CreateFrame("Frame", "ZoidsToolsObjectiveTrackerSkin", frame, "BackdropTemplate")
+    -- Keep addon-owned decoration out of Blizzard's live objective-tracker
+    -- hierarchy. A foreign child can taint the quest-header click that opens
+    -- protected MapCanvas providers, where Retail configures pin mouse
+    -- passthrough. Anchoring an independent UIParent frame preserves the same
+    -- visual bounds without modifying the protected tracker tree.
+    skin = CreateFrame("Frame", "ZoidsToolsObjectiveTrackerSkin", UIParent, "BackdropTemplate")
+    skin:SetFrameStrata(frame:GetFrameStrata() or "MEDIUM")
     -- Blizzard's tracker background extends beyond the internal container
     -- frame (notably 30 px to the left), and Edit Mode uses those visible
     -- background bounds for its selection outline. Anchor to that same native
@@ -576,9 +580,35 @@ end
 
 local function RefreshMouseoverTicker()
     local db = GetSettings()
-    local shouldRun = db and db.enabled and db.mouseoverControls
+    -- Polling one tracker state five times per second avoids hooking Blizzard's
+    -- protected collapse and module methods. Those hooks can contaminate the
+    -- quest-supertracking path even when the hook only schedules cosmetic work.
+    local shouldRun = db and db.enabled
     if shouldRun and not mouseoverTicker and C_Timer and C_Timer.NewTicker then
-        mouseoverTicker = C_Timer.NewTicker(0.20, UpdateMouseoverControls)
+        mouseoverTicker = C_Timer.NewTicker(0.20, function()
+            local frame = FindTracker()
+            local settings = GetSettings()
+            if not frame or not settings or not settings.enabled then return end
+
+            if frame.IsCollapsed then
+                local collapsed = frame:IsCollapsed() and true or false
+                if collapsed ~= knownCollapsed then
+                    knownCollapsed = collapsed
+                    ScheduleRefresh(0, false)
+                    return
+                end
+            end
+
+            if skin then
+                local minimizeOnly = ShouldShowOnlyMinimizeButton(settings, frame)
+                skin:SetShown(
+                    frame:IsShown()
+                    and not minimizeOnly
+                    and (settings.backgroundOpacity > 0 or settings.borderEnabled)
+                )
+            end
+            UpdateMouseoverControls()
+        end)
     elseif not shouldRun and mouseoverTicker then
         mouseoverTicker:Cancel()
         mouseoverTicker = nil
@@ -674,6 +704,7 @@ local function ApplyAppearance()
         end
         appearance:SetShown(
             db.enabled
+            and frame:IsShown()
             and not minimizeOnly
             and (db.backgroundOpacity > 0 or db.borderEnabled)
         )
@@ -691,7 +722,7 @@ end
 
 ApplyAppearance = ns:WrapDiagnosticFunction("ObjectiveTracker.Refresh", ApplyAppearance)
 
-local function ScheduleRefresh(delay, refreshLayout, refreshFonts)
+ScheduleRefresh = function(delay, refreshLayout, refreshFonts)
     if refreshLayout then layoutRefreshRequested = true end
     if refreshFonts then fontRefreshRequested = true end
     if refreshPending then return end
@@ -769,36 +800,6 @@ function ns:InitializeObjectiveTrackerAppearance()
     if frame then
         if frame.IsCollapsed then
             knownCollapsed = frame:IsCollapsed() and true or false
-        end
-        frame:HookScript("OnShow", function() ScheduleRefresh(0, true, true) end)
-        if hooksecurefunc and frame.SetCollapsed and not collapseHooked then
-            collapseHooked = true
-            hooksecurefunc(frame, "SetCollapsed", function(_, collapsed)
-                knownCollapsed = collapsed and true or false
-                ScheduleRefresh(0, false)
-            end)
-        end
-        local header = frame.Header
-        if hooksecurefunc and header and header.SetCollapsed and not headerCollapseHooked then
-            headerCollapseHooked = true
-            hooksecurefunc(header, "SetCollapsed", function(_, collapsed)
-                knownCollapsed = collapsed and true or false
-                ScheduleRefresh(0, false)
-            end)
-        end
-        if hooksecurefunc and frame.AddModule then
-            hooksecurefunc(frame, "AddModule", function()
-                ScheduleRefresh(0, true, true)
-            end)
-        end
-        if hooksecurefunc and frame.AnchorSelectionFrame and not selectionAnchorHooked then
-            selectionAnchorHooked = true
-            hooksecurefunc(frame, "AnchorSelectionFrame", function(self)
-                local db = GetSettings()
-                if db and db.enabled then
-                    ApplyEditModeSelectionBounds(self, true, true)
-                end
-            end)
         end
     end
 

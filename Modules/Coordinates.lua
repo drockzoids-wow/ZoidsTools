@@ -510,9 +510,15 @@ local function CreateMapOverlay()
         return mapOverlay
     end
 
-    mapOverlay = CreateFrame("Frame", "ZoidsToolsMapCoordinates", WorldMapFrame, "BackdropTemplate")
+    -- Never parent addon-owned regions to WorldMapFrame. Retail's MapCanvas
+    -- builds protected POI pins beneath that hierarchy and a foreign child can
+    -- taint the later SetPropagateMouseClicks/SetPassThroughButtons setup when
+    -- a tracked quest opens the map. Anchoring an independent UIParent child
+    -- to the map keeps identical positioning without modifying the protected
+    -- frame tree.
+    mapOverlay = CreateFrame("Frame", "ZoidsToolsMapCoordinates", UIParent, "BackdropTemplate")
     mapOverlay:SetFrameStrata("HIGH")
-    mapOverlay:SetFrameLevel((WorldMapFrame:GetFrameLevel() or 1) + 40)
+    mapOverlay:SetFrameLevel(100)
     mapOverlay:SetSize(190, 42)
     mapOverlay:EnableMouse(false)
     PositionMapOverlay()

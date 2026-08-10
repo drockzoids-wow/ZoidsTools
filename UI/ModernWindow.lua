@@ -524,6 +524,36 @@ local function CreateInterfacePage(parent)
         end
     end)
 
+    local queueCard = CreateSectionCard(page, "Queue Alerts", cardW, 154)
+    queueCard:SetPoint("TOPLEFT", widgetsCard, "BOTTOMLEFT", 0, -10)
+
+    local queueSound = ns.UI.CreateCheckbox(
+        queueCard,
+        "Sound while in background",
+        "Plays the dungeon-ready alert on the Master channel, including while WoW is in the background.",
+        function() return ns.IsQueueBackgroundSoundEnabled and ns:IsQueueBackgroundSoundEnabled() end,
+        function(value) if ns.SetQueueBackgroundSoundEnabled then ns:SetQueueBackgroundSoundEnabled(value) end end
+    )
+    PlaceFirst(queueSound, queueCard)
+
+    local queueCountdown = ns.UI.CreateCheckbox(
+        queueCard,
+        "Show queue countdown",
+        "Shows a countdown on both the response dialog and the waiting-for-party status.",
+        function() return ns.IsQueueCountdownEnabled and ns:IsQueueCountdownEnabled() end,
+        function(value) if ns.SetQueueCountdownEnabled then ns:SetQueueCountdownEnabled(value) end end
+    )
+    PlaceBelow(queueCountdown, queueSound)
+
+    local safeQueue = ns.UI.CreateCheckbox(
+        queueCard,
+        "Safe queue (hide Decline)",
+        "Hides the Decline button on the dungeon-ready response dialog. ZoidsTools never accepts automatically.",
+        function() return ns.IsSafeQueueEnabled and ns:IsSafeQueueEnabled() end,
+        function(value) if ns.SetSafeQueueEnabled then ns:SetSafeQueueEnabled(value) end end
+    )
+    PlaceBelow(safeQueue, queueCountdown)
+
     local qualityCard = CreateSectionCard(page, "Quality of Life", cardW, 190)
     qualityCard:SetPoint("TOPLEFT", page, "TOPLEFT", 0, 0)
 
@@ -650,6 +680,9 @@ local function CreateInterfacePage(parent)
         audioSync:Refresh()
         cinematicFastSkip:Refresh()
         cinematicAutoSkip:Refresh()
+        queueSound:Refresh()
+        queueCountdown:Refresh()
+        safeQueue:Refresh()
 
         if ns.UI and ns.UI.SetControlEnabled then
             local talkingHeadActive = subtleTalkingHead:GetChecked() == true

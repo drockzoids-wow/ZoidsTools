@@ -2,12 +2,12 @@ local _, ns = ...
 
 local helperButton
 local eventFrame
-local tooltipHooked = false
 local lastActionText = ""
-local lastTooltipOwner
-local lastTooltipBagID
-local lastTooltipSlotID
+local lastHoveredOwner
+local lastHoveredBagID
+local lastHoveredSlotID
 local clickRegistrationPending = false
+local hoverElapsed = 0
 
 local BUTTON_NAME = "ZoidsToolsProfessionActionButton"
 local ACTION_BUTTON_USE_KEY_DOWN_CVAR = "ActionButtonUseKeyDown"
@@ -636,7 +636,7 @@ end
 
 local ShowActionForItem
 
-local function ShowActionForBagSlot(tooltip, bagID, slotID)
+local function ShowActionForBagSlot(owner, bagID, slotID)
     if not IsPlayerBagSlot(bagID, slotID) then
         return false
     end
@@ -647,17 +647,15 @@ local function ShowActionForBagSlot(tooltip, bagID, slotID)
         return false
     end
 
-    lastTooltipOwner = tooltip and tooltip:GetOwner()
-    lastTooltipBagID = bagID
-    lastTooltipSlotID = slotID
-    ShowActionForItem(tooltip, item)
+    lastHoveredOwner = owner
+    lastHoveredBagID = bagID
+    lastHoveredSlotID = slotID
+    ShowActionForItem(owner, item)
 
     return true
 end
 
-local function AnchorButtonToTooltipOwner(button)
-    local owner = GameTooltip and GameTooltip:GetOwner()
-
+local function AnchorButtonToOwner(button, owner)
     if not owner then
         return false
     end
@@ -701,10 +699,10 @@ local function HideButton()
     end
 end
 
-function ShowActionForItem(tooltip, item)
+function ShowActionForItem(owner, item)
     local db = EnsureDB()
 
-    if not db or db.enabled ~= true or not tooltip or tooltip ~= GameTooltip then
+    if not db or db.enabled ~= true or not owner then
         HideButton()
         return
     end
@@ -732,7 +730,7 @@ function ShowActionForItem(tooltip, item)
 
     local button = helperButton
 
-    if not button or not ConfigureButtonForAction(button, action) or not AnchorButtonToTooltipOwner(button) then
+    if not button or not ConfigureButtonForAction(button, action) or not AnchorButtonToOwner(button, owner) then
         return
     end
 
@@ -741,75 +739,152 @@ function ShowActionForItem(tooltip, item)
     lastActionText = string.format("%s ready for %s.", tostring(action.label or "Action"), tostring(GetItemName(action.itemID) or "item"))
 end
 
-local function HookTooltip()
-    if tooltipHooked then
-        return
-    end
+local function GetBagSlotFromFrame(frame)
+    local current = frame
 
-    tooltipHooked = true
+    for _ = 1, 5 do
+        if not current then
+            break
+        end
 
-    if TooltipDataProcessor and C_TooltipInfo and Enum and Enum.TooltipDataType then
-        TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item, function(tooltip, data)
-            if not tooltip or tooltip ~= GameTooltip or tooltip:IsForbidden() then
-                return
-            end
+        if current == helperButton then
+            return current, nil, nil, true
+        end
 
-            local owner = tooltip:GetOwner()
+        if type(current.GetSlotAndBagID) == "function" then
+            local ok, slotID, bagID = pcall(current.GetSlotAndBagID, current)
 
-            if not owner or owner == helperButton then
-                return
-            end
+            if ok and not IsSecretValue(bagID) and not IsSecretValue(slotID) then
+                bagID = tonumber(bagID)
+                slotID = tonumber(slotID)
 
-            if data and data.guid and C_Item and C_Item.GetItemLocation then
-                local location = C_Item.GetItemLocation(data.guid)
-
-                if location and location:IsBagAndSlot() then
-                    local bagID, slotID = location:GetBagAndSlot()
-
-                    if IsPlayerBagSlot(bagID, slotID) then
-                        lastTooltipOwner = owner
-                        lastTooltipBagID = bagID
-                        lastTooltipSlotID = slotID
-                        ShowActionForItem(tooltip, Item:CreateFromItemLocation(location))
-                    end
+                if IsPlayerBagSlot(bagID, slotID) then
+                    return current, bagID, slotID, false
                 end
             end
-        end)
-    else
-        hooksecurefunc(GameTooltip, "SetBagItem", function(tooltip, bagID, slotID)
-            if tooltip and tooltip:GetOwner() == helperButton then
-                return
-            end
+        end
 
-            if IsPlayerBagSlot(bagID, slotID) then
-                ShowActionForBagSlot(tooltip, bagID, slotID)
+        if type(current.GetBagID) == "function" and type(current.GetID) == "function" then
+            local bagOK, bagID = pcall(current.GetBagID, current)
+            local slotOK, slotID = pcall(current.GetID, current)
+
+            if bagOK and slotOK and not IsSecretValue(bagID) and not IsSecretValue(slotID) then
+                bagID = tonumber(bagID)
+                slotID = tonumber(slotID)
+
+                if IsPlayerBagSlot(bagID, slotID) then
+                    return current, bagID, slotID, false
+                end
             end
-        end)
+        end
+
+        if type(current.GetParent) ~= "function" then
+            break
+        end
+
+        local ok, parent = pcall(current.GetParent, current)
+        current = ok and parent or nil
     end
+
+    return nil
 end
 
-local function RecheckCurrentTooltip()
-    if not GameTooltip or not GameTooltip:IsShown() or not GameTooltip:GetOwner() then
-        return
-    end
+local function GetHoveredBagSlot()
+    local candidates = {}
 
-    local owner = GameTooltip:GetOwner()
+    if type(GetMouseFoci) == "function" then
+        local results = { pcall(GetMouseFoci) }
 
-    if not owner or not owner.IsMouseOver or not owner:IsMouseOver() then
-        return
-    end
+        if results[1] then
+            for index = 2, #results do
+                local value = results[index]
 
-    if owner.GetSlotAndBagID then
-        local slotID, bagID = owner:GetSlotAndBagID()
+                if type(value) == "table" and not value.GetObjectType then
+                    for _, nested in ipairs(value) do
+                        candidates[#candidates + 1] = nested
+                    end
+                else
+                    candidates[#candidates + 1] = value
+                end
+            end
+        end
+    elseif type(GetMouseFocus) == "function" then
+        local ok, focus = pcall(GetMouseFocus)
 
-        if bagID and slotID then
-            ShowActionForBagSlot(GameTooltip, bagID, slotID)
-            return
+        if ok then
+            candidates[1] = focus
         end
     end
 
-    if owner == lastTooltipOwner and IsPlayerBagSlot(lastTooltipBagID, lastTooltipSlotID) then
-        ShowActionForBagSlot(GameTooltip, lastTooltipBagID, lastTooltipSlotID)
+    for _, candidate in ipairs(candidates) do
+        local owner, bagID, slotID, isHelper = GetBagSlotFromFrame(candidate)
+
+        if isHelper then
+            return helperButton, nil, nil, true
+        end
+
+        if owner then
+            return owner, bagID, slotID, false
+        end
+    end
+
+    return nil
+end
+
+local function RecheckHoveredItem()
+    local db = EnsureDB()
+
+    if not db or db.enabled ~= true or InCombatLockdown and InCombatLockdown() or not IsActivationModifierHeld() then
+        HideButton()
+        return
+    end
+
+    local owner, bagID, slotID, isHelper = GetHoveredBagSlot()
+
+    if isHelper then
+        return
+    end
+
+    if owner and IsPlayerBagSlot(bagID, slotID) then
+        ShowActionForBagSlot(owner, bagID, slotID)
+        return
+    end
+
+    if lastHoveredOwner
+        and lastHoveredOwner.IsMouseOver
+        and lastHoveredOwner:IsMouseOver()
+        and IsPlayerBagSlot(lastHoveredBagID, lastHoveredSlotID)
+    then
+        ShowActionForBagSlot(lastHoveredOwner, lastHoveredBagID, lastHoveredSlotID)
+        return
+    end
+
+    HideButton()
+end
+
+local function UpdateHoverWatcher(_, elapsed)
+    hoverElapsed = hoverElapsed + (elapsed or 0)
+
+    if hoverElapsed < 0.05 then
+        return
+    end
+
+    hoverElapsed = 0
+    RecheckHoveredItem()
+end
+
+local function UpdateHoverWatcherState()
+    if not eventFrame then
+        return
+    end
+
+    local enabled = not (InCombatLockdown and InCombatLockdown()) and IsActivationModifierHeld()
+    eventFrame:SetScript("OnUpdate", enabled and UpdateHoverWatcher or nil)
+
+    if enabled then
+        RecheckHoveredItem()
+    else
+        HideButton()
     end
 end
 
@@ -982,7 +1057,7 @@ function ns:SetProfessionHelperActivation(value)
     end
 
     UpdateAttributeDriver()
-    RecheckCurrentTooltip()
+    UpdateHoverWatcherState()
 end
 
 function ns:GetProfessionHelperActionEnabled(actionType)
@@ -995,7 +1070,7 @@ function ns:SetProfessionHelperActionEnabled(actionType, value)
 
     if db and db.actions and db.actions[actionType] ~= nil then
         db.actions[actionType] = value == true
-        RecheckCurrentTooltip()
+        RecheckHoveredItem()
     end
 end
 
@@ -1012,7 +1087,6 @@ end
 function ns:InitializeProfessionHelper()
     EnsureDB()
     CreateHelperButton()
-    HookTooltip()
 
     if not eventFrame then
         eventFrame = CreateFrame("Frame")
@@ -1022,6 +1096,7 @@ function ns:InitializeProfessionHelper()
         eventFrame:SetScript("OnEvent", function(_, event, arg1)
             if event == "PLAYER_REGEN_DISABLED" then
                 UnregisterProfessionWorkEvents()
+                UpdateHoverWatcherState()
                 return
             elseif event == "BAG_UPDATE_DELAYED" then
                 if InCombatLockdown and InCombatLockdown() then
@@ -1042,11 +1117,7 @@ function ns:InitializeProfessionHelper()
                     return
                 end
 
-                if not IsActivationModifierHeld() then
-                    HideButton()
-                end
-
-                RecheckCurrentTooltip()
+                UpdateHoverWatcherState()
             elseif event == "PLAYER_REGEN_ENABLED" then
                 RegisterProfessionWorkEvents()
 
@@ -1055,7 +1126,7 @@ function ns:InitializeProfessionHelper()
                 end
 
                 UpdateAttributeDriver()
-                RecheckCurrentTooltip()
+                UpdateHoverWatcherState()
             end
         end)
     end

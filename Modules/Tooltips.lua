@@ -8,6 +8,7 @@ local pendingInspects = {}
 local activeInspectGuid
 local lastInspectRequest = 0
 local RefreshCurrentTooltipForGUID
+local unitDetailsPanel
 
 local DEFAULT_BG = { 0.02, 0.018, 0.014, 0.92 }
 local DEFAULT_BORDER = { 0.35, 0.35, 0.35, 0.85 }
@@ -63,55 +64,6 @@ local PERCENTILE_COLORS = {
     legendary = { 1, 0.5, 0 },
 }
 
-local function EnsureTintTexture(tooltip)
-    if not tooltip or type(tooltip.CreateTexture) ~= "function" then
-        return nil
-    end
-
-    if tooltip.ZoidsToolsFactionTint then
-        return tooltip.ZoidsToolsFactionTint
-    end
-
-    local tint = tooltip:CreateTexture(nil, "BORDER", nil, -7)
-    tint:SetPoint("TOPLEFT", tooltip, "TOPLEFT", 4, -4)
-    tint:SetPoint("BOTTOMRIGHT", tooltip, "BOTTOMRIGHT", -4, 4)
-    tint:SetColorTexture(0, 0, 0, 0)
-    tint:Hide()
-
-    tooltip.ZoidsToolsFactionTint = tint
-
-    return tint
-end
-
-local function SetFactionTint(tooltip, color)
-    local tint = EnsureTintTexture(tooltip)
-
-    if not tint then
-        return
-    end
-
-    if color then
-        tint:SetColorTexture(color[1], color[2], color[3], color[4])
-        tint:Show()
-    else
-        tint:Hide()
-    end
-end
-
-local function SetBackdropColors(tooltip, bg, border)
-    if not tooltip then
-        return
-    end
-
-    if bg and tooltip.SetBackdropColor then
-        tooltip:SetBackdropColor(bg[1], bg[2], bg[3], bg[4])
-    end
-
-    if border and tooltip.SetBackdropBorderColor then
-        tooltip:SetBackdropBorderColor(border[1], border[2], border[3], border[4])
-    end
-end
-
 local function EnsureDB()
     if not ns.db then
         return nil
@@ -150,28 +102,6 @@ local function IsTooltipItemLevelEnabled()
     local db = EnsureDB()
 
     return db and db.showItemLevel == true
-end
-
-local function ResetTooltipBackdrop(tooltip)
-    if tooltip ~= GameTooltip then
-        return
-    end
-
-    SetBackdropColors(tooltip, DEFAULT_BG, DEFAULT_BORDER)
-    SetFactionTint(tooltip)
-end
-
-local function ResetTooltipState(tooltip)
-    ResetTooltipBackdrop(tooltip)
-
-    if tooltip ~= GameTooltip then
-        return
-    end
-
-    tooltip.ZoidsToolsUnitGuid = nil
-    tooltip.ZoidsToolsDetailsKey = nil
-    tooltip.ZoidsToolsMythicScoreLine = nil
-    tooltip.ZoidsToolsItemLevelLine = nil
 end
 
 local function IsSecretValue(value)
@@ -309,32 +239,6 @@ local function GetClassColor(classFile)
     end
 
     return nil, nil, nil
-end
-
-local function ColorTooltipName(tooltip, unit)
-    local db = EnsureDB()
-
-    if not db or not db.classColoredNames then
-        return
-    end
-
-    if not UnitIsPlayerSafe(unit) then
-        return
-    end
-
-    local classFile = GetUnitClassFile(unit)
-    local r, g, b = GetClassColor(classFile)
-
-    if not r or not g or not b then
-        return
-    end
-
-    local tooltipName = tooltip and tooltip.GetName and tooltip:GetName()
-    local nameLine = tooltipName and _G[tooltipName .. "TextLeft1"]
-
-    if nameLine and nameLine.SetTextColor then
-        nameLine:SetTextColor(r, g, b)
-    end
 end
 
 local function FormatScore(value)
@@ -1064,34 +968,163 @@ local function FormatItemLevel(itemLevel)
     return tostring(math.floor(itemLevel + 0.5))
 end
 
-local function SetOrAddDetailLine(tooltip, lineKey, label, value, leftR, leftG, leftB, rightR, rightG, rightB)
-    if not tooltip or not label or not value then
-        return false
+local function GetUnitNameSafe(unit)
+    if not unit or not UnitName then
+        return nil
     end
 
-    local tooltipName = tooltip.GetName and tooltip:GetName()
-    local lineIndex = tooltip[lineKey]
-    local leftLine = lineIndex and tooltipName and _G[tooltipName .. "TextLeft" .. lineIndex]
-    local rightLine = lineIndex and tooltipName and _G[tooltipName .. "TextRight" .. lineIndex]
+    local ok, name, realm = pcall(UnitName, unit)
 
-    if leftLine and rightLine then
-        leftLine:SetText(label)
-        leftLine:SetTextColor(leftR, leftG, leftB)
-        rightLine:SetText(value)
-        rightLine:SetTextColor(rightR, rightG, rightB)
-        return false
+    if not ok or IsSecretValue(name) or type(name) ~= "string" or name == "" then
+        return nil
     end
 
-    lineIndex = (tooltip.NumLines and tooltip:NumLines() or 0) + 1
-    tooltip:AddDoubleLine(label, value, leftR, leftG, leftB, rightR, rightG, rightB)
-    tooltip[lineKey] = lineIndex
-    return true
+    if not IsSecretValue(realm) and type(realm) == "string" and realm ~= "" then
+        return name .. "-" .. realm
+    end
+
+    return name
 end
 
-local function AddTooltipDetails(tooltip, unit, guid)
+local function HideUnitDetailsPanel()
+    if unitDetailsPanel then
+        unitDetailsPanel.guid = nil
+        unitDetailsPanel.detailsKey = nil
+        unitDetailsPanel:Hide()
+    end
+end
+
+local function EnsureUnitDetailsPanel()
+    if unitDetailsPanel then
+        return unitDetailsPanel
+    end
+
+    local panel = CreateFrame("Frame", "ZoidsToolsUnitTooltipDetails", UIParent, "BackdropTemplate")
+    panel:SetSize(230, 34)
+    panel:SetFrameStrata("TOOLTIP")
+    panel:SetFrameLevel(100)
+    panel:SetClampedToScreen(true)
+    panel:EnableMouse(false)
+    panel:SetBackdrop({
+        bgFile = "Interface\\Buttons\\WHITE8X8",
+        edgeFile = "Interface\\Buttons\\WHITE8X8",
+        edgeSize = 1,
+    })
+    panel:SetBackdropColor(unpack(DEFAULT_BG))
+    panel:SetBackdropBorderColor(unpack(DEFAULT_BORDER))
+
+    panel.title = panel:CreateFontString(nil, "OVERLAY", "GameTooltipHeaderText")
+    panel.title:SetPoint("TOPLEFT", panel, "TOPLEFT", 8, -7)
+    panel.title:SetPoint("TOPRIGHT", panel, "TOPRIGHT", -8, -7)
+    panel.title:SetJustifyH("LEFT")
+    panel.title:SetWordWrap(false)
+
+    panel.scoreLabel = panel:CreateFontString(nil, "OVERLAY", "GameTooltipText")
+    panel.scoreLabel:SetPoint("TOPLEFT", panel.title, "BOTTOMLEFT", 0, -5)
+    panel.scoreLabel:SetText("Mythic+ Score")
+    panel.scoreLabel:SetTextColor(0.75, 0.85, 1)
+
+    panel.scoreValue = panel:CreateFontString(nil, "OVERLAY", "GameTooltipText")
+    panel.scoreValue:SetPoint("TOPRIGHT", panel.title, "BOTTOMRIGHT", 0, -5)
+    panel.scoreValue:SetJustifyH("RIGHT")
+
+    panel.itemLevelLabel = panel:CreateFontString(nil, "OVERLAY", "GameTooltipText")
+    panel.itemLevelLabel:SetPoint("TOPLEFT", panel.scoreLabel, "BOTTOMLEFT", 0, -3)
+    panel.itemLevelLabel:SetText("Item Level")
+    panel.itemLevelLabel:SetTextColor(1, 0.82, 0)
+
+    panel.itemLevelValue = panel:CreateFontString(nil, "OVERLAY", "GameTooltipText")
+    panel.itemLevelValue:SetPoint("TOPRIGHT", panel.scoreValue, "BOTTOMRIGHT", 0, -3)
+    panel.itemLevelValue:SetJustifyH("RIGHT")
+
+    panel:SetScript("OnUpdate", function(self, elapsed)
+        self.watchElapsed = (self.watchElapsed or 0) + elapsed
+
+        if self.watchElapsed < 0.10 then
+            return
+        end
+
+        self.watchElapsed = 0
+
+        local unit = "mouseover"
+        local guid = GetUnitGUIDSafe(unit)
+
+        if not guid or guid ~= self.guid or not UnitIsPlayerSafe(unit) then
+            HideUnitDetailsPanel()
+        end
+    end)
+
+    panel:Hide()
+    unitDetailsPanel = panel
+
+    return panel
+end
+
+local function PositionUnitDetailsPanel(panel)
+    if not panel or not UIParent or not GetCursorPosition then
+        return
+    end
+
+    local scale = UIParent.GetEffectiveScale and UIParent:GetEffectiveScale() or 1
+    local cursorX, cursorY = GetCursorPosition()
+
+    if IsSecretValue(scale) or IsSecretValue(cursorX) or IsSecretValue(cursorY) then
+        return
+    end
+
+    scale = tonumber(scale) or 1
+    cursorX = (tonumber(cursorX) or 0) / scale
+    cursorY = (tonumber(cursorY) or 0) / scale
+
+    local parentWidth = UIParent.GetWidth and UIParent:GetWidth() or 0
+    local parentHeight = UIParent.GetHeight and UIParent:GetHeight() or 0
+    local panelWidth = panel.GetWidth and panel:GetWidth() or 230
+    local panelHeight = panel.GetHeight and panel:GetHeight() or 34
+    local anchorRight = parentWidth > 0 and cursorX + panelWidth + 18 > parentWidth
+    local anchorDown = parentHeight > 0 and cursorY + panelHeight + 18 > parentHeight
+    local point
+
+    if anchorRight and anchorDown then
+        point = "TOPRIGHT"
+        cursorX = cursorX - 14
+        cursorY = cursorY - 18
+    elseif anchorRight then
+        point = "BOTTOMRIGHT"
+        cursorX = cursorX - 14
+        cursorY = cursorY + 18
+    elseif anchorDown then
+        point = "TOPLEFT"
+        cursorX = cursorX + 14
+        cursorY = cursorY - 18
+    else
+        point = "BOTTOMLEFT"
+        cursorX = cursorX + 14
+        cursorY = cursorY + 18
+    end
+
+    panel:ClearAllPoints()
+    panel:SetPoint(point, UIParent, "BOTTOMLEFT", cursorX, cursorY)
+end
+
+local function UpdateUnitDetailsPanel(unit, guid)
     local db = EnsureDB()
 
-    if not db or IsCombatLocked() or not UnitIsPlayerSafe(unit) then
+    if not db or not UnitIsPlayerSafe(unit) then
+        HideUnitDetailsPanel()
+        return
+    end
+
+    guid = guid or GetUnitGUIDSafe(unit)
+
+    if not guid then
+        HideUnitDetailsPanel()
+        return
+    end
+
+    local name = GetUnitNameSafe(unit)
+
+    if not name then
+        HideUnitDetailsPanel()
         return
     end
 
@@ -1109,21 +1142,53 @@ local function AddTooltipDetails(tooltip, unit, guid)
         and guid
         and not IsSecretValue(guid)
         and pendingInspects[guid] ~= nil
-    local detailsKey = (guid or "unknown")
+    local detailsKey = guid
+        .. ":"
+        .. name
         .. ":"
         .. (mythicScoreText or "")
         .. ":"
         .. (itemLevel or "")
         .. ":"
         .. (itemLevelPending and "pending" or "")
+        .. ":"
+        .. tostring(db.factionBackground == true)
+        .. ":"
+        .. tostring(db.classColoredNames == true)
 
-    if tooltip.ZoidsToolsDetailsKey == detailsKey then
+    local panel = EnsureUnitDetailsPanel()
+
+    if panel.detailsKey == detailsKey and panel:IsShown() then
         return
     end
 
-    tooltip.ZoidsToolsDetailsKey = detailsKey
+    panel.guid = guid
+    panel.detailsKey = detailsKey
+    panel.title:SetText(name)
 
-    local addedDetails = false
+    local titleR, titleG, titleB = 1, 0.82, 0
+
+    if db.classColoredNames then
+        local classR, classG, classB = GetClassColor(GetUnitClassFile(unit))
+
+        if classR and classG and classB then
+            titleR, titleG, titleB = classR, classG, classB
+        end
+    end
+
+    panel.title:SetTextColor(titleR, titleG, titleB)
+
+    local factionColor = db.factionBackground and FACTION_COLORS[GetFaction(unit)] or nil
+
+    if factionColor then
+        panel:SetBackdropColor(unpack(factionColor.bg))
+        panel:SetBackdropBorderColor(unpack(factionColor.border))
+    else
+        panel:SetBackdropColor(unpack(DEFAULT_BG))
+        panel:SetBackdropBorderColor(unpack(DEFAULT_BORDER))
+    end
+
+    local height = 27
 
     if mythicScoreText then
         local r, g, b = 1, 1, 1
@@ -1132,104 +1197,52 @@ local function AddTooltipDetails(tooltip, unit, guid)
             r, g, b = mythicScore.r, mythicScore.g, mythicScore.b
         end
 
-        addedDetails = SetOrAddDetailLine(
-            tooltip,
-            "ZoidsToolsMythicScoreLine",
-            "Mythic+ Score",
-            mythicScoreText,
-            0.75,
-            0.85,
-            1,
-            r,
-            g,
-            b
-        ) or addedDetails
+        panel.scoreValue:SetText(mythicScoreText)
+        panel.scoreValue:SetTextColor(r, g, b)
+        panel.scoreLabel:Show()
+        panel.scoreValue:Show()
+        height = height + 17
+    else
+        panel.scoreLabel:Hide()
+        panel.scoreValue:Hide()
     end
 
     if itemLevel then
-        addedDetails = SetOrAddDetailLine(
-            tooltip,
-            "ZoidsToolsItemLevelLine",
-            "Item Level",
-            itemLevel,
-            1,
-            0.82,
-            0,
-            1,
-            1,
-            1
-        ) or addedDetails
+        panel.itemLevelValue:SetText(itemLevel)
+        panel.itemLevelValue:SetTextColor(1, 1, 1)
+        panel.itemLevelLabel:Show()
+        panel.itemLevelValue:Show()
+        height = height + 17
     elseif itemLevelPending then
-        addedDetails = SetOrAddDetailLine(
-            tooltip,
-            "ZoidsToolsItemLevelLine",
-            "Item Level",
-            "Inspecting...",
-            1,
-            0.82,
-            0,
-            0.65,
-            0.65,
-            0.65
-        ) or addedDetails
-    end
-
-    if addedDetails and tooltip.Show then
-        tooltip:Show()
-    end
-end
-
-local function ApplyUnitTooltipAppearance(tooltip, unit)
-    if tooltip ~= GameTooltip or not unit then
-        return
-    end
-
-    local db = EnsureDB()
-    local faction = UnitIsPlayerSafe(unit) and GetFaction(unit) or GetFaction("player")
-    local color = db and db.factionBackground and faction and FACTION_COLORS[faction]
-
-    if color then
-        SetBackdropColors(tooltip, color.bg, color.border)
-        SetFactionTint(tooltip, color.tint)
+        panel.itemLevelValue:SetText("Inspecting...")
+        panel.itemLevelValue:SetTextColor(0.65, 0.65, 0.65)
+        panel.itemLevelLabel:Show()
+        panel.itemLevelValue:Show()
+        height = height + 17
     else
-        ResetTooltipBackdrop(tooltip)
+        panel.itemLevelLabel:Hide()
+        panel.itemLevelValue:Hide()
     end
 
-    ColorTooltipName(tooltip, unit)
-end
-
-local function ApplyUnitTooltipStyleUnsafe(tooltip)
-    if tooltip ~= GameTooltip then
-        return
+    if panel.itemLevelLabel:IsShown() and not panel.scoreLabel:IsShown() then
+        panel.itemLevelLabel:ClearAllPoints()
+        panel.itemLevelLabel:SetPoint("TOPLEFT", panel.title, "BOTTOMLEFT", 0, -5)
+        panel.itemLevelValue:ClearAllPoints()
+        panel.itemLevelValue:SetPoint("TOPRIGHT", panel.title, "BOTTOMRIGHT", 0, -5)
+    else
+        panel.itemLevelLabel:ClearAllPoints()
+        panel.itemLevelLabel:SetPoint("TOPLEFT", panel.scoreLabel, "BOTTOMLEFT", 0, -3)
+        panel.itemLevelValue:ClearAllPoints()
+        panel.itemLevelValue:SetPoint("TOPRIGHT", panel.scoreValue, "BOTTOMRIGHT", 0, -3)
     end
 
-    local unit = GetDisplayedUnit(tooltip)
-
-    if not unit then
-        ResetTooltipBackdrop(tooltip)
-        return
-    end
-
-    local guid = GetUnitGUIDSafe(unit)
-
-    -- TooltipDataProcessor runs after Blizzard has rebuilt the unit tooltip.
-    -- Its lines may have been cleared even when the same unit is shown again,
-    -- so never carry line indexes across separate tooltip builds.
-    tooltip.ZoidsToolsUnitGuid = guid
-    tooltip.ZoidsToolsDetailsKey = nil
-    tooltip.ZoidsToolsMythicScoreLine = nil
-    tooltip.ZoidsToolsItemLevelLine = nil
-
-    ApplyUnitTooltipAppearance(tooltip, unit)
-    AddTooltipDetails(tooltip, unit, guid)
-end
-
-local function ApplyUnitTooltipStyle(tooltip)
-    pcall(ApplyUnitTooltipStyleUnsafe, tooltip)
+    panel:SetHeight(height)
+    PositionUnitDetailsPanel(panel)
+    panel:Show()
 end
 
 RefreshCurrentTooltipForGUID = function(guid)
-    if not guid or IsSecretValue(guid) or not GameTooltip or not GameTooltip:IsShown() then
+    if not guid or IsSecretValue(guid) then
         return
     end
 
@@ -1237,17 +1250,17 @@ RefreshCurrentTooltipForGUID = function(guid)
         return
     end
 
-    local unit = GetDisplayedUnit(GameTooltip)
+    local unit = "mouseover"
 
-    if not unit or GetUnitGUIDSafe(unit) ~= guid then
+    if GetUnitGUIDSafe(unit) ~= guid then
         return
     end
 
-    -- The inspect result only changes ZoidsTools' detail row. Updating that
-    -- row in place avoids rebuilding the entire visible GameTooltip, which
-    -- otherwise briefly redraws Blizzard's default tooltip first.
-    GameTooltip.ZoidsToolsDetailsKey = nil
-    pcall(AddTooltipDetails, GameTooltip, unit, guid)
+    if unitDetailsPanel then
+        unitDetailsPanel.detailsKey = nil
+    end
+
+    pcall(UpdateUnitDetailsPanel, unit, guid)
 end
 
 local function OnInspectReady(guid)
@@ -1264,21 +1277,18 @@ local function OnInspectReady(guid)
 end
 
 local function RefreshCurrentTooltip()
-    if IsCombatLocked() then
+    local unit = "mouseover"
+
+    if UnitIsPlayerSafe(unit) then
+        if unitDetailsPanel then
+            unitDetailsPanel.detailsKey = nil
+        end
+
+        pcall(UpdateUnitDetailsPanel, unit, GetUnitGUIDSafe(unit))
         return
     end
 
-    if GameTooltip and GameTooltip:IsShown() then
-        local unit = GetDisplayedUnit(GameTooltip)
-
-        GameTooltip.ZoidsToolsDetailsKey = nil
-
-        if unit and type(GameTooltip.SetUnit) == "function" then
-            pcall(GameTooltip.SetUnit, GameTooltip, unit)
-        else
-            ApplyUnitTooltipStyle(GameTooltip)
-        end
-    end
+    HideUnitDetailsPanel()
 end
 
 function ns:IsTooltipFactionBackgroundEnabled()
@@ -1384,12 +1394,6 @@ function ns:InitializeTooltips()
 
     initialized = true
 
-    if not GameTooltip then
-        return
-    end
-
-    ResetTooltipState(GameTooltip)
-
     eventFrame = CreateFrame("Frame")
     eventFrame:RegisterEvent("INSPECT_READY")
     eventFrame:RegisterEvent("UPDATE_MOUSEOVER_UNIT")
@@ -1398,17 +1402,14 @@ function ns:InitializeTooltips()
             OnInspectReady(guid)
         elseif event == "UPDATE_MOUSEOVER_UNIT" then
             if not IsCombatLocked() then
-                -- Cache inspect data here, but never alter the shared
-                -- GameTooltip from this event. It may currently belong to a
-                -- map quest or embedded reward even when mouseover changed.
                 PrefetchUnitItemLevel("mouseover")
             end
+
+            -- Build the independent player-details panel only from the
+            -- mouseover unit. Do not register a shared-tooltip callback
+            -- or anchor anything to GameTooltip: World Map POIs reuse that
+            -- shared tooltip with secret-valued layout data.
+            RunNextFrame(RefreshCurrentTooltip)
         end
     end)
-
-    if TooltipDataProcessor and Enum and Enum.TooltipDataType and Enum.TooltipDataType.Unit then
-        TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Unit, function(tooltip)
-            ApplyUnitTooltipStyle(tooltip)
-        end)
-    end
 end

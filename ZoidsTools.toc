@@ -26,6 +26,7 @@ Modules\CinematicSkip.lua
 Modules\AutoConfirm.lua
 Modules\TalkingHead.lua
 Modules\AudioSync.lua
+Modules\QueueAlerts.lua
 Modules\CombatBanner.lua
 Modules\MythicInviteBanner.lua
 Modules\BuffWarnings.lua

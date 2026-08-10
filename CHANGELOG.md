@@ -2,8 +2,9 @@
 
 ## Unreleased
 
+- Added dungeon queue-ready tools: a background-capable alert sound, a countdown that stays visible through both proposal states, and an optional safe-queue mode that hides Decline without auto-accepting.
 - Detached addon-owned World Map and objective-tracker cosmetic layers from Blizzard's protected frame hierarchies and replaced tracker method hooks with read-only state polling, preventing quest and super-tracking updates from tainting protected pin mouse propagation.
-- Isolated unit-tooltip styling from Blizzard's shared quest-reward and map-POI construction, preventing secret-value sizing taint in embedded reward and widget tooltips.
+- Fully removed ZoidsTools callbacks and anchor dependencies from Blizzard's shared GameTooltip construction path: player details now use a cursor-positioned addon panel, while the profession helper discovers hovered bag slots directly, allowing secret-valued map POI and quest-offer layouts to remain untainted.
 - Excluded Blizzard's protected World Map canvas from movable-window and scaling hooks, preventing quest-pin and POI layout taint.
 - Deferred World Map coordinate-overlay refreshes until after protected MapCanvas updates and disabled the overlay during combat.
 - Reworked smart-mount pool refreshes to discard temporary post-combat usability snapshots, use Blizzard's current mount usability and steady-flight data, and record each keypress only once.

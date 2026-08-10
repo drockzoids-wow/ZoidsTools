@@ -82,6 +82,11 @@ local defaults = {
     mythicInviteBanner = {
         enabled = true,
     },
+    queueAlerts = {
+        backgroundSound = true,
+        countdown = true,
+        safeQueue = false,
+    },
     tooltips = {
         factionBackground = true,
         classColoredNames = true,
@@ -813,6 +818,7 @@ local moduleInitializers = {
     "InitializeAutoConfirm",
     "InitializeSubtleTalkingHead",
     "InitializeAudioSync",
+    "InitializeQueueAlerts",
     "InitializeCombatBanner",
     "InitializeMythicInviteBanner",
     "InitializeBuffWarnings",

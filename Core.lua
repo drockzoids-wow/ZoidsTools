@@ -41,8 +41,6 @@ local defaults = {
         autoTurnIn = false,
         autoGossip = false,
         pauseModifier = "shift",
-        skipDaily = true,
-        skipWarbandCompleted = true,
         questItemButtonEnabled = true,
         questItemButton = {
             point = "CENTER",
@@ -461,6 +459,7 @@ local function PrintHelp()
     ns:Print("/zt coords reset resets the coordinates widget position.")
     ns:Print("/zt diag start/stop/report/reset controls performance diagnostics.")
     ns:Print("/zt talentdiag start/report/stop/reset diagnoses talent application failures.")
+    ns:Print("/zt talentpaneldiag reports and repairs the talent helper panel.")
     ns:Print("/zt chatdiag reports Blizzard chat-link interaction state.")
     ns:Print("/zt invitebanner previews the Mythic+ invitation banner.")
     ns:Print("/zt items opens item overlay options.")
@@ -775,6 +774,10 @@ local function HandleSlash(input)
         if ns.ResetTalentApplyDiagnostics then
             ns:ResetTalentApplyDiagnostics()
         end
+    elseif input == "talentpaneldiag" or input == "talent panel diag" then
+        if ns.ReportTalentPanelDiagnostics then
+            ns:ReportTalentPanelDiagnostics()
+        end
     elseif input == "chatdiag" or input == "chat diag" then
         if ns.ReportChatDiagnostics then
             ns:ReportChatDiagnostics()
@@ -860,6 +863,8 @@ eventFrame:SetScript("OnEvent", function(_, event, addonName)
         RunMigrations(ZoidsToolsDB)
         CopyDefaults(defaults, ZoidsToolsDB)
         ns.db = ZoidsToolsDB
+        ZoidsToolsCharDB = type(ZoidsToolsCharDB) == "table" and ZoidsToolsCharDB or {}
+        ns.charDB = ZoidsToolsCharDB
     elseif event == "PLAYER_LOGIN" then
         eventFrame:UnregisterEvent("PLAYER_LOGIN")
 

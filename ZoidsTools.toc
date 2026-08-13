@@ -4,6 +4,7 @@
 ## Author: Drockzoids
 ## Version: @project-version@
 ## SavedVariables: ZoidsToolsDB
+## SavedVariablesPerCharacter: ZoidsToolsCharDB
 ## IconTexture: Interface\AddOns\ZoidsTools\Media\ZoidToolsIcon.png
 ## Bindings: Bindings.xml
 

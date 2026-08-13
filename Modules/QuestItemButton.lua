@@ -16,7 +16,6 @@ local eventFrame
 local updateQueued = false
 local moveMode = false
 local pendingCombatUpdate = false
-local rangeTicker
 local cachedBagItemIndex
 local cachedUsableQuestItems
 local bagItemIndexDirty = true
@@ -411,7 +410,7 @@ local function UpdateHotkey()
     end
 end
 
-local function UpdateCooldownAndRange()
+local function UpdateCooldown()
     if not button or not button:IsShown() or not button.candidate then
         return
     end
@@ -438,26 +437,10 @@ local function UpdateCooldownAndRange()
         button.icon:SetDesaturated(false)
     end
 
-    local inRange
-    if candidate.inventoryItem and IsItemInRange then
-        inRange = IsItemInRange(candidate.itemID, "target")
-    elseif IsQuestLogSpecialItemInRange then
-        inRange = IsQuestLogSpecialItemInRange(questLogIndex)
-    end
-    if not IsSecretValue(inRange) and inRange == 0 then
-        button.icon:SetVertexColor(1, 0.30, 0.30)
-    else
-        button.icon:SetVertexColor(1, 1, 1)
-    end
-end
-
-local function RefreshRangeTicker(shouldRun)
-    if shouldRun and not rangeTicker and C_Timer and C_Timer.NewTicker then
-        rangeTicker = C_Timer.NewTicker(0.20, UpdateCooldownAndRange)
-    elseif not shouldRun and rangeTicker then
-        rangeTicker:Cancel()
-        rangeTicker = nil
-    end
+    -- Item and quest-special-item range queries can be protected/secret in
+    -- 12.1. Keep the secure item action available and let Blizzard reject an
+    -- out-of-range use normally instead of tainting the protected UI path.
+    button.icon:SetVertexColor(1, 1, 1)
 end
 
 local function ApplyCandidate(candidate)
@@ -481,7 +464,6 @@ local function ApplyCandidate(candidate)
         button.icon:SetTexture(candidate.itemTexture or DEFAULT_ICON)
         button.count:SetText((candidate.charges and candidate.charges > 1) and candidate.charges or "")
         button:Show()
-        RefreshRangeTicker(true)
     else
         button:SetAttribute("type", nil)
         button:SetAttribute("type1", nil)
@@ -494,10 +476,9 @@ local function ApplyCandidate(candidate)
         else
             button:Hide()
         end
-        RefreshRangeTicker(false)
     end
 
-    UpdateCooldownAndRange()
+    UpdateCooldown()
 end
 
 local function RefreshButton()
@@ -697,7 +678,7 @@ function ns:InitializeQuestItemButton()
         end
 
         if event == "BAG_UPDATE_COOLDOWN" then
-            UpdateCooldownAndRange()
+            UpdateCooldown()
             return
         end
 

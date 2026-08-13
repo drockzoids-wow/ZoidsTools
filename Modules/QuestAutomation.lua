@@ -1,6 +1,8 @@
 local _, ns = ...
 
 local eventFrame
+local questFilterPrompt
+local pendingQuestFilterPrompt = false
 local pendingAcceptQuests = {}
 local clickedGossipOptions = {}
 local tableUnpack = table.unpack or unpack
@@ -12,6 +14,11 @@ local pauseModifiers = {
     shift = true,
     ctrl = true,
     alt = true,
+}
+
+local characterFilterKeys = {
+    skipDaily = true,
+    skipWarbandCompleted = true,
 }
 
 local function PackResults(...)
@@ -57,12 +64,31 @@ local function EnsureDB()
         db.pauseModifier = "shift"
     end
 
+    -- These two filters used to be stored account-wide. They now live only in
+    -- SavedVariablesPerCharacter, so stale account values must not leak into a
+    -- character that has not made its own choices yet.
+    db.skipDaily = nil
+    db.skipWarbandCompleted = nil
+
+    return db
+end
+
+local function EnsureCharacterQuestDB()
+    if type(_G.ZoidsToolsCharDB) ~= "table" then
+        _G.ZoidsToolsCharDB = {}
+    end
+
+    ns.charDB = _G.ZoidsToolsCharDB
+    ns.charDB.quests = type(ns.charDB.quests) == "table" and ns.charDB.quests or {}
+
+    local db = ns.charDB.quests
+
     if db.skipDaily == nil then
-        db.skipDaily = true
+        db.skipDaily = false
     end
 
     if db.skipWarbandCompleted == nil then
-        db.skipWarbandCompleted = true
+        db.skipWarbandCompleted = false
     end
 
     return db
@@ -138,8 +164,9 @@ end
 
 local function ShouldSkipQuest(questID, frequency, action)
     local db = EnsureDB()
+    local filters = EnsureCharacterQuestDB()
 
-    if not db then
+    if not db or not filters then
         return true
     end
 
@@ -147,14 +174,14 @@ local function ShouldSkipQuest(questID, frequency, action)
         return false
     end
 
-    if db.skipDaily and IsRepeatableQuest(questID, frequency) then
+    if filters.skipDaily and IsRepeatableQuest(questID, frequency) then
         return true
     end
 
-    if action ~= QUEST_ACTION_TURN_IN and db.skipWarbandCompleted and IsWarbandCompletedQuest(questID) then
+    if action ~= QUEST_ACTION_TURN_IN and filters.skipWarbandCompleted and IsWarbandCompletedQuest(questID) then
         -- When dailies are allowed, that explicit choice takes precedence over
         -- the account-completion filter for daily quests.
-        return db.skipDaily == true or not IsDailyQuest(frequency)
+        return filters.skipDaily == true or not IsDailyQuest(frequency)
     end
 
     return false
@@ -373,6 +400,14 @@ local function HandleQuestComplete()
 end
 
 function ns:SetQuestAutomationOption(key, value)
+    if characterFilterKeys[key] then
+        local characterDB = EnsureCharacterQuestDB()
+
+        characterDB[key] = value == true
+        characterDB.filterPromptCompleted = true
+        return
+    end
+
     local db = EnsureDB()
 
     if not db or db[key] == nil then
@@ -383,9 +418,136 @@ function ns:SetQuestAutomationOption(key, value)
 end
 
 function ns:GetQuestAutomationOption(key)
+    if characterFilterKeys[key] then
+        local characterDB = EnsureCharacterQuestDB()
+
+        return characterDB and characterDB[key] == true
+    end
+
     local db = EnsureDB()
 
     return db and db[key] == true
+end
+
+local function SaveQuestFilterChoices(skipDaily, skipWarbandCompleted)
+    local db = EnsureCharacterQuestDB()
+
+    db.skipDaily = skipDaily == true
+    db.skipWarbandCompleted = skipWarbandCompleted == true
+    db.filterPromptCompleted = true
+    pendingQuestFilterPrompt = false
+
+    if eventFrame then
+        eventFrame:UnregisterEvent("PLAYER_REGEN_ENABLED")
+    end
+
+    if questFilterPrompt then
+        questFilterPrompt:Hide()
+    end
+end
+
+local function CreateQuestFilterPrompt()
+    if questFilterPrompt then
+        return questFilterPrompt
+    end
+
+    local frame = CreateFrame("Frame", "ZoidsToolsQuestFilterPrompt", UIParent, "BackdropTemplate")
+    frame:SetSize(500, 270)
+    frame:SetPoint("CENTER", UIParent, "CENTER", 0, 80)
+    frame:SetFrameStrata("FULLSCREEN_DIALOG")
+    frame:SetFrameLevel(500)
+    frame:SetClampedToScreen(true)
+    frame:SetBackdrop({
+        bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background-Dark",
+        edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
+        tile = true,
+        tileSize = 32,
+        edgeSize = 32,
+        insets = { left = 11, right = 12, top = 12, bottom = 11 },
+    })
+    frame:Hide()
+
+    local title = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+    title:SetPoint("TOP", 0, -24)
+    title:SetText("ZoidsTools Quest Filters")
+
+    local description = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+    description:SetPoint("TOPLEFT", 32, -58)
+    description:SetPoint("TOPRIGHT", -32, -58)
+    description:SetJustifyH("LEFT")
+    description:SetText("Choose which quests this character should ignore during automatic quest acceptance. These choices can be changed later in ZoidsTools > Automation > Quests.")
+
+    local daily = CreateFrame("CheckButton", nil, frame, "UICheckButtonTemplate")
+    daily:SetPoint("TOPLEFT", 34, -112)
+    daily:SetSize(26, 26)
+    daily.label = daily:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+    daily.label:SetPoint("LEFT", daily, "RIGHT", 6, 0)
+    daily.label:SetText("Skip daily and weekly quests")
+    frame.skipDaily = daily
+
+    local warband = CreateFrame("CheckButton", nil, frame, "UICheckButtonTemplate")
+    warband:SetPoint("TOPLEFT", daily, "BOTTOMLEFT", 0, -14)
+    warband:SetSize(26, 26)
+    warband.label = warband:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+    warband.label:SetPoint("LEFT", warband, "RIGHT", 6, 0)
+    warband.label:SetText("Skip Warband-completed quests")
+    frame.skipWarbandCompleted = warband
+
+    local save = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
+    save:SetSize(150, 28)
+    save:SetPoint("BOTTOMRIGHT", -28, 24)
+    save:SetText("Save Choices")
+    save:SetScript("OnClick", function()
+        SaveQuestFilterChoices(daily:GetChecked(), warband:GetChecked())
+    end)
+
+    local keepOff = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
+    keepOff:SetSize(150, 28)
+    keepOff:SetPoint("RIGHT", save, "LEFT", -12, 0)
+    keepOff:SetText("Keep Both Off")
+    keepOff:SetScript("OnClick", function()
+        SaveQuestFilterChoices(false, false)
+    end)
+
+    local close = CreateFrame("Button", nil, frame, "UIPanelCloseButton")
+    close:SetPoint("TOPRIGHT", -5, -5)
+    close:SetScript("OnClick", function()
+        SaveQuestFilterChoices(false, false)
+    end)
+
+    questFilterPrompt = frame
+    return frame
+end
+
+local function ShowQuestFilterPromptIfNeeded()
+    local db = EnsureCharacterQuestDB()
+
+    if db.filterPromptCompleted == true then
+        pendingQuestFilterPrompt = false
+        return
+    end
+
+    if InCombatLockdown and InCombatLockdown() then
+        pendingQuestFilterPrompt = true
+
+        if eventFrame then
+            eventFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
+        end
+
+        return
+    end
+
+    pendingQuestFilterPrompt = false
+
+    if eventFrame then
+        eventFrame:UnregisterEvent("PLAYER_REGEN_ENABLED")
+    end
+
+    local frame = CreateQuestFilterPrompt()
+    frame.skipDaily:SetChecked(db.skipDaily == true)
+    frame.skipWarbandCompleted:SetChecked(db.skipWarbandCompleted == true)
+    frame:Show()
+    frame:Raise()
 end
 
 function ns:SetQuestAutomationPauseModifier(value)
@@ -415,6 +577,7 @@ end
 
 function ns:InitializeQuestAutomation()
     EnsureDB()
+    EnsureCharacterQuestDB()
 
     if eventFrame then
         return
@@ -444,6 +607,14 @@ function ns:InitializeQuestAutomation()
             HandleQuestProgress()
         elseif event == "QUEST_COMPLETE" then
             HandleQuestComplete()
+        elseif event == "PLAYER_REGEN_ENABLED" and pendingQuestFilterPrompt then
+            ShowQuestFilterPromptIfNeeded()
         end
     end)
+
+    if C_Timer and type(C_Timer.After) == "function" then
+        C_Timer.After(1.5, ShowQuestFilterPromptIfNeeded)
+    else
+        ShowQuestFilterPromptIfNeeded()
+    end
 end

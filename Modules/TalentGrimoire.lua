@@ -2871,7 +2871,10 @@ local function IsTalentsTabActive()
             local ok, active = pcall(playerSpells.IsFrameTabActive, playerSpells, tab)
 
             if ok then
-                return active == true
+                -- This has returned both a boolean and a truthy enum/value in
+                -- different PlayerSpells revisions. Treat every truthy result
+                -- as active instead of requiring the literal boolean true.
+                return not not active
             end
         end
     end
@@ -2883,10 +2886,19 @@ end
 local function FindTalentFrame()
     local playerSpells = _G.PlayerSpellsFrame
 
-    if playerSpells and playerSpells.IsShown and playerSpells:IsShown() and IsTalentsTabActive() then
+    if playerSpells and playerSpells.IsShown and playerSpells:IsShown() then
         local talents = playerSpells.TalentsFrame or playerSpells.TalentFrame or playerSpells.ClassTalentFrame
 
-        if not talents or not talents.IsShown or talents:IsShown() then
+        -- The final saved loadout can be deleted while this window remains
+        -- open. Blizzard then swaps to its special Default Loadout state and
+        -- may briefly report no active tab/config even though the talent tree
+        -- itself is still visible. Prefer the visible child frame as the
+        -- authoritative signal so the ZoidsTools controls do not disappear.
+        if talents and (not talents.IsShown or talents:IsShown()) then
+            return talents
+        end
+
+        if IsTalentsTabActive() then
             return talents or playerSpells
         end
     end
@@ -2905,6 +2917,10 @@ local function FindTalentFrame()
 end
 
 local function GetTalentPanelHost(talentFrame)
+    -- ButtonsParent ends at the top of Blizzard's bottom loadout bar, which is
+    -- the intended baseline for the ZoidsTools controls. Fall back to the
+    -- visible talent-content frame, never the outer PlayerSpells window whose
+    -- bottom edge includes the loadout bar and page tabs.
     if talentFrame and talentFrame.ButtonsParent then
         return talentFrame.ButtonsParent
     end
@@ -3441,7 +3457,7 @@ local function AnchorPanel(talentFrame)
     panel:ClearAllPoints()
     panel:SetPoint("BOTTOMLEFT", hostFrame, "BOTTOMLEFT", PANEL_ANCHOR_X, PANEL_ANCHOR_Y)
     panel._ztTalentHost = hostFrame
-    panel:SetFrameStrata(hostFrame:GetFrameStrata() or "HIGH")
+    panel:SetFrameStrata("FULLSCREEN_DIALOG")
     panel:SetFrameLevel((hostFrame:GetFrameLevel() or 1) + 500)
     panel:Raise()
 
@@ -3607,6 +3623,34 @@ local function InstallTalentFrameHooks()
             QueueRefresh(0.05)
         end, panel or playerSpells)
     end
+
+    -- Saved loadouts can be deleted without closing PlayerSpellsFrame. In
+    -- particular, deleting the final one transitions Blizzard to its special
+    -- Default Loadout after the normal trait update has already fired. Secure
+    -- post-hooks give that transition a second visibility pass without
+    -- replacing or tainting Blizzard's loadout functions.
+    if hooksecurefunc and C_ClassTalents then
+        for _, apiName in ipairs({ "DeleteConfig", "LoadConfig" }) do
+            local hookKey = "classTalents" .. apiName
+
+            if not talentFrameHooks[hookKey] and type(C_ClassTalents[apiName]) == "function" then
+                local ok = pcall(hooksecurefunc, C_ClassTalents, apiName, function()
+                    QueueRefresh(0.05)
+
+                    if C_Timer and C_Timer.After then
+                        C_Timer.After(0.4, function()
+                            InstallTalentFrameHooks()
+                            QueueRefresh(0)
+                        end)
+                    end
+                end)
+
+                if ok then
+                    talentFrameHooks[hookKey] = true
+                end
+            end
+        end
+    end
 end
 
 function ns:GetTalentGrimoireEnabled()
@@ -3622,7 +3666,55 @@ function ns:SetTalentGrimoireEnabled(value)
     end
 
     db.enabled = value == true
-    QueueRefresh(0)
+
+    if db.enabled then
+        InstallTalentFrameHooks()
+        UpdatePanelVisibility()
+
+        if C_Timer and C_Timer.After then
+            C_Timer.After(0.2, function()
+                InstallTalentFrameHooks()
+                UpdatePanelVisibility()
+            end)
+        end
+    else
+        QueueRefresh(0)
+    end
+end
+
+function ns:ReportTalentPanelDiagnostics()
+    local db = EnsureDB()
+    local playerSpells = _G.PlayerSpellsFrame
+    local talents = playerSpells
+        and (playerSpells.TalentsFrame or playerSpells.TalentFrame or playerSpells.ClassTalentFrame)
+    local found = FindTalentFrame()
+
+    CreatePanel()
+
+    local function FrameState(frame)
+        if not frame then
+            return "missing"
+        end
+
+        local shown = frame.IsShown and frame:IsShown() or false
+        local visible = frame.IsVisible and frame:IsVisible() or false
+        return string.format("present shown=%s visible=%s", tostring(shown), tostring(visible))
+    end
+
+    PrintTalentMessage(string.format(
+        "Talent panel: enabled=%s combat=%s playerSpells=%s talents=%s found=%s panel=%s alpha=%s strata=%s level=%s.",
+        tostring(db and db.enabled == true),
+        tostring(InCombatLockdown and InCombatLockdown() or false),
+        FrameState(playerSpells),
+        FrameState(talents),
+        FrameState(found),
+        FrameState(panel),
+        tostring(panel and panel.GetAlpha and panel:GetAlpha() or "n/a"),
+        tostring(panel and panel.GetFrameStrata and panel:GetFrameStrata() or "n/a"),
+        tostring(panel and panel.GetFrameLevel and panel:GetFrameLevel() or "n/a")
+    ))
+
+    UpdatePanelVisibility()
 end
 
 function ns:GetTalentGrimoireContentType()
@@ -3782,12 +3874,26 @@ function ns:InitializeTalentGrimoire()
         eventFrame:RegisterEvent("ACTIVE_TALENT_GROUP_CHANGED")
         eventFrame:RegisterEvent("ZONE_CHANGED_NEW_AREA")
         eventFrame:RegisterEvent("TRAIT_CONFIG_UPDATED")
+
+        -- These events are present in current clients, but keep registration
+        -- guarded so the addon remains loadable on a build where one is absent.
+        pcall(eventFrame.RegisterEvent, eventFrame, "TRAIT_CONFIG_CREATED")
+        pcall(eventFrame.RegisterEvent, eventFrame, "TRAIT_CONFIG_DELETED")
         eventFrame:SetScript("OnEvent", function(_, event)
             if not (InCombatLockdown and InCombatLockdown()) then
                 InstallTalentFrameHooks()
             end
 
             QueueRefresh(0.12)
+
+            if (event == "TRAIT_CONFIG_CREATED" or event == "TRAIT_CONFIG_DELETED")
+                and C_Timer and C_Timer.After
+            then
+                C_Timer.After(0.4, function()
+                    InstallTalentFrameHooks()
+                    QueueRefresh(0)
+                end)
+            end
 
             if event == "PLAYER_REGEN_ENABLED" and pendingCombatRefresh then
                 QueueRefresh(0.12)

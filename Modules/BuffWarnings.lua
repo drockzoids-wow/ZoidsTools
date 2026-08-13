@@ -30,6 +30,10 @@ local warningFrame
 local checkQueued = false
 local refreshAfterCombat = false
 
+local function IsSecretValue(value)
+    return type(issecretvalue) == "function" and issecretvalue(value) == true
+end
+
 local function EnsureDB()
     if not ns.db then
         return nil
@@ -358,22 +362,6 @@ local function PlayerCanCastBuff(spellID)
     return false
 end
 
-local function SafeEquals(left, right)
-    local ok, matches = pcall(function()
-        return left ~= nil and right ~= nil and left == right
-    end)
-
-    return ok and matches == true
-end
-
-local function SafeAuraNameEquals(aura, spellName)
-    local ok, matches = pcall(function()
-        return aura and aura.name ~= nil and spellName ~= nil and aura.name == spellName
-    end)
-
-    return ok and matches == true
-end
-
 local function IsWarningAllowed()
     local db = EnsureDB()
 
@@ -407,39 +395,11 @@ local function PlayerHasAura(spellID, fallbackName)
 
     local spellName = GetSpellName(spellID, fallbackName)
 
-    if C_UnitAuras and C_UnitAuras.GetAuraDataByIndex then
-        for index = 1, 80 do
-            local ok, aura = pcall(C_UnitAuras.GetAuraDataByIndex, "player", index, "HELPFUL")
-
-            if not ok or not aura then
-                break
-            end
-
-            if SafeAuraNameEquals(aura, spellName) then
-                return true
-            end
-        end
-    end
-
-    if AuraUtil and AuraUtil.FindAuraByName and spellName then
-        local ok, aura = pcall(AuraUtil.FindAuraByName, spellName, "player", "HELPFUL")
+    if C_UnitAuras and C_UnitAuras.GetAuraDataBySpellName and spellName then
+        local ok, aura = pcall(C_UnitAuras.GetAuraDataBySpellName, "player", spellName, "HELPFUL")
 
         if ok and aura then
             return true
-        end
-    end
-
-    if UnitAura then
-        for index = 1, 80 do
-            local ok, name = pcall(UnitAura, "player", index, "HELPFUL")
-
-            if not ok or not name then
-                break
-            end
-
-            if SafeEquals(name, spellName) then
-                return true
-            end
         end
     end
 
@@ -447,12 +407,19 @@ local function PlayerHasAura(spellID, fallbackName)
 end
 
 local function AddExpectedBuffsFromUnit(expectedBuffs, unit)
-    if not UnitExists or not UnitExists(unit) then
+    local exists = UnitExists and UnitExists(unit)
+
+    if IsSecretValue(exists) or not exists then
         return
     end
 
-    local _, classFile = UnitClass(unit)
-    local classBuffs = classFile and GROUP_BUFFS_BY_CLASS[classFile]
+    local ok, _, classFile = pcall(UnitClass, unit)
+
+    if not ok or IsSecretValue(classFile) or type(classFile) ~= "string" then
+        return
+    end
+
+    local classBuffs = GROUP_BUFFS_BY_CLASS[classFile]
 
     if not classBuffs then
         return
@@ -706,11 +673,7 @@ function ns:InitializeBuffWarnings()
     eventFrame:RegisterEvent("ZONE_CHANGED")
     eventFrame:RegisterEvent("ZONE_CHANGED_INDOORS")
     eventFrame:RegisterEvent("ZONE_CHANGED_NEW_AREA")
-    eventFrame:SetScript("OnEvent", function(_, event, unit)
-        if event == "UNIT_AURA" and unit ~= "player" then
-            return
-        end
-
+    eventFrame:SetScript("OnEvent", function(_, event)
         if event == "PLAYER_REGEN_DISABLED" then
             UnregisterBuffUnitEvents()
             ConcealWarningFrameForCombat()

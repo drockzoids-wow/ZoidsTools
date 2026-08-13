@@ -1831,7 +1831,8 @@ function ns:InitializeStatTargets()
                 return
             end
 
-            if event == "UNIT_AURA" and unitOrAddon ~= "player" then
+            if event == "UNIT_AURA" then
+                QueueRefresh(0.08)
                 return
             end
 

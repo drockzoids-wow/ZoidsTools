@@ -7,8 +7,10 @@ local mythicScoreCache = {}
 local pendingInspects = {}
 local activeInspectGuid
 local lastInspectRequest = 0
-local RefreshCurrentTooltipForGUID
 local unitDetailsPanel
+local RefreshCurrentTooltipForGUID
+local RefreshCurrentTooltip
+local PositionUnitDetailsPanel
 
 local DEFAULT_BG = { 0.02, 0.018, 0.014, 0.92 }
 local DEFAULT_BORDER = { 0.35, 0.35, 0.35, 0.85 }
@@ -1040,18 +1042,20 @@ local function EnsureUnitDetailsPanel()
     panel:SetScript("OnUpdate", function(self, elapsed)
         self.watchElapsed = (self.watchElapsed or 0) + elapsed
 
-        if self.watchElapsed < 0.10 then
+        if self.watchElapsed < 0.05 then
             return
         end
 
         self.watchElapsed = 0
 
-        local unit = "mouseover"
-        local guid = GetUnitGUIDSafe(unit)
+        local guid = GetUnitGUIDSafe("mouseover")
 
-        if not guid or guid ~= self.guid or not UnitIsPlayerSafe(unit) then
+        if not guid or guid ~= self.guid or not UnitIsPlayerSafe("mouseover") then
             HideUnitDetailsPanel()
+            return
         end
+
+        PositionUnitDetailsPanel(self)
     end)
 
     panel:Hide()
@@ -1060,56 +1064,77 @@ local function EnsureUnitDetailsPanel()
     return panel
 end
 
-local function PositionUnitDetailsPanel(panel)
-    if not panel or not UIParent or not GetCursorPosition then
-        return
+PositionUnitDetailsPanel = function(panel)
+    local tooltip = GameTooltip
+
+    if not panel or not tooltip or not UIParent or not tooltip.IsShown or not tooltip:IsShown() then
+        HideUnitDetailsPanel()
+        return false
     end
 
-    local scale = UIParent.GetEffectiveScale and UIParent:GetEffectiveScale() or 1
-    local cursorX, cursorY = GetCursorPosition()
+    -- Never anchor the addon frame to GameTooltip. Blizzard reuses that
+    -- tooltip for map widgets whose geometry becomes secret in 12.1. Read
+    -- ordinary player-tooltip geometry and place this UIParent-owned panel
+    -- at the equivalent absolute screen position instead.
+    local left = tooltip.GetLeft and tooltip:GetLeft()
+    local bottom = tooltip.GetBottom and tooltip:GetBottom()
+    local top = tooltip.GetTop and tooltip:GetTop()
+    local width = tooltip.GetWidth and tooltip:GetWidth()
+    local tooltipScale = tooltip.GetEffectiveScale and tooltip:GetEffectiveScale()
+    local parentScale = UIParent.GetEffectiveScale and UIParent:GetEffectiveScale()
 
-    if IsSecretValue(scale) or IsSecretValue(cursorX) or IsSecretValue(cursorY) then
-        return
+    if IsSecretValue(left)
+        or IsSecretValue(bottom)
+        or IsSecretValue(top)
+        or IsSecretValue(width)
+        or IsSecretValue(tooltipScale)
+        or IsSecretValue(parentScale)
+    then
+        HideUnitDetailsPanel()
+        return false
     end
 
-    scale = tonumber(scale) or 1
-    cursorX = (tonumber(cursorX) or 0) / scale
-    cursorY = (tonumber(cursorY) or 0) / scale
+    left = tonumber(left)
+    bottom = tonumber(bottom)
+    top = tonumber(top)
+    width = tonumber(width)
+    tooltipScale = tonumber(tooltipScale)
+    parentScale = tonumber(parentScale)
 
-    local parentWidth = UIParent.GetWidth and UIParent:GetWidth() or 0
-    local parentHeight = UIParent.GetHeight and UIParent:GetHeight() or 0
-    local panelWidth = panel.GetWidth and panel:GetWidth() or 230
+    if not left or not bottom or not top or not width or not tooltipScale or not parentScale or parentScale <= 0 then
+        HideUnitDetailsPanel()
+        return false
+    end
+
+    local ratio = tooltipScale / parentScale
+    local panelLeft = left * ratio
+    local panelBottom = bottom * ratio
+    local panelTop = top * ratio
+    local panelWidth = math.max(190, width * ratio)
     local panelHeight = panel.GetHeight and panel:GetHeight() or 34
-    local anchorRight = parentWidth > 0 and cursorX + panelWidth + 18 > parentWidth
-    local anchorDown = parentHeight > 0 and cursorY + panelHeight + 18 > parentHeight
-    local point
 
-    if anchorRight and anchorDown then
-        point = "TOPRIGHT"
-        cursorX = cursorX - 14
-        cursorY = cursorY - 18
-    elseif anchorRight then
-        point = "BOTTOMRIGHT"
-        cursorX = cursorX - 14
-        cursorY = cursorY + 18
-    elseif anchorDown then
-        point = "TOPLEFT"
-        cursorX = cursorX + 14
-        cursorY = cursorY - 18
-    else
-        point = "BOTTOMLEFT"
-        cursorX = cursorX + 14
-        cursorY = cursorY + 18
+    if IsSecretValue(panelHeight) then
+        HideUnitDetailsPanel()
+        return false
     end
 
+    panelHeight = tonumber(panelHeight) or 34
+    panel:SetWidth(panelWidth)
     panel:ClearAllPoints()
-    panel:SetPoint(point, UIParent, "BOTTOMLEFT", cursorX, cursorY)
+
+    if panelBottom >= panelHeight - 1 then
+        panel:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", panelLeft, panelBottom + 1)
+    else
+        panel:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", panelLeft, panelTop - 1)
+    end
+
+    return true
 end
 
 local function UpdateUnitDetailsPanel(unit, guid)
     local db = EnsureDB()
 
-    if not db or not UnitIsPlayerSafe(unit) then
+    if not db or IsCombatLocked() or not UnitIsPlayerSafe(unit) then
         HideUnitDetailsPanel()
         return
     end
@@ -1159,6 +1184,7 @@ local function UpdateUnitDetailsPanel(unit, guid)
     local panel = EnsureUnitDetailsPanel()
 
     if panel.detailsKey == detailsKey and panel:IsShown() then
+        PositionUnitDetailsPanel(panel)
         return
     end
 
@@ -1236,17 +1262,20 @@ local function UpdateUnitDetailsPanel(unit, guid)
         panel.itemLevelValue:SetPoint("TOPRIGHT", panel.scoreValue, "BOTTOMRIGHT", 0, -3)
     end
 
-    panel:SetHeight(height)
-    PositionUnitDetailsPanel(panel)
-    panel:Show()
-end
-
-RefreshCurrentTooltipForGUID = function(guid)
-    if not guid or IsSecretValue(guid) then
+    if not mythicScoreText and not itemLevel and not itemLevelPending then
+        HideUnitDetailsPanel()
         return
     end
 
-    if IsCombatLocked() then
+    panel:SetHeight(height)
+
+    if PositionUnitDetailsPanel(panel) then
+        panel:Show()
+    end
+end
+
+RefreshCurrentTooltipForGUID = function(guid)
+    if not guid or IsSecretValue(guid) or IsCombatLocked() then
         return
     end
 
@@ -1276,7 +1305,7 @@ local function OnInspectReady(guid)
     RetryInspectResult(guid, 0)
 end
 
-local function RefreshCurrentTooltip()
+RefreshCurrentTooltip = function()
     local unit = "mouseover"
 
     if UnitIsPlayerSafe(unit) then
@@ -1405,10 +1434,10 @@ function ns:InitializeTooltips()
                 PrefetchUnitItemLevel("mouseover")
             end
 
-            -- Build the independent player-details panel only from the
-            -- mouseover unit. Do not register a shared-tooltip callback
-            -- or anchor anything to GameTooltip: World Map POIs reuse that
-            -- shared tooltip with secret-valued layout data.
+            -- Keep all addon work outside Blizzard's shared GameTooltip.
+            -- Map POIs reuse it with secret geometry in 12.1, so even a
+            -- unit-only post-call can make later Blizzard layout inherit
+            -- ZoidsTools' taint attribution.
             RunNextFrame(RefreshCurrentTooltip)
         end
     end)

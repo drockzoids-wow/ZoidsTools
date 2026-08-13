@@ -26,6 +26,10 @@ local lastStatus = {
     mana = "Mana macro disabled.",
 }
 
+local function IsSecretValue(value)
+    return type(issecretvalue) == "function" and issecretvalue(value) == true
+end
+
 local function EnsureMacroDB()
     if not ns.db then
         return nil
@@ -184,7 +188,11 @@ local function ReadTooltipViaScanner(bag, slot)
     tooltipScanner:ClearLines()
 
     if tooltipScanner.SetBagItem then
-        tooltipScanner:SetBagItem(bag, slot)
+        local ok = pcall(tooltipScanner.SetBagItem, tooltipScanner, bag, slot)
+
+        if not ok then
+            return ""
+        end
     end
 
     local lines = {}
@@ -197,7 +205,7 @@ local function ReadTooltipViaScanner(bag, slot)
         if left and left.GetText then
             local text = left:GetText()
 
-            if text and text ~= "" then
+            if not IsSecretValue(text) and type(text) == "string" and text ~= "" then
                 lines[#lines + 1] = text
             end
         end
@@ -205,7 +213,7 @@ local function ReadTooltipViaScanner(bag, slot)
         if right and right.GetText then
             local text = right:GetText()
 
-            if text and text ~= "" then
+            if not IsSecretValue(text) and type(text) == "string" and text ~= "" then
                 lines[#lines + 1] = text
             end
         end
@@ -216,17 +224,21 @@ end
 
 local function ReadTooltipText(bag, slot)
     if C_TooltipInfo and C_TooltipInfo.GetBagItem then
-        local data = C_TooltipInfo.GetBagItem(bag, slot)
+        local ok, data = pcall(C_TooltipInfo.GetBagItem, bag, slot)
 
-        if data and data.lines then
+        if ok and type(data) == "table" and type(data.lines) == "table" then
             local lines = {}
 
             for _, line in ipairs(data.lines) do
-                if line.leftText and line.leftText ~= "" then
+                if not IsSecretValue(line.leftText)
+                    and type(line.leftText) == "string"
+                    and line.leftText ~= "" then
                     lines[#lines + 1] = line.leftText
                 end
 
-                if line.rightText and line.rightText ~= "" then
+                if not IsSecretValue(line.rightText)
+                    and type(line.rightText) == "string"
+                    and line.rightText ~= "" then
                     lines[#lines + 1] = line.rightText
                 end
             end
@@ -246,15 +258,21 @@ local function ParseNumber(value)
 end
 
 local function GetPercentBase(kind)
+    local ok, value
+
     if kind == "mana" and UnitPowerMax and Enum and Enum.PowerType then
-        return UnitPowerMax("player", Enum.PowerType.Mana) or 0
+        ok, value = pcall(UnitPowerMax, "player", Enum.PowerType.Mana)
     elseif kind == "mana" and UnitPowerMax then
-        return UnitPowerMax("player", 0) or 0
+        ok, value = pcall(UnitPowerMax, "player", 0)
     elseif UnitHealthMax then
-        return UnitHealthMax("player") or 0
+        ok, value = pcall(UnitHealthMax, "player")
     end
 
-    return 0
+    if not ok or IsSecretValue(value) or type(value) ~= "number" then
+        return 0
+    end
+
+    return value
 end
 
 local function FindRestoreAmount(text, kind)
@@ -264,7 +282,13 @@ local function FindRestoreAmount(text, kind)
         local value = ParseNumber(amount)
 
         if percent == "%" then
-            value = GetPercentBase(kind) * (value / 100)
+            local base = GetPercentBase(kind)
+
+            if base <= 0 then
+                return
+            end
+
+            value = base * (value / 100)
         end
 
         if value > best then

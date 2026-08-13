@@ -218,6 +218,10 @@ local function NormalizeMountName(name)
     return ""
 end
 
+local function IsSecretValue(value)
+    return issecretvalue and issecretvalue(value) == true
+end
+
 local function IsPlayerInCombat()
     if InCombatLockdown and InCombatLockdown() then
         return true
@@ -261,16 +265,34 @@ local function GetTargetMatchBlockReason()
         return "Target matching pauses in combat."
     end
 
-    if not UnitExists or not UnitExists("target") then
+    local exists = UnitExists and UnitExists("target")
+
+    if IsSecretValue(exists) then
+        return "Target details are unavailable in the current game context."
+    end
+
+    if not exists then
         return "No target selected."
     end
 
-    if UnitCanAttack and UnitCanAttack("player", "target") then
-        return "Target matching ignores hostile targets."
+    if UnitCanAttack then
+        local canAttack = UnitCanAttack("player", "target")
+
+        if IsSecretValue(canAttack) then
+            return "Target details are unavailable in the current game context."
+        elseif canAttack then
+            return "Target matching ignores hostile targets."
+        end
     end
 
-    if UnitIsPlayer and not UnitIsPlayer("target") then
-        return "Target matching only checks player targets."
+    if UnitIsPlayer then
+        local isPlayer = UnitIsPlayer("target")
+
+        if IsSecretValue(isPlayer) then
+            return "Target details are unavailable in the current game context."
+        elseif not isPlayer then
+            return "Target matching only checks player targets."
+        end
     end
 
     return nil
@@ -538,29 +560,29 @@ local function GetMountIDByAuraName(name)
 end
 
 local function GetHelpfulAura(unit, index)
-    if C_UnitAuras and C_UnitAuras.GetAuraDataByIndex then
-        local ok, aura = pcall(C_UnitAuras.GetAuraDataByIndex, unit, index, "HELPFUL")
-
-        if ok and aura then
-            local readOk, name, icon, spellID = pcall(function()
-                return aura.name, aura.icon, aura.spellId or aura.spellID
-            end)
-
-            if readOk then
-                return name, icon, spellID
-            end
-        end
+    if not C_UnitAuras or not C_UnitAuras.GetAuraDataByIndex then
+        return nil, nil, nil, true
     end
 
-    if UnitAura then
-        local ok, name, icon, _, _, _, _, _, _, _, spellID = pcall(UnitAura, unit, index, "HELPFUL")
+    local ok, aura = pcall(C_UnitAuras.GetAuraDataByIndex, unit, index, "HELPFUL")
 
-        if ok and name then
-            return name, icon, spellID
-        end
+    if not ok then
+        return nil, nil, nil, true
     end
 
-    return nil, nil, nil
+    if not aura then
+        return nil, nil, nil, false
+    end
+
+    local readOk, name, icon, spellID = pcall(function()
+        return aura.name, aura.icon, aura.spellId or aura.spellID
+    end)
+
+    if not readOk or IsSecretValue(name) or IsSecretValue(icon) or IsSecretValue(spellID) then
+        return nil, nil, nil, true
+    end
+
+    return name, icon, spellID, false
 end
 
 local function GetActiveMountID()
@@ -621,7 +643,11 @@ local function GetTargetMountMatch()
     local foundUnavailableStatus
 
     for index = 1, 40 do
-        local auraName, auraIcon = GetHelpfulAura("target", index)
+        local auraName, auraIcon, _, queryUnavailable = GetHelpfulAura("target", index)
+
+        if queryUnavailable then
+            return BlockedTargetMatch("Target mount details are unavailable in the current game context.")
+        end
 
         if not auraName then
             break
@@ -813,7 +839,11 @@ local function CreateTargetMatchButton()
     end)
 
     button:SetScript("OnEvent", function(self, event, unit)
-        if event == "UNIT_AURA" and unit ~= "target" then
+        if event == "UNIT_AURA" then
+            if not IsPlayerInCombat() then
+                ScheduleTargetMatchButtonUpdate(0.08)
+            end
+
             return
         end
 

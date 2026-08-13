@@ -25,6 +25,10 @@ local function IsInCombat()
     return InCombatLockdown and InCombatLockdown()
 end
 
+local function IsSecretValue(value)
+    return type(issecretvalue) == "function" and issecretvalue(value) == true
+end
+
 local function EnsureDB()
     if not ns.db then
         return nil
@@ -422,7 +426,13 @@ local function UpdateCooldownAndRange()
     end
     if start then
         CooldownFrame_Set(button.cooldown, start, duration, enabled)
-        button.icon:SetDesaturated(duration and duration > 0 and enabled == 0)
+
+        local desaturated = false
+        if not IsSecretValue(duration) and not IsSecretValue(enabled) then
+            desaturated = (tonumber(duration) or 0) > 0 and tonumber(enabled) == 0
+        end
+
+        button.icon:SetDesaturated(desaturated)
     else
         button.cooldown:Clear()
         button.icon:SetDesaturated(false)
@@ -434,7 +444,7 @@ local function UpdateCooldownAndRange()
     elseif IsQuestLogSpecialItemInRange then
         inRange = IsQuestLogSpecialItemInRange(questLogIndex)
     end
-    if inRange == 0 then
+    if not IsSecretValue(inRange) and inRange == 0 then
         button.icon:SetVertexColor(1, 0.30, 0.30)
     else
         button.icon:SetVertexColor(1, 1, 1)

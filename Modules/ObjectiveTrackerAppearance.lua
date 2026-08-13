@@ -280,7 +280,6 @@ local function ApplyTextScale(enabled, scale, outlineText, force)
     appliedTextScale = scale
     appliedTextOutline = outlineText
 
-    local changed = false
     VisitFontStrings(frame, function(fontString)
         local original = originalFonts[fontString]
         if not original and fontString.GetFont then
@@ -304,34 +303,15 @@ local function ApplyTextScale(enabled, scale, outlineText, force)
             if currentPath ~= original.path
                 or not sameSize
                 or (currentFlags or "") ~= (flags or "") then
-                local ok = pcall(fontString.SetFont, fontString, original.path, size, flags)
-                changed = changed or ok
+                pcall(fontString.SetFont, fontString, original.path, size, flags)
             end
         end
     end)
 
-    -- Blizzard caches each module's block and line heights. Marking only the
-    -- container dirty allows otherwise-complete modules to reuse those cached
-    -- measurements, leaving enlarged multiline text inside the old row height.
-    -- Dirty every module so its native SetStringText/AddObjective layout pass
-    -- measures the scaled font before positioning the following quest.
-    if changed then
-        local function MarkModuleDirty(module)
-            if module and module.MarkDirty then
-                pcall(module.MarkDirty, module)
-            end
-        end
-
-        if frame.ForEachModule then
-            pcall(frame.ForEachModule, frame, MarkModuleDirty)
-        elseif type(frame.modules) == "table" then
-            for _, module in ipairs(frame.modules) do
-                MarkModuleDirty(module)
-            end
-        end
-
-        if frame.MarkDirty then pcall(frame.MarkDirty, frame) end
-    end
+    -- Never initiate Blizzard's objective-tracker layout from addon execution.
+    -- In 12.1 a scenario layout can inspect secret aura data; calling MarkDirty
+    -- here taints that protected aura query. Blizzard's own tracker events will
+    -- perform the required layout pass after these cosmetic font changes.
 end
 
 local function ApplyModuleWidths(frame, enabled, width)

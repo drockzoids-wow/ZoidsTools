@@ -5,10 +5,12 @@ local initialized = false
 local healthHooks = {}
 local castbarHooks = {}
 local auraHooks = {}
+local managedAuraHooks = {}
 local auraFrameCache = {}
 local originalHealthColors = {}
 local originalCastbarState = {}
 local originalAuraState = {}
+local originalManagedAuraLimits = {}
 local castbarPreviewFrame
 local castbarPreviewKey
 local castbarPreviewToken = 0
@@ -18,6 +20,7 @@ local healthRefreshQueued = false
 local auraVisibilityQueued = false
 local unitStateQueued = {}
 local HasAuraVisibilityOverrides
+local HasAuraVisibilityOverridesFor
 
 local DEFAULT_CASTBAR_WIDTH = 195
 local DEFAULT_CASTBAR_HEIGHT = 16
@@ -44,6 +47,10 @@ local fallbackClassColors = {
     DEMONHUNTER = { r = 0.64, g = 0.19, b = 0.79 },
     EVOKER = { r = 0.2, g = 0.58, b = 0.5 },
 }
+
+local function IsSecretValue(value)
+    return type(issecretvalue) == "function" and issecretvalue(value) == true
+end
 
 local healthBars = {
     player = {
@@ -293,7 +300,7 @@ local function UpdateAuraEventRegistration()
         eventFrame:UnregisterEvent("UNIT_AURA")
     end
 
-    if HasAuraVisibilityOverrides() then
+    if HasAuraVisibilityOverrides() and not (InCombatLockdown and InCombatLockdown()) then
         RegisterUnitEventSafe(eventFrame, "UNIT_AURA", "target", "focus")
     end
 end
@@ -362,9 +369,26 @@ local function IsNameplateFrame(frame)
 end
 
 local function CanChangeFrame(frame)
-    if InCombatLockdown and InCombatLockdown() and frame and frame.IsProtected and frame:IsProtected() then
-        pendingProtectedRefresh = true
+    if not frame then
         return false
+    end
+
+    if type(frame.CanBeAccessedInContext) == "function" then
+        local ok, canAccess = pcall(frame.CanBeAccessedInContext, frame)
+
+        if not ok or canAccess ~= true then
+            pendingProtectedRefresh = true
+            return false
+        end
+    end
+
+    if InCombatLockdown and InCombatLockdown() and type(frame.IsProtected) == "function" then
+        local ok, isProtected = pcall(frame.IsProtected, frame)
+
+        if not ok or isProtected == true then
+            pendingProtectedRefresh = true
+            return false
+        end
     end
 
     return true
@@ -407,12 +431,27 @@ local function ReadColor(color)
 end
 
 local function GetClassColor(unit)
-    if not UnitExists(unit) or (UnitIsPlayer and not UnitIsPlayer(unit)) then
+    local exists = UnitExists and UnitExists(unit)
+
+    if IsSecretValue(exists) or not exists then
         return nil
     end
 
-    local _, classFile = UnitClass(unit)
-    local color = classFile and fallbackClassColors[classFile]
+    if UnitIsPlayer then
+        local isPlayer = UnitIsPlayer(unit)
+
+        if IsSecretValue(isPlayer) or not isPlayer then
+            return nil
+        end
+    end
+
+    local ok, _, classFile = pcall(UnitClass, unit)
+
+    if not ok or IsSecretValue(classFile) or type(classFile) ~= "string" then
+        return nil
+    end
+
+    local color = fallbackClassColors[classFile]
     local r, g, b = ReadColor(color)
 
     if r and g and b then
@@ -1048,7 +1087,7 @@ local function RestoreAuraFrame(frame)
 end
 
 local function GetAuraKindFromName(name)
-    if type(name) ~= "string" then
+    if IsSecretValue(name) or type(name) ~= "string" then
         return nil
     end
 
@@ -1063,58 +1102,39 @@ local function GetAuraKindFromName(name)
     return nil
 end
 
-local function GetAuraKindFromAuraData(unit, auraInstanceID)
-    if not unit or not auraInstanceID or not C_UnitAuras or not C_UnitAuras.GetAuraDataByAuraInstanceID then
-        return nil
-    end
-
-    local ok, auraData = pcall(C_UnitAuras.GetAuraDataByAuraInstanceID, unit, auraInstanceID)
-
-    if not ok then
-        return nil
-    end
-
-    if auraData and auraData.isHelpful == true then
-        return "buffs"
-    elseif auraData and auraData.isHarmful == true then
-        return "debuffs"
-    end
-
-    return nil
-end
-
 local function GetAuraKindFromAuraInfo(info)
     if type(info) ~= "table" then
         return nil
     end
 
-    if info.isHelpful == true or info.isBuff == true then
+    local isHelpful = info.isHelpful
+    local isBuff = info.isBuff
+    local isHarmful = info.isHarmful
+    local isDebuff = info.isDebuff
+
+    if (not IsSecretValue(isHelpful) and isHelpful == true)
+        or (not IsSecretValue(isBuff) and isBuff == true) then
         return "buffs"
-    elseif info.isHarmful == true or info.isDebuff == true then
+    elseif (not IsSecretValue(isHarmful) and isHarmful == true)
+        or (not IsSecretValue(isDebuff) and isDebuff == true) then
         return "debuffs"
     end
 
     return nil
 end
 
-local function GetAuraKindFromFields(child, unit)
+local function GetAuraKindFromFields(child)
     if not child then
         return nil
     end
 
-    local dataKind = GetAuraKindFromAuraData(unit, child.auraInstanceID)
+    local dataKind = GetAuraKindFromAuraInfo(child.auraInfo or child.auraData)
 
     if dataKind then
         return dataKind
     end
 
-    dataKind = GetAuraKindFromAuraInfo(child.auraInfo or child.auraData)
-
-    if dataKind then
-        return dataKind
-    end
-
-    if child.auraInstanceID or child.auraInfo or child.auraData then
+    if child.auraInfo or child.auraData then
         return nil
     end
 
@@ -1124,15 +1144,22 @@ local function GetAuraKindFromFields(child, unit)
         return namedKind
     end
 
-    if child.isBuff == true or child.isHelpful == true then
+    local isBuff = child.isBuff
+    local isHelpful = child.isHelpful
+    local isDebuff = child.isDebuff
+    local isHarmful = child.isHarmful
+
+    if (not IsSecretValue(isBuff) and isBuff == true)
+        or (not IsSecretValue(isHelpful) and isHelpful == true) then
         return "buffs"
-    elseif child.isDebuff == true or child.isHarmful == true then
+    elseif (not IsSecretValue(isDebuff) and isDebuff == true)
+        or (not IsSecretValue(isHarmful) and isHarmful == true) then
         return "debuffs"
     end
 
     local filter = child.filter or child.auraFilter
 
-    if type(filter) == "string" then
+    if not IsSecretValue(filter) and type(filter) == "string" then
         local lowerFilter = string.lower(filter)
 
         if lowerFilter:find("harmful") then
@@ -1152,7 +1179,12 @@ local function IsSmallFrame(frame)
 
     local width, height = frame:GetSize()
 
-    return width and height and width > 0 and height > 0 and width <= 72 and height <= 72
+    if IsSecretValue(width) or IsSecretValue(height)
+        or type(width) ~= "number" or type(height) ~= "number" then
+        return false
+    end
+
+    return width > 0 and height > 0 and width <= 72 and height <= 72
 end
 
 local function LooksLikeAuraButton(child)
@@ -1170,7 +1202,12 @@ local function LooksLikeAuraButton(child)
         return IsSmallFrame(child)
     end
 
-    if child.auraInstanceID or child.auraInfo or child.spellID or child.spellId then
+    local auraInstanceID = child.auraInstanceID
+    local spellID = child.spellID or child.spellId
+
+    if (not IsSecretValue(auraInstanceID) and auraInstanceID)
+        or child.auraInfo
+        or (not IsSecretValue(spellID) and spellID) then
         return IsSmallFrame(child)
     end
 
@@ -1182,7 +1219,7 @@ end
 
 local function ChildNameMatches(child, patterns, auraType, unit)
     local name = child and child.GetName and child:GetName()
-    local lowerName = type(name) == "string" and string.lower(name) or nil
+    local lowerName = not IsSecretValue(name) and type(name) == "string" and string.lower(name) or nil
     local kind = GetAuraKindFromFields(child, unit)
 
     if not LooksLikeAuraButton(child) then
@@ -1307,6 +1344,96 @@ local function ShouldHideAuraType(key, auraType)
     return false
 end
 
+local function GetManagedAuraOwner(key)
+    local info = auraTargets[key]
+    local owner = info and ResolveFirst(info.roots)
+
+    if owner and type(owner.GetAuraContainer) == "function" and type(owner.ConfigureAuraContainer) == "function" then
+        return owner
+    end
+
+    return nil
+end
+
+local function ApplyManagedAuraVisibility(key)
+    local owner = GetManagedAuraOwner(key)
+
+    if not owner then
+        return false
+    end
+
+    if InCombatLockdown and InCombatLockdown() then
+        pendingProtectedRefresh = true
+        return true
+    end
+
+    if not CanChangeFrame(owner) then
+        return true
+    end
+
+    local ok, container = pcall(owner.GetAuraContainer, owner)
+
+    if not ok or not container then
+        pendingProtectedRefresh = true
+        return true
+    end
+
+    if type(container.CanBeAccessedInContext) == "function" then
+        local accessOK, canAccess = pcall(container.CanBeAccessedInContext, container)
+
+        if not accessOK or canAccess ~= true then
+            pendingProtectedRefresh = true
+            return true
+        end
+    end
+
+    if not managedAuraHooks[owner] and type(hooksecurefunc) == "function" then
+        managedAuraHooks[owner] = true
+        hooksecurefunc(owner, "ConfigureAuraContainer", function()
+            if HasAuraVisibilityOverridesFor(key) and C_Timer and C_Timer.After then
+                C_Timer.After(0, function()
+                    ApplyManagedAuraVisibility(key)
+                end)
+            end
+        end)
+    end
+
+    local state = originalManagedAuraLimits[owner]
+
+    if not state then
+        local buffsOK, maxBuffs = pcall(container.GetMaxBuffs, container)
+        local debuffsOK, maxDebuffs = pcall(container.GetMaxDebuffs, container)
+
+        if not buffsOK or not debuffsOK or type(maxBuffs) ~= "number" or type(maxDebuffs) ~= "number" then
+            pendingProtectedRefresh = true
+            return true
+        end
+
+        state = {
+            maxBuffs = maxBuffs,
+            maxDebuffs = maxDebuffs,
+        }
+        originalManagedAuraLimits[owner] = state
+    end
+
+    local buffsSet = pcall(
+        container.SetMaxBuffs,
+        container,
+        ShouldHideAuraType(key, "buffs") and 0 or state.maxBuffs
+    )
+    local debuffsSet = pcall(
+        container.SetMaxDebuffs,
+        container,
+        ShouldHideAuraType(key, "debuffs") and 0 or state.maxDebuffs
+    )
+
+    if not buffsSet or not debuffsSet then
+        pendingProtectedRefresh = true
+    end
+
+    return true
+end
+
 function HasAuraVisibilityOverrides()
     for _, key in ipairs(auraFrameOrder) do
         if ShouldHideAuraType(key, "buffs") or ShouldHideAuraType(key, "debuffs") then
@@ -1317,14 +1444,18 @@ function HasAuraVisibilityOverrides()
     return false
 end
 
-local function HasAuraVisibilityOverridesFor(key)
+HasAuraVisibilityOverridesFor = function(key)
     return ShouldHideAuraType(key, "buffs") or ShouldHideAuraType(key, "debuffs")
 end
 
-local function ApplyAuraVisibilityFor(key, auraType)
+local function ApplyAuraVisibilityFor(key, auraType, legacyOnly)
     local info = auraTargets[key]
 
     if not info then
+        return
+    end
+
+    if not legacyOnly and ApplyManagedAuraVisibility(key) then
         return
     end
 
@@ -1339,8 +1470,10 @@ end
 
 local function ApplyAuraVisibility()
     for _, key in ipairs(auraFrameOrder) do
-        ApplyAuraVisibilityFor(key, "buffs")
-        ApplyAuraVisibilityFor(key, "debuffs")
+        if not ApplyManagedAuraVisibility(key) then
+            ApplyAuraVisibilityFor(key, "buffs", true)
+            ApplyAuraVisibilityFor(key, "debuffs", true)
+        end
     end
 end
 
@@ -1383,8 +1516,10 @@ local function ApplyUnitFrameState(key)
     end
 
     if HasAuraVisibilityOverridesFor(key) then
-        ApplyAuraVisibilityFor(key, "buffs")
-        ApplyAuraVisibilityFor(key, "debuffs")
+        if not ApplyManagedAuraVisibility(key) then
+            ApplyAuraVisibilityFor(key, "buffs", true)
+            ApplyAuraVisibilityFor(key, "debuffs", true)
+        end
     end
 end
 
@@ -1416,6 +1551,10 @@ local function HookAuraFramesFor(key, auraType)
     local info = auraTargets[key]
 
     if not info then
+        return
+    end
+
+    if GetManagedAuraOwner(key) then
         return
     end
 
@@ -1697,8 +1836,14 @@ function ns:InitializeUnitFrames()
     RegisterUnitEventSafe(eventFrame, "UNIT_HEALTH", "player", "target", "targettarget", "focus")
     RegisterUnitEventSafe(eventFrame, "UNIT_MAXHEALTH", "player", "target", "targettarget", "focus")
     eventFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
+    eventFrame:RegisterEvent("PLAYER_REGEN_DISABLED")
     eventFrame:SetScript("OnEvent", function(_, event, unit)
-        if event == "PLAYER_REGEN_ENABLED" then
+        if event == "PLAYER_REGEN_DISABLED" then
+            UpdateAuraEventRegistration()
+            return
+        elseif event == "PLAYER_REGEN_ENABLED" then
+            UpdateAuraEventRegistration()
+
             if pendingProtectedRefresh then
                 pendingProtectedRefresh = false
                 ScheduleRefresh(0.05)
@@ -1736,6 +1881,15 @@ function ns:InitializeUnitFrames()
             return
         end
 
+        if event == "UNIT_AURA" then
+            if HasAuraVisibilityOverrides() then
+                ClearAuraFrameCache()
+                ScheduleAuraVisibility(0.08)
+            end
+
+            return
+        end
+
         if event == "UNIT_TARGET" and unit ~= "player" and unit ~= "target" then
             return
         end
@@ -1750,19 +1904,6 @@ function ns:InitializeUnitFrames()
             or event == "UNIT_FACTION"
             or event == "UNIT_CONNECTION" then
             ScheduleHealthBars(0.08)
-            return
-        end
-
-        if event == "UNIT_AURA" then
-            if HasAuraVisibilityOverrides() then
-                if unit == "target" or unit == "focus" then
-                    ClearAuraFrameCache(unit)
-                else
-                    ClearAuraFrameCache()
-                end
-                ScheduleAuraVisibility(0.08)
-            end
-
             return
         end
 

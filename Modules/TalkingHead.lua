@@ -82,11 +82,9 @@ local function CreateSubtitleFrame()
     frame:SetFrameLevel(980)
     frame:SetClampedToScreen(true)
     frame:SetMovable(false)
-    frame:EnableMouse(true)
-    if frame.SetPropagateMouseMotion then frame:SetPropagateMouseMotion(true) end
-    if frame.SetPropagateMouseClicks then
-        pcall(frame.SetPropagateMouseClicks, frame, true)
-    end
+    -- Mouse propagation became protected in 12.1. Keep the subtitle genuinely
+    -- click-through; the temporary move overlay enables its own mouse input.
+    frame:EnableMouse(false)
     frame:SetBackdrop({
         bgFile = "Interface\\Buttons\\WHITE8x8",
         edgeFile = "Interface\\Buttons\\WHITE8x8",

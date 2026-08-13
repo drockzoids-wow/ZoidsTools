@@ -255,8 +255,12 @@ local function FormatRowValue(source, windowIndex)
     end
     if meterType == "Deaths" then
         local deathTime = source.deathTimeSeconds
+
+        if IsSecret(deathTime) then
+            return tostring(deathTime)
+        end
+
         if deathTime ~= nil then
-            if IsSecret(deathTime) then return tostring(deathTime) end
             deathTime = tonumber(deathTime)
             if deathTime == -1 then return "" end
             if deathTime and deathTime >= 0 and SecondsToClock then return SecondsToClock(deathTime) end
@@ -279,7 +283,7 @@ end
 
 local function SetClassIcon(texture, source)
     local specIconID = source and source.specIconID
-    if specIconID ~= nil and not IsSecret(specIconID) then
+    if not IsSecret(specIconID) and specIconID ~= nil then
         texture:SetTexture(specIconID)
         texture:SetTexCoord(0.08, 0.92, 0.08, 0.92)
         return
@@ -1225,11 +1229,12 @@ local function UpdateRow(frame, row, source, index, maxAmount)
     end
 
     local amount = GetSourceBarValue(source, frame.windowIndex)
-    if amount == nil then amount = 0 end
-    if maxAmount == nil then maxAmount = 1 end
+    if not IsSecret(amount) and amount == nil then amount = 0 end
+    if not IsSecret(maxAmount) and maxAmount == nil then maxAmount = 1 end
 
     local r, g, b = GetClassColor(source.classFilename)
-    row.bar:SetStatusBarColor(r, g, b, source.isLocalPlayer == true and 0.92 or 0.76)
+    local isLocalPlayer = not IsSecret(source.isLocalPlayer) and source.isLocalPlayer == true
+    row.bar:SetStatusBarColor(r, g, b, isLocalPlayer and 0.92 or 0.76)
     row.bar:SetMinMaxValues(0, maxAmount)
     row.bar:SetValue(amount)
     SetClassIcon(row.icon, source)
@@ -1269,7 +1274,7 @@ local function RefreshMeterWindow(windowIndex)
         sources = session and type(session.combatSources) == "table" and session.combatSources or nil
         maxAmount = session and session.maxAmount or nil
     end
-    if maxAmount == nil and sources and sources[1] then
+    if not IsSecret(maxAmount) and maxAmount == nil and sources and sources[1] then
         maxAmount = GetSourceBarValue(sources[1], windowIndex)
     end
 
@@ -1354,7 +1359,8 @@ local function GetGroupSourceGUID(source)
 
     local sourceName = source.name
     if not IsSecret(sourceName) and sourceName ~= nil then sourceName = tostring(sourceName) else sourceName = nil end
-    local sourceClass = type(source.classFilename) == "string" and source.classFilename or nil
+    local sourceClass = not IsSecret(source.classFilename) and type(source.classFilename) == "string"
+        and source.classFilename or nil
     local classMatchGUID
     local classMatches = 0
     local units = {}
@@ -1369,7 +1375,14 @@ local function GetGroupSourceGUID(source)
     end
 
     for _, unit in ipairs(units) do
-        if not UnitExists or UnitExists(unit) then
+        local exists = true
+
+        if UnitExists then
+            exists = UnitExists(unit)
+            if IsSecret(exists) then exists = false end
+        end
+
+        if exists then
             local guid = UnitGUID(unit)
             if not IsSecret(guid) and guid ~= nil then
                 local unitName, realm
@@ -1384,8 +1397,8 @@ local function GetGroupSourceGUID(source)
                     if sourceName == unitName or sourceName == fullName then return guid end
                 end
 
-                local _, classFilename = UnitClass(unit)
-                if sourceClass and classFilename == sourceClass then
+                local classOK, _, classFilename = pcall(UnitClass, unit)
+                if classOK and sourceClass and not IsSecret(classFilename) and classFilename == sourceClass then
                     classMatches = classMatches + 1
                     classMatchGUID = guid
                 end
@@ -1407,7 +1420,7 @@ local function GetSourceDetails(frame, source)
     local rawCreatureID = source.sourceCreatureID
     local sourceGUID = not IsSecret(rawGUID) and rawGUID ~= nil and rawGUID or nil
     local sourceCreatureID = not IsSecret(rawCreatureID) and rawCreatureID ~= nil and rawCreatureID or nil
-    local isLocalPlayer = source.isLocalPlayer == true
+    local isLocalPlayer = not IsSecret(source.isLocalPlayer) and source.isLocalPlayer == true
     if sourceGUID == nil and sourceCreatureID == nil then
         if isLocalPlayer and UnitGUID then
             sourceGUID = UnitGUID("player")

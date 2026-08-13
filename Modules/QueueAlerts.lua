@@ -10,6 +10,17 @@ local lastDisplayedSecond
 local restoreBackgroundSound
 local updateGeneration = 0
 
+local function CanAccessFrame(frame)
+    if not frame then return false end
+
+    if type(frame.CanBeAccessedInContext) == "function" then
+        local ok, canAccess = pcall(frame.CanBeAccessedInContext, frame)
+        return ok and canAccess == true
+    end
+
+    return true
+end
+
 local function EnsureDB()
     if not ns.db then return nil end
     ns.db.queueAlerts = ns.db.queueAlerts or {}
@@ -90,7 +101,12 @@ local function CreateCountdownFrame()
     })
     frame:SetBackdropColor(0.015, 0.02, 0.03, 0.94)
     frame:SetBackdropBorderColor(0.72, 0.50, 0.10, 0.95)
-    frame:SetPoint("BOTTOM", popup, "BOTTOM", 0, 3)
+    local anchored = CanAccessFrame(popup)
+        and pcall(frame.SetPoint, frame, "BOTTOM", popup, "BOTTOM", 0, 3)
+
+    if not anchored then
+        frame:SetPoint("CENTER", UIParent, "CENTER", 0, 80)
+    end
 
     frame.text = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     frame.text:SetPoint("CENTER", 0, 0)
@@ -138,13 +154,13 @@ end
 
 local function ApplySafeQueue()
     local button = _G.LFGDungeonReadyDialog and _G.LFGDungeonReadyDialog.leaveButton
-    if not button then return end
+    if not CanAccessFrame(button) or (InCombatLockdown and InCombatLockdown()) then return end
 
     local db = EnsureDB()
     if db and db.safeQueue and ProposalIsVisible() then
-        button:Hide()
+        pcall(button.Hide, button)
     else
-        button:Show()
+        pcall(button.Show, button)
     end
 end
 
@@ -183,7 +199,9 @@ local function StopProposal()
     RestoreBackgroundSound()
 
     local button = _G.LFGDungeonReadyDialog and _G.LFGDungeonReadyDialog.leaveButton
-    if button then button:Show() end
+    if CanAccessFrame(button) and not (InCombatLockdown and InCombatLockdown()) then
+        pcall(button.Show, button)
+    end
 end
 
 function ns:IsQueueBackgroundSoundEnabled()

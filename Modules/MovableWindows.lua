@@ -463,19 +463,16 @@ local function RelayoutContainerFrames()
 end
 
 local function RelayoutUIPanelFrames(frame)
-    local layoutFunctions = {
-        "UpdateUIPanelPositions",
-        "UIParent_ManageFramePositions",
-    }
-
     if frame then
         frame.ZTRestoringPoint = true
     end
 
-    for _, functionName in ipairs(layoutFunctions) do
-        if type(_G[functionName]) == "function" then
-            pcall(_G[functionName], frame)
-        end
+    if type(_G.UpdateUIPanelPositions) == "function" then
+        pcall(_G.UpdateUIPanelPositions, frame)
+    end
+
+    if type(_G.ManageFramePositions) == "function" then
+        pcall(_G.ManageFramePositions)
     end
 
     if frame then

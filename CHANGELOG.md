@@ -2,9 +2,16 @@
 
 ## Unreleased
 
+- Updated the Retail interface metadata for Midnight 12.1.0 (`120100`).
+- Updated removed 12.1 addon-loading, frame-layout, spellbook, aura-container, and mouse-propagation API paths.
+- Isolated ZoidsTools player details from Blizzard's reusable 12.1 `GameTooltip`; the addon-owned extension now follows the native player tooltip by absolute screen position without modifying or anchoring to Blizzard's protected tooltip.
+- Audited all registered events and C API calls against Blizzard's 12.1 interface source, and hardened remaining cooldown, range, consumable, damage-meter, unit-frame, and queue paths against secret values and inaccessible protected frames.
+- Guarded dungeon-restricted unit identity and class values before class-color, missing-buff, damage-meter matching, or target-mount lookups, preserving Blizzard's native fallback display whenever identity data is secret.
+- Stopped ZoidsTools from marking Blizzard objective-tracker modules dirty, preventing scenario layouts from reaching protected 12.1 aura data through a tainted refresh.
+- Removed the retired settings-window implementation now that the modern ZoidsTools window is the sole control UI, eliminating duplicate popup registrations and unnecessary startup work.
 - Added dungeon queue-ready tools: a background-capable alert sound, a countdown that stays visible through both proposal states, and an optional safe-queue mode that hides Decline without auto-accepting.
 - Detached addon-owned World Map and objective-tracker cosmetic layers from Blizzard's protected frame hierarchies and replaced tracker method hooks with read-only state polling, preventing quest and super-tracking updates from tainting protected pin mouse propagation.
-- Fully removed ZoidsTools callbacks and anchor dependencies from Blizzard's shared GameTooltip construction path: player details now use a cursor-positioned addon panel, while the profession helper discovers hovered bag slots directly, allowing secret-valued map POI and quest-offer layouts to remain untainted.
+- Kept profession-helper hover discovery and player-detail rendering independent of Blizzard's shared tooltip, with no global tooltip-data callback remaining.
 - Excluded Blizzard's protected World Map canvas from movable-window and scaling hooks, preventing quest-pin and POI layout taint.
 - Deferred World Map coordinate-overlay refreshes until after protected MapCanvas updates and disabled the overlay during combat.
 - Reworked smart-mount pool refreshes to discard temporary post-combat usability snapshots, use Blizzard's current mount usability and steady-flight data, and record each keypress only once.
@@ -17,7 +24,7 @@
 - Added source-ordered secondary-stat priorities to generated stat goals and displayed them in a taller, better-aligned Character Stats Goals header.
 - Normalized Scenario and Dungeon tracker header widths so their titles, bars, and collapse buttons align with Campaign and Quest sections.
 - Recalculated objective-tracker module line and block heights after text scaling so enlarged outlined multiline objectives no longer overlap the following quest.
-- Applied unit-tooltip appearance before display and updated inspected item level in place, eliminating the visible default-to-custom tooltip redraw.
+- Updated inspected player details in place inside the isolated tooltip extension, eliminating the former cursor-following panel and shared-tooltip redraw path.
 - Inset Dungeon, Scenario, and other objective-tracker section collapse buttons so they remain inside the customized tracker border.
 - Shifted attached chat typing boxes two pixels right for cleaner alignment with Blizzard's visible chat edge.
 - Prevented stopped or reload-cleared diagnostic sessions from reporting WoW's client uptime as a zero-frame test result.

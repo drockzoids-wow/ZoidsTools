@@ -1,4 +1,4 @@
-## Interface: 121000, 120007
+## Interface: 120100, 120007
 ## Title: ZoidsTools
 ## Notes: A personal WoW toolkit by Drockzoids.
 ## Author: Drockzoids
@@ -53,20 +53,5 @@ Modules\MinimapTools.lua
 Modules\Tooltips.lua
 UI\Theme.lua
 UI\Controls.lua
-UI\Pages\General.lua
-UI\Pages\Tooltips.lua
-UI\Pages\Windows.lua
-UI\Pages\Chat.lua
-UI\Pages\Items.lua
-UI\Pages\Professions.lua
-UI\Pages\Builds.lua
-UI\Pages\Meters.lua
-UI\Pages\Combat.lua
-UI\Pages\UnitFrames.lua
-UI\Pages\Macros.lua
-UI\Pages\Mounts.lua
-UI\Pages\Loot.lua
-UI\Pages\Quests.lua
-UI\Pages\About.lua
 UI\ModernWindow.lua
 UI\Minimap.lua

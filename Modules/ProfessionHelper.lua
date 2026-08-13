@@ -212,12 +212,21 @@ local function IsSpellKnown(spellID)
         return false
     end
 
-    if C_SpellBook and C_SpellBook.IsSpellKnown and C_SpellBook.IsSpellKnown(spellID) then
-        return true
-    end
+    if C_SpellBook then
+        local checkers = {
+            C_SpellBook.IsSpellKnown,
+            C_SpellBook.IsSpellKnownOrInSpellBook,
+        }
 
-    if C_SpellBook and C_SpellBook.IsSpellKnownOrOverridesKnown and C_SpellBook.IsSpellKnownOrOverridesKnown(spellID) then
-        return true
+        for _, checker in ipairs(checkers) do
+            if type(checker) == "function" then
+                local ok, known = pcall(checker, spellID)
+
+                if ok and known == true then
+                    return true
+                end
+            end
+        end
     end
 
     return IsPlayerSpell and IsPlayerSpell(spellID)

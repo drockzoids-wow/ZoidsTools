@@ -91,7 +91,7 @@ local function CreateCountdownFrame()
 
     local frame = CreateFrame("Frame", "ZoidsToolsQueueCountdown", UIParent, "BackdropTemplate")
     frame:SetSize(116, 22)
-    frame:SetFrameStrata("DIALOG")
+    frame:SetFrameStrata("FULLSCREEN_DIALOG")
     frame:SetFrameLevel(1000)
     frame:SetClampedToScreen(true)
     frame:SetBackdrop({
@@ -102,7 +102,7 @@ local function CreateCountdownFrame()
     frame:SetBackdropColor(0.015, 0.02, 0.03, 0.94)
     frame:SetBackdropBorderColor(0.72, 0.50, 0.10, 0.95)
     local anchored = CanAccessFrame(popup)
-        and pcall(frame.SetPoint, frame, "BOTTOM", popup, "BOTTOM", 0, 3)
+        and pcall(frame.SetPoint, frame, "TOP", popup, "BOTTOM", 0, -4)
 
     if not anchored then
         frame:SetPoint("CENTER", UIParent, "CENTER", 0, 80)

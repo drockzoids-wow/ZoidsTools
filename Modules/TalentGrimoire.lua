@@ -3297,6 +3297,18 @@ local function RefreshPanel()
         return
     end
 
+    for _, dropdown in ipairs({
+        panel.providerDropdown,
+        panel.contentDropdown,
+        panel.modeDropdown,
+        panel.targetDropdown,
+    }) do
+        if dropdown and dropdown.SetEnabled then
+            dropdown:SetEnabled(true)
+            dropdown:SetAlpha(1)
+        end
+    end
+
     local entry, context = GetBuildEntry()
     local contentType = context.contentType or "mythicplus"
     local mode = context.mode or GetModeKey(contentType)
@@ -3419,12 +3431,16 @@ local function AnchorPanel(talentFrame)
         return
     end
 
-    if panel:GetParent() ~= hostFrame then
-        panel:SetParent(hostFrame)
+    -- Keep the helper independent from Blizzard's protected talent hierarchy.
+    -- It can then remain visible and be made read-only during combat without
+    -- attempting to show, hide, or reparent protected descendants.
+    if panel:GetParent() ~= UIParent then
+        panel:SetParent(UIParent)
     end
 
     panel:ClearAllPoints()
     panel:SetPoint("BOTTOMLEFT", hostFrame, "BOTTOMLEFT", PANEL_ANCHOR_X, PANEL_ANCHOR_Y)
+    panel._ztTalentHost = hostFrame
     panel:SetFrameStrata(hostFrame:GetFrameStrata() or "HIGH")
     panel:SetFrameLevel((hostFrame:GetFrameLevel() or 1) + 500)
     panel:Raise()
@@ -3445,11 +3461,74 @@ local function AnchorPanel(talentFrame)
     end
 end
 
+local function RefreshPanelForCombat(talentFrame)
+    pendingCombatRefresh = true
+
+    if not panel then
+        return
+    end
+
+    local db = EnsureDB()
+
+    if not db or db.enabled ~= true or not talentFrame then
+        panel:Hide()
+        return
+    end
+
+    -- The panel itself is addon-owned and parented to UIParent, so positioning
+    -- and displaying it is safe. Avoid querying or changing Blizzard frame
+    -- levels here; talent buttons, import data, and the tree stay untouched.
+    local hostFrame = GetTalentPanelHost(talentFrame)
+
+    if not hostFrame then
+        panel:Hide()
+        return
+    end
+
+    if panel._ztTalentHost ~= hostFrame then
+        panel:ClearAllPoints()
+        panel:SetPoint("BOTTOMLEFT", hostFrame, "BOTTOMLEFT", PANEL_ANCHOR_X, PANEL_ANCHOR_Y)
+        panel._ztTalentHost = hostFrame
+    end
+
+    for _, dropdown in ipairs({
+        panel.providerDropdown,
+        panel.contentDropdown,
+        panel.modeDropdown,
+        panel.targetDropdown,
+    }) do
+        if dropdown and dropdown.SetEnabled then
+            dropdown:SetEnabled(false)
+            dropdown:SetAlpha(0.65)
+        end
+    end
+
+    panel.copyButton:SetText("In Combat")
+    panel.copyButton:SetEnabled(false)
+    panel.copyButton:SetAlpha(0.45)
+    panel.statusText:SetText("Build helper is read-only during combat. Selection and Apply unlock automatically afterward.")
+
+    if panel.importPopup then
+        panel.importPopup:Hide()
+    end
+
+    panel:Show()
+end
+
 local function UpdatePanelVisibility()
     local db = EnsureDB()
     local talentFrame = FindTalentFrame()
 
+    -- This frame is entirely addon-owned and safe to construct in combat.
+    -- Blizzard talent-tree reads and edits remain in the out-of-combat path.
     CreatePanel()
+
+    if InCombatLockdown and InCombatLockdown() then
+        RefreshPanelForCombat(talentFrame)
+        return
+    end
+
+    pendingCombatRefresh = false
 
     if not db or db.enabled ~= true or not talentFrame then
         panel:Hide()
@@ -3469,10 +3548,9 @@ end
 function QueueRefresh(delay)
     if InCombatLockdown and InCombatLockdown() then
         pendingCombatRefresh = true
-        return
+    else
+        pendingCombatRefresh = false
     end
-
-    pendingCombatRefresh = false
 
     if refreshQueued then
         return
@@ -3698,13 +3776,17 @@ function ns:InitializeTalentGrimoire()
         eventFrame = CreateFrame("Frame")
         eventFrame:RegisterEvent("ADDON_LOADED")
         eventFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
+        eventFrame:RegisterEvent("PLAYER_REGEN_DISABLED")
         eventFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
         eventFrame:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED")
         eventFrame:RegisterEvent("ACTIVE_TALENT_GROUP_CHANGED")
         eventFrame:RegisterEvent("ZONE_CHANGED_NEW_AREA")
         eventFrame:RegisterEvent("TRAIT_CONFIG_UPDATED")
         eventFrame:SetScript("OnEvent", function(_, event)
-            InstallTalentFrameHooks()
+            if not (InCombatLockdown and InCombatLockdown()) then
+                InstallTalentFrameHooks()
+            end
+
             QueueRefresh(0.12)
 
             if event == "PLAYER_REGEN_ENABLED" and pendingCombatRefresh then

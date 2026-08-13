@@ -11,6 +11,7 @@ local unitDetailsPanel
 local RefreshCurrentTooltipForGUID
 local RefreshCurrentTooltip
 local PositionUnitDetailsPanel
+local UpdateUnitDetailsPanel
 
 local DEFAULT_BG = { 0.02, 0.018, 0.014, 0.92 }
 local DEFAULT_BORDER = { 0.35, 0.35, 0.35, 0.85 }
@@ -970,29 +971,272 @@ local function FormatItemLevel(itemLevel)
     return tostring(math.floor(itemLevel + 0.5))
 end
 
-local function GetUnitNameSafe(unit)
-    if not unit or not UnitName then
+local function GetNativeFactionTint(tooltip)
+    if not tooltip or type(tooltip.CreateTexture) ~= "function" then
         return nil
     end
 
-    local ok, name, realm = pcall(UnitName, unit)
+    if tooltip.ZoidsToolsFactionTint then
+        return tooltip.ZoidsToolsFactionTint
+    end
 
-    if not ok or IsSecretValue(name) or type(name) ~= "string" or name == "" then
+    -- Blizzard's current tooltip background is textured artwork rather than a
+    -- plain backdrop. A translucent layer above that artwork provides the
+    -- faction color while preserving Blizzard's texture, shape, and border.
+    local tint = tooltip:CreateTexture(nil, "BORDER", nil, -7)
+    tint:SetPoint("TOPLEFT", tooltip, "TOPLEFT", 4, -4)
+    tint:SetPoint("BOTTOMRIGHT", tooltip, "BOTTOMRIGHT", -4, 4)
+    tint:SetColorTexture(0, 0, 0, 0)
+    tint:Hide()
+    tooltip.ZoidsToolsFactionTint = tint
+
+    if type(tooltip.HookScript) == "function" then
+        tooltip:HookScript("OnTooltipCleared", function(self)
+            local currentTint = self.ZoidsToolsFactionTint
+
+            if currentTint then
+                currentTint:Hide()
+            end
+        end)
+    end
+
+    return tint
+end
+
+local function SetNativeFactionTint(tooltip, color)
+    local tint = GetNativeFactionTint(tooltip)
+
+    if not tint then
+        return
+    end
+
+    if color then
+        tint:SetColorTexture(color[1], color[2], color[3], color[4])
+        tint:Show()
+    else
+        tint:Hide()
+    end
+end
+
+local function ApplyNativeUnitTooltipAppearance(tooltip, unit)
+    local db = EnsureDB()
+
+    if not db or tooltip ~= GameTooltip or IsCombatLocked() or not UnitIsPlayerSafe(unit) then
+        return
+    end
+
+    if db.factionBackground then
+        local faction = GetFaction(unit)
+        local color = faction and FACTION_COLORS[faction]
+
+        if color then
+            if type(tooltip.SetBackdropColor) == "function" then
+                tooltip:SetBackdropColor(color.bg[1], color.bg[2], color.bg[3], color.bg[4])
+            end
+
+            if type(tooltip.SetBackdropBorderColor) == "function" then
+                tooltip:SetBackdropBorderColor(color.border[1], color.border[2], color.border[3], color.border[4])
+            end
+
+            SetNativeFactionTint(tooltip, color.tint)
+        else
+            SetNativeFactionTint(tooltip, nil)
+        end
+    else
+        SetNativeFactionTint(tooltip, nil)
+    end
+
+    if db.classColoredNames then
+        local r, g, b = GetClassColor(GetUnitClassFile(unit))
+        local tooltipName = tooltip.GetName and tooltip:GetName()
+        local nameLine = tooltipName and _G[tooltipName .. "TextLeft1"]
+
+        if r and g and b and nameLine and type(nameLine.SetTextColor) == "function" then
+            nameLine:SetTextColor(r, g, b)
+        end
+    end
+end
+
+-- Keep unit tooltips native. Blizzard rebuilds the shared GameTooltip several
+-- times while a unit is hovered, so hiding it and drawing a synchronized copy
+-- causes visible flicker and can expose stale geometry. Extra information is
+-- appended through Blizzard's normal tooltip layout instead.
+local function AddNativeUnitTooltipDetails(tooltip, unit, guid)
+    local db = EnsureDB()
+
+    if not db or tooltip ~= GameTooltip or IsCombatLocked() or not UnitIsPlayerSafe(unit) then
+        return
+    end
+
+    ApplyNativeUnitTooltipAppearance(tooltip, unit)
+
+    guid = guid or GetUnitGUIDSafe(unit)
+
+    if not guid then
+        return
+    end
+
+    local mythicScore = db.showMythicScore and GetTooltipMythicScore(unit, guid) or nil
+    local mythicScoreText = mythicScore and mythicScore.score or nil
+
+    if mythicScoreText and db.showMythicPercentile and mythicScore.percentile then
+        mythicScoreText = mythicScoreText .. " (" .. mythicScore.percentile .. ")"
+    end
+
+    if mythicScoreText then
+        local r, g, b = 1, 1, 1
+
+        if db.colorMythicScore and mythicScore.r and mythicScore.g and mythicScore.b then
+            r, g, b = mythicScore.r, mythicScore.g, mythicScore.b
+        end
+
+        tooltip:AddDoubleLine("Mythic+ Score", mythicScoreText, 0.75, 0.85, 1, r, g, b)
+    end
+
+    local itemLevel = db.showItemLevel and FormatItemLevel(GetTooltipItemLevel(unit, guid)) or nil
+
+    if itemLevel then
+        tooltip:AddDoubleLine("Item Level", itemLevel, 1, 0.82, 0, 1, 1, 1)
+    end
+end
+
+local function GetTooltipStatusBar(tooltip)
+    if not tooltip then
         return nil
     end
 
-    if not IsSecretValue(realm) and type(realm) == "string" and realm ~= "" then
-        return name .. "-" .. realm
+    if tooltip.StatusBar then
+        return tooltip.StatusBar
     end
 
-    return name
+    local tooltipName = tooltip.GetName and tooltip:GetName()
+
+    return tooltipName and _G[tooltipName .. "StatusBar"] or nil
+end
+
+local function SetFrameAlphaSafe(frame, alpha)
+    if frame and type(frame.SetAlpha) == "function" then
+        pcall(frame.SetAlpha, frame, alpha)
+    end
+end
+
+local function SuppressBlizzardUnitTooltip(panel)
+    local tooltip = panel and panel.tooltip
+
+    if not tooltip then
+        return
+    end
+
+    local statusBar = GetTooltipStatusBar(tooltip)
+
+    if panel.originalTooltipAlpha == nil and type(tooltip.GetAlpha) == "function" then
+        local ok, alpha = pcall(tooltip.GetAlpha, tooltip)
+
+        if ok and not IsSecretValue(alpha) then
+            panel.originalTooltipAlpha = tonumber(alpha) or 1
+        end
+    end
+
+    if statusBar and panel.originalStatusBarAlpha == nil and type(statusBar.GetAlpha) == "function" then
+        local ok, alpha = pcall(statusBar.GetAlpha, statusBar)
+
+        if ok and not IsSecretValue(alpha) then
+            panel.originalStatusBarAlpha = tonumber(alpha) or 1
+        end
+    end
+
+    SetFrameAlphaSafe(tooltip, 0)
+    SetFrameAlphaSafe(statusBar, 0)
+end
+
+local function RestoreBlizzardUnitTooltip(panel)
+    if not panel then
+        return
+    end
+
+    local tooltip = panel.tooltip
+    local statusBar = GetTooltipStatusBar(tooltip)
+
+    SetFrameAlphaSafe(tooltip, panel.originalTooltipAlpha or 1)
+    SetFrameAlphaSafe(statusBar, panel.originalStatusBarAlpha or 1)
+    panel.originalTooltipAlpha = nil
+    panel.originalStatusBarAlpha = nil
 end
 
 local function HideUnitDetailsPanel()
     if unitDetailsPanel then
+        RestoreBlizzardUnitTooltip(unitDetailsPanel)
         unitDetailsPanel.guid = nil
         unitDetailsPanel.detailsKey = nil
+        unitDetailsPanel.sourceLineCount = nil
+        unitDetailsPanel.tooltip = nil
         unitDetailsPanel:Hide()
+    end
+end
+
+local function GetSafeText(fontString)
+    if not fontString or type(fontString.GetText) ~= "function" then
+        return nil
+    end
+
+    local ok, text = pcall(fontString.GetText, fontString)
+
+    if not ok or IsSecretValue(text) or type(text) ~= "string" or text == "" then
+        return nil
+    end
+
+    return text
+end
+
+
+local function GetSafeTextColor(fontString, defaultR, defaultG, defaultB)
+    if not fontString or type(fontString.GetTextColor) ~= "function" then
+        return defaultR, defaultG, defaultB
+    end
+
+    local ok, r, g, b = pcall(fontString.GetTextColor, fontString)
+
+    if not ok or IsSecretValue(r) or IsSecretValue(g) or IsSecretValue(b) then
+        return defaultR, defaultG, defaultB
+    end
+
+    r, g, b = tonumber(r), tonumber(g), tonumber(b)
+
+    if not r or not g or not b then
+        return defaultR, defaultG, defaultB
+    end
+
+    return r, g, b
+end
+
+
+local function EnsurePanelLine(panel, index)
+    local line = panel.lines[index]
+
+    if line then
+        return line
+    end
+
+    line = {
+        left = panel:CreateFontString(nil, "OVERLAY", "GameTooltipText"),
+        right = panel:CreateFontString(nil, "OVERLAY", "GameTooltipText"),
+    }
+    line.left:SetJustifyH("LEFT")
+    line.left:SetJustifyV("TOP")
+    line.left:SetWordWrap(true)
+    line.right:SetJustifyH("RIGHT")
+    line.right:SetJustifyV("TOP")
+    line.right:SetWordWrap(false)
+    panel.lines[index] = line
+
+    return line
+end
+
+
+local function HideUnusedPanelLines(panel, firstUnused)
+    for index = firstUnused, #panel.lines do
+        panel.lines[index].left:Hide()
+        panel.lines[index].right:Hide()
     end
 end
 
@@ -1004,7 +1248,7 @@ local function EnsureUnitDetailsPanel()
     local panel = CreateFrame("Frame", "ZoidsToolsUnitTooltipDetails", UIParent, "BackdropTemplate")
     panel:SetSize(230, 34)
     panel:SetFrameStrata("TOOLTIP")
-    panel:SetFrameLevel(100)
+    panel:SetFrameLevel(1000)
     panel:SetClampedToScreen(true)
     panel:EnableMouse(false)
     panel:SetBackdrop({
@@ -1015,31 +1259,23 @@ local function EnsureUnitDetailsPanel()
     panel:SetBackdropColor(unpack(DEFAULT_BG))
     panel:SetBackdropBorderColor(unpack(DEFAULT_BORDER))
 
-    panel.title = panel:CreateFontString(nil, "OVERLAY", "GameTooltipHeaderText")
-    panel.title:SetPoint("TOPLEFT", panel, "TOPLEFT", 8, -7)
-    panel.title:SetPoint("TOPRIGHT", panel, "TOPRIGHT", -8, -7)
-    panel.title:SetJustifyH("LEFT")
-    panel.title:SetWordWrap(false)
-
-    panel.scoreLabel = panel:CreateFontString(nil, "OVERLAY", "GameTooltipText")
-    panel.scoreLabel:SetPoint("TOPLEFT", panel.title, "BOTTOMLEFT", 0, -5)
-    panel.scoreLabel:SetText("Mythic+ Score")
-    panel.scoreLabel:SetTextColor(0.75, 0.85, 1)
-
-    panel.scoreValue = panel:CreateFontString(nil, "OVERLAY", "GameTooltipText")
-    panel.scoreValue:SetPoint("TOPRIGHT", panel.title, "BOTTOMRIGHT", 0, -5)
-    panel.scoreValue:SetJustifyH("RIGHT")
-
-    panel.itemLevelLabel = panel:CreateFontString(nil, "OVERLAY", "GameTooltipText")
-    panel.itemLevelLabel:SetPoint("TOPLEFT", panel.scoreLabel, "BOTTOMLEFT", 0, -3)
-    panel.itemLevelLabel:SetText("Item Level")
-    panel.itemLevelLabel:SetTextColor(1, 0.82, 0)
-
-    panel.itemLevelValue = panel:CreateFontString(nil, "OVERLAY", "GameTooltipText")
-    panel.itemLevelValue:SetPoint("TOPRIGHT", panel.scoreValue, "BOTTOMRIGHT", 0, -3)
-    panel.itemLevelValue:SetJustifyH("RIGHT")
+    panel.lines = {}
 
     panel:SetScript("OnUpdate", function(self, elapsed)
+        local tooltip = self.tooltip
+        local unit = tooltip and GetDisplayedUnit(tooltip)
+        local guid = unit and GetUnitGUIDSafe(unit)
+
+        if not tooltip or not tooltip:IsShown() or not unit or not guid or guid ~= self.guid or not UnitIsPlayerSafe(unit) then
+            HideUnitDetailsPanel()
+            return
+        end
+
+        -- Blizzard may restore the shared tooltip and its separately-owned
+        -- status bar after the unit post-call. Maintain suppression for the
+        -- entire lifetime of this addon-owned replacement.
+        SuppressBlizzardUnitTooltip(self)
+
         self.watchElapsed = (self.watchElapsed or 0) + elapsed
 
         if self.watchElapsed < 0.05 then
@@ -1048,11 +1284,18 @@ local function EnsureUnitDetailsPanel()
 
         self.watchElapsed = 0
 
-        local guid = GetUnitGUIDSafe("mouseover")
+        local ok, sourceLineCount = pcall(tooltip.NumLines, tooltip)
 
-        if not guid or guid ~= self.guid or not UnitIsPlayerSafe("mouseover") then
-            HideUnitDetailsPanel()
-            return
+        if ok and not IsSecretValue(sourceLineCount) then
+            sourceLineCount = tonumber(sourceLineCount) or 0
+
+            -- Unit-frame instructions are appended after the unit post-call.
+            -- Rebuild when Blizzard adds them so they become part of the one
+            -- visible replacement rather than showing beneath it.
+            if sourceLineCount > 0 and sourceLineCount ~= self.sourceLineCount then
+                UpdateUnitDetailsPanel(tooltip, unit, guid)
+                return
+            end
         end
 
         PositionUnitDetailsPanel(self)
@@ -1065,7 +1308,7 @@ local function EnsureUnitDetailsPanel()
 end
 
 PositionUnitDetailsPanel = function(panel)
-    local tooltip = GameTooltip
+    local tooltip = panel and panel.tooltip
 
     if not panel or not tooltip or not UIParent or not tooltip.IsShown or not tooltip:IsShown() then
         HideUnitDetailsPanel()
@@ -1074,8 +1317,8 @@ PositionUnitDetailsPanel = function(panel)
 
     -- Never anchor the addon frame to GameTooltip. Blizzard reuses that
     -- tooltip for map widgets whose geometry becomes secret in 12.1. Read
-    -- ordinary player-tooltip geometry and place this UIParent-owned panel
-    -- at the equivalent absolute screen position instead.
+    -- ordinary unit-tooltip geometry and place this UIParent-owned overlay
+    -- at the same absolute screen position instead.
     local left = tooltip.GetLeft and tooltip:GetLeft()
     local bottom = tooltip.GetBottom and tooltip:GetBottom()
     local top = tooltip.GetTop and tooltip:GetTop()
@@ -1122,19 +1365,126 @@ PositionUnitDetailsPanel = function(panel)
     panel:SetWidth(panelWidth)
     panel:ClearAllPoints()
 
-    if panelBottom >= panelHeight - 1 then
-        panel:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", panelLeft, panelBottom + 1)
+    if panelTop >= panelHeight then
+        panel:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", panelLeft, panelTop)
     else
-        panel:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", panelLeft, panelTop - 1)
+        panel:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", panelLeft, panelBottom)
     end
 
     return true
 end
 
-local function UpdateUnitDetailsPanel(unit, guid)
+local function AddPanelLine(panel, index, topOffset, leftText, rightText, leftR, leftG, leftB, rightR, rightG, rightB, isHeader)
+    local line = EnsurePanelLine(panel, index)
+    local left = line.left
+    local right = line.right
+    local contentWidth = math.max(150, panel:GetWidth() - 16)
+    local rightWidth = rightText and math.min(contentWidth * 0.42, math.max(42, (#rightText * 7) + 4)) or 0
+
+    left:ClearAllPoints()
+    right:ClearAllPoints()
+    left:SetFontObject(isHeader and GameTooltipHeaderText or GameTooltipText)
+    right:SetFontObject(GameTooltipText)
+    left:SetText(leftText or "")
+    left:SetTextColor(leftR or 1, leftG or 1, leftB or 1)
+    left:SetPoint("TOPLEFT", panel, "TOPLEFT", 8, -topOffset)
+
+    if rightText then
+        right:SetText(rightText)
+        right:SetTextColor(rightR or 1, rightG or 1, rightB or 1)
+        right:SetWidth(rightWidth)
+        right:SetPoint("TOPRIGHT", panel, "TOPRIGHT", -8, -topOffset)
+        right:Show()
+        left:SetWidth(math.max(40, contentWidth - rightWidth - 8))
+    else
+        right:SetText("")
+        right:Hide()
+        left:SetWidth(contentWidth)
+    end
+
+    left:Show()
+
+    local leftHeight = left:GetStringHeight()
+    local rightHeight = rightText and right:GetStringHeight() or 0
+
+    if IsSecretValue(leftHeight) or IsSecretValue(rightHeight) then
+        return isHeader and 16 or 14
+    end
+
+    return math.max(2, tonumber(leftHeight) or 0, tonumber(rightHeight) or 0)
+end
+
+
+local function CopyBlizzardUnitTooltipLines(panel, tooltip, classR, classG, classB)
+    local tooltipName = tooltip and tooltip.GetName and tooltip:GetName()
+    local lineCount = tooltip and tooltip.NumLines and tooltip:NumLines()
+
+    if not tooltipName or IsSecretValue(lineCount) then
+        return 0, 8
+    end
+
+    lineCount = tonumber(lineCount) or 0
+    local outputIndex = 0
+    local topOffset = 7
+    local deferredInstruction
+
+    for sourceIndex = 1, lineCount do
+        local sourceLeft = _G[tooltipName .. "TextLeft" .. sourceIndex]
+        local sourceRight = _G[tooltipName .. "TextRight" .. sourceIndex]
+        local leftText = GetSafeText(sourceLeft)
+        local rightText = GetSafeText(sourceRight)
+
+        if leftText or rightText then
+            local leftR, leftG, leftB = GetSafeTextColor(sourceLeft, 1, 1, 1)
+            local rightR, rightG, rightB = GetSafeTextColor(sourceRight, 1, 1, 1)
+            local isFinalGreenInstruction = sourceIndex == lineCount
+                and leftText
+                and not rightText
+                and leftG > 0.7
+                and leftR < 0.45
+                and leftB < 0.45
+
+            if isFinalGreenInstruction then
+                deferredInstruction = {
+                    text = leftText,
+                    r = leftR,
+                    g = leftG,
+                    b = leftB,
+                }
+            else
+                outputIndex = outputIndex + 1
+
+                if outputIndex == 1 and classR and classG and classB then
+                    leftR, leftG, leftB = classR, classG, classB
+                end
+
+                local rowHeight = AddPanelLine(
+                    panel,
+                    outputIndex,
+                    topOffset,
+                    leftText or "",
+                    rightText,
+                    leftR,
+                    leftG,
+                    leftB,
+                    rightR,
+                    rightG,
+                    rightB,
+                    outputIndex == 1
+                )
+                topOffset = topOffset + rowHeight + 1
+            end
+        end
+    end
+
+    return outputIndex, topOffset, deferredInstruction
+end
+
+
+UpdateUnitDetailsPanel = function(tooltip, unit, guid)
     local db = EnsureDB()
 
-    if not db or IsCombatLocked() or not UnitIsPlayerSafe(unit) then
+    if not db or tooltip ~= GameTooltip or IsCombatLocked() or not UnitIsPlayerSafe(unit) then
         HideUnitDetailsPanel()
         return
     end
@@ -1142,13 +1492,6 @@ local function UpdateUnitDetailsPanel(unit, guid)
     guid = guid or GetUnitGUIDSafe(unit)
 
     if not guid then
-        HideUnitDetailsPanel()
-        return
-    end
-
-    local name = GetUnitNameSafe(unit)
-
-    if not name then
         HideUnitDetailsPanel()
         return
     end
@@ -1169,8 +1512,6 @@ local function UpdateUnitDetailsPanel(unit, guid)
         and pendingInspects[guid] ~= nil
     local detailsKey = guid
         .. ":"
-        .. name
-        .. ":"
         .. (mythicScoreText or "")
         .. ":"
         .. (itemLevel or "")
@@ -1183,38 +1524,54 @@ local function UpdateUnitDetailsPanel(unit, guid)
 
     local panel = EnsureUnitDetailsPanel()
 
-    if panel.detailsKey == detailsKey and panel:IsShown() then
-        PositionUnitDetailsPanel(panel)
-        return
-    end
-
     panel.guid = guid
+    panel.tooltip = tooltip
     panel.detailsKey = detailsKey
-    panel.title:SetText(name)
 
-    local titleR, titleG, titleB = 1, 0.82, 0
+    local classR, classG, classB
 
     if db.classColoredNames then
-        local classR, classG, classB = GetClassColor(GetUnitClassFile(unit))
-
-        if classR and classG and classB then
-            titleR, titleG, titleB = classR, classG, classB
-        end
+        classR, classG, classB = GetClassColor(GetUnitClassFile(unit))
     end
-
-    panel.title:SetTextColor(titleR, titleG, titleB)
 
     local factionColor = db.factionBackground and FACTION_COLORS[GetFaction(unit)] or nil
 
     if factionColor then
-        panel:SetBackdropColor(unpack(factionColor.bg))
+        panel:SetBackdropColor(factionColor.bg[1], factionColor.bg[2], factionColor.bg[3], 0.98)
         panel:SetBackdropBorderColor(unpack(factionColor.border))
     else
-        panel:SetBackdropColor(unpack(DEFAULT_BG))
+        panel:SetBackdropColor(DEFAULT_BG[1], DEFAULT_BG[2], DEFAULT_BG[3], 0.98)
         panel:SetBackdropBorderColor(unpack(DEFAULT_BORDER))
     end
 
-    local height = 27
+    local tooltipWidth = tooltip.GetWidth and tooltip:GetWidth()
+    local tooltipScale = tooltip.GetEffectiveScale and tooltip:GetEffectiveScale()
+    local parentScale = UIParent.GetEffectiveScale and UIParent:GetEffectiveScale()
+
+    if IsSecretValue(tooltipWidth) or IsSecretValue(tooltipScale) or IsSecretValue(parentScale) then
+        HideUnitDetailsPanel()
+        return
+    end
+
+    tooltipWidth = tonumber(tooltipWidth)
+    tooltipScale = tonumber(tooltipScale)
+    parentScale = tonumber(parentScale)
+
+    if not tooltipWidth or not tooltipScale or not parentScale or parentScale <= 0 then
+        HideUnitDetailsPanel()
+        return
+    end
+
+    panel:SetWidth(math.max(190, tooltipWidth * tooltipScale / parentScale))
+
+    local lineIndex, topOffset, deferredInstruction = CopyBlizzardUnitTooltipLines(panel, tooltip, classR, classG, classB)
+    local lineCountOK, sourceLineCount = pcall(tooltip.NumLines, tooltip)
+
+    if lineCountOK and not IsSecretValue(sourceLineCount) then
+        panel.sourceLineCount = tonumber(sourceLineCount) or lineIndex
+    else
+        panel.sourceLineCount = lineIndex
+    end
 
     if mythicScoreText then
         local r, g, b = 1, 1, 1
@@ -1223,73 +1580,61 @@ local function UpdateUnitDetailsPanel(unit, guid)
             r, g, b = mythicScore.r, mythicScore.g, mythicScore.b
         end
 
-        panel.scoreValue:SetText(mythicScoreText)
-        panel.scoreValue:SetTextColor(r, g, b)
-        panel.scoreLabel:Show()
-        panel.scoreValue:Show()
-        height = height + 17
-    else
-        panel.scoreLabel:Hide()
-        panel.scoreValue:Hide()
+        lineIndex = lineIndex + 1
+        topOffset = topOffset + AddPanelLine(panel, lineIndex, topOffset, "Mythic+ Score", mythicScoreText, 0.75, 0.85, 1, r, g, b, false) + 2
     end
 
     if itemLevel then
-        panel.itemLevelValue:SetText(itemLevel)
-        panel.itemLevelValue:SetTextColor(1, 1, 1)
-        panel.itemLevelLabel:Show()
-        panel.itemLevelValue:Show()
-        height = height + 17
+        lineIndex = lineIndex + 1
+        topOffset = topOffset + AddPanelLine(panel, lineIndex, topOffset, "Item Level", itemLevel, 1, 0.82, 0, 1, 1, 1, false) + 2
     elseif itemLevelPending then
-        panel.itemLevelValue:SetText("Inspecting...")
-        panel.itemLevelValue:SetTextColor(0.65, 0.65, 0.65)
-        panel.itemLevelLabel:Show()
-        panel.itemLevelValue:Show()
-        height = height + 17
-    else
-        panel.itemLevelLabel:Hide()
-        panel.itemLevelValue:Hide()
+        lineIndex = lineIndex + 1
+        topOffset = topOffset + AddPanelLine(panel, lineIndex, topOffset, "Item Level", "Inspecting...", 1, 0.82, 0, 0.65, 0.65, 0.65, false) + 2
     end
 
-    if panel.itemLevelLabel:IsShown() and not panel.scoreLabel:IsShown() then
-        panel.itemLevelLabel:ClearAllPoints()
-        panel.itemLevelLabel:SetPoint("TOPLEFT", panel.title, "BOTTOMLEFT", 0, -5)
-        panel.itemLevelValue:ClearAllPoints()
-        panel.itemLevelValue:SetPoint("TOPRIGHT", panel.title, "BOTTOMRIGHT", 0, -5)
-    else
-        panel.itemLevelLabel:ClearAllPoints()
-        panel.itemLevelLabel:SetPoint("TOPLEFT", panel.scoreLabel, "BOTTOMLEFT", 0, -3)
-        panel.itemLevelValue:ClearAllPoints()
-        panel.itemLevelValue:SetPoint("TOPRIGHT", panel.scoreValue, "BOTTOMRIGHT", 0, -3)
+    if deferredInstruction then
+        lineIndex = lineIndex + 1
+        topOffset = topOffset + AddPanelLine(
+            panel,
+            lineIndex,
+            topOffset,
+            deferredInstruction.text,
+            nil,
+            deferredInstruction.r,
+            deferredInstruction.g,
+            deferredInstruction.b,
+            1,
+            1,
+            1,
+            false
+        ) + 1
     end
 
-    if not mythicScoreText and not itemLevel and not itemLevelPending then
+    if lineIndex == 0 then
         HideUnitDetailsPanel()
         return
     end
 
-    panel:SetHeight(height)
+    HideUnusedPanelLines(panel, lineIndex + 1)
+    -- Extra lower padding fully masks Blizzard's separate unit status bar if
+    -- it is briefly restored between frame updates.
+    panel:SetHeight(math.max(24, topOffset + 11))
 
     if PositionUnitDetailsPanel(panel) then
         panel:Show()
+
+        -- The addon-owned player tooltip is a complete visual replacement.
+        -- Hide Blizzard's rendering while it is active so its status bar and
+        -- borders cannot peek out around the replacement. OnUpdate restores
+        -- the shared tooltip immediately when its unit changes or it closes.
+        SuppressBlizzardUnitTooltip(panel)
     end
 end
 
 RefreshCurrentTooltipForGUID = function(guid)
-    if not guid or IsSecretValue(guid) or IsCombatLocked() then
-        return
-    end
-
-    local unit = "mouseover"
-
-    if GetUnitGUIDSafe(unit) ~= guid then
-        return
-    end
-
-    if unitDetailsPanel then
-        unitDetailsPanel.detailsKey = nil
-    end
-
-    pcall(UpdateUnitDetailsPanel, unit, guid)
+    -- Inspect results are cached for the next native tooltip build. Mutating a
+    -- currently visible shared GameTooltip here makes Blizzard immediately
+    -- rebuild it and is the source of the previous hover flicker.
 end
 
 local function OnInspectReady(guid)
@@ -1306,18 +1651,8 @@ local function OnInspectReady(guid)
 end
 
 RefreshCurrentTooltip = function()
-    local unit = "mouseover"
-
-    if UnitIsPlayerSafe(unit) then
-        if unitDetailsPanel then
-            unitDetailsPanel.detailsKey = nil
-        end
-
-        pcall(UpdateUnitDetailsPanel, unit, GetUnitGUIDSafe(unit))
-        return
-    end
-
-    HideUnitDetailsPanel()
+    -- Settings are reflected the next time Blizzard builds a unit tooltip.
+    -- Deliberately do not repaint or replace the tooltip while it is visible.
 end
 
 function ns:IsTooltipFactionBackgroundEnabled()
@@ -1423,6 +1758,31 @@ function ns:InitializeTooltips()
 
     initialized = true
 
+    if TooltipDataProcessor
+        and TooltipDataProcessor.AddTooltipPostCall
+        and Enum
+        and Enum.TooltipDataType
+        and Enum.TooltipDataType.Unit
+    then
+        TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Unit, function(tooltip)
+            if tooltip ~= GameTooltip then
+                return
+            end
+
+            local unit = GetDisplayedUnit(tooltip)
+
+            if not UnitIsPlayerSafe(unit) then
+                return
+            end
+
+            if not IsCombatLocked() then
+                PrefetchUnitItemLevel(unit)
+            end
+
+            pcall(AddNativeUnitTooltipDetails, tooltip, unit, GetUnitGUIDSafe(unit))
+        end)
+    end
+
     eventFrame = CreateFrame("Frame")
     eventFrame:RegisterEvent("INSPECT_READY")
     eventFrame:RegisterEvent("UPDATE_MOUSEOVER_UNIT")
@@ -1434,11 +1794,6 @@ function ns:InitializeTooltips()
                 PrefetchUnitItemLevel("mouseover")
             end
 
-            -- Keep all addon work outside Blizzard's shared GameTooltip.
-            -- Map POIs reuse it with secret geometry in 12.1, so even a
-            -- unit-only post-call can make later Blizzard layout inherit
-            -- ZoidsTools' taint attribution.
-            RunNextFrame(RefreshCurrentTooltip)
         end
     end)
 end

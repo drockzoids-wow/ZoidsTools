@@ -13,6 +13,7 @@ local originalAuraState = {}
 local originalManagedAuraLimits = {}
 local castbarPreviewFrame
 local castbarPreviewKey
+local castbarPreviewAnchor
 local castbarPreviewToken = 0
 local pendingProtectedRefresh = false
 local refreshQueued = false
@@ -901,6 +902,7 @@ local function EnsureCastbarPreviewFrame()
     local frame = CreateFrame("Frame", "ZoidsToolsCastbarPreview", UIParent, "BackdropTemplate")
     frame:SetFrameStrata("TOOLTIP")
     frame:SetFrameLevel(900)
+    frame:SetClampedToScreen(true)
     frame:SetBackdrop({
         bgFile = "Interface\\Buttons\\WHITE8x8",
         edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
@@ -939,30 +941,42 @@ local function EnsureCastbarPreviewFrame()
     return frame
 end
 
-local function PositionCastbarPreview(key)
+local function IsCastbarPreviewAnchorUsable(anchor)
+    if not anchor or type(anchor.GetObjectType) ~= "function" then
+        return false
+    end
+
+    if type(anchor.IsForbidden) == "function" then
+        local ok, forbidden = pcall(anchor.IsForbidden, anchor)
+
+        if not ok or IsSecretValue(forbidden) or forbidden == true then
+            return false
+        end
+    end
+
+    if type(anchor.CanBeAccessedInContext) == "function" then
+        local ok, canAccess = pcall(anchor.CanBeAccessedInContext, anchor)
+
+        if not ok or IsSecretValue(canAccess) or canAccess ~= true then
+            return false
+        end
+    end
+
+    return true
+end
+
+local function PositionCastbarPreview()
     local frame = EnsureCastbarPreviewFrame()
-    local info = key and castbars[key]
-    local bar = info and ResolveFirst(info.paths)
-    local selection = bar and bar.Selection
 
     frame:ClearAllPoints()
     frame:SetParent(UIParent)
     frame:SetFrameStrata("TOOLTIP")
     frame:SetFrameLevel(900)
 
-    if selection and selection.GetObjectType then
-        frame:SetPoint("TOPLEFT", selection, "TOPLEFT", 0, 0)
-        frame:SetPoint("BOTTOMRIGHT", selection, "BOTTOMRIGHT", 0, 0)
-    elseif bar and bar.GetCenter then
-        frame:SetPoint("CENTER", bar, "CENTER", 0, 0)
-    elseif key == "player" and PlayerFrame then
-        frame:SetPoint("TOP", PlayerFrame, "BOTTOM", 42, -18)
-    elseif key == "target" and TargetFrame then
-        frame:SetPoint("TOP", TargetFrame, "BOTTOM", 42, -18)
-    elseif key == "focus" and FocusFrame then
-        frame:SetPoint("TOP", FocusFrame, "BOTTOM", 42, -18)
+    if IsCastbarPreviewAnchorUsable(castbarPreviewAnchor) then
+        frame:SetPoint("BOTTOM", castbarPreviewAnchor, "TOP", 0, 34)
     else
-        frame:SetPoint("CENTER", UIParent, "CENTER", 0, 120)
+        frame:SetPoint("TOP", UIParent, "TOP", 0, -120)
     end
 end
 
@@ -982,19 +996,14 @@ local function UpdateCastbarPreview(key, keepVisible)
     local height = frameDB.castbar.height or DEFAULT_CASTBAR_HEIGHT
     local outerWidth = width + CASTBAR_PREVIEW_OUTER_PAD_X
     local outerHeight = height + CASTBAR_PREVIEW_OUTER_PAD_Y
-    local info = castbars[key]
-    local bar = info and ResolveFirst(info.paths)
-    local selection = bar and bar.Selection
 
-    if not selection then
-        frame:SetSize(outerWidth, outerHeight)
-    end
+    frame:SetSize(outerWidth, outerHeight)
     frame.fill:SetWidth(math.max(8, width * 0.66))
     frame.spark:ClearAllPoints()
     frame.spark:SetPoint("LEFT", frame.fill, "RIGHT", -1, 0)
     frame.spark:SetHeight(math.max(12, height + 8))
     frame.text:SetText(string.format("%s Castbar Preview", GetFrameLabel(key)))
-    PositionCastbarPreview(key)
+    PositionCastbarPreview()
 
     if keepVisible ~= false then
         frame:Show()
@@ -1763,7 +1772,7 @@ function ns:RefreshUnitFrames()
     RefreshUnitFrames()
 end
 
-function ns:PreviewUnitFrameCastbar(key)
+function ns:PreviewUnitFrameCastbar(key, anchor)
     key = key or "player"
 
     if not castbars[key] then
@@ -1771,6 +1780,7 @@ function ns:PreviewUnitFrameCastbar(key)
     end
 
     castbarPreviewKey = key
+    castbarPreviewAnchor = IsCastbarPreviewAnchorUsable(anchor) and anchor or nil
     castbarPreviewToken = castbarPreviewToken + 1
     local token = castbarPreviewToken
 
@@ -1790,6 +1800,7 @@ end
 function ns:HideUnitFrameCastbarPreview()
     castbarPreviewToken = castbarPreviewToken + 1
     castbarPreviewKey = nil
+    castbarPreviewAnchor = nil
 
     if castbarPreviewFrame then
         castbarPreviewFrame:Hide()

@@ -9,10 +9,10 @@ elseif GetAddOnMetadata then
     metadataVersion = GetAddOnMetadata(ADDON_NAME, "Version")
 end
 ns.version = metadataVersion and not metadataVersion:find("@", 1, true) and metadataVersion or "Development"
-local CURRENT_MIGRATION_VERSION = 3
+local CURRENT_MIGRATION_VERSION = 4
 
 local defaults = {
-    migrationVersion = 3,
+    migrationVersion = 4,
     windows = {
         enabled = true,
         moveBags = true,
@@ -86,11 +86,8 @@ local defaults = {
         safeQueue = false,
     },
     tooltips = {
-        factionBackground = true,
         classColoredNames = true,
         showMythicScore = true,
-        colorMythicScore = true,
-        showMythicPercentile = true,
         showItemLevel = true,
     },
     chat = {
@@ -395,6 +392,10 @@ local function RunMigrations(db)
         db.customDamageMeter.textScale = math.max(0.8, math.min(1.5, oldScale / 1.2))
     end
 
+    if version < 4 then
+        db.tooltips = nil
+    end
+
     db.migrationVersion = CURRENT_MIGRATION_VERSION
 end
 
@@ -439,7 +440,7 @@ local function PrintHelp()
     ns:Print("/zt opens ZoidsTools.")
     ns:Print("/zt2 also opens ZoidsTools.")
     ns:Print("/zt windows on/off toggles movable Blizzard windows.")
-    ns:Print("/zt tooltips opens tooltip options.")
+    ns:Print("/zt tooltips opens player tooltip options.")
     ns:Print("/zt chat opens chat enhancement options.")
     ns:Print("/zt chatcopy opens a searchable copy window for the active chat tab.")
     ns:Print("/zt bags on/off toggles default bag movement.")
@@ -838,6 +839,7 @@ local moduleInitializers = {
     "InitializeBlizzardDamageMeterProfiles",
     "InitializeCustomDamageMeter",
     "InitializeProfessionHelper",
+    "InitializePlayerTooltip",
     "InitializeQuestItemButton",
     "InitializeObjectiveTrackerAppearance",
     "InitializeQuestAutomation",
@@ -894,10 +896,5 @@ eventFrame:SetScript("OnEvent", function(_, event, addonName)
             end)
         end
 
-        if ns.InitializeTooltips then
-            RunInitializer("InitializeTooltips", function()
-                ns:InitializeTooltips()
-            end)
-        end
     end
 end)

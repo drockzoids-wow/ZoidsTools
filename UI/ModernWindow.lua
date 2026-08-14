@@ -16,7 +16,7 @@ local pages = {
     overview = { key = "overview", label = "Overview", icon = "ZT", page = nil, sectionKey = "overview", description = "Status, quick actions, and common ZoidsTools areas." },
     minimap = { key = "minimap", label = "Minimap", icon = "N", page = "general", sectionKey = "core", description = "Minimap shape, title bar, addon buttons, and expansion button tools." },
     general = { key = "general", label = "Interface", icon = "G", page = "general", sectionKey = "core", description = "Widgets, audio sync, Talking Head, and general interface tools." },
-    tooltips = { key = "tooltips", label = "Tooltips", icon = "T", page = "tooltips", sectionKey = "core", description = "Tooltip colors, player details, Mythic+ score, and item level display." },
+    tooltips = { key = "tooltips", label = "Tooltips", icon = "T", page = "tooltips", sectionKey = "core", description = "Class-colored player names, Mythic+ rating, and equipped item level." },
     windows = { key = "windows", label = "Windows", icon = "W", page = "windows", sectionKey = "core", description = "Move and scale Blizzard windows and default bag frames." },
     chat = { key = "chat", label = "Chat", icon = "H", page = "chat", sectionKey = "chat", description = "Chat copy, saved history, input styling, scrolling, and message awareness." },
     items = { key = "items", label = "Items", icon = "I", page = "items", sectionKey = "character", description = "Item level, gems, enchants, bind text, and stat goal overlays." },
@@ -455,7 +455,7 @@ local function CreateInterfacePage(parent)
     local cardW = 374
     local rightX = cardW + 14
 
-    local widgetsCard = CreateSectionCard(page, "Widgets", cardW, 294)
+    local widgetsCard = CreateSectionCard(page, "Widgets", cardW, 264)
     widgetsCard:SetPoint("TOPLEFT", page, "TOPLEFT", rightX, 0)
 
     local performanceDisplay = ns.UI.CreateDropdown(
@@ -524,7 +524,7 @@ local function CreateInterfacePage(parent)
         end
     end)
 
-    local queueCard = CreateSectionCard(page, "Queue Alerts", cardW, 154)
+    local queueCard = CreateSectionCard(page, "Queue Alerts", cardW, 130)
     queueCard:SetPoint("TOPLEFT", widgetsCard, "BOTTOMLEFT", 0, -10)
 
     local queueSound = ns.UI.CreateCheckbox(
@@ -1421,83 +1421,45 @@ local function CreateTooltipsPage(parent)
     page:Hide()
 
     local cardW = 374
-    local leftX = 0
     local rightX = cardW + 14
 
-    local appearance = CreateSectionCard(page, "Appearance", cardW, 160)
-    appearance:SetPoint("TOPLEFT", page, "TOPLEFT", leftX, 0)
+    local appearance = CreateSectionCard(page, "Appearance", cardW, 150)
+    appearance:SetPoint("TOPLEFT", page, "TOPLEFT", 0, 0)
 
-    local tooltipBackground = UI.CreateCheckbox(
-        appearance,
-        "Faction background",
-        "Adds a subtle Alliance blue or Horde red tint to player unit tooltips.",
-        function() return ns.IsTooltipFactionBackgroundEnabled and ns:IsTooltipFactionBackgroundEnabled() end,
-        function(value) if ns.SetTooltipFactionBackgroundEnabled then ns:SetTooltipFactionBackgroundEnabled(value) end end
-    )
-    PlaceFirst(tooltipBackground, appearance)
-
-    local tooltipNames = UI.CreateCheckbox(
+    local classColoredNames = UI.CreateCheckbox(
         appearance,
         "Class-colored names",
-        "Colors player names on unit tooltips by class.",
+        "Colors player names on mouseover tooltips using their class color.",
         function() return ns.IsTooltipClassColoredNamesEnabled and ns:IsTooltipClassColoredNamesEnabled() end,
         function(value) if ns.SetTooltipClassColoredNamesEnabled then ns:SetTooltipClassColoredNamesEnabled(value) end end
     )
-    PlaceBelow(tooltipNames, tooltipBackground)
+    PlaceFirst(classColoredNames, appearance)
 
-    local playerDetails = CreateSectionCard(page, "Player Details", cardW, 210)
+    local playerDetails = CreateSectionCard(page, "Player Details", cardW, 150)
     playerDetails:SetPoint("TOPLEFT", page, "TOPLEFT", rightX, 0)
 
-    local tooltipScore = UI.CreateCheckbox(
+    local mythicRating = UI.CreateCheckbox(
         playerDetails,
-        "Show Mythic+ score",
-        "Adds the player's current Mythic+ score to unit tooltips when available.",
+        "Show Mythic+ rating",
+        "Shows the player's current Mythic+ rating with Blizzard's rating color.",
         function() return ns.IsTooltipMythicScoreEnabled and ns:IsTooltipMythicScoreEnabled() end,
         function(value) if ns.SetTooltipMythicScoreEnabled then ns:SetTooltipMythicScoreEnabled(value) end end
     )
-    PlaceFirst(tooltipScore, playerDetails)
+    PlaceFirst(mythicRating, playerDetails)
 
-    local tooltipScoreColor = UI.CreateCheckbox(
-        playerDetails,
-        "Color Mythic+ score",
-        "Colors Mythic+ score using percentile colors when available, otherwise Blizzard dungeon-score colors.",
-        function() return ns.IsTooltipMythicScoreColorEnabled and ns:IsTooltipMythicScoreColorEnabled() end,
-        function(value) if ns.SetTooltipMythicScoreColorEnabled then ns:SetTooltipMythicScoreColorEnabled(value) end end
-    )
-    PlaceBelow(tooltipScoreColor, tooltipScore)
-
-    local tooltipPercentile = UI.CreateCheckbox(
-        playerDetails,
-        "Show M+ percentile",
-        "Shows Raider.IO percentile next to Mythic+ score when another loaded addon exposes it.",
-        function() return ns.IsTooltipMythicPercentileEnabled and ns:IsTooltipMythicPercentileEnabled() end,
-        function(value) if ns.SetTooltipMythicPercentileEnabled then ns:SetTooltipMythicPercentileEnabled(value) end end
-    )
-    PlaceBelow(tooltipPercentile, tooltipScoreColor)
-
-    local tooltipItemLevel = UI.CreateCheckbox(
+    local itemLevel = UI.CreateCheckbox(
         playerDetails,
         "Show item level",
-        "Adds player item level to unit tooltips when inspect data is available.",
+        "Shows equipped item level when player inspection data is available.",
         function() return ns.IsTooltipItemLevelEnabled and ns:IsTooltipItemLevelEnabled() end,
         function(value) if ns.SetTooltipItemLevelEnabled then ns:SetTooltipItemLevelEnabled(value) end end
     )
-    PlaceBelow(tooltipItemLevel, tooltipPercentile)
+    PlaceBelow(itemLevel, mythicRating)
 
     function page:Refresh()
-        tooltipBackground:Refresh()
-        tooltipNames:Refresh()
-        tooltipScore:Refresh()
-        tooltipScoreColor:Refresh()
-        tooltipPercentile:Refresh()
-        tooltipItemLevel:Refresh()
-
-        if UI.SetControlEnabled then
-            local scoreActive = tooltipScore:GetChecked() == true
-            UI.SetControlEnabled(tooltipScoreColor, scoreActive)
-            UI.SetControlEnabled(tooltipPercentile, scoreActive)
-            UI.SetControlEnabled(openLegacy, true)
-        end
+        classColoredNames:Refresh()
+        mythicRating:Refresh()
+        itemLevel:Refresh()
     end
 
     page:SetScript("OnShow", function(self) self:Refresh() end)
@@ -2712,7 +2674,7 @@ local function CreateUnitFramesPage(parent)
         previewCastbar:SetPoint("TOPLEFT", castbarHeight, "BOTTOMLEFT", -10, -18)
         previewCastbar:SetScript("OnClick", function()
             if ns.PreviewUnitFrameCastbar then
-                ns:PreviewUnitFrameCastbar(info.key)
+                ns:PreviewUnitFrameCastbar(info.key, previewCastbar)
             end
         end)
 
@@ -3905,7 +3867,7 @@ local function CreateModernWindow()
     frame.quickTitle:SetText("Feature Areas")
 
     frame.areaRows = {
-        CreateAreaRow(frame.overview, "Core", "Minimap, tooltips, window movement, audio sync, and Talking Head.", "minimap"),
+        CreateAreaRow(frame.overview, "Core", "Minimap, player tooltips, window movement, audio sync, and Talking Head.", "minimap"),
         CreateAreaRow(frame.overview, "Character", "Items, stat goals, profession helper, talents, and recommendations.", "items"),
         CreateAreaRow(frame.overview, "Combat", "Meters, keybind text, range tint, missing buffs, unit frames, and macros.", "meters"),
         CreateAreaRow(frame.overview, "Automation", "Fast loot, vendor tools, quest automation, tracker styling, and quest item button.", "loot"),

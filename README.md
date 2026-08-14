@@ -6,7 +6,7 @@ A personal World of Warcraft Retail quality-of-life addon by Drockzoids.
 
 - Opens a modern ZoidsTools settings window with `/zt`, `/zoids`, or `/zoidstools`.
 - Moves and scales supported Blizzard windows and default bags, with saved positions.
-- Adds tooltip details, item overlays, keybind label styling, range tint, and unit frame options.
+- Adds class-colored player mouseover names with Mythic+ rating and equipped item level details beneath the character lines, item overlays, keybind label styling, range tint, and unit frame options.
 - Adds smart mount tools, service mount buttons, target mount matching, recent mount avoidance, and faction-safe mount filtering.
 - Adds Molinari-style profession actions for modifier-click disenchanting, milling, prospecting, and lockboxes.
 - Adds generated Archon, Icy Veins, Wowhead, and Murlok.io talent recommendations directly to Blizzard's talent window for Mythic+, Raid, and PvP.

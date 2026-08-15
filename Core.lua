@@ -50,10 +50,6 @@ local defaults = {
         },
         trackerAppearance = {
             enabled = false,
-            scale = 1,
-            width = 280,
-            textScale = 1,
-            outlineText = false,
             fitHeight = true,
             backgroundOpacity = 0,
             borderEnabled = false,
@@ -79,6 +75,12 @@ local defaults = {
     },
     mythicInviteBanner = {
         enabled = true,
+    },
+    instanceLockouts = {
+        enabled = true,
+        legacyExpanded = false,
+        minimized = false,
+        excludeLockedDungeons = false,
     },
     queueAlerts = {
         backgroundSound = true,
@@ -825,6 +827,7 @@ local moduleInitializers = {
     "InitializeQueueAlerts",
     "InitializeCombatBanner",
     "InitializeMythicInviteBanner",
+    "InitializeInstanceLockouts",
     "InitializeBuffWarnings",
     "InitializeUnitFrames",
     "InitializeConsumableMacros",

@@ -447,9 +447,36 @@ local function PositionMapOverlay()
     end
 
     local anchor = WorldMapFrame.ScrollContainer or WorldMapFrame
+    local right = anchor.GetRight and anchor:GetRight()
+    local bottom = anchor.GetBottom and anchor:GetBottom()
+
+    if not right or not bottom
+        or (issecretvalue and (issecretvalue(right) or issecretvalue(bottom))) then
+        mapOverlay:Hide()
+        return false
+    end
+
+    -- Do not anchor an addon frame to MapCanvas or any of its children. Even
+    -- with UIParent as our parent, SetPoint creates a layout dependency on the
+    -- protected canvas. Retail 12.1 can then treat pin acquisition as tainted
+    -- when Blizzard calls SetPassThroughButtons on a newly acquired pin.
+    -- Convert the canvas corner to UIParent coordinates so the overlay remains
+    -- visually attached without entering Blizzard's protected layout graph.
+    local anchorScale = anchor.GetEffectiveScale and anchor:GetEffectiveScale() or 1
+    local parentScale = UIParent.GetEffectiveScale and UIParent:GetEffectiveScale() or 1
+    if issecretvalue and (issecretvalue(anchorScale) or issecretvalue(parentScale)) then
+        mapOverlay:Hide()
+        return false
+    end
+    if parentScale <= 0 then
+        parentScale = 1
+    end
+    right = right * anchorScale / parentScale
+    bottom = bottom * anchorScale / parentScale
 
     mapOverlay:ClearAllPoints()
-    mapOverlay:SetPoint("BOTTOMRIGHT", anchor, "BOTTOMRIGHT", -12, 48)
+    mapOverlay:SetPoint("BOTTOMRIGHT", UIParent, "BOTTOMLEFT", right - 12, bottom + 48)
+    return true
 end
 
 local function UpdateMapOverlay()
@@ -475,7 +502,9 @@ local function UpdateMapOverlay()
     local playerX, playerY = GetMapPlayerPosition(mapID)
     local mouseX, mouseY = GetMapMousePosition()
 
-    PositionMapOverlay()
+    if not PositionMapOverlay() then
+        return
+    end
     mapOverlay.playerText:SetText("Player: " .. FormatCoordinates(playerX, playerY))
 
     if mouseX and mouseY then
@@ -510,12 +539,8 @@ local function CreateMapOverlay()
         return mapOverlay
     end
 
-    -- Never parent addon-owned regions to WorldMapFrame. Retail's MapCanvas
-    -- builds protected POI pins beneath that hierarchy and a foreign child can
-    -- taint the later SetPropagateMouseClicks/SetPassThroughButtons setup when
-    -- a tracked quest opens the map. Anchoring an independent UIParent child
-    -- to the map keeps identical positioning without modifying the protected
-    -- frame tree.
+    -- Keep both the parent and the anchor dependency outside MapCanvas. The
+    -- absolute UIParent placement is refreshed by our independent event frame.
     mapOverlay = CreateFrame("Frame", "ZoidsToolsMapCoordinates", UIParent, "BackdropTemplate")
     mapOverlay:SetFrameStrata("HIGH")
     mapOverlay:SetFrameLevel(100)
@@ -540,19 +565,6 @@ local function CreateMapOverlay()
     mapOverlay.mouseText:SetTextColor(1, 1, 1)
     mapOverlay.mouseText:SetShadowOffset(1, -1)
     mapOverlay.mouseText:SetShadowColor(0, 0, 0, 1)
-
-    mapOverlay:SetScript("OnUpdate", OnMapUpdate)
-
-    if type(ToggleWorldMap) == "function" then
-        hooksecurefunc("ToggleWorldMap", function()
-            -- ToggleWorldMap refreshes protected MapCanvas providers before
-            -- returning. Defer all ZoidsTools work until the next frame so it
-            -- cannot contaminate pin acquisition or mouse propagation.
-            if C_Timer and C_Timer.After then
-                C_Timer.After(0, RefreshCoordinates)
-            end
-        end)
-    end
 
     ApplyClassColor()
     UpdateMapOverlay()
@@ -582,12 +594,8 @@ RefreshCoordinates = function()
 
     if not IsCombatLocked() then
         CreateMapOverlay()
-        if mapOverlay then
-            mapOverlay:SetScript("OnUpdate", OnMapUpdate)
-        end
         UpdateMapOverlay()
     elseif mapOverlay then
-        mapOverlay:SetScript("OnUpdate", nil)
         mapOverlay:Hide()
     end
 end
@@ -669,6 +677,10 @@ function ns:InitializeCoordinates()
     eventFrame:SetScript("OnEvent", function()
         RefreshCoordinates()
     end)
+    -- Poll from an addon-owned frame. A hidden coordinate overlay cannot use
+    -- its own OnUpdate to notice that the map has opened, and hooking
+    -- ToggleWorldMap would put addon execution next to protected pin refreshes.
+    eventFrame:SetScript("OnUpdate", OnMapUpdate)
 
     if C_Timer and C_Timer.After then
         C_Timer.After(1, RefreshCoordinates)

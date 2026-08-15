@@ -5,6 +5,9 @@ local BUTTON_SIZE = 46
 local ICON_INSET = 4
 local DEFAULT_ICON = 134400
 local UPDATE_DELAY = 0.08
+local PROXIMITY_UPDATE_INTERVAL = 1
+local NEARBY_QUEST_DISTANCE = 250
+local NEARBY_QUEST_DISTANCE_SQ = NEARBY_QUEST_DISTANCE * NEARBY_QUEST_DISTANCE
 
 -- Blizzard exposes most usable quest items through the quest log. A smaller
 -- group only exists in the player's bags; Data/QuestItems.lua holds verified
@@ -19,6 +22,7 @@ local pendingCombatUpdate = false
 local cachedBagItemIndex
 local cachedUsableQuestItems
 local bagItemIndexDirty = true
+local proximityUpdateElapsed = 0
 
 local function IsInCombat()
     return InCombatLockdown and InCombatLockdown()
@@ -230,16 +234,17 @@ local function GetQuestRelevance(questID, watchOrder, superTrackedQuestID)
     local insideQuestArea = false
     if C_Minimap and type(C_Minimap.IsInsideQuestBlob) == "function" then
         local ok, inside = pcall(C_Minimap.IsInsideQuestBlob, questID)
-        insideQuestArea = ok and inside == true
+        insideQuestArea = ok and not IsSecretValue(inside) and inside == true
     end
 
     local distanceSq
     local onContinent = false
     if type(C_QuestLog.GetDistanceSqToQuest) == "function" then
         local ok, distance, sameContinent = pcall(C_QuestLog.GetDistanceSqToQuest, questID)
-        if ok and type(distance) == "number" then
+        if ok and not IsSecretValue(distance) and not IsSecretValue(sameContinent)
+            and type(distance) == "number" then
             distanceSq = distance
-            onContinent = sameContinent ~= false
+            onContinent = sameContinent == true
         end
     end
 
@@ -253,6 +258,20 @@ local function GetQuestRelevance(questID, watchOrder, superTrackedQuestID)
         onContinent = onContinent,
         watchOrder = watchOrder or math.huge,
     }
+end
+
+local function IsQuestNearby(candidate)
+    if not candidate then
+        return false
+    end
+
+    if candidate.insideQuestArea then
+        return true
+    end
+
+    return candidate.onContinent == true
+        and candidate.distanceSq ~= nil
+        and candidate.distanceSq <= NEARBY_QUEST_DISTANCE_SQ
 end
 
 local function GetQuestCandidate(candidate, bagItemIndex)
@@ -334,11 +353,11 @@ local function FindBestQuestItem()
         seen[questID] = true
         order = order + 1
         local relevance = GetQuestRelevance(questID, order, superTrackedQuestID)
-        if relevance and CandidateIsBetter(relevance, bestRelevantQuest) then
+        if relevance and IsQuestNearby(relevance) and CandidateIsBetter(relevance, bestRelevantQuest) then
             bestRelevantQuest = relevance
         end
 
-        local candidate = GetQuestCandidate(relevance, bagItemIndex)
+        local candidate = IsQuestNearby(relevance) and GetQuestCandidate(relevance, bagItemIndex) or nil
         if candidate and CandidateIsBetter(candidate, best) then
             best = candidate
         end
@@ -378,8 +397,7 @@ local function FindBestQuestItem()
     -- Some bag-only quest items have no quest ID in Blizzard's API and are not
     -- present in the offline exception catalog. When there is exactly one
     -- usable quest item and one clearly relevant quest, selecting it is safe.
-    if not best and #usableQuestItems == 1 and bestRelevantQuest
-        and (bestRelevantQuest.insideQuestArea or bestRelevantQuest.superTracked) then
+    if not best and #usableQuestItems == 1 and bestRelevantQuest then
         local entry = usableQuestItems[1]
         best = bestRelevantQuest
         best.itemLink = entry.itemLink
@@ -457,10 +475,12 @@ local function ApplyCandidate(candidate)
     button.candidate = candidate
 
     if candidate then
-        button:SetAttribute("type", "item")
-        button:SetAttribute("type1", "item")
-        button:SetAttribute("item", candidate.itemLink)
-        button:SetAttribute("item1", candidate.itemLink)
+        -- Keep right-click free for moving, and disable the left-click action
+        -- while unlocked so finishing a drag cannot also use the item.
+        button:SetAttribute("type", nil)
+        button:SetAttribute("item", nil)
+        button:SetAttribute("type1", moveMode and nil or "item")
+        button:SetAttribute("item1", moveMode and nil or candidate.itemLink)
         button.icon:SetTexture(candidate.itemTexture or DEFAULT_ICON)
         button.count:SetText((candidate.charges and candidate.charges > 1) and candidate.charges or "")
         button:Show()
@@ -536,7 +556,7 @@ local function CreateButton()
     button:SetMovable(true)
     button:EnableMouse(true)
     button:RegisterForClicks("AnyDown", "AnyUp")
-    button:RegisterForDrag("LeftButton")
+    button:RegisterForDrag("LeftButton", "RightButton")
     button:SetAttribute("pressAndHoldAction", true)
     button:SetBackdrop({
         bgFile = "Interface\\Buttons\\WHITE8x8",
@@ -564,8 +584,8 @@ local function CreateButton()
     button.hotkey = button:CreateFontString(nil, "OVERLAY", "NumberFontNormalSmallGray")
     button.hotkey:SetPoint("TOPRIGHT", button, "TOPRIGHT", -3, -3)
 
-    button:SetScript("OnDragStart", function(self)
-        if moveMode and not IsInCombat() then
+    button:SetScript("OnDragStart", function(self, mouseButton)
+        if not IsInCombat() and (moveMode or mouseButton == "RightButton") then
             self:StartMoving()
         end
     end)
@@ -591,7 +611,9 @@ local function CreateButton()
             GameTooltip:AddLine("A usable quest item will appear here when one is relevant to your current area.", 1, 1, 1, true)
         end
         if moveMode then
-            GameTooltip:AddLine("Drag to move this button.", 0.65, 0.85, 1, true)
+            GameTooltip:AddLine("Left- or right-drag to move this button.", 0.65, 0.85, 1, true)
+        else
+            GameTooltip:AddLine("Right-drag to move this button.", 0.65, 0.85, 1, true)
         end
         GameTooltip:Show()
     end)
@@ -700,6 +722,20 @@ function ns:InitializeQuestItemButton()
         end
 
         ScheduleRefresh()
+    end)
+
+    eventFrame:SetScript("OnUpdate", function(_, elapsed)
+        local db = EnsureDB()
+        if not db or db.questItemButtonEnabled ~= true or IsInCombat() then
+            proximityUpdateElapsed = 0
+            return
+        end
+
+        proximityUpdateElapsed = proximityUpdateElapsed + elapsed
+        if proximityUpdateElapsed >= PROXIMITY_UPDATE_INTERVAL then
+            proximityUpdateElapsed = 0
+            ScheduleRefresh(0)
+        end
     end)
 
     RefreshButton()

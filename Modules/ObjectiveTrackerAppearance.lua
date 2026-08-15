@@ -67,10 +67,6 @@ local function GetSettings()
     quests.trackerAppearance = quests.trackerAppearance or {}
     local db = quests.trackerAppearance
     if db.enabled == nil then db.enabled = false end
-    db.scale = Clamp(db.scale or 1, MIN_SCALE, MAX_SCALE)
-    db.width = Clamp(db.width or 280, MIN_WIDTH, MAX_WIDTH)
-    db.textScale = Clamp(db.textScale or 1, MIN_TEXT_SCALE, MAX_TEXT_SCALE)
-    if db.outlineText == nil then db.outlineText = false end
     if db.fitHeight == nil then db.fitHeight = true end
     db.backgroundOpacity = Clamp(db.backgroundOpacity or 0, 0, 0.70)
     if db.borderEnabled == nil then db.borderEnabled = false end
@@ -603,83 +599,20 @@ local function ApplyAppearance()
     local frame = FindTracker()
     if not db or not frame then return end
 
-    if InCombatLockdown and InCombatLockdown() then
-        deferredForCombat = true
-        return
-    end
-    deferredForCombat = false
-    local forceLayoutRefresh = layoutRefreshRequested
+    local refreshBounds = layoutRefreshRequested
     layoutRefreshRequested = false
-
     applyingLayout = true
-    if db.enabled then
-        local enabling = not appearanceWasEnabled
-        local scaleChanged = enabling
-            or forceLayoutRefresh
-            or appliedTrackerScale ~= db.scale
-        local widthChanged = enabling
-            or forceLayoutRefresh
-            or appliedTrackerWidth ~= db.width
-        if enabling then
-            preAppearanceWidth = frame.GetWidth and frame:GetWidth() or originalWidth
-            preAppearanceScale = frame.GetScale and frame:GetScale() or originalScale
-            previousSavedScale = ns.db.windows
-                and ns.db.windows.scales
-                and ns.db.windows.scales[TRACKER_NAME]
-            appearanceWasEnabled = true
-        end
-
-        if scaleChanged then
-            frame.ZTApplyingScale = true
-            pcall(frame.SetScale, frame, db.scale)
-            frame.ZTApplyingScale = nil
-            appliedTrackerScale = db.scale
-        end
-        if widthChanged then
-            pcall(frame.SetWidth, frame, db.width)
-            ApplyModuleWidths(frame, true, db.width)
-            appliedTrackerWidth = db.width
-        end
-        if enabling or forceLayoutRefresh then
-            ApplyTrackerBackgroundBounds(frame, true)
-        end
-
-        if scaleChanged then
-            ns.db.windows = ns.db.windows or {}
-            ns.db.windows.scales = ns.db.windows.scales or {}
-            ns.db.windows.scales[TRACKER_NAME] = db.scale
-        end
-    elseif appearanceWasEnabled then
-        ApplyModuleWidths(frame, false, preAppearanceWidth or originalWidth)
-        ApplyTrackerBackgroundBounds(frame, false)
-        if preAppearanceWidth then pcall(frame.SetWidth, frame, preAppearanceWidth) end
-        if preAppearanceScale then
-            frame.ZTApplyingScale = true
-            pcall(frame.SetScale, frame, preAppearanceScale)
-            frame.ZTApplyingScale = nil
-        end
-        ns.db.windows = ns.db.windows or {}
-        ns.db.windows.scales = ns.db.windows.scales or {}
-        ns.db.windows.scales[TRACKER_NAME] = previousSavedScale
-        appearanceWasEnabled = false
-        appliedTrackerScale = nil
-        appliedTrackerWidth = nil
-    end
-    applyingLayout = false
-
-    ApplyTextScale(
-        db.enabled,
-        db.textScale,
-        db.outlineText,
-        forceLayoutRefresh or fontRefreshRequested
-    )
+    -- Do not resize, scale, re-anchor, or change fonts anywhere in Blizzard's
+    -- objective-tracker hierarchy. Its OnSizeChanged handler schedules a
+    -- deferred layout; when that layout originates in addon execution, the
+    -- scenario module cannot inspect secret aura data in 12.1. Keep all
+    -- decoration on the independent UIParent-owned skin below.
     fontRefreshRequested = false
-    ApplyEditModeSelectionBounds(frame, db.enabled, forceLayoutRefresh)
 
     local minimizeOnly = ApplyMinimizedHeaderStyle(db, frame)
     local appearance = CreateSkin()
     if appearance then
-        if forceLayoutRefresh then
+        if refreshBounds or db.enabled then
             ApplySkinBounds(appearance, frame, db.enabled and db.fitHeight)
         end
         appearance:SetShown(
@@ -695,6 +628,8 @@ local function ApplyAppearance()
             appearance:SetBackdropBorderColor(red, green, blue, db.borderEnabled and 0.92 or 0)
         end
     end
+
+    applyingLayout = false
 
     UpdateMouseoverControls()
     RefreshMouseoverTicker()
@@ -718,29 +653,7 @@ local function SetOption(key, value)
     local db = GetSettings()
     if not db or db[key] == nil then return false end
     db[key] = value
-
-    if key == "textScale" then
-        -- Blizzard recalculates every objective line and then runs its managed
-        -- frame positioning after a font change. Debounce slider motion so it
-        -- performs that expensive layout once after the user pauses instead
-        -- of moving between managed positions for every intermediate value.
-        textScaleRefreshGeneration = textScaleRefreshGeneration + 1
-        local generation = textScaleRefreshGeneration
-        if C_Timer and C_Timer.After then
-            C_Timer.After(0.15, function()
-                if generation == textScaleRefreshGeneration then
-                    ScheduleRefresh(0, false, true)
-                end
-            end)
-        else
-            ScheduleRefresh(0, false, true)
-        end
-        return true
-    end
-
     local needsLayoutRefresh = key == "enabled"
-        or key == "scale"
-        or key == "width"
         or key == "fitHeight"
     ScheduleRefresh(0, needsLayoutRefresh)
     return true
@@ -752,14 +665,8 @@ function ns:GetObjectiveTrackerAppearanceOption(key)
 end
 
 function ns:SetObjectiveTrackerAppearanceOption(key, value)
-    if key == "enabled" or key == "fitHeight" or key == "outlineText" or key == "borderEnabled" or key == "classColoredBorder" or key == "mouseoverControls" or key == "minimizeToButton" then
+    if key == "enabled" or key == "fitHeight" or key == "borderEnabled" or key == "classColoredBorder" or key == "mouseoverControls" or key == "minimizeToButton" then
         value = value == true
-    elseif key == "scale" then
-        value = Clamp(value, MIN_SCALE, MAX_SCALE)
-    elseif key == "width" then
-        value = Clamp(value, MIN_WIDTH, MAX_WIDTH)
-    elseif key == "textScale" then
-        value = Clamp(value, MIN_TEXT_SCALE, MAX_TEXT_SCALE)
     elseif key == "backgroundOpacity" then
         value = Clamp(value, 0, 0.70)
     else
@@ -786,32 +693,12 @@ function ns:InitializeObjectiveTrackerAppearance()
     local events = CreateFrame("Frame")
     for _, eventName in ipairs({
         "PLAYER_ENTERING_WORLD",
-        "PLAYER_REGEN_ENABLED",
-        "QUEST_LOG_UPDATE",
-        "TRACKED_ACHIEVEMENT_UPDATE",
-        "SCENARIO_UPDATE",
         "UI_SCALE_CHANGED",
         "EDIT_MODE_LAYOUTS_UPDATED",
     }) do
         pcall(events.RegisterEvent, events, eventName)
     end
-    events:SetScript("OnEvent", function(_, eventName)
-        if eventName == "PLAYER_REGEN_ENABLED" then
-            if not deferredForCombat then return end
-            deferredForCombat = false
-            ScheduleRefresh(0, false, false)
-            return
-        end
-
-        if eventName == "QUEST_LOG_UPDATE"
-            or eventName == "TRACKED_ACHIEVEMENT_UPDATE"
-            or eventName == "SCENARIO_UPDATE" then
-            local db = GetSettings()
-            if not db or not db.enabled then return end
-            ScheduleRefresh(0.08, false, true)
-            return
-        end
-
+    events:SetScript("OnEvent", function()
         ScheduleRefresh(0, true, true)
     end)
 

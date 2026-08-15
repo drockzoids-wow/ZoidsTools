@@ -30,6 +30,7 @@ Modules\AudioSync.lua
 Modules\QueueAlerts.lua
 Modules\CombatBanner.lua
 Modules\MythicInviteBanner.lua
+Modules\InstanceLockouts.lua
 Modules\BuffWarnings.lua
 Modules\UnitFrames.lua
 Modules\ConsumableMacros.lua

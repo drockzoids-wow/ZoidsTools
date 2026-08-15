@@ -554,7 +554,7 @@ local function CreateInterfacePage(parent)
     )
     PlaceBelow(safeQueue, queueCountdown)
 
-    local qualityCard = CreateSectionCard(page, "Quality of Life", cardW, 190)
+    local qualityCard = CreateSectionCard(page, "Quality of Life", cardW, 224)
     qualityCard:SetPoint("TOPLEFT", page, "TOPLEFT", 0, 0)
 
     local inviteBanner = ns.UI.CreateCheckbox(
@@ -566,6 +566,24 @@ local function CreateInterfacePage(parent)
     )
     PlaceFirst(inviteBanner, qualityCard)
 
+    local instanceLockouts = ns.UI.CreateCheckbox(
+        qualityCard,
+        "Show instance lockout panel",
+        "Shows current-expansion Mythic dungeon and raid saves beside Dungeons & Raids, with legacy lockouts collapsed below.",
+        function() return ns.IsInstanceLockoutPanelEnabled and ns:IsInstanceLockoutPanelEnabled() end,
+        function(value) if ns.SetInstanceLockoutPanelEnabled then ns:SetInstanceLockoutPanelEnabled(value) end end
+    )
+    PlaceBelow(instanceLockouts, inviteBanner)
+
+    local excludeLockedDungeons = ns.UI.CreateCheckbox(
+        qualityCard,
+        "Exclude locked dungeons in Premade Groups",
+        "Unchecks saved Mythic dungeon lockouts from the dungeon filter when opening Premade Groups > Dungeons. Leave this off to keep practice and repeat-run groups visible.",
+        function() return ns.IsLockedDungeonFilterEnabled and ns:IsLockedDungeonFilterEnabled() end,
+        function(value) if ns.SetLockedDungeonFilterEnabled then ns:SetLockedDungeonFilterEnabled(value) end end
+    )
+    PlaceBelow(excludeLockedDungeons, instanceLockouts)
+
     local audioSync = ns.UI.CreateCheckbox(
         qualityCard,
         "Keep audio device synced",
@@ -573,7 +591,7 @@ local function CreateInterfacePage(parent)
         function() return ns.IsAudioSyncEnabled and ns:IsAudioSyncEnabled() end,
         function(value) if ns.SetAudioSyncEnabled then ns:SetAudioSyncEnabled(value) end end
     )
-    PlaceBelow(audioSync, inviteBanner)
+    PlaceBelow(audioSync, excludeLockedDungeons)
 
     local cinematicFastSkip = ns.UI.CreateCheckbox(
         qualityCard,
@@ -677,6 +695,8 @@ local function CreateInterfacePage(parent)
         talkingHeadOpacity:Refresh()
         talkingHeadFontSize:Refresh()
         inviteBanner:Refresh()
+        instanceLockouts:Refresh()
+        excludeLockedDungeons:Refresh()
         audioSync:Refresh()
         cinematicFastSkip:Refresh()
         cinematicAutoSkip:Refresh()
@@ -3155,13 +3175,13 @@ local function CreateTrackerPage(parent)
     local leftX = 0
     local rightX = cardW + 14
 
-    local sizing = CreateSectionCard(page, "Sizing", cardW, 255)
+    local sizing = CreateSectionCard(page, "Tracker", cardW, 130)
     sizing:SetPoint("TOPLEFT", page, "TOPLEFT", leftX, 0)
 
     local trackerAppearanceEnabled = UI.CreateCheckbox(
         sizing,
         "Customize Blizzard objective tracker",
-        "Keeps Blizzard's tracker structure while applying ZoidsTools sizing and appearance controls.",
+        "Keeps Blizzard's native tracker layout while applying taint-safe ZoidsTools appearance controls.",
         function() return ns.GetObjectiveTrackerAppearanceOption and ns:GetObjectiveTrackerAppearanceOption("enabled") end,
         function(value)
             if ns.SetObjectiveTrackerAppearanceOption then ns:SetObjectiveTrackerAppearanceOption("enabled", value) end
@@ -3170,30 +3190,6 @@ local function CreateTrackerPage(parent)
     )
     PlaceFirst(trackerAppearanceEnabled, sizing)
 
-    local trackerScale = UI.CreateSlider(
-        sizing,
-        "Tracker scale",
-        "Scales Blizzard's entire objective tracker.",
-        0.70, 1.30, 0.05,
-        function() return ns.GetObjectiveTrackerAppearanceOption and ns:GetObjectiveTrackerAppearanceOption("scale") or 1 end,
-        function(value) if ns.SetObjectiveTrackerAppearanceOption then ns:SetObjectiveTrackerAppearanceOption("scale", value) end end,
-        260,
-        function(value) return tostring(math.floor(((value or 1) * 100) + 0.5)) .. "%" end
-    )
-    trackerScale:SetPoint("TOPLEFT", trackerAppearanceEnabled, "BOTTOMLEFT", 10, -16)
-
-    local trackerWidth = UI.CreateSlider(
-        sizing,
-        "Tracker width",
-        "Changes the native tracker width and lets Blizzard reflow long text.",
-        220, 420, 10,
-        function() return ns.GetObjectiveTrackerAppearanceOption and ns:GetObjectiveTrackerAppearanceOption("width") or 280 end,
-        function(value) if ns.SetObjectiveTrackerAppearanceOption then ns:SetObjectiveTrackerAppearanceOption("width", value) end end,
-        260,
-        function(value) return tostring(math.floor((value or 280) + 0.5)) .. " px" end
-    )
-    trackerWidth:SetPoint("TOPLEFT", trackerScale, "BOTTOMLEFT", 0, -20)
-
     local trackerFitHeight = UI.CreateCheckbox(
         sizing,
         "Fit tracker background to tracked content",
@@ -3201,31 +3197,7 @@ local function CreateTrackerPage(parent)
         function() return ns.GetObjectiveTrackerAppearanceOption and ns:GetObjectiveTrackerAppearanceOption("fitHeight") end,
         function(value) if ns.SetObjectiveTrackerAppearanceOption then ns:SetObjectiveTrackerAppearanceOption("fitHeight", value) end end
     )
-    trackerFitHeight:SetPoint("TOPLEFT", trackerWidth, "BOTTOMLEFT", -10, -18)
-
-    local text = CreateSectionCard(page, "Text", cardW, 180)
-    text:SetPoint("TOPLEFT", sizing, "BOTTOMLEFT", 0, -14)
-
-    local trackerTextScale = UI.CreateSlider(
-        text,
-        "Tracker text scale",
-        "Scales text inside Blizzard's tracker without replacing its rows or objective types.",
-        0.80, 1.30, 0.05,
-        function() return ns.GetObjectiveTrackerAppearanceOption and ns:GetObjectiveTrackerAppearanceOption("textScale") or 1 end,
-        function(value) if ns.SetObjectiveTrackerAppearanceOption then ns:SetObjectiveTrackerAppearanceOption("textScale", value) end end,
-        260,
-        function(value) return tostring(math.floor(((value or 1) * 100) + 0.5)) .. "%" end
-    )
-    PlaceFirst(trackerTextScale, text, 28, -46)
-
-    local trackerTextOutline = UI.CreateCheckbox(
-        text,
-        "Outline tracker text",
-        "Adds an outline to Blizzard's objective-tracker text while preserving its styles.",
-        function() return ns.GetObjectiveTrackerAppearanceOption and ns:GetObjectiveTrackerAppearanceOption("outlineText") end,
-        function(value) if ns.SetObjectiveTrackerAppearanceOption then ns:SetObjectiveTrackerAppearanceOption("outlineText", value) end end
-    )
-    trackerTextOutline:SetPoint("TOPLEFT", trackerTextScale, "BOTTOMLEFT", -10, -20)
+    PlaceBelow(trackerFitHeight, trackerAppearanceEnabled)
 
     local appearance = CreateSectionCard(page, "Appearance", cardW, 255)
     appearance:SetPoint("TOPLEFT", page, "TOPLEFT", rightX, 0)
@@ -3289,15 +3261,11 @@ local function CreateTrackerPage(parent)
     noteText:SetWidth(cardW - 36)
     noteText:SetJustifyH("LEFT")
     noteText:SetTextColor(0.78, 0.78, 0.72)
-    noteText:SetText("These options style Blizzard's existing tracker instead of replacing quest rows, progress bars, or objective behavior.")
+    noteText:SetText("ZoidsTools leaves Blizzard's native tracker size, fonts, and objective layout untouched so scenario aura updates remain untainted.")
 
     function page:Refresh()
         trackerAppearanceEnabled:Refresh()
-        trackerScale:Refresh()
-        trackerWidth:Refresh()
         trackerFitHeight:Refresh()
-        trackerTextScale:Refresh()
-        trackerTextOutline:Refresh()
         trackerBackgroundOpacity:Refresh()
         trackerBorderEnabled:Refresh()
         trackerClassBorder:Refresh()
@@ -3305,11 +3273,7 @@ local function CreateTrackerPage(parent)
         trackerMinimizeToButton:Refresh()
 
         local appearanceActive = trackerAppearanceEnabled:GetChecked() == true
-        UI.SetControlEnabled(trackerScale, appearanceActive)
-        UI.SetControlEnabled(trackerWidth, appearanceActive)
         UI.SetControlEnabled(trackerFitHeight, appearanceActive)
-        UI.SetControlEnabled(trackerTextScale, appearanceActive)
-        UI.SetControlEnabled(trackerTextOutline, appearanceActive)
         UI.SetControlEnabled(trackerBackgroundOpacity, appearanceActive)
         UI.SetControlEnabled(trackerBorderEnabled, appearanceActive)
         UI.SetControlEnabled(trackerClassBorder, appearanceActive and trackerBorderEnabled:GetChecked() == true)

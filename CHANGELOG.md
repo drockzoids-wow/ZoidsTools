@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Restricted objective-tracker customization to an independent background/border and alpha-only header styling, removing native tracker size, scale, font, anchor, and module-field mutations that could taint Blizzard's secret scenario-aura layout in 12.1.
+- Added an optional lockout panel beside Dungeons & Raids with current-expansion Mythic dungeon and raid saves, boss progress, reset times, a remembered legacy section, a saved minimize control, stable direct attachment to the Blizzard panel, and an opt-in setting that excludes saved Mythic dungeons from Premade Groups filters; pooled labels are initialized with their font before text assignment.
+- Limited the smart quest-item button to quests whose Blizzard area or distance data says they are nearby, added live proximity refreshes, and made the button directly movable with right-drag outside combat.
+- Prevented the world-map coordinate overlay from joining Blizzard's protected MapCanvas layout graph, avoiding `SetPassThroughButtons` blocks while bonus-objective pins are acquired.
+
 - Replaced the legacy player-tooltip implementation and obsolete options with a clean Blizzard-tooltip-data integration built back one feature at a time.
 - Added class-colored player mouseover names with spaced Mythic+ rating and Item Level label/value rows beneath Blizzard's character lines, including a secure same-player refresh when inspection data arrives, without detached panels or direct shared-tooltip line mutations.
 - Restored a focused Core > Tooltips settings page containing only the currently supported class-name, Mythic+ rating, and item-level options.

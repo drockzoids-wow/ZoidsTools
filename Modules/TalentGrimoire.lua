@@ -546,6 +546,27 @@ local function GetPvpBuildsForTarget(targetKey)
     return builds, targetKey, targetData
 end
 
+local function GetBuildModeLabel(buildKey, entry)
+    if type(entry) == "table" then
+        if entry.modeLabel and entry.modeLabel ~= "" then
+            return entry.modeLabel
+        end
+
+        -- Archon's temporary PTR feed has one combined key range. Older
+        -- generated data stores its identical build under both lowkey and
+        -- highkey, but the player-facing mode is simply PTR M+.
+        if entry.difficulty == "PTR M+" then
+            return "PTR M+"
+        end
+
+        if entry.title and entry.title ~= "" then
+            return entry.title
+        end
+    end
+
+    return TitleCase(buildKey)
+end
+
 local function GetModeOptions(contentType, targetKey)
     contentType = NormalizeContentType(contentType)
 
@@ -566,11 +587,24 @@ local function GetModeOptions(contentType, targetKey)
     local dynamicOptions = {}
 
     if type(builds) == "table" then
-        for buildKey, entry in pairs(builds) do
+        local collapsePtrModes = contentType == "mythicplus"
+            and BuildEntriesEquivalent(builds.lowkey, builds.highkey)
+            and (builds.highkey.difficulty == "PTR M+" or builds.highkey.modeLabel == "PTR M+")
+
+        if collapsePtrModes then
             dynamicOptions[#dynamicOptions + 1] = {
-                value = buildKey,
-                text = FormatPvpModeLabel(type(entry) == "table" and (entry.modeLabel or entry.title) or TitleCase(buildKey)),
+                value = "highkey",
+                text = GetBuildModeLabel("highkey", builds.highkey),
             }
+        end
+
+        for buildKey, entry in pairs(builds) do
+            if not collapsePtrModes or (buildKey ~= "lowkey" and buildKey ~= "highkey") then
+                dynamicOptions[#dynamicOptions + 1] = {
+                    value = buildKey,
+                    text = FormatPvpModeLabel(GetBuildModeLabel(buildKey, entry)),
+                }
+            end
         end
     end
 
@@ -601,7 +635,7 @@ local function GetModeOptions(contentType, targetKey)
                             seenModes[buildKey] = true
                             dynamicOptions[#dynamicOptions + 1] = {
                                 value = buildKey,
-                                text = FormatPvpModeLabel(type(entry) == "table" and (entry.modeLabel or entry.title) or TitleCase(buildKey)),
+                                text = FormatPvpModeLabel(GetBuildModeLabel(buildKey, entry)),
                             }
                         end
                     end
@@ -628,7 +662,7 @@ local function GetModeOptions(contentType, targetKey)
 
         if type(builds) == "table" then
             for buildKey, entry in pairs(builds) do
-                local label = type(entry) == "table" and (entry.modeLabel or entry.title) or TitleCase(buildKey)
+                local label = GetBuildModeLabel(buildKey, entry)
 
                 options[#options + 1] = {
                     value = buildKey,
@@ -1282,7 +1316,13 @@ local function BuildTalentLabel(context)
         parts[#parts + 1] = context.modeLabel
     end
 
-    if context.targetLabel and context.targetLabel ~= "" then
+    local modeContainsTarget = context.modeLabel
+        and context.modeLabel ~= ""
+        and context.targetLabel
+        and context.targetLabel ~= ""
+        and string.find(string.lower(context.modeLabel), string.lower(context.targetLabel), 1, true) ~= nil
+
+    if context.targetLabel and context.targetLabel ~= "" and not modeContainsTarget then
         parts[#parts + 1] = context.targetLabel
     end
 
@@ -1301,7 +1341,7 @@ local function BuildLoadoutName(buildLabel)
     end
 
     if #name > 48 then
-        name = string.sub(name, 1, 48)
+        name = string.sub(name, 1, 45) .. "..."
     end
 
     return name

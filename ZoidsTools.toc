@@ -1,4 +1,4 @@
-## Interface: 120100, 120007
+## Interface: 120100
 ## Title: ZoidsTools
 ## Notes: A personal WoW toolkit by Drockzoids.
 ## Author: Drockzoids

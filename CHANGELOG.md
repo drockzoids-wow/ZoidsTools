@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Collapsed identical PTR Mythic+ low/high talent builds into one visible `PTR M+` mode and shortened generated loadout labels without ambiguous hard truncation.
+- Matched the expanded Instance Lockouts panel to the visible height of Dungeons & Raids and added the player's current Mythic+ rating, per-dungeon current-season Best Run values with a `+0` Mythic fallback, and labeled Reset columns.
 - Restricted objective-tracker customization to an independent background/border and alpha-only header styling, removing native tracker size, scale, font, anchor, and module-field mutations that could taint Blizzard's secret scenario-aura layout in 12.1.
 - Added an optional lockout panel beside Dungeons & Raids with current-expansion Mythic dungeon and raid saves, boss progress, reset times, a remembered legacy section, a saved minimize control, stable direct attachment to the Blizzard panel, and an opt-in setting that excludes saved Mythic dungeons from Premade Groups filters; pooled labels are initialized with their font before text assignment.
 - Limited the smart quest-item button to quests whose Blizzard area or distance data says they are nearby, added live proximity refreshes, and made the button directly movable with right-drag outside combat.

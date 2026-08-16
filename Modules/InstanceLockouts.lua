@@ -5,8 +5,12 @@ local PANEL_WIDTH = 304
 local PANEL_MINIMIZED_WIDTH = 184
 local PANEL_MINIMIZED_HEIGHT = 42
 local PANEL_MIN_HEIGHT = 360
-local PANEL_MAX_HEIGHT = 620
 local PANEL_GAP = 8
+local RATING_SUMMARY_WIDTH = 128
+local BEST_RUN_COLUMN_WIDTH = 58
+local RESET_COLUMN_WIDTH = 66
+local COLUMN_GAP = 4
+local ROW_RIGHT_INSET = 7
 local MYTHIC_DUNGEON_DIFFICULTY_ID = 23
 local GROUP_FINDER_CATEGORY_ID_DUNGEONS = 2
 
@@ -216,6 +220,76 @@ local function FormatResetTime(seconds)
         return string.format("%dh %dm", hours, minutes)
     end
     return string.format("%dm", math.max(1, minutes))
+end
+
+local function GetCurrentMythicPlusRating()
+    if not C_PlayerInfo
+        or type(C_PlayerInfo.GetPlayerMythicPlusRatingSummary) ~= "function" then
+        return 0
+    end
+
+    local ok, summary = pcall(C_PlayerInfo.GetPlayerMythicPlusRatingSummary, "player")
+    if not ok or IsSecretValue(summary) or type(summary) ~= "table" then
+        return 0
+    end
+
+    local score = SafeNumber(summary.currentSeasonScore)
+    return score and math.max(0, math.floor(score + 0.5)) or 0
+end
+
+local function RecordBestRun(bestByMapID, bestByName, mapID, level)
+    mapID = SafeNumber(mapID)
+    level = SafeNumber(level)
+    if not mapID or not level or level < 2 or level > 40 then
+        return
+    end
+
+    level = math.floor(level)
+    bestByMapID[mapID] = math.max(bestByMapID[mapID] or 0, level)
+
+    if C_ChallengeMode and type(C_ChallengeMode.GetMapUIInfo) == "function" then
+        local ok, mapName = pcall(C_ChallengeMode.GetMapUIInfo, mapID)
+        local normalizedName = ok and NormalizeName(mapName) or nil
+        if normalizedName then
+            bestByName[normalizedName] = math.max(bestByName[normalizedName] or 0, level)
+        end
+    end
+end
+
+local function GetCurrentSeasonBestRuns()
+    local bestByMapID = {}
+    local bestByName = {}
+
+    if not C_MythicPlus or type(C_MythicPlus.GetRunHistory) ~= "function" then
+        return bestByMapID, bestByName
+    end
+
+    local ok, runs = pcall(C_MythicPlus.GetRunHistory, true, false, true)
+    if not ok or IsSecretValue(runs) or type(runs) ~= "table" then
+        return bestByMapID, bestByName
+    end
+
+    for _, run in ipairs(runs) do
+        if not IsSecretValue(run) and type(run) == "table" then
+            local completed = SafeBoolean(run.completed)
+            if completed ~= false then
+                RecordBestRun(bestByMapID, bestByName, run.mapChallengeModeID, run.level)
+            end
+        end
+    end
+    return bestByMapID, bestByName
+end
+
+local function AddMythicPlusProgress(lockouts)
+    if not lockouts then
+        return
+    end
+
+    local _, bestByName = GetCurrentSeasonBestRuns()
+    for _, info in ipairs(lockouts.currentDungeons or {}) do
+        local normalizedName = NormalizeName(info.name)
+        info.bestRunLevel = normalizedName and bestByName[normalizedName] or nil
+    end
 end
 
 local function GetDifficultyName(difficultyID, providedName)
@@ -598,19 +672,19 @@ local function CreateLockoutRow(parent)
     row.accent:SetWidth(3)
 
     row.name = row:CreateFontString(nil, "OVERLAY")
-    row.name:SetPoint("TOPLEFT", 10, -4)
-    row.name:SetPoint("TOPRIGHT", -72, -4)
     row.name:SetHeight(17)
     SetTextStyle(row.name, 12, 0.95, 0.95, 0.95, "LEFT")
 
+    row.bestRun = row:CreateFontString(nil, "OVERLAY")
+    row.bestRun:SetSize(BEST_RUN_COLUMN_WIDTH, 17)
+    SetTextStyle(row.bestRun, 10, 0.95, 0.72, 0.18, "CENTER")
+
     row.reset = row:CreateFontString(nil, "OVERLAY")
-    row.reset:SetPoint("TOPRIGHT", -7, -4)
-    row.reset:SetSize(66, 17)
+    row.reset:SetPoint("TOPRIGHT", -ROW_RIGHT_INSET, -4)
+    row.reset:SetSize(RESET_COLUMN_WIDTH, 17)
     SetTextStyle(row.reset, 10, 0.58, 0.72, 0.95, "RIGHT")
 
     row.detail = row:CreateFontString(nil, "OVERLAY")
-    row.detail:SetPoint("BOTTOMLEFT", 10, 4)
-    row.detail:SetPoint("BOTTOMRIGHT", -7, 4)
     row.detail:SetHeight(15)
     SetTextStyle(row.detail, 10, 0.62, 0.62, 0.65, "LEFT")
 
@@ -657,7 +731,35 @@ local function AddLabel(style, text, y, height)
         SetTextStyle(label, 11, 0.75, 0.75, 0.78, "LEFT")
     end
     label:SetText(text)
-    return y - height
+    return y - height, label
+end
+
+local function AddSectionHeader(text, y, showBestRun)
+    local label = AcquireLabel("section")
+    local rightReserve = RESET_COLUMN_WIDTH + ROW_RIGHT_INSET
+    if showBestRun then
+        rightReserve = rightReserve + BEST_RUN_COLUMN_WIDTH + COLUMN_GAP
+    end
+    label:SetPoint("TOPLEFT", panel.content, "TOPLEFT", 4, y)
+    label:SetPoint("TOPRIGHT", panel.content, "TOPRIGHT", -rightReserve, y)
+    label:SetHeight(20)
+    SetTextStyle(label, 11, 0.95, 0.72, 0.18, "LEFT")
+    label:SetText(text)
+
+    if showBestRun then
+        local bestHeader = AcquireLabel("bestRunHeader")
+        bestHeader:SetPoint("TOPRIGHT", panel.content, "TOPRIGHT", -(RESET_COLUMN_WIDTH + ROW_RIGHT_INSET + COLUMN_GAP), y)
+        bestHeader:SetSize(BEST_RUN_COLUMN_WIDTH, 20)
+        SetTextStyle(bestHeader, 9, 0.95, 0.72, 0.18, "CENTER")
+        bestHeader:SetText("BEST RUN")
+    end
+
+    local resetHeader = AcquireLabel("resetHeader")
+    resetHeader:SetPoint("TOPRIGHT", panel.content, "TOPRIGHT", -ROW_RIGHT_INSET, y)
+    resetHeader:SetSize(RESET_COLUMN_WIDTH, 20)
+    SetTextStyle(resetHeader, 9, 0.58, 0.72, 0.95, "RIGHT")
+    resetHeader:SetText("RESET")
+    return y - 20
 end
 
 local function AcquireRow()
@@ -672,7 +774,7 @@ local function AcquireRow()
     return row
 end
 
-local function AddLockoutRows(list, emptyText, y, legacy)
+local function AddLockoutRows(list, emptyText, y, legacy, showBestRun)
     if #list == 0 then
         return AddLabel("empty", emptyText, y, 22) - 2
     end
@@ -684,6 +786,24 @@ local function AddLockoutRows(list, emptyText, y, legacy)
         row.info = info
         row.name:SetText(info.name)
         row.reset:SetText(FormatResetTime(info.reset))
+
+        local rightReserve = RESET_COLUMN_WIDTH + ROW_RIGHT_INSET
+        if showBestRun then
+            rightReserve = rightReserve + BEST_RUN_COLUMN_WIDTH + COLUMN_GAP
+            row.bestRun:ClearAllPoints()
+            row.bestRun:SetPoint("TOPRIGHT", row, "TOPRIGHT", -(RESET_COLUMN_WIDTH + ROW_RIGHT_INSET + COLUMN_GAP), -4)
+            row.bestRun:SetText(string.format("+%d", info.bestRunLevel or 0))
+            row.bestRun:Show()
+        else
+            row.bestRun:Hide()
+        end
+
+        row.name:ClearAllPoints()
+        row.name:SetPoint("TOPLEFT", 10, -4)
+        row.name:SetPoint("TOPRIGHT", -rightReserve, -4)
+        row.detail:ClearAllPoints()
+        row.detail:SetPoint("BOTTOMLEFT", 10, 4)
+        row.detail:SetPoint("BOTTOMRIGHT", -rightReserve, 4)
 
         local detail
         if info.numEncounters > 0 then
@@ -732,11 +852,23 @@ local function RenderLockouts(lockouts)
     panel.rowUse = 0
 
     local y = -5
-    y = AddLabel("expansion", currentExpansionName, y, 24)
-    y = AddLabel("section", "MYTHIC DUNGEONS", y, 20)
-    y = AddLockoutRows(lockouts.currentDungeons, "No current Mythic dungeon lockouts.", y, false)
+    local expansionY = y
+    local expansionLabel
+    y, expansionLabel = AddLabel("expansion", currentExpansionName, y, 24)
+    expansionLabel:ClearAllPoints()
+    expansionLabel:SetPoint("TOPLEFT", panel.content, "TOPLEFT", 4, expansionY)
+    expansionLabel:SetPoint("TOPRIGHT", panel.content, "TOPRIGHT", -(RATING_SUMMARY_WIDTH + 8), expansionY)
+
+    panel.ratingSummary:ClearAllPoints()
+    panel.ratingSummary:SetPoint("TOPRIGHT", panel.content, "TOPRIGHT", -4, expansionY)
+    panel.ratingSummary:SetSize(RATING_SUMMARY_WIDTH, 24)
+    panel.ratingSummary:SetText(string.format("M+ RATING  |cffffffff%d|r", GetCurrentMythicPlusRating()))
+    panel.ratingSummary:Show()
+
+    y = AddSectionHeader("MYTHIC DUNGEONS", y, true)
+    y = AddLockoutRows(lockouts.currentDungeons, "No current Mythic dungeon lockouts.", y, false, true)
     y = y - 6
-    y = AddLabel("section", "RAIDS", y, 20)
+    y = AddSectionHeader("RAIDS", y, false)
     y = AddLockoutRows(lockouts.currentRaids, "No current raid lockouts.", y, false)
     y = y - 9
 
@@ -755,10 +887,10 @@ local function RenderLockouts(lockouts)
     y = y - 31
 
     if legacyExpanded then
-        y = AddLabel("section", "MYTHIC DUNGEONS", y, 20)
+        y = AddSectionHeader("MYTHIC DUNGEONS", y, false)
         y = AddLockoutRows(lockouts.legacyDungeons, "No legacy Mythic dungeon lockouts.", y, true)
         y = y - 6
-        y = AddLabel("section", "RAIDS", y, 20)
+        y = AddSectionHeader("RAIDS", y, false)
         y = AddLockoutRows(lockouts.legacyRaids, "No legacy raid lockouts.", y, true)
     end
 
@@ -772,6 +904,7 @@ local function RefreshLockouts()
     end
 
     local lockouts = ReadSavedLockouts()
+    AddMythicPlusProgress(lockouts)
     RenderLockouts(lockouts)
     SyncLockedDungeonFilters(lockouts)
 end
@@ -798,7 +931,15 @@ local function RequestLockoutData()
     if type(RequestRaidInfo) == "function" then
         pcall(RequestRaidInfo)
     end
+    if C_MythicPlus and type(C_MythicPlus.RequestMapInfo) == "function" then
+        pcall(C_MythicPlus.RequestMapInfo)
+    end
     ScheduleRefresh(0.10)
+    if C_Timer and type(C_Timer.After) == "function" then
+        C_Timer.After(0.75, function()
+            ScheduleRefresh(0)
+        end)
+    end
 end
 
 local ApplyPanelDisplayState
@@ -895,6 +1036,9 @@ local function CreatePanel()
     panel.content = CreateFrame("Frame", nil, panel.scroll)
     panel.content:SetSize(PANEL_WIDTH - 24, 1)
     panel.scroll:SetScrollChild(panel.content)
+
+    panel.ratingSummary = panel.content:CreateFontString(nil, "OVERLAY")
+    SetTextStyle(panel.ratingSummary, 10, 0.95, 0.72, 0.18, "RIGHT")
     panel.scroll:SetScript("OnSizeChanged", function(self, width)
         width = SafeNumber(width)
         if width then
@@ -981,12 +1125,20 @@ local function PositionPanel()
 
     local right = SafeNumber(pveFrame:GetRight())
     local pveHeight = SafeNumber(pveFrame:GetHeight())
+    local pveScale = pveFrame.GetEffectiveScale and SafeNumber(pveFrame:GetEffectiveScale())
+    local panelScale = panel.GetEffectiveScale and SafeNumber(panel:GetEffectiveScale())
     local screenRight = UIParent and UIParent.GetRight and SafeNumber(UIParent:GetRight())
     if not pveHeight then
         return false
     end
 
-    panel.expandedHeight = math.max(PANEL_MIN_HEIGHT, math.min(PANEL_MAX_HEIGHT, pveHeight))
+    -- PVEFrame and this UIParent-level panel can use different effective
+    -- scales. Convert Blizzard's height into the panel's coordinate space so
+    -- both frames have the same visible height on screen.
+    if pveScale and panelScale and panelScale > 0 then
+        pveHeight = pveHeight * pveScale / panelScale
+    end
+    panel.expandedHeight = math.max(PANEL_MIN_HEIGHT, pveHeight)
     panel:ClearAllPoints()
     if right and screenRight and right + PANEL_GAP + PANEL_WIDTH <= screenRight - 4 then
         panel.anchorSide = "RIGHT"
@@ -1063,6 +1215,7 @@ local function InstallPVEHooks()
 
     if type(pveFrame.HookScript) == "function" then
         pveFrame:HookScript("OnShow", SyncAfterBlizzardUpdate)
+        pveFrame:HookScript("OnSizeChanged", SyncAfterBlizzardUpdate)
         pveFrame:HookScript("OnHide", function()
             pveWasShown = false
             if panel and panel:IsShown() then

@@ -87,6 +87,35 @@ local function EnsureDB()
     return db
 end
 
+local function GetWeeklyResetCycle()
+    if not C_DateAndTime or type(C_DateAndTime.GetSecondsUntilWeeklyReset) ~= "function" then
+        return nil
+    end
+
+    local ok, secondsUntilReset = pcall(C_DateAndTime.GetSecondsUntilWeeklyReset)
+    secondsUntilReset = ok and SafeNumber(secondsUntilReset) or nil
+    if not secondsUntilReset or secondsUntilReset < 0 then
+        return nil
+    end
+
+    local serverTime
+    if type(GetServerTime) == "function" then
+        ok, serverTime = pcall(GetServerTime)
+        serverTime = ok and SafeNumber(serverTime) or nil
+    elseif type(time) == "function" then
+        ok, serverTime = pcall(time)
+        serverTime = ok and SafeNumber(serverTime) or nil
+    end
+    if not serverTime then
+        return nil
+    end
+
+    -- The next weekly reset moves forward by seven days when a new week
+    -- begins. Store it in an hour bucket so one-second API rounding cannot
+    -- create a false cycle change.
+    return math.floor((serverTime + secondsUntilReset + 30) / 3600)
+end
+
 local function EmptyCatalog()
     currentCatalog.instanceIDs = {}
     currentCatalog.journalInstanceIDs = {}
@@ -527,6 +556,14 @@ local function SyncLockedDungeonFilters(lockouts)
     local lockedGroups = db.excludeLockedDungeons == true
         and GetLockedDungeonGroupIDs(lockouts, availableGroupIDs)
         or {}
+    local resetCycle = GetWeeklyResetCycle()
+    local previousResetCycle = SafeNumber(db.dungeonFilterResetCycle)
+    if resetCycle and db.excludeLockedDungeons ~= true then
+        -- Keep the baseline current while automatic lockout filtering is off,
+        -- so enabling it later does not look like a weekly reset.
+        db.dungeonFilterResetCycle = resetCycle
+        previousResetCycle = resetCycle
+    end
 
     local ok, advancedFilter = pcall(C_LFGList.GetAdvancedFilter)
     if not ok or type(advancedFilter) ~= "table" then
@@ -536,6 +573,31 @@ local function SyncLockedDungeonFilters(lockouts)
     local activities = type(advancedFilter.activities) == "table"
         and advancedFilter.activities
         or {}
+
+    local resetCycleChanged = resetCycle and resetCycle ~= previousResetCycle
+    local restoreAllForWeeklyReset = resetCycleChanged
+        and db.excludeLockedDungeons == true
+        and not next(lockedGroups)
+    if restoreAllForWeeklyReset then
+        local filterChanged = #activities > 0
+        if filterChanged then
+            -- Blizzard represents "Check All" with an empty activity list.
+            advancedFilter.activities = {}
+            local saved = pcall(C_LFGList.SaveAdvancedFilter, advancedFilter)
+            if not saved then
+                return false
+            end
+        end
+
+        db.autoExcludedDungeonGroups = {}
+        db.dungeonFilterResetCycle = resetCycle
+        return filterChanged
+    elseif resetCycle and previousResetCycle == nil then
+        -- Establish a baseline when upgrading during a week that already has
+        -- lockouts. The next actual weekly cycle will perform the reset.
+        db.dungeonFilterResetCycle = resetCycle
+    end
+
     local selected = {}
     local defaultAll = #activities == 0
     if defaultAll then

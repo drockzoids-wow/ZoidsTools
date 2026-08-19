@@ -1,10 +1,8 @@
 local _, ns = ...
 
 local widget
-local mapOverlay
 local eventFrame
 local elapsedSinceUpdate = 0
-local mapElapsedSinceUpdate = 0
 local RefreshCoordinates
 
 local DEFAULT_POINT = "BOTTOM"
@@ -17,10 +15,6 @@ local OLD_CORE_DEFAULT_Y = 8
 local OLD_DEFAULT_Y = 245
 local DEFAULT_SCALE = 1
 local DEFAULT_UPDATE_INTERVAL = 0.15
-
-local function IsCombatLocked()
-    return InCombatLockdown and InCombatLockdown()
-end
 
 local function ClampScale(value)
     value = tonumber(value) or DEFAULT_SCALE
@@ -78,10 +72,6 @@ local function EnsureDB()
         db.enabled = true
     end
 
-    if db.mapEnabled == nil then
-        db.mapEnabled = true
-    end
-
     if db.updateInterval == nil then
         db.updateInterval = DEFAULT_UPDATE_INTERVAL
     end
@@ -127,10 +117,6 @@ end
 local function GetBestPlayerMapID()
     if C_Map and type(C_Map.GetBestMapForUnit) == "function" then
         return C_Map.GetBestMapForUnit("player")
-    end
-
-    if WorldMapFrame and type(WorldMapFrame.GetMapID) == "function" then
-        return WorldMapFrame:GetMapID()
     end
 
     return nil
@@ -262,11 +248,6 @@ local function ApplyClassColor()
     widget:SetBackdropBorderColor(r, g, b, 0.62)
     widget.topLine:SetVertexColor(r, g, b, 0.45)
     widget.bottomLine:SetVertexColor(r, g, b, 0.25)
-
-    if mapOverlay then
-        mapOverlay.playerText:SetTextColor(1, 1, 1)
-        mapOverlay.mouseText:SetTextColor(1, 1, 1)
-    end
 end
 
 local function ApplyWidgetSize()
@@ -388,190 +369,6 @@ local function CreateWidget()
     return widget
 end
 
-local function GetWorldMapID()
-    if WorldMapFrame and type(WorldMapFrame.GetMapID) == "function" then
-        return WorldMapFrame:GetMapID()
-    end
-
-    return GetBestPlayerMapID()
-end
-
-local function GetMapMousePosition()
-    if not WorldMapFrame then
-        return nil, nil
-    end
-
-    local scrollContainer = WorldMapFrame.ScrollContainer
-
-    if scrollContainer and type(scrollContainer.IsMouseOver) == "function" and not scrollContainer:IsMouseOver() then
-        return nil, nil
-    end
-
-    if scrollContainer and type(scrollContainer.GetNormalizedCursorPosition) == "function" then
-        local x, y = scrollContainer:GetNormalizedCursorPosition()
-
-        if x and y and x >= 0 and x <= 1 and y >= 0 and y <= 1 then
-            return x * 100, y * 100
-        end
-    end
-
-    if not WorldMapFrame:IsMouseOver() then
-        return nil, nil
-    end
-
-    local target = scrollContainer or WorldMapFrame
-    local left, bottom, width, height = target:GetRect()
-
-    if not left or not bottom or not width or not height or width <= 0 or height <= 0 then
-        return nil, nil
-    end
-
-    local scale = UIParent and UIParent.GetEffectiveScale and UIParent:GetEffectiveScale() or 1
-    local cursorX, cursorY = GetCursorPosition()
-    cursorX = (cursorX or 0) / scale
-    cursorY = (cursorY or 0) / scale
-
-    local x = (cursorX - left) / width
-    local y = ((bottom + height) - cursorY) / height
-
-    if x < 0 or x > 1 or y < 0 or y > 1 then
-        return nil, nil
-    end
-
-    return x * 100, y * 100
-end
-
-local function PositionMapOverlay()
-    if not mapOverlay or not WorldMapFrame then
-        return
-    end
-
-    local anchor = WorldMapFrame.ScrollContainer or WorldMapFrame
-    local right = anchor.GetRight and anchor:GetRight()
-    local bottom = anchor.GetBottom and anchor:GetBottom()
-
-    if not right or not bottom
-        or (issecretvalue and (issecretvalue(right) or issecretvalue(bottom))) then
-        mapOverlay:Hide()
-        return false
-    end
-
-    -- Do not anchor an addon frame to MapCanvas or any of its children. Even
-    -- with UIParent as our parent, SetPoint creates a layout dependency on the
-    -- protected canvas. Retail 12.1 can then treat pin acquisition as tainted
-    -- when Blizzard calls SetPassThroughButtons on a newly acquired pin.
-    -- Convert the canvas corner to UIParent coordinates so the overlay remains
-    -- visually attached without entering Blizzard's protected layout graph.
-    local anchorScale = anchor.GetEffectiveScale and anchor:GetEffectiveScale() or 1
-    local parentScale = UIParent.GetEffectiveScale and UIParent:GetEffectiveScale() or 1
-    if issecretvalue and (issecretvalue(anchorScale) or issecretvalue(parentScale)) then
-        mapOverlay:Hide()
-        return false
-    end
-    if parentScale <= 0 then
-        parentScale = 1
-    end
-    right = right * anchorScale / parentScale
-    bottom = bottom * anchorScale / parentScale
-
-    mapOverlay:ClearAllPoints()
-    mapOverlay:SetPoint("BOTTOMRIGHT", UIParent, "BOTTOMLEFT", right - 12, bottom + 48)
-    return true
-end
-
-local function UpdateMapOverlay()
-    local db = EnsureDB()
-
-    if IsCombatLocked() then
-        if mapOverlay then
-            mapOverlay:Hide()
-        end
-
-        return
-    end
-
-    if not mapOverlay or not db or db.mapEnabled ~= true or not WorldMapFrame or not WorldMapFrame:IsShown() then
-        if mapOverlay then
-            mapOverlay:Hide()
-        end
-
-        return
-    end
-
-    local mapID = GetWorldMapID()
-    local playerX, playerY = GetMapPlayerPosition(mapID)
-    local mouseX, mouseY = GetMapMousePosition()
-
-    if not PositionMapOverlay() then
-        return
-    end
-    mapOverlay.playerText:SetText("Player: " .. FormatCoordinates(playerX, playerY))
-
-    if mouseX and mouseY then
-        mapOverlay.mouseText:SetText("Cursor: " .. FormatCoordinates(mouseX, mouseY))
-        mapOverlay.mouseText:Show()
-    else
-        mapOverlay.mouseText:Hide()
-    end
-
-    mapOverlay:Show()
-end
-
-local function OnMapUpdate(_, elapsed)
-    if IsCombatLocked() then
-        return
-    end
-
-    mapElapsedSinceUpdate = mapElapsedSinceUpdate + (elapsed or 0)
-
-    if mapElapsedSinceUpdate < DEFAULT_UPDATE_INTERVAL then
-        return
-    end
-
-    mapElapsedSinceUpdate = 0
-    UpdateMapOverlay()
-end
-
-OnMapUpdate = ns:WrapDiagnosticFunction("Coordinates.Map", OnMapUpdate)
-
-local function CreateMapOverlay()
-    if mapOverlay or not WorldMapFrame then
-        return mapOverlay
-    end
-
-    -- Keep both the parent and the anchor dependency outside MapCanvas. The
-    -- absolute UIParent placement is refreshed by our independent event frame.
-    mapOverlay = CreateFrame("Frame", "ZoidsToolsMapCoordinates", UIParent, "BackdropTemplate")
-    mapOverlay:SetFrameStrata("HIGH")
-    mapOverlay:SetFrameLevel(100)
-    mapOverlay:SetSize(190, 42)
-    mapOverlay:EnableMouse(false)
-    PositionMapOverlay()
-
-    mapOverlay.playerText = mapOverlay:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-    mapOverlay.playerText:SetFont(STANDARD_TEXT_FONT or "Fonts\\FRIZQT__.TTF", 13, "OUTLINE")
-    mapOverlay.playerText:SetPoint("BOTTOMRIGHT", mapOverlay, "BOTTOMRIGHT", 0, 0)
-    mapOverlay.playerText:SetWidth(190)
-    mapOverlay.playerText:SetJustifyH("RIGHT")
-    mapOverlay.playerText:SetTextColor(1, 1, 1)
-    mapOverlay.playerText:SetShadowOffset(1, -1)
-    mapOverlay.playerText:SetShadowColor(0, 0, 0, 1)
-
-    mapOverlay.mouseText = mapOverlay:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-    mapOverlay.mouseText:SetFont(STANDARD_TEXT_FONT or "Fonts\\FRIZQT__.TTF", 13, "OUTLINE")
-    mapOverlay.mouseText:SetPoint("BOTTOMRIGHT", mapOverlay.playerText, "TOPRIGHT", 0, 8)
-    mapOverlay.mouseText:SetWidth(190)
-    mapOverlay.mouseText:SetJustifyH("RIGHT")
-    mapOverlay.mouseText:SetTextColor(1, 1, 1)
-    mapOverlay.mouseText:SetShadowOffset(1, -1)
-    mapOverlay.mouseText:SetShadowColor(0, 0, 0, 1)
-
-    ApplyClassColor()
-    UpdateMapOverlay()
-
-    return mapOverlay
-end
-
 RefreshCoordinates = function()
     local db = EnsureDB()
     local frame = CreateWidget()
@@ -591,13 +388,6 @@ RefreshCoordinates = function()
         frame:SetScript("OnUpdate", nil)
         frame:Hide()
     end
-
-    if not IsCombatLocked() then
-        CreateMapOverlay()
-        UpdateMapOverlay()
-    elseif mapOverlay then
-        mapOverlay:Hide()
-    end
 end
 
 function ns:SetCoordinatesWidgetShown(value)
@@ -615,23 +405,6 @@ function ns:IsCoordinatesWidgetShown()
     local db = EnsureDB()
 
     return db and db.enabled == true
-end
-
-function ns:SetMapCoordinatesShown(value)
-    local db = EnsureDB()
-
-    if not db then
-        return
-    end
-
-    db.mapEnabled = value == true
-    RefreshCoordinates()
-end
-
-function ns:IsMapCoordinatesShown()
-    local db = EnsureDB()
-
-    return db and db.mapEnabled == true
 end
 
 function ns:SetCoordinatesWidgetScale(value)
@@ -672,15 +445,9 @@ function ns:InitializeCoordinates()
     eventFrame:RegisterEvent("ZONE_CHANGED")
     eventFrame:RegisterEvent("ZONE_CHANGED_INDOORS")
     eventFrame:RegisterEvent("ZONE_CHANGED_NEW_AREA")
-    eventFrame:RegisterEvent("PLAYER_REGEN_DISABLED")
-    eventFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
     eventFrame:SetScript("OnEvent", function()
         RefreshCoordinates()
     end)
-    -- Poll from an addon-owned frame. A hidden coordinate overlay cannot use
-    -- its own OnUpdate to notice that the map has opened, and hooking
-    -- ToggleWorldMap would put addon execution next to protected pin refreshes.
-    eventFrame:SetScript("OnUpdate", OnMapUpdate)
 
     if C_Timer and C_Timer.After then
         C_Timer.After(1, RefreshCoordinates)

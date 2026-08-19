@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Restored minimized World Map movement on Retail 12.1 with a dedicated position-only title-bar drag path that avoids map scaling, addon anchoring, `SetPoint` hooks, and MapCanvas polling.
+- Removed ZoidsTools' World Map coordinate overlay, setting, slash commands, and map polling now that Retail provides built-in map coordinates; the standalone coordinates widget remains available.
+- Rechecks every Premade Groups dungeon filter after the weekly reset once the character's dungeon lockouts are empty, then clears ZoidsTools' prior auto-exclusion tracking for the new week.
+- Restricted automatic bind confirmation to bind-on-pickup loot rolls. Bind-on-equip, auto-equip, bind-on-use, and innkeeper binding prompts now always require manual confirmation.
+- Added an opt-in auto-confirm option for the crafting-order warning shown when the crafter supplies some of their own reagents. It confirms during the original Create click so Blizzard's protected crafting action remains authorized, without affecting other generic confirmation dialogs.
 - Collapsed identical PTR Mythic+ low/high talent builds into one visible `PTR M+` mode and shortened generated loadout labels without ambiguous hard truncation.
 - Matched the expanded Instance Lockouts panel to the visible height of Dungeons & Raids and added the player's current Mythic+ rating, per-dungeon current-season Best Run values with a `+0` Mythic fallback, and labeled Reset columns.
 - Restricted objective-tracker customization to an independent background/border and alpha-only header styling, removing native tracker size, scale, font, anchor, and module-field mutations that could taint Blizzard's secret scenario-aura layout in 12.1.

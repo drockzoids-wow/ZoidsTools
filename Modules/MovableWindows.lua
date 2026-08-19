@@ -8,6 +8,8 @@ local windowsRegistered = false
 local bagWatcher
 local panelRefreshQueued = false
 local bagRefreshQueued = false
+local worldMapMoverInstalled = false
+local worldMapMoving = false
 local RestoreOriginalPoint
 
 local blockedFrames = {
@@ -20,9 +22,9 @@ local blockedFrames = {
     -- protected quest-pin mouse setup (SetPassThroughButtons), so it must stay
     -- entirely under Blizzard's control.
     FlightMapFrame = true,
-    -- The World Map uses the same protected MapCanvas data-provider system.
-    -- Making or scaling the parent frame contaminates secret POI/widget
-    -- dimensions later used by Blizzard's tooltip and pin layout code.
+    -- The generic mover changes scale, anchors, placement state, and frame
+    -- scripts. Keep those operations away from MapCanvas; WorldMapFrame gets
+    -- a dedicated position-only title-bar mover below.
     WorldMapFrame = true,
     HouseEditorFrame = true,
     LossOfControlFrame = true,
@@ -138,6 +140,119 @@ end
 
 local function IsBlockedFrame(frame, isBagWindow)
     return IsBlockedFrameName(GetFrameName(frame), isBagWindow)
+end
+
+local function CanMoveWorldMap(frame)
+    if not frame
+        or not ns.db
+        or not ns.db.windows
+        or not ns.db.windows.enabled
+        or InCombatLockdown()
+    then
+        return false
+    end
+
+    return not frame.IsMaximized or not frame:IsMaximized()
+end
+
+local function FinishWorldMapMove(frame)
+    if not frame or not worldMapMoving then
+        return
+    end
+
+    SafeCall(frame.StopMovingOrSizing, frame)
+    worldMapMoving = false
+
+    -- StartMoving marks the frame as user placed. Leave persistence to WoW's
+    -- native layout cache instead of restoring anchors from addon code.
+    if frame.SetUserPlaced then
+        local remember = ns.db
+            and ns.db.windows
+            and ns.db.windows.savePositions == true
+        SafeCall(frame.SetUserPlaced, frame, remember)
+    end
+
+    if frame.SetDontSavePosition then
+        SafeCall(frame.SetDontSavePosition, frame, false)
+    end
+end
+
+local function RefreshWorldMapMovement()
+    local frame = _G.WorldMapFrame
+    local titleContainer = frame and frame.BorderFrame and frame.BorderFrame.TitleContainer
+
+    if not frame or not titleContainer then
+        return
+    end
+
+    if not worldMapMoverInstalled then
+        if not SafeCall(frame.SetMovable, frame, true) then
+            return
+        end
+
+        SafeCall(frame.SetClampedToScreen, frame, true)
+
+        if frame.SetDontSavePosition then
+            SafeCall(frame.SetDontSavePosition, frame, false)
+        end
+
+        if titleContainer.SetMouseClickEnabled then
+            SafeCall(titleContainer.SetMouseClickEnabled, titleContainer, true)
+        elseif titleContainer.EnableMouse then
+            SafeCall(titleContainer.EnableMouse, titleContainer, true)
+        end
+
+        titleContainer:HookScript("OnMouseDown", function(_, button)
+            if button ~= "LeftButton" or not CanMoveWorldMap(frame) then
+                return
+            end
+
+            if SafeCall(frame.StartMoving, frame) then
+                worldMapMoving = true
+            end
+        end)
+
+        titleContainer:HookScript("OnMouseUp", function(_, button)
+            if button == "LeftButton" then
+                FinishWorldMapMove(frame)
+            end
+        end)
+
+        titleContainer:HookScript("OnHide", function()
+            FinishWorldMapMove(frame)
+        end)
+
+        worldMapMoverInstalled = true
+    end
+
+    local enabled = ns.db and ns.db.windows and ns.db.windows.enabled == true
+    if not enabled then
+        FinishWorldMapMove(frame)
+    end
+
+    SafeCall(frame.SetMovable, frame, enabled)
+
+    if enabled and ns.db.windows.savePositions ~= true and frame.SetUserPlaced then
+        SafeCall(frame.SetUserPlaced, frame, false)
+    end
+end
+
+local function ResetWorldMapPosition()
+    local frame = _G.WorldMapFrame
+
+    if not frame or InCombatLockdown() then
+        return
+    end
+
+    FinishWorldMapMove(frame)
+
+    if frame.SetUserPlaced then
+        SafeCall(frame.SetUserPlaced, frame, false)
+    end
+
+    if frame.SetDontSavePosition then
+        SafeCall(frame.SetDontSavePosition, frame, false)
+    end
 end
 
 local function ClearSavedWindowState(name)
@@ -1081,6 +1196,8 @@ local function RegisterUIPanelWindows()
     if SpellBookFrame then
         MakeMovable(SpellBookFrame)
     end
+
+    RefreshWorldMapMovement()
 end
 
 local function RefreshPanelWindowsSoon()
@@ -1309,6 +1426,8 @@ function ns:ResetMovableWindowPositions()
         UpdateBagHandle(frame)
     end
 
+    ResetWorldMapPosition()
+
     self:Print("Saved window positions reset.")
 end
 
@@ -1353,6 +1472,10 @@ function ns:GetMovableWindowStats()
     local scaleCount = self.GetSavedWindowScaleCount and self:GetSavedWindowScaleCount() or 0
 
     for _ in pairs(movableFrames) do
+        windowCount = windowCount + 1
+    end
+
+    if worldMapMoverInstalled and _G.WorldMapFrame then
         windowCount = windowCount + 1
     end
 

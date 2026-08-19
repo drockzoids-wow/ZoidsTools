@@ -455,7 +455,7 @@ local function CreateInterfacePage(parent)
     local cardW = 374
     local rightX = cardW + 14
 
-    local widgetsCard = CreateSectionCard(page, "Widgets", cardW, 264)
+    local widgetsCard = CreateSectionCard(page, "Widgets", cardW, 237)
     widgetsCard:SetPoint("TOPLEFT", page, "TOPLEFT", rightX, 0)
 
     local performanceDisplay = ns.UI.CreateDropdown(
@@ -507,17 +507,8 @@ local function CreateInterfacePage(parent)
     )
     coordinatesWidget:SetPoint("TOPLEFT", unlockPerformance, "BOTTOMLEFT", 0, -10)
 
-    local mapCoordinates = ns.UI.CreateCheckbox(
-        widgetsCard,
-        "Show map coordinates",
-        "Shows player and mouse coordinates on the map.",
-        function() return ns.IsMapCoordinatesShown and ns:IsMapCoordinatesShown() end,
-        function(value) if ns.SetMapCoordinatesShown then ns:SetMapCoordinatesShown(value) end end
-    )
-    mapCoordinates:SetPoint("TOPLEFT", coordinatesWidget, "TOPLEFT", 0, -27)
-
     local resetCoordinates = CreateButton(widgetsCard, "Reset Coords", 132, 27)
-    resetCoordinates:SetPoint("TOPLEFT", mapCoordinates, "BOTTOMLEFT", 0, -10)
+    resetCoordinates:SetPoint("TOPLEFT", coordinatesWidget, "BOTTOMLEFT", 0, -10)
     resetCoordinates:SetScript("OnClick", function()
         if ns.ResetCoordinatesWidgetPosition then
             ns:ResetCoordinatesWidgetPosition()
@@ -688,7 +679,6 @@ local function CreateInterfacePage(parent)
         performanceDisplay:Refresh()
         performanceScale:Refresh()
         coordinatesWidget:Refresh()
-        mapCoordinates:Refresh()
         subtleTalkingHead:Refresh()
         talkingHeadBackground:Refresh()
         talkingHeadBold:Refresh()
@@ -1503,7 +1493,7 @@ local function CreateWindowsPage(parent)
     local windowsEnabled = UI.CreateCheckbox(
         movement,
         "Make Blizzard windows movable",
-        "Allows supported Blizzard interface panels to be repositioned.",
+        "Allows supported Blizzard interface panels to be repositioned. Drag the minimized World Map by its title bar.",
         function() return ns.db and ns.db.windows and ns.db.windows.enabled end,
         function(value)
             ns.db.windows.enabled = value
@@ -1561,7 +1551,7 @@ local function CreateWindowsPage(parent)
     local scaleEnabled = UI.CreateCheckbox(
         movement,
         "Ctrl-scroll scales windows",
-        "Hold Ctrl and use the mouse wheel over a movable window or its move handle to adjust scale.",
+        "Hold Ctrl and use the mouse wheel over a movable window or its move handle to adjust scale. The World Map is position-only.",
         function() return ns.db and ns.db.windows and ns.db.windows.scaleEnabled end,
         function(value) ns.db.windows.scaleEnabled = value end
     )
@@ -3331,15 +3321,24 @@ local function CreateDialogsPage(parent)
 
     local bindPrompts = UI.CreateCheckbox(
         main,
-        "Confirm bind prompts",
-        "Automatically confirms bind-on-pickup, bind-on-equip, and bind-on-use prompts.",
+        "Confirm bind-on-pickup rolls",
+        "Automatically confirms bind-on-pickup loot rolls. Equipping or using an item is never confirmed automatically.",
         function() return ns.GetAutoConfirmOption and ns:GetAutoConfirmOption("bindPrompts") end,
         function(value) if ns.SetAutoConfirmOption then ns:SetAutoConfirmOption("bindPrompts", value) end end
     )
     PlaceBelow(bindPrompts, disenchantRolls)
 
+    local craftingOrderReagents = UI.CreateCheckbox(
+        main,
+        "Confirm crafting-order reagents",
+        "Automatically accepts the warning when filling a crafting order with some of your own reagents.",
+        function() return ns.GetAutoConfirmOption and ns:GetAutoConfirmOption("craftingOrderReagents") end,
+        function(value) if ns.SetAutoConfirmOption then ns:SetAutoConfirmOption("craftingOrderReagents", value) end end
+    )
+    PlaceBelow(craftingOrderReagents, bindPrompts)
+
     local note = main:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
-    note:SetPoint("TOPLEFT", bindPrompts, "BOTTOMLEFT", 4, -16)
+    note:SetPoint("TOPLEFT", craftingOrderReagents, "BOTTOMLEFT", 4, -16)
     note:SetWidth(cardW - 40)
     note:SetJustifyH("LEFT")
     note:SetTextColor(0.90, 0.72, 0.34)
@@ -3408,6 +3407,7 @@ local function CreateDialogsPage(parent)
         deleteGoodItems:Refresh()
         disenchantRolls:Refresh()
         bindPrompts:Refresh()
+        craftingOrderReagents:Refresh()
         replaceEnchant:Refresh()
         replaceSockets:Refresh()
         merchantTradeTimers:Refresh()
@@ -3418,6 +3418,7 @@ local function CreateDialogsPage(parent)
         UI.SetControlEnabled(deleteGoodItems, active)
         UI.SetControlEnabled(disenchantRolls, active)
         UI.SetControlEnabled(bindPrompts, active)
+        UI.SetControlEnabled(craftingOrderReagents, active)
         UI.SetControlEnabled(replaceEnchant, active)
         UI.SetControlEnabled(replaceSockets, active)
         UI.SetControlEnabled(merchantTradeTimers, active)

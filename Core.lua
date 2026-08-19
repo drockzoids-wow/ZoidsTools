@@ -72,6 +72,7 @@ local defaults = {
         merchantTradeTimers = false,
         tokenPurchases = false,
         highCostPurchases = false,
+        craftingOrderReagents = false,
     },
     mythicInviteBanner = {
         enabled = true,
@@ -311,7 +312,6 @@ local defaults = {
     },
     coordinates = {
         enabled = true,
-        mapEnabled = true,
         updateInterval = 0.15,
         point = "BOTTOM",
         relativePoint = "BOTTOM",
@@ -648,16 +648,6 @@ local function HandleSlash(input)
         if ns.ResetCoordinatesWidgetPosition then
             ns:ResetCoordinatesWidgetPosition()
             ns:Print("Coordinates widget position reset.")
-        end
-    elseif input == "mapcoords on" or input == "map coordinates on" then
-        if ns.SetMapCoordinatesShown then
-            ns:SetMapCoordinatesShown(true)
-            ns:Print("Map coordinates shown.")
-        end
-    elseif input == "mapcoords off" or input == "map coordinates off" then
-        if ns.SetMapCoordinatesShown then
-            ns:SetMapCoordinatesShown(false)
-            ns:Print("Map coordinates hidden.")
         end
     elseif input == "iteminfo on" or input == "items on" then
         if ns.SetItemOverlaysEnabled then

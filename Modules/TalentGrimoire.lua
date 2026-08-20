@@ -16,6 +16,8 @@ local PANEL_WIDTH = 700
 local PANEL_ANCHOR_X = 8
 local PANEL_ANCHOR_Y = 8
 local CONTROL_GAP = 6
+local PANEL_FRAME_LEVEL_OFFSET = 10
+local CONTROL_FRAME_LEVEL_OFFSET = 2
 local ZOIDS_LOADOUT_NAME = "ZoidsTools"
 local DUNGEON_PROMPT_DIALOG = "ZOIDSTOOLS_TALENT_GRIMOIRE_DUNGEON_PROMPT"
 local BIT_WIDTH_HEADER_VERSION = 8
@@ -587,11 +589,19 @@ local function GetModeOptions(contentType, targetKey)
     local dynamicOptions = {}
 
     if type(builds) == "table" then
-        local collapsePtrModes = contentType == "mythicplus"
+        local collapseCombinedModes = contentType == "mythicplus"
             and BuildEntriesEquivalent(builds.lowkey, builds.highkey)
-            and (builds.highkey.difficulty == "PTR M+" or builds.highkey.modeLabel == "PTR M+")
+            and (
+                builds.highkey.difficulty == "PTR M+"
+                or builds.highkey.modeLabel == "PTR M+"
+                or (
+                    type(builds.highkey.modeLabel) == "string"
+                    and builds.highkey.modeLabel ~= ""
+                    and builds.highkey.modeLabel == builds.lowkey.modeLabel
+                )
+            )
 
-        if collapsePtrModes then
+        if collapseCombinedModes then
             dynamicOptions[#dynamicOptions + 1] = {
                 value = "highkey",
                 text = GetBuildModeLabel("highkey", builds.highkey),
@@ -599,7 +609,7 @@ local function GetModeOptions(contentType, targetKey)
         end
 
         for buildKey, entry in pairs(builds) do
-            if not collapsePtrModes or (buildKey ~= "lowkey" and buildKey ~= "highkey") then
+            if not collapseCombinedModes or (buildKey ~= "lowkey" and buildKey ~= "highkey") then
                 dynamicOptions[#dynamicOptions + 1] = {
                     value = buildKey,
                     text = FormatPvpModeLabel(GetBuildModeLabel(buildKey, entry)),
@@ -3411,7 +3421,7 @@ local function CreatePanel()
 
     panel = CreateFrame("Frame", "ZoidsToolsTalentGrimoirePanel", UIParent, "BackdropTemplate")
     panel:SetSize(PANEL_WIDTH, PANEL_HEIGHT)
-    panel:SetFrameStrata("FULLSCREEN_DIALOG")
+    panel:SetFrameStrata("DIALOG")
     panel:EnableMouse(true)
     panel:SetBackdrop({
         edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
@@ -3497,11 +3507,12 @@ local function AnchorPanel(talentFrame)
     panel:ClearAllPoints()
     panel:SetPoint("BOTTOMLEFT", hostFrame, "BOTTOMLEFT", PANEL_ANCHOR_X, PANEL_ANCHOR_Y)
     panel._ztTalentHost = hostFrame
-    panel:SetFrameStrata("FULLSCREEN_DIALOG")
-    panel:SetFrameLevel((hostFrame:GetFrameLevel() or 1) + 500)
-    panel:Raise()
+    -- Sit above the talent window itself, but below Blizzard's
+    -- FULLSCREEN_DIALOG loadout menus and third-party tooltip popups.
+    panel:SetFrameStrata("DIALOG")
+    panel:SetFrameLevel((hostFrame:GetFrameLevel() or 1) + PANEL_FRAME_LEVEL_OFFSET)
 
-    local controlLevel = (panel:GetFrameLevel() or 1) + 5
+    local controlLevel = (panel:GetFrameLevel() or 1) + CONTROL_FRAME_LEVEL_OFFSET
 
     for _, control in ipairs({
         panel.contentDropdown,
@@ -3512,7 +3523,6 @@ local function AnchorPanel(talentFrame)
     }) do
         if control and control.SetFrameLevel then
             control:SetFrameLevel(controlLevel)
-            control:Raise()
         end
     end
 end

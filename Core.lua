@@ -81,7 +81,6 @@ local defaults = {
         enabled = true,
         legacyExpanded = false,
         minimized = false,
-        excludeLockedDungeons = false,
     },
     queueAlerts = {
         backgroundSound = true,

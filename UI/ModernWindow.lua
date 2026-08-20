@@ -566,15 +566,6 @@ local function CreateInterfacePage(parent)
     )
     PlaceBelow(instanceLockouts, inviteBanner)
 
-    local excludeLockedDungeons = ns.UI.CreateCheckbox(
-        qualityCard,
-        "Exclude locked dungeons in Premade Groups",
-        "Unchecks saved Mythic dungeon lockouts from the dungeon filter when opening Premade Groups > Dungeons. Leave this off to keep practice and repeat-run groups visible.",
-        function() return ns.IsLockedDungeonFilterEnabled and ns:IsLockedDungeonFilterEnabled() end,
-        function(value) if ns.SetLockedDungeonFilterEnabled then ns:SetLockedDungeonFilterEnabled(value) end end
-    )
-    PlaceBelow(excludeLockedDungeons, instanceLockouts)
-
     local audioSync = ns.UI.CreateCheckbox(
         qualityCard,
         "Keep audio device synced",
@@ -582,7 +573,7 @@ local function CreateInterfacePage(parent)
         function() return ns.IsAudioSyncEnabled and ns:IsAudioSyncEnabled() end,
         function(value) if ns.SetAudioSyncEnabled then ns:SetAudioSyncEnabled(value) end end
     )
-    PlaceBelow(audioSync, excludeLockedDungeons)
+    PlaceBelow(audioSync, instanceLockouts)
 
     local cinematicFastSkip = ns.UI.CreateCheckbox(
         qualityCard,
@@ -686,7 +677,6 @@ local function CreateInterfacePage(parent)
         talkingHeadFontSize:Refresh()
         inviteBanner:Refresh()
         instanceLockouts:Refresh()
-        excludeLockedDungeons:Refresh()
         audioSync:Refresh()
         cinematicFastSkip:Refresh()
         cinematicAutoSkip:Refresh()

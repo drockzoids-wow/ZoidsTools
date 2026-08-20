@@ -1,6 +1,7 @@
 local _, ns = ...
 
 local WARNING_FRAME_NAME = "ZoidsToolsMissingBuffWarningFrame"
+local WARNING_COMBAT_FRAME_NAME = "ZoidsToolsMissingBuffWarningCombatController"
 local WARNING_FRAME_MIN_WIDTH = 174
 local WARNING_FRAME_HEIGHT = 88
 local WARNING_ICON_SIZE = 40
@@ -26,6 +27,7 @@ local GROUP_BUFFS_BY_CLASS = {
 }
 
 local eventFrame
+local combatVisibilityFrame
 local warningFrame
 local checkQueued = false
 local refreshAfterCombat = false
@@ -111,8 +113,6 @@ local function HideWarningFrame()
     end
 
     warningFrame:Hide()
-    warningFrame:SetAlpha(1)
-    warningFrame.ZTConcealedForCombat = nil
     return true
 end
 
@@ -123,25 +123,10 @@ local function ConcealWarningFrameForCombat()
 
     refreshAfterCombat = true
 
-    if GameTooltip and GameTooltip.Hide then
-        GameTooltip:Hide()
-    end
-
+    -- The secure visibility driver owns the combat transition. Do not use
+    -- alpha here: a transparent secure action button can still receive clicks.
     if not IsCombatLocked() then
-        warningFrame:Hide()
-        warningFrame:SetAlpha(1)
-        warningFrame.ZTConcealedForCombat = nil
-        return
-    end
-
-    warningFrame.ZTConcealedForCombat = true
-    warningFrame:SetAlpha(0)
-end
-
-local function RestoreWarningFrameAfterCombat()
-    if warningFrame and warningFrame.ZTConcealedForCombat then
-        warningFrame:SetAlpha(1)
-        warningFrame.ZTConcealedForCombat = nil
+        HideWarningFrame()
     end
 end
 
@@ -169,7 +154,24 @@ local function CreateWarningFrame()
         return warningFrame
     end
 
-    local frame = CreateFrame("Frame", WARNING_FRAME_NAME, UIParent, "BackdropTemplate")
+    local controller = CreateFrame(
+        "Frame",
+        WARNING_COMBAT_FRAME_NAME,
+        UIParent,
+        "SecureHandlerStateTemplate"
+    )
+    controller:SetAllPoints(UIParent)
+    if type(RegisterStateDriver) == "function" then
+        RegisterStateDriver(controller, "visibility", "[combat] hide; show")
+    end
+    combatVisibilityFrame = controller
+
+    local frame = CreateFrame(
+        "Frame",
+        WARNING_FRAME_NAME,
+        controller,
+        "BackdropTemplate"
+    )
     frame:SetSize(WARNING_FRAME_MIN_WIDTH, WARNING_FRAME_HEIGHT)
     frame:SetFrameStrata("MEDIUM")
     frame:SetFrameLevel(12)
@@ -197,10 +199,17 @@ local function CreateWarningFrame()
     frame.buffIcons = {}
 
     frame:SetScript("OnDragStart", function(self)
-        self:StartMoving()
+        if not IsCombatLocked() then
+            self:StartMoving()
+        end
     end)
 
     frame:SetScript("OnDragStop", function(self)
+        if IsCombatLocked() then
+            refreshAfterCombat = true
+            return
+        end
+
         self:StopMovingOrSizing()
         SaveWarningFramePosition(self)
     end)
@@ -267,6 +276,11 @@ local function GetGroupChatType()
 end
 
 local function AnnounceMissingBuff(spellID, buffName)
+    if IsCombatLocked() then
+        refreshAfterCombat = true
+        return
+    end
+
     local chatType = GetGroupChatType()
     if not chatType then
         ns:Print("Unable to announce the missing buff because you are not in a group.")
@@ -518,7 +532,7 @@ local function GetWarningIconButton(frame, index)
         GameTooltip:Hide()
     end)
     button:SetScript("PostClick", function(self, mouseButton)
-        if mouseButton == "LeftButton" and not self.canCastBuff then
+        if mouseButton == "LeftButton" and not self.canCastBuff and not IsCombatLocked() then
             AnnounceMissingBuff(self.spellID, self.buffName)
         end
     end)
@@ -679,7 +693,11 @@ function ns:InitializeBuffWarnings()
             ConcealWarningFrameForCombat()
         elseif event == "PLAYER_REGEN_ENABLED" then
             RegisterBuffUnitEvents()
-            RestoreWarningFrameAfterCombat()
+            if warningFrame then
+                warningFrame:StopMovingOrSizing()
+                SaveWarningFramePosition(warningFrame)
+            end
+            HideWarningFrame()
             refreshAfterCombat = false
             ScheduleCheck(0.3)
         elseif IsCombatLocked() then

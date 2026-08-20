@@ -2,15 +2,17 @@
 
 ## Unreleased
 
+- Placed the Talent Grimoire bar at the intermediate `DIALOG` strata so it remains above the talent window while Blizzard and third-party loadout popups can remain above its dropdown controls.
+- Adapted Mythic+ talent recommendations to Archon's combined live key-range feed, presenting identical compatibility builds as one `Mythic+` mode while retaining PTR and split low/high-key support.
+- Made the missing-group-buff popup use an invisible secure combat-visibility controller, keeping its buttons genuinely hidden during combat without forcing an empty popup to appear while solo; group announcements are also rejected while combat-locked.
 - Restored minimized World Map movement on Retail 12.1 with a dedicated position-only title-bar drag path that avoids map scaling, addon anchoring, `SetPoint` hooks, and MapCanvas polling.
 - Removed ZoidsTools' World Map coordinate overlay, setting, slash commands, and map polling now that Retail provides built-in map coordinates; the standalone coordinates widget remains available.
-- Rechecks every Premade Groups dungeon filter after the weekly reset once the character's dungeon lockouts are empty, then clears ZoidsTools' prior auto-exclusion tracking for the new week.
 - Restricted automatic bind confirmation to bind-on-pickup loot rolls. Bind-on-equip, auto-equip, bind-on-use, and innkeeper binding prompts now always require manual confirmation.
 - Added an opt-in auto-confirm option for the crafting-order warning shown when the crafter supplies some of their own reagents. It confirms during the original Create click so Blizzard's protected crafting action remains authorized, without affecting other generic confirmation dialogs.
 - Collapsed identical PTR Mythic+ low/high talent builds into one visible `PTR M+` mode and shortened generated loadout labels without ambiguous hard truncation.
 - Matched the expanded Instance Lockouts panel to the visible height of Dungeons & Raids and added the player's current Mythic+ rating, per-dungeon current-season Best Run values with a `+0` Mythic fallback, and labeled Reset columns.
 - Restricted objective-tracker customization to an independent background/border and alpha-only header styling, removing native tracker size, scale, font, anchor, and module-field mutations that could taint Blizzard's secret scenario-aura layout in 12.1.
-- Added an optional lockout panel beside Dungeons & Raids with current-expansion Mythic dungeon and raid saves, boss progress, reset times, a remembered legacy section, a saved minimize control, stable direct attachment to the Blizzard panel, and an opt-in setting that excludes saved Mythic dungeons from Premade Groups filters; pooled labels are initialized with their font before text assignment.
+- Added an optional lockout panel beside Dungeons & Raids with current-expansion Mythic dungeon and raid saves, boss progress, reset times, a remembered legacy section, a saved minimize control, and stable direct attachment to the Blizzard panel; pooled labels are initialized with their font before text assignment.
 - Limited the smart quest-item button to quests whose Blizzard area or distance data says they are nearby, added live proximity refreshes, and made the button directly movable with right-drag outside combat.
 - Prevented the world-map coordinate overlay from joining Blizzard's protected MapCanvas layout graph, avoiding `SetPassThroughButtons` blocks while bonus-objective pins are acquired.
 

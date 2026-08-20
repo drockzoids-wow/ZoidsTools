@@ -12,7 +12,6 @@ local RESET_COLUMN_WIDTH = 66
 local COLUMN_GAP = 4
 local ROW_RIGHT_INSET = 7
 local MYTHIC_DUNGEON_DIFFICULTY_ID = 23
-local GROUP_FINDER_CATEGORY_ID_DUNGEONS = 2
 
 local panel
 local eventFrame
@@ -20,7 +19,6 @@ local updateQueued = false
 local catalogReady = false
 local pveWasShown = false
 local pveHooksInstalled = false
-local lfgListHooksInstalled = false
 local currentExpansionName = "Current Expansion"
 local currentCatalog = {
     instanceIDs = {},
@@ -78,42 +76,7 @@ local function EnsureDB()
     if db.minimized == nil then
         db.minimized = false
     end
-    if db.excludeLockedDungeons == nil then
-        db.excludeLockedDungeons = false
-    end
-    if type(db.autoExcludedDungeonGroups) ~= "table" then
-        db.autoExcludedDungeonGroups = {}
-    end
     return db
-end
-
-local function GetWeeklyResetCycle()
-    if not C_DateAndTime or type(C_DateAndTime.GetSecondsUntilWeeklyReset) ~= "function" then
-        return nil
-    end
-
-    local ok, secondsUntilReset = pcall(C_DateAndTime.GetSecondsUntilWeeklyReset)
-    secondsUntilReset = ok and SafeNumber(secondsUntilReset) or nil
-    if not secondsUntilReset or secondsUntilReset < 0 then
-        return nil
-    end
-
-    local serverTime
-    if type(GetServerTime) == "function" then
-        ok, serverTime = pcall(GetServerTime)
-        serverTime = ok and SafeNumber(serverTime) or nil
-    elseif type(time) == "function" then
-        ok, serverTime = pcall(time)
-        serverTime = ok and SafeNumber(serverTime) or nil
-    end
-    if not serverTime then
-        return nil
-    end
-
-    -- The next weekly reset moves forward by seven days when a new week
-    -- begins. Store it in an hour bucket so one-second API rounding cannot
-    -- create a false cycle change.
-    return math.floor((serverTime + secondsUntilReset + 30) / 3600)
 end
 
 local function EmptyCatalog()
@@ -460,227 +423,6 @@ local function ReadSavedLockouts()
     return result
 end
 
-local function GetAvailableDungeonGroupIDs()
-    if not C_LFGList or type(C_LFGList.GetAvailableActivityGroups) ~= "function"
-        or not Enum or not Enum.LFGListFilter or not bit or type(bit.bor) ~= "function" then
-        return {}, {}
-    end
-
-    local filterValues = Enum.LFGListFilter
-    local ordered = {}
-    local available = {}
-
-    local function AddGroups(...)
-        local mask = 0
-        for index = 1, select("#", ...) do
-            local value = SafeNumber(select(index, ...))
-            if not value then
-                return
-            end
-            mask = bit.bor(mask, value)
-        end
-
-        local ok, groups = pcall(
-            C_LFGList.GetAvailableActivityGroups,
-            GROUP_FINDER_CATEGORY_ID_DUNGEONS,
-            mask
-        )
-        if not ok or type(groups) ~= "table" then
-            return
-        end
-
-        for _, value in ipairs(groups) do
-            local groupID = SafeNumber(value)
-            if groupID and not available[groupID] then
-                available[groupID] = true
-                ordered[#ordered + 1] = groupID
-            end
-        end
-    end
-
-    AddGroups(filterValues.CurrentSeason, filterValues.PvE)
-    AddGroups(filterValues.CurrentExpansion, filterValues.NotCurrentSeason, filterValues.PvE)
-
-    local timerunning = false
-    if type(PlayerIsTimerunning) == "function" then
-        local ok, result = pcall(PlayerIsTimerunning)
-        timerunning = ok and SafeBoolean(result) == true
-    end
-    if timerunning then
-        AddGroups(filterValues.Timerunning, filterValues.PvE)
-    end
-
-    return ordered, available
-end
-
-local function GetLockedDungeonGroupIDs(lockouts, availableGroupIDs)
-    local lockedNames = {}
-    for _, listName in ipairs({ "currentDungeons", "legacyDungeons" }) do
-        for _, info in ipairs(lockouts[listName] or {}) do
-            local normalizedName = NormalizeName(info.name)
-            if normalizedName then
-                lockedNames[normalizedName] = true
-            end
-        end
-    end
-
-    local lockedGroups = {}
-    if not next(lockedNames) or not C_LFGList
-        or type(C_LFGList.GetActivityGroupInfo) ~= "function" then
-        return lockedGroups
-    end
-
-    for _, groupID in ipairs(availableGroupIDs) do
-        local ok, groupName = pcall(C_LFGList.GetActivityGroupInfo, groupID)
-        local normalizedName = ok and NormalizeName(groupName) or nil
-        if normalizedName and lockedNames[normalizedName] then
-            lockedGroups[groupID] = true
-        end
-    end
-    return lockedGroups
-end
-
-local function SyncLockedDungeonFilters(lockouts)
-    local db = EnsureDB()
-    if not db or not C_LFGList or type(C_LFGList.GetAdvancedFilter) ~= "function"
-        or type(C_LFGList.SaveAdvancedFilter) ~= "function" then
-        return false
-    end
-
-    local availableGroupIDs, availableGroups = GetAvailableDungeonGroupIDs()
-    if #availableGroupIDs == 0 then
-        return false
-    end
-
-    lockouts = lockouts or ReadSavedLockouts()
-    local lockedGroups = db.excludeLockedDungeons == true
-        and GetLockedDungeonGroupIDs(lockouts, availableGroupIDs)
-        or {}
-    local resetCycle = GetWeeklyResetCycle()
-    local previousResetCycle = SafeNumber(db.dungeonFilterResetCycle)
-    if resetCycle and db.excludeLockedDungeons ~= true then
-        -- Keep the baseline current while automatic lockout filtering is off,
-        -- so enabling it later does not look like a weekly reset.
-        db.dungeonFilterResetCycle = resetCycle
-        previousResetCycle = resetCycle
-    end
-
-    local ok, advancedFilter = pcall(C_LFGList.GetAdvancedFilter)
-    if not ok or type(advancedFilter) ~= "table" then
-        return false
-    end
-
-    local activities = type(advancedFilter.activities) == "table"
-        and advancedFilter.activities
-        or {}
-
-    local resetCycleChanged = resetCycle and resetCycle ~= previousResetCycle
-    local restoreAllForWeeklyReset = resetCycleChanged
-        and db.excludeLockedDungeons == true
-        and not next(lockedGroups)
-    if restoreAllForWeeklyReset then
-        local filterChanged = #activities > 0
-        if filterChanged then
-            -- Blizzard represents "Check All" with an empty activity list.
-            advancedFilter.activities = {}
-            local saved = pcall(C_LFGList.SaveAdvancedFilter, advancedFilter)
-            if not saved then
-                return false
-            end
-        end
-
-        db.autoExcludedDungeonGroups = {}
-        db.dungeonFilterResetCycle = resetCycle
-        return filterChanged
-    elseif resetCycle and previousResetCycle == nil then
-        -- Establish a baseline when upgrading during a week that already has
-        -- lockouts. The next actual weekly cycle will perform the reset.
-        db.dungeonFilterResetCycle = resetCycle
-    end
-
-    local selected = {}
-    local defaultAll = #activities == 0
-    if defaultAll then
-        for _, groupID in ipairs(availableGroupIDs) do
-            selected[groupID] = true
-        end
-    else
-        for _, value in ipairs(activities) do
-            local groupID = SafeNumber(value)
-            if groupID then
-                selected[groupID] = true
-            end
-        end
-    end
-
-    local tracked = {}
-    for key, value in pairs(db.autoExcludedDungeonGroups) do
-        if value == true then
-            tracked[tostring(key)] = true
-        end
-    end
-
-    local filterChanged = false
-    for key in pairs(tracked) do
-        local groupID = tonumber(key)
-        if not groupID or not availableGroups[groupID] then
-            tracked[key] = nil
-        elseif db.excludeLockedDungeons ~= true or not lockedGroups[groupID] then
-            if not selected[groupID] then
-                selected[groupID] = true
-                filterChanged = true
-            end
-            tracked[key] = nil
-        end
-    end
-
-    if db.excludeLockedDungeons == true then
-        for groupID in pairs(lockedGroups) do
-            if selected[groupID] then
-                selected[groupID] = nil
-                tracked[tostring(groupID)] = true
-                filterChanged = true
-            end
-        end
-    end
-
-    local newActivities = {}
-    local emitted = {}
-    for _, groupID in ipairs(availableGroupIDs) do
-        if selected[groupID] then
-            newActivities[#newActivities + 1] = groupID
-            emitted[groupID] = true
-        end
-    end
-    for _, value in ipairs(activities) do
-        local groupID = SafeNumber(value)
-        if groupID and selected[groupID] and not emitted[groupID] then
-            newActivities[#newActivities + 1] = groupID
-            emitted[groupID] = true
-        end
-    end
-
-    if filterChanged and #newActivities == 0 then
-        -- Blizzard treats an empty activity list as "all checked." If every
-        -- available dungeon is locked, retain one entry instead of silently
-        -- turning every dungeon back on.
-        local fallbackGroupID = availableGroupIDs[1]
-        newActivities[1] = fallbackGroupID
-        tracked[tostring(fallbackGroupID)] = nil
-    end
-
-    if filterChanged then
-        advancedFilter.activities = newActivities
-        local saved = pcall(C_LFGList.SaveAdvancedFilter, advancedFilter)
-        if not saved then
-            return false
-        end
-    end
-
-    db.autoExcludedDungeonGroups = tracked
-    return filterChanged
-end
-
 local function SetTextStyle(fontString, size, r, g, b, justify)
     fontString:SetFont(STANDARD_TEXT_FONT or "Fonts\\FRIZQT__.TTF", size, "")
     fontString:SetTextColor(r, g, b)
@@ -968,7 +710,6 @@ local function RefreshLockouts()
     local lockouts = ReadSavedLockouts()
     AddMythicPlusProgress(lockouts)
     RenderLockouts(lockouts)
-    SyncLockedDungeonFilters(lockouts)
 end
 
 local function ScheduleRefresh(delay)
@@ -1294,24 +1035,6 @@ local function InstallPVEHooks()
     return true
 end
 
-local function InstallLFGListHooks()
-    if lfgListHooksInstalled then
-        return true
-    end
-    if type(hooksecurefunc) ~= "function"
-        or type(_G.LFGListSearchPanel_SetCategory) ~= "function" then
-        return false
-    end
-
-    hooksecurefunc("LFGListSearchPanel_SetCategory", function(_, categoryID)
-        if SafeNumber(categoryID) == GROUP_FINDER_CATEGORY_ID_DUNGEONS then
-            SyncLockedDungeonFilters()
-        end
-    end)
-    lfgListHooksInstalled = true
-    return true
-end
-
 function ns:IsInstanceLockoutPanelEnabled()
     local db = EnsureDB()
     return db and db.enabled == true
@@ -1326,21 +1049,6 @@ function ns:SetInstanceLockoutPanelEnabled(value)
     db.enabled = value == true
     CreatePanel()
     SyncPanelVisibility()
-end
-
-function ns:IsLockedDungeonFilterEnabled()
-    local db = EnsureDB()
-    return db and db.excludeLockedDungeons == true
-end
-
-function ns:SetLockedDungeonFilterEnabled(value)
-    local db = EnsureDB()
-    if not db then
-        return
-    end
-
-    db.excludeLockedDungeons = value == true
-    SyncLockedDungeonFilters()
 end
 
 function ns:RefreshInstanceLockouts()
@@ -1374,7 +1082,6 @@ function ns:InitializeInstanceLockouts()
                 ScheduleRefresh(0)
             elseif addonName == "Blizzard_GroupFinder" then
                 InstallPVEHooks()
-                InstallLFGListHooks()
                 SyncPanelVisibility()
             end
             return
@@ -1398,6 +1105,5 @@ function ns:InitializeInstanceLockouts()
     end)
 
     InstallPVEHooks()
-    InstallLFGListHooks()
     SyncPanelVisibility()
 end

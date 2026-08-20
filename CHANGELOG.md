@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Corrected missing-group-buff detection for all current persistent class buffs: Blessing of the Bronze now separates its Evoker cast spell from all 13 recipient-class aura IDs, and Shaman's Skyfury is now included alongside Mark of the Wild, Arcane Intellect, Power Word: Fortitude, and Battle Shout.
+- Lowered the Instance Lockouts panel from `DIALOG` to `HIGH` strata so invitation and confirmation popups—and their Accept buttons—remain above it.
 - Placed the Talent Grimoire bar at the intermediate `DIALOG` strata so it remains above the talent window while Blizzard and third-party loadout popups can remain above its dropdown controls.
 - Adapted Mythic+ talent recommendations to Archon's combined live key-range feed, presenting identical compatibility builds as one `Mythic+` mode while retaining PTR and split low/high-key support.
 - Made the missing-group-buff popup use an invisible secure combat-visibility controller, keeping its buttons genuinely hidden during combat without forcing an empty popup to appear while solo; group announcements are also rejected while combat-locked.

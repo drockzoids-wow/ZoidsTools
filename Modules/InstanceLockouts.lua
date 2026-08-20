@@ -754,7 +754,7 @@ local function CreatePanel()
 
     panel = CreateFrame("Frame", PANEL_NAME, UIParent, "BackdropTemplate")
     panel:SetSize(PANEL_WIDTH, 510)
-    panel:SetFrameStrata("DIALOG")
+    panel:SetFrameStrata("HIGH")
     panel:SetClampedToScreen(true)
     panel:SetBackdrop({
         bgFile = "Interface\\Buttons\\WHITE8x8",

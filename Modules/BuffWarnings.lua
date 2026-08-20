@@ -8,21 +8,65 @@ local WARNING_ICON_SIZE = 40
 local WARNING_ICON_GAP = 8
 local MISSING_ICON_FALLBACK = "Interface\\Icons\\INV_Misc_QuestionMark"
 
+-- Persistent one-hour player raid buffs only. Enemy debuffs such as Chaos
+-- Brand, Mystic Touch, and Hunter's Mark are intentionally outside this
+-- player-aura reminder.
+local BLESSING_OF_THE_BRONZE_AURA_BY_CLASS = {
+    DEATHKNIGHT = 381732,
+    DEMONHUNTER = 381741,
+    DRUID = 381746,
+    EVOKER = 381748,
+    HUNTER = 381749,
+    MAGE = 381750,
+    MONK = 381751,
+    PALADIN = 381752,
+    PRIEST = 381753,
+    ROGUE = 381754,
+    SHAMAN = 381756,
+    WARLOCK = 381757,
+    WARRIOR = 381758,
+}
+
+local BLESSING_OF_THE_BRONZE_AURA_IDS = {
+    381732,
+    381741,
+    381746,
+    381748,
+    381749,
+    381750,
+    381751,
+    381752,
+    381753,
+    381754,
+    381756,
+    381757,
+    381758,
+}
+
 local GROUP_BUFFS_BY_CLASS = {
     DRUID = {
-        { spellID = 1126, fallbackName = "Mark of the Wild" },
+        { key = "markOfTheWild", castSpellID = 1126, auraSpellIDs = { 1126 }, fallbackName = "Mark of the Wild" },
     },
     EVOKER = {
-        { spellID = 381748, fallbackName = "Blessing of the Bronze" },
+        {
+            key = "blessingOfTheBronze",
+            castSpellID = 364342,
+            auraSpellIDs = BLESSING_OF_THE_BRONZE_AURA_IDS,
+            auraSpellIDByPlayerClass = BLESSING_OF_THE_BRONZE_AURA_BY_CLASS,
+            fallbackName = "Blessing of the Bronze",
+        },
     },
     MAGE = {
-        { spellID = 1459, fallbackName = "Arcane Intellect" },
+        { key = "arcaneIntellect", castSpellID = 1459, auraSpellIDs = { 1459 }, fallbackName = "Arcane Intellect" },
     },
     PRIEST = {
-        { spellID = 21562, fallbackName = "Power Word: Fortitude" },
+        { key = "powerWordFortitude", castSpellID = 21562, auraSpellIDs = { 21562 }, fallbackName = "Power Word: Fortitude" },
+    },
+    SHAMAN = {
+        { key = "skyfury", castSpellID = 462854, auraSpellIDs = { 462854 }, fallbackName = "Skyfury" },
     },
     WARRIOR = {
-        { spellID = 6673, fallbackName = "Battle Shout" },
+        { key = "battleShout", castSpellID = 6673, auraSpellIDs = { 6673 }, fallbackName = "Battle Shout" },
     },
 }
 
@@ -398,7 +442,11 @@ local function IsWarningAllowed()
     return IsInRaid and IsInRaid()
 end
 
-local function PlayerHasAura(spellID, fallbackName)
+local function PlayerHasAuraBySpellID(spellID)
+    if not spellID then
+        return false
+    end
+
     if C_UnitAuras and C_UnitAuras.GetPlayerAuraBySpellID then
         local ok, aura = pcall(C_UnitAuras.GetPlayerAuraBySpellID, spellID)
 
@@ -407,14 +455,54 @@ local function PlayerHasAura(spellID, fallbackName)
         end
     end
 
-    local spellName = GetSpellName(spellID, fallbackName)
-
-    if C_UnitAuras and C_UnitAuras.GetAuraDataBySpellName and spellName then
-        local ok, aura = pcall(C_UnitAuras.GetAuraDataBySpellName, "player", spellName, "HELPFUL")
+    if C_UnitAuras and C_UnitAuras.GetUnitAuraBySpellID then
+        local ok, aura = pcall(C_UnitAuras.GetUnitAuraBySpellID, "player", spellID)
 
         if ok and aura then
             return true
         end
+    end
+
+    return false
+end
+
+local function GetPlayerClassFile()
+    if type(UnitClass) ~= "function" then
+        return nil
+    end
+
+    local ok, _, classFile = pcall(UnitClass, "player")
+
+    if ok and not IsSecretValue(classFile) and type(classFile) == "string" then
+        return classFile
+    end
+
+    return nil
+end
+
+local function PlayerHasBuff(buff)
+    if not buff then
+        return false
+    end
+
+    local auraSpellIDByPlayerClass = buff.auraSpellIDByPlayerClass
+
+    if auraSpellIDByPlayerClass then
+        local classAuraSpellID = auraSpellIDByPlayerClass[GetPlayerClassFile()]
+
+        if classAuraSpellID then
+            return PlayerHasAuraBySpellID(classAuraSpellID)
+        end
+    end
+
+    for _, auraSpellID in ipairs(buff.auraSpellIDs or {}) do
+        if PlayerHasAuraBySpellID(auraSpellID) then
+            return true
+        end
+    end
+
+    if buff.castSpellID then
+        return PlayerHasAuraBySpellID(buff.castSpellID)
     end
 
     return false
@@ -440,7 +528,7 @@ local function AddExpectedBuffsFromUnit(expectedBuffs, unit)
     end
 
     for _, buff in ipairs(classBuffs) do
-        expectedBuffs[buff.spellID] = buff
+        expectedBuffs[buff.key or buff.castSpellID] = buff
     end
 end
 
@@ -470,13 +558,15 @@ local function BuildMissingBuffList()
     local expectedBuffs = GetExpectedBuffs()
     local missing = {}
 
-    for spellID, buff in pairs(expectedBuffs) do
-        if not PlayerHasAura(spellID, buff.fallbackName) then
+    for _, buff in pairs(expectedBuffs) do
+        if not PlayerHasBuff(buff) then
+            local castSpellID = buff.castSpellID
+
             table.insert(missing, {
-                spellID = spellID,
-                name = GetSpellName(spellID, buff.fallbackName) or buff.fallbackName,
-                icon = GetSpellIcon(spellID),
-                canCast = PlayerCanCastBuff(spellID),
+                spellID = castSpellID,
+                name = GetSpellName(castSpellID, buff.fallbackName) or buff.fallbackName,
+                icon = GetSpellIcon(castSpellID),
+                canCast = PlayerCanCastBuff(castSpellID),
             })
         end
     end

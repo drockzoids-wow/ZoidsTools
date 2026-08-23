@@ -14,6 +14,7 @@ local ROW_HEIGHT = 44
 
 local pages = {
     overview = { key = "overview", label = "Overview", icon = "ZT", page = nil, sectionKey = "overview", description = "Status, quick actions, and common ZoidsTools areas." },
+    warband = { key = "warband", label = "Warband Weekly", icon = "WB", page = "warband", sectionKey = "warband", description = "Account-wide Mythic+, Great Vault, keystone, and current-expansion lockout snapshots." },
     minimap = { key = "minimap", label = "Minimap", icon = "N", page = "general", sectionKey = "core", description = "Minimap shape, title bar, addon buttons, and expansion button tools." },
     general = { key = "general", label = "Interface", icon = "G", page = "general", sectionKey = "core", description = "Widgets, audio sync, Talking Head, and general interface tools." },
     tooltips = { key = "tooltips", label = "Tooltips", icon = "T", page = "tooltips", sectionKey = "core", description = "Class-colored player names, Mythic+ rating, and equipped item level." },
@@ -23,7 +24,7 @@ local pages = {
     professions = { key = "professions", label = "Professions", icon = "P", page = "professions", sectionKey = "character", description = "Molinari-style disenchant, mill, prospect, and lockbox helpers." },
     talents = { key = "talents", label = "Talents", icon = "B", page = "builds", sectionKey = "character", description = "Talent recommendations, source selection, and application helpers." },
     meters = { key = "meters", label = "Meters", icon = "M", page = "meters", sectionKey = "combat_area", description = "Custom damage meters and Blizzard meter profile tools." },
-    combat = { key = "combat", label = "Combat", icon = "C", page = "combat", sectionKey = "combat_area", description = "Keybind text, range tinting, missing buffs, and combat notifications." },
+    combat = { key = "combat", label = "Combat", icon = "C", page = "combat", sectionKey = "combat_area", description = "Keybind text, skill flyouts, range tinting, missing buffs, and combat notifications." },
     unitframes = { key = "unitframes", label = "Unit Frames", icon = "U", page = "unitframes", sectionKey = "combat_area", description = "Blizzard unit frame health, castbar, and aura settings." },
     macros = { key = "macros", label = "Macros", icon = "A", page = "macros", sectionKey = "combat_area", description = "Health, mana, hearthstone, and consumable macro tools." },
     mounts = { key = "mounts", label = "Mounts", icon = "R", page = "mounts", sectionKey = "mounts", description = "Smart mount pools, class utilities, target matching, and rotation history." },
@@ -35,6 +36,7 @@ local pages = {
 
 local sections = {
     { key = "overview", label = "Overview", icon = "ZT", iconTexture = "Interface\\Icons\\INV_Misc_Map_01", defaultPageKey = "overview", tabs = { pages.overview } },
+    { key = "warband", label = "Warband", icon = "WB", iconTexture = "Interface\\Icons\\INV_Misc_GroupLooking", defaultPageKey = "warband", tabs = { pages.warband } },
     { key = "core", label = "Core", icon = "UI", iconTexture = "Interface\\Icons\\INV_Misc_Gear_01", defaultPageKey = "minimap", tabs = { pages.minimap, pages.general, pages.tooltips, pages.windows } },
     { key = "character", label = "Character", icon = "CHAR", iconTexture = "Interface\\Icons\\INV_Misc_GroupLooking", defaultPageKey = "items", tabs = { pages.items, pages.professions, pages.talents } },
     { key = "chat", label = "Chat", icon = "CHAT", iconTexture = "Interface\\Icons\\INV_Letter_15", defaultPageKey = "chat", tabs = { pages.chat } },
@@ -55,6 +57,8 @@ local pageAliases = {
     quest = "quests",
     dialog = "dialogs",
     meter = "meters",
+    weekly = "warband",
+    dashboard = "warband",
 }
 
 local sectionByKey = {}
@@ -354,6 +358,400 @@ local function IsDescendantOf(frame, ancestor)
     return false
 end
 
+local WARBAND_COLUMNS = {
+    { key = "character", label = "CHARACTER", width = 186, align = "LEFT" },
+    { key = "itemLevel", label = "ILVL", width = 52, align = "CENTER" },
+    { key = "rating", label = "M+", width = 58, align = "CENTER" },
+    { key = "best", label = "BEST", width = 55, align = "CENTER" },
+    { key = "keystone", label = "KEYSTONE", width = 122, align = "CENTER" },
+    { key = "vault", label = "VAULT", width = 66, align = "CENTER" },
+    { key = "saves", label = "SAVES", width = 58, align = "CENTER" },
+    { key = "updated", label = "UPDATED", width = 94, align = "RIGHT" },
+}
+
+local function WarbandNow()
+    if type(GetServerTime) == "function" then
+        local ok, value = pcall(GetServerTime)
+        if ok and type(value) == "number" then
+            return value
+        end
+    end
+    if type(time) == "function" then
+        local ok, value = pcall(time)
+        if ok and type(value) == "number" then
+            return value
+        end
+    end
+    return 0
+end
+
+local function FormatWarbandDuration(seconds)
+    seconds = math.max(0, math.floor(tonumber(seconds) or 0))
+    local days = math.floor(seconds / 86400)
+    local hours = math.floor((seconds % 86400) / 3600)
+    local minutes = math.floor((seconds % 3600) / 60)
+    if days > 0 then
+        return string.format("%dd %dh", days, hours)
+    elseif hours > 0 then
+        return string.format("%dh %dm", hours, minutes)
+    end
+    return string.format("%dm", math.max(1, minutes))
+end
+
+local function FormatWarbandAge(timestamp)
+    timestamp = tonumber(timestamp)
+    if not timestamp then
+        return "Unknown"
+    end
+
+    local elapsed = math.max(0, WarbandNow() - timestamp)
+    if elapsed < 60 then
+        return "Now"
+    elseif elapsed < 3600 then
+        return string.format("%dm ago", math.floor(elapsed / 60))
+    elseif elapsed < 86400 then
+        return string.format("%dh ago", math.floor(elapsed / 3600))
+    end
+    return string.format("%dd ago", math.floor(elapsed / 86400))
+end
+
+local function FormatWarbandBest(level)
+    level = tonumber(level)
+    if not level then
+        return "—"
+    elseif level >= 2 then
+        return "+" .. math.floor(level)
+    elseif level == 0 then
+        return "+0"
+    elseif level == -1 then
+        return "Heroic"
+    end
+    return "—"
+end
+
+local function GetWarbandClassColor(classFile)
+    local colors = CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS
+    local color = colors and classFile and colors[classFile]
+    if color then
+        return color.r or 1, color.g or 1, color.b or 1
+    end
+    return 0.92, 0.92, 0.92
+end
+
+local function GetVaultCategoryText(category)
+    if type(category) ~= "table" or (tonumber(category.total) or 0) <= 0 then
+        return "Not available"
+    end
+
+    local detail = string.format("%d/%d slots", tonumber(category.unlocked) or 0, tonumber(category.total) or 0)
+    for _, slot in ipairs(category.slots or {}) do
+        if not slot.unlocked then
+            detail = detail .. string.format("  •  Next %d/%d", tonumber(slot.progress) or 0, tonumber(slot.threshold) or 0)
+            break
+        end
+    end
+    return detail
+end
+
+local function ShowWarbandCharacterTooltip(row)
+    local info = row and row.info
+    if not info or not GameTooltip then
+        return
+    end
+
+    GameTooltip:SetOwner(row, "ANCHOR_RIGHT")
+    local r, g, b = GetWarbandClassColor(info.classFile)
+    GameTooltip:SetText(tostring(info.name or "Unknown"), r, g, b)
+    GameTooltip:AddLine(string.format("%s  •  Level %d %s", tostring(info.realm or "Unknown Realm"), tonumber(info.level) or 0, tostring(info.specialization or info.className or "")), 0.72, 0.72, 0.75)
+    GameTooltip:AddDoubleLine("Equipped item level", tostring(tonumber(info.itemLevel) or 0), 0.82, 0.82, 0.82, 1, 1, 1)
+    GameTooltip:AddDoubleLine("Mythic+ rating", tostring(tonumber(info.mythicPlusRating) or 0), 0.82, 0.82, 0.82, 1, 0.72, 0.18)
+
+    if info.weeklyExpired then
+        GameTooltip:AddLine(" ")
+        GameTooltip:AddLine("This character's weekly snapshot expired at reset.", 1, 0.55, 0.24, true)
+        GameTooltip:AddLine("Log into the character to refresh its weekly progress.", 0.72, 0.72, 0.75, true)
+    else
+        GameTooltip:AddDoubleLine("Best run this week", FormatWarbandBest(info.weeklyBestLevel), 0.82, 0.82, 0.82, 1, 0.82, 0.22)
+        local keystone = info.keystone
+        local keystoneText = "None"
+        if type(keystone) == "table" and tonumber(keystone.level) then
+            keystoneText = string.format("+%d %s", keystone.level, tostring(keystone.name or "Unknown dungeon"))
+        end
+        GameTooltip:AddDoubleLine("Owned keystone", keystoneText, 0.82, 0.82, 0.82, 0.72, 0.82, 1)
+
+        local vault = info.vault
+        if type(vault) == "table" then
+            GameTooltip:AddLine(" ")
+            GameTooltip:AddLine("Great Vault", 1, 0.82, 0.18)
+            GameTooltip:AddDoubleLine("Dungeons", GetVaultCategoryText(vault.dungeons), 0.82, 0.82, 0.82, 1, 1, 1)
+            GameTooltip:AddDoubleLine("Raids", GetVaultCategoryText(vault.raid), 0.82, 0.82, 0.82, 1, 1, 1)
+            GameTooltip:AddDoubleLine("World", GetVaultCategoryText(vault.world), 0.82, 0.82, 0.82, 1, 1, 1)
+            if type(vault.pvp) == "table" and (tonumber(vault.pvp.total) or 0) > 0 then
+                GameTooltip:AddDoubleLine("Rated PvP", GetVaultCategoryText(vault.pvp), 0.82, 0.82, 0.82, 1, 1, 1)
+            end
+            if vault.rewardAvailable then
+                GameTooltip:AddLine("A previous Great Vault reward is available.", 0.36, 0.95, 0.52)
+            end
+        end
+
+        local lockouts = info.lockouts
+        if type(lockouts) == "table" then
+            local dungeonCount = type(lockouts.dungeons) == "table" and #lockouts.dungeons or 0
+            local raidCount = type(lockouts.raids) == "table" and #lockouts.raids or 0
+            if dungeonCount + raidCount > 0 then
+                GameTooltip:AddLine(" ")
+                GameTooltip:AddLine("Current-expansion saves", 1, 0.82, 0.18)
+                for _, lockout in ipairs(lockouts.dungeons or {}) do
+                    GameTooltip:AddDoubleLine(lockout.name or "Mythic dungeon", lockout.resetAt and FormatWarbandDuration(lockout.resetAt - WarbandNow()) or "Saved", 0.82, 0.82, 0.82, 0.58, 0.72, 0.95)
+                end
+                for _, lockout in ipairs(lockouts.raids or {}) do
+                    local progress = tonumber(lockout.numEncounters) and lockout.numEncounters > 0
+                        and string.format("%d/%d", tonumber(lockout.progress) or 0, lockout.numEncounters)
+                        or (lockout.difficultyName or "Saved")
+                    GameTooltip:AddDoubleLine(lockout.name or "Raid", progress, 0.82, 0.82, 0.82, 0.58, 0.72, 0.95)
+                end
+            end
+        end
+    end
+
+    local updatedText = FormatWarbandAge(info.lastSeen)
+    if type(date) == "function" and tonumber(info.lastSeen) then
+        local ok, formatted = pcall(date, "%b %d, %Y %I:%M %p", info.lastSeen)
+        if ok and formatted then
+            updatedText = formatted
+        end
+    end
+    GameTooltip:AddLine(" ")
+    GameTooltip:AddDoubleLine("Last updated", updatedText, 0.55, 0.55, 0.58, 0.75, 0.75, 0.78)
+    GameTooltip:Show()
+end
+
+local function CreateWarbandPage(parent)
+    local page = CreateFrame("Frame", nil, parent)
+    page:SetAllPoints()
+    page:Hide()
+
+    local summary = CreateSectionCard(page, "Current Week", 760, 68)
+    summary:SetPoint("TOPLEFT", page, "TOPLEFT", 0, 0)
+
+    summary.reset = summary:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    summary.reset:SetPoint("TOPLEFT", summary, "TOPLEFT", 18, -40)
+    summary.reset:SetWidth(220)
+    summary.reset:SetJustifyH("LEFT")
+
+    summary.characters = summary:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    summary.characters:SetPoint("LEFT", summary.reset, "RIGHT", 12, 0)
+    summary.characters:SetWidth(170)
+    summary.characters:SetJustifyH("LEFT")
+
+    summary.vault = summary:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    summary.vault:SetPoint("LEFT", summary.characters, "RIGHT", 12, 0)
+    summary.vault:SetWidth(170)
+    summary.vault:SetJustifyH("LEFT")
+
+    local refreshButton = CreateButton(summary, "Refresh Current", 144, 24)
+    refreshButton:SetPoint("RIGHT", summary, "RIGHT", -12, -8)
+    refreshButton:SetScript("OnClick", function()
+        if ns.RequestWarbandWeeklyRefresh then
+            ns:RequestWarbandWeeklyRefresh()
+        end
+    end)
+
+    local showLeveling = ns.UI.CreateCheckbox(
+        page,
+        "Include leveling characters",
+        "Shows saved characters below the current expansion's maximum level.",
+        function() return ns.GetWarbandWeeklyShowLevelingCharacters and ns:GetWarbandWeeklyShowLevelingCharacters() end,
+        function(value) if ns.SetWarbandWeeklyShowLevelingCharacters then ns:SetWarbandWeeklyShowLevelingCharacters(value) end end
+    )
+    showLeveling:SetPoint("TOPLEFT", summary, "BOTTOMLEFT", 0, -6)
+
+    page.freshness = page:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
+    page.freshness:SetPoint("RIGHT", summary, "BOTTOMRIGHT", 0, -23)
+    page.freshness:SetText("Offline characters use their last-login snapshot.")
+
+    page.header = CreateFrame("Frame", nil, page, "BackdropTemplate")
+    page.header:SetPoint("TOPLEFT", summary, "BOTTOMLEFT", 0, -39)
+    page.header:SetSize(760, 24)
+    ApplyBackdrop(page.header, 0.56)
+
+    local x = 10
+    for _, column in ipairs(WARBAND_COLUMNS) do
+        local label = page.header:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
+        label:SetPoint("LEFT", page.header, "LEFT", x, 0)
+        label:SetWidth(column.width)
+        label:SetJustifyH(column.align)
+        label:SetTextColor(0.68, 0.69, 0.72)
+        label:SetText(column.label)
+        x = x + column.width
+    end
+
+    page.scroll = CreateFrame("ScrollFrame", nil, page)
+    page.scroll:SetPoint("TOPLEFT", page.header, "BOTTOMLEFT", 0, -5)
+    page.scroll:SetPoint("BOTTOMRIGHT", page, "BOTTOMRIGHT", -28, 24)
+    page.scroll:SetClipsChildren(true)
+    page.scroll:EnableMouseWheel(true)
+
+    page.content = CreateFrame("Frame", nil, page.scroll)
+    page.content:SetSize(760, 1)
+    page.scroll:SetScrollChild(page.content)
+    page.rows = {}
+
+    local function CreateRow()
+        local row = CreateFrame("Button", nil, page.content, "BackdropTemplate")
+        row:SetSize(760, 50)
+        ApplyBackdrop(row, 0.42)
+
+        row.accent = row:CreateTexture(nil, "ARTWORK")
+        row.accent:SetPoint("TOPLEFT", 4, -5)
+        row.accent:SetPoint("BOTTOMLEFT", 4, 5)
+        row.accent:SetWidth(3)
+
+        row.name = row:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+        row.name:SetPoint("TOPLEFT", row, "TOPLEFT", 14, -8)
+        row.name:SetWidth(WARBAND_COLUMNS[1].width - 16)
+        row.name:SetJustifyH("LEFT")
+        row.name:SetWordWrap(false)
+
+        row.detail = row:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
+        row.detail:SetPoint("TOPLEFT", row.name, "BOTTOMLEFT", 0, -3)
+        row.detail:SetWidth(WARBAND_COLUMNS[1].width - 16)
+        row.detail:SetJustifyH("LEFT")
+        row.detail:SetWordWrap(false)
+
+        row.values = {}
+        local valueX = 10 + WARBAND_COLUMNS[1].width
+        for index = 2, #WARBAND_COLUMNS do
+            local column = WARBAND_COLUMNS[index]
+            local value = row:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+            value:SetPoint("CENTER", row, "LEFT", valueX + column.width / 2, 0)
+            value:SetWidth(column.width - 4)
+            value:SetJustifyH(column.align)
+            value:SetWordWrap(false)
+            row.values[column.key] = value
+            valueX = valueX + column.width
+        end
+
+        row:SetScript("OnEnter", function(self)
+            self:SetBackdropBorderColor(0.84, 0.64, 0.22, 0.82)
+            ShowWarbandCharacterTooltip(self)
+        end)
+        row:SetScript("OnLeave", function(self)
+            self:SetBackdropBorderColor(0.25, 0.28, 0.33, 0.58)
+            GameTooltip:Hide()
+        end)
+        return row
+    end
+
+    page.empty = page:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+    page.empty:SetPoint("TOP", page.header, "BOTTOM", 0, -64)
+    page.empty:SetWidth(700)
+    page.empty:SetJustifyH("CENTER")
+    page.empty:SetTextColor(0.72, 0.72, 0.74)
+    page.empty:SetText("No character snapshots yet. Log into a character to add it to the dashboard.")
+
+    page.scroll:SetScript("OnSizeChanged", function(self, width)
+        width = tonumber(width)
+        if width then
+            page.content:SetWidth(math.max(1, width))
+            for _, row in ipairs(page.rows) do
+                row:SetWidth(math.max(1, width))
+            end
+        end
+    end)
+    page.scroll:SetScript("OnMouseWheel", function(self, delta)
+        local current = tonumber(self:GetVerticalScroll()) or 0
+        local range = tonumber(self:GetVerticalScrollRange()) or 0
+        self:SetVerticalScroll(math.max(0, math.min(range, current - (tonumber(delta) or 0) * 52)))
+    end)
+
+    function page:Refresh()
+        showLeveling:Refresh()
+        local characters = ns.GetWarbandWeeklyCharacters and ns:GetWarbandWeeklyCharacters() or {}
+        local unlocked = 0
+        local total = 0
+        for _, info in ipairs(characters) do
+            if not info.weeklyExpired and type(info.vault) == "table" then
+                unlocked = unlocked + (tonumber(info.vault.unlocked) or 0)
+                total = total + (tonumber(info.vault.total) or 0)
+            end
+        end
+
+        local resetAt = ns.GetWarbandWeeklyResetAt and ns:GetWarbandWeeklyResetAt()
+        summary.reset:SetText("RESET  |cffffffff" .. (resetAt and FormatWarbandDuration(resetAt - WarbandNow()) or "Unavailable") .. "|r")
+        summary.characters:SetText(string.format("CHARACTERS  |cffffffff%d|r", #characters))
+        summary.vault:SetText(string.format("VAULT SLOTS  |cffffffff%d/%d|r", unlocked, total))
+
+        for index, info in ipairs(characters) do
+            local row = page.rows[index]
+            if not row then
+                row = CreateRow()
+                page.rows[index] = row
+            end
+            row:ClearAllPoints()
+            row:SetPoint("TOPLEFT", page.content, "TOPLEFT", 0, -((index - 1) * 53))
+            row:SetWidth(page.content:GetWidth() or 760)
+            row.info = info
+
+            local r, g, b = GetWarbandClassColor(info.classFile)
+            row.accent:SetColorTexture(r, g, b, 0.95)
+            row.name:SetText((info.isCurrent and "• " or "") .. tostring(info.name or "Unknown"))
+            row.name:SetTextColor(r, g, b)
+            row.detail:SetText(string.format("%s  •  %s", tostring(info.specialization or info.className or "Unknown"), tostring(info.realm or "Unknown Realm")))
+
+            row.values.itemLevel:SetText((tonumber(info.itemLevel) or 0) > 0 and tostring(math.floor(info.itemLevel)) or "—")
+            row.values.rating:SetText(tostring(math.floor(tonumber(info.mythicPlusRating) or 0)))
+
+            if info.weeklyExpired then
+                row.values.best:SetText("Reset")
+                row.values.keystone:SetText("Refresh")
+                row.values.vault:SetText("Reset")
+                row.values.saves:SetText("—")
+                row.values.best:SetTextColor(0.52, 0.52, 0.55)
+                row.values.keystone:SetTextColor(0.52, 0.52, 0.55)
+                row.values.vault:SetTextColor(0.52, 0.52, 0.55)
+            else
+                row.values.best:SetText(FormatWarbandBest(info.weeklyBestLevel))
+                row.values.best:SetTextColor(1, 0.78, 0.20)
+                local keystone = info.keystone
+                row.values.keystone:SetText(type(keystone) == "table" and string.format("+%d %s", tonumber(keystone.level) or 0, tostring(keystone.name or "")) or "—")
+                row.values.keystone:SetTextColor(0.82, 0.86, 0.95)
+                local vault = type(info.vault) == "table" and info.vault or {}
+                row.values.vault:SetText((tonumber(vault.total) or 0) > 0 and string.format("%d/%d%s", tonumber(vault.unlocked) or 0, tonumber(vault.total) or 0, vault.rewardAvailable and " !" or "") or "—")
+                row.values.vault:SetTextColor(vault.rewardAvailable and 0.42 or 0.92, vault.rewardAvailable and 0.95 or 0.92, vault.rewardAvailable and 0.52 or 0.92)
+                local lockouts = type(info.lockouts) == "table" and info.lockouts or {}
+                local saves = (type(lockouts.dungeons) == "table" and #lockouts.dungeons or 0) + (type(lockouts.raids) == "table" and #lockouts.raids or 0)
+                row.values.saves:SetText(tostring(saves))
+            end
+            row.values.updated:SetText(FormatWarbandAge(info.lastSeen))
+            row:Show()
+        end
+
+        for index = #characters + 1, #page.rows do
+            page.rows[index].info = nil
+            page.rows[index]:Hide()
+        end
+        page.empty:SetShown(#characters == 0)
+        page.content:SetHeight(math.max(1, #characters * 53))
+    end
+
+    page:SetScript("OnShow", function(self)
+        self:Refresh()
+        if ns.RequestWarbandWeeklyRefresh then
+            ns:RequestWarbandWeeklyRefresh()
+        end
+    end)
+    local updateElapsed = 0
+    page:SetScript("OnUpdate", function(self, elapsed)
+        updateElapsed = updateElapsed + (tonumber(elapsed) or 0)
+        if updateElapsed >= 60 then
+            updateElapsed = 0
+            self:Refresh()
+        end
+    end)
+    return page
+end
+
 local function CreateMinimapPage(parent)
     local page = CreateFrame("Frame", nil, parent)
     page:SetAllPoints()
@@ -560,7 +958,7 @@ local function CreateInterfacePage(parent)
     local instanceLockouts = ns.UI.CreateCheckbox(
         qualityCard,
         "Show instance lockout panel",
-        "Shows current-expansion Mythic dungeon and raid saves beside Dungeons & Raids, with legacy lockouts collapsed below.",
+        "Shows every active seasonal Mythic+ dungeon with weekly and season bests, base-Mythic loot locks, current raid saves, and collapsed legacy lockouts.",
         function() return ns.IsInstanceLockoutPanelEnabled and ns:IsInstanceLockoutPanelEnabled() end,
         function(value) if ns.SetInstanceLockoutPanelEnabled then ns:SetInstanceLockoutPanelEnabled(value) end end
     )
@@ -2386,7 +2784,7 @@ local function CreateCombatPage(parent)
     local leftX = 0
     local rightX = cardW + 14
 
-    local input = CreateSectionCard(page, "Input and Alerts", cardW, 250)
+    local input = CreateSectionCard(page, "Input and Alerts", cardW, 224)
     input:SetPoint("TOPLEFT", page, "TOPLEFT", leftX, 0)
 
     local castOnKeyDown = UI.CreateCheckbox(
@@ -2454,6 +2852,175 @@ local function CreateCombatPage(parent)
     status:SetWidth(cardW - 36)
     status:SetJustifyH("LEFT")
     status:SetTextColor(0.78, 0.78, 0.72)
+
+    local flyouts = CreateSectionCard(page, "Skill Flyouts", cardW, 184)
+    flyouts:SetPoint("TOPLEFT", input, "BOTTOMLEFT", 0, -10)
+
+    local defaultFlyoutDirection = UI.CreateDropdown(
+        flyouts,
+        "Default direction",
+        "Chooses where skill flyouts such as Summon Demon expand. Blizzard automatic follows the action bar's position.",
+        ns.GetSkillFlyoutDirectionOptions and ns:GetSkillFlyoutDirectionOptions(false) or {
+            { value = "AUTO", text = "Blizzard automatic" },
+            { value = "UP", text = "Up" },
+            { value = "DOWN", text = "Down" },
+            { value = "LEFT", text = "Left" },
+            { value = "RIGHT", text = "Right" },
+        },
+        function() return ns.GetSkillFlyoutDefaultDirection and ns:GetSkillFlyoutDefaultDirection() or "AUTO" end,
+        function(value) if ns.SetSkillFlyoutDefaultDirection then ns:SetSkillFlyoutDefaultDirection(value) end end,
+        330
+    )
+    PlaceFirst(defaultFlyoutDirection, flyouts)
+
+    local knownFlyoutOptions = ns.GetKnownSkillFlyoutOptions and ns:GetKnownSkillFlyoutOptions() or {}
+    local selectedFlyoutIDs = {}
+    local selectedFlyoutDirection
+    local noFlyoutsDetected = #knownFlyoutOptions == 0
+
+    local function EnsureFlyoutSelection(options)
+        local available = {}
+
+        for _, option in ipairs(options or {}) do
+            local flyoutID = tonumber(option.value)
+            if flyoutID and flyoutID > 0 then
+                available[math.floor(flyoutID)] = true
+            end
+        end
+
+        for flyoutID in pairs(selectedFlyoutIDs) do
+            if not available[flyoutID] then
+                selectedFlyoutIDs[flyoutID] = nil
+            end
+        end
+
+        if next(selectedFlyoutIDs) == nil and next(available) ~= nil then
+            local preferred = ns.GetPreferredSkillFlyoutID and tonumber(ns:GetPreferredSkillFlyoutID()) or nil
+            preferred = preferred and math.floor(preferred) or nil
+
+            if preferred and available[preferred] then
+                selectedFlyoutIDs[preferred] = true
+            else
+                local firstID = options[1] and tonumber(options[1].value)
+                if firstID then
+                    selectedFlyoutIDs[math.floor(firstID)] = true
+                end
+            end
+        end
+    end
+
+    local function BuildFlyoutSelectionOptions(options)
+        local result = {}
+
+        for _, source in ipairs(options or {}) do
+            local flyoutID = tonumber(source.value)
+            if flyoutID and flyoutID > 0 then
+                flyoutID = math.floor(flyoutID)
+                result[#result + 1] = {
+                    value = flyoutID,
+                    text = source.text or ("Flyout " .. flyoutID),
+                    shortText = source.shortText or source.text,
+                    tooltip = source.tooltip,
+                    getter = function()
+                        return selectedFlyoutIDs[flyoutID] == true
+                    end,
+                    setter = function(value)
+                        selectedFlyoutIDs[flyoutID] = value == true or nil
+                        if selectedFlyoutDirection then
+                            selectedFlyoutDirection:Refresh()
+                            UI.SetControlEnabled(selectedFlyoutDirection, next(selectedFlyoutIDs) ~= nil)
+                        end
+                    end,
+                }
+            end
+        end
+        return result
+    end
+
+    local function GetSelectedFlyoutIDs()
+        local result = {}
+
+        for _, option in ipairs(knownFlyoutOptions) do
+            local flyoutID = tonumber(option.value)
+            flyoutID = flyoutID and math.floor(flyoutID) or nil
+            if flyoutID and selectedFlyoutIDs[flyoutID] then
+                result[#result + 1] = flyoutID
+            end
+        end
+        return result
+    end
+
+    local function GetSelectedFlyoutDirection()
+        local commonDirection
+
+        for _, flyoutID in ipairs(GetSelectedFlyoutIDs()) do
+            local direction = ns.GetSkillFlyoutOverrideDirection
+                and ns:GetSkillFlyoutOverrideDirection(flyoutID)
+                or "INHERIT"
+
+            if commonDirection and commonDirection ~= direction then
+                return "MIXED"
+            end
+            commonDirection = direction
+        end
+        return commonDirection or "INHERIT"
+    end
+
+    local bulkDirectionOptions = {}
+    for _, option in ipairs(ns.GetSkillFlyoutDirectionOptions and ns:GetSkillFlyoutDirectionOptions(true) or {
+        { value = "INHERIT", text = "Use default" },
+        { value = "AUTO", text = "Blizzard automatic" },
+        { value = "UP", text = "Up" },
+        { value = "DOWN", text = "Down" },
+        { value = "LEFT", text = "Left" },
+        { value = "RIGHT", text = "Right" },
+    }) do
+        bulkDirectionOptions[#bulkDirectionOptions + 1] = option
+    end
+    bulkDirectionOptions[#bulkDirectionOptions + 1] = { value = "MIXED", text = "Mixed directions" }
+
+    EnsureFlyoutSelection(knownFlyoutOptions)
+
+    local flyoutSelector = UI.CreateMultiSelectDropdown(
+        flyouts,
+        "Select flyouts",
+        "Select one or more known skill flyouts. Overrides follow each named flyout if it is moved to another action-bar slot.",
+        BuildFlyoutSelectionOptions(knownFlyoutOptions),
+        200
+    )
+    flyoutSelector:SetPoint("TOPLEFT", defaultFlyoutDirection, "BOTTOMLEFT", 0, -12)
+
+    selectedFlyoutDirection = UI.CreateDropdown(
+        flyouts,
+        "Set selected to",
+        "Applies one direction to every selected flyout. Use default removes their individual overrides.",
+        bulkDirectionOptions,
+        GetSelectedFlyoutDirection,
+        function(value)
+            if value == "MIXED" then
+                selectedFlyoutDirection:Refresh()
+                return
+            end
+
+            local selected = GetSelectedFlyoutIDs()
+            if ns.SetSkillFlyoutOverrideDirections then
+                ns:SetSkillFlyoutOverrideDirections(selected, value)
+            elseif ns.SetSkillFlyoutOverrideDirection then
+                for _, flyoutID in ipairs(selected) do
+                    ns:SetSkillFlyoutOverrideDirection(flyoutID, value)
+                end
+            end
+            selectedFlyoutDirection:Refresh()
+        end,
+        126
+    )
+    selectedFlyoutDirection:SetPoint("TOPLEFT", flyoutSelector, "TOPRIGHT", 12, 0)
+
+    local flyoutNote = flyouts:CreateFontString(nil, "ARTWORK", "GameFontDisableSmall")
+    flyoutNote:SetPoint("BOTTOMLEFT", flyouts, "BOTTOMLEFT", 18, 10)
+    flyoutNote:SetPoint("RIGHT", flyouts, "RIGHT", -18, 0)
+    flyoutNote:SetJustifyH("LEFT")
+    flyoutNote:SetText("Select one or more flyouts; changes apply outside combat and remain active during combat.")
 
     local keybinds = CreateSectionCard(page, "Action Keybind Text", cardW, 390)
     keybinds:SetPoint("TOPLEFT", page, "TOPLEFT", rightX, 0)
@@ -2568,6 +3135,17 @@ local function CreateCombatPage(parent)
         combatBanner:Refresh()
         combatBannerPersistent:Refresh()
         combatBannerLocked:Refresh()
+        defaultFlyoutDirection:Refresh()
+
+        local refreshedFlyoutOptions = ns.GetKnownSkillFlyoutOptions and ns:GetKnownSkillFlyoutOptions() or {}
+        noFlyoutsDetected = #refreshedFlyoutOptions == 0
+
+        knownFlyoutOptions = refreshedFlyoutOptions
+        EnsureFlyoutSelection(knownFlyoutOptions)
+        flyoutSelector:SetOptions(BuildFlyoutSelectionOptions(knownFlyoutOptions))
+        selectedFlyoutDirection:Refresh()
+        UI.SetControlEnabled(flyoutSelector, not noFlyoutsDetected)
+        UI.SetControlEnabled(selectedFlyoutDirection, not noFlyoutsDetected and next(selectedFlyoutIDs) ~= nil)
         keybindTextEnabled:Refresh()
         shortenKeybindText:Refresh()
         keybindFont:Refresh()
@@ -3749,6 +4327,7 @@ local function CreateModernWindow()
     frame.overview:SetAllPoints()
     frame.overview.ZTPageKey = "overview"
     frame.modernPages = {
+        warband = CreateModernPage(frame.pageHost, "warband", CreateWarbandPage),
         minimap = CreateModernPage(frame.pageHost, "minimap", CreateMinimapPage),
         general = CreateModernPage(frame.pageHost, "general", CreateInterfacePage),
         tooltips = CreateModernPage(frame.pageHost, "tooltips", CreateTooltipsPage),
@@ -3822,6 +4401,7 @@ local function CreateModernWindow()
     frame.quickTitle:SetText("Feature Areas")
 
     frame.areaRows = {
+        CreateAreaRow(frame.overview, "Warband Weekly", "Mythic+, Great Vault, keystones, and current-expansion saves across your characters.", "warband"),
         CreateAreaRow(frame.overview, "Core", "Minimap, player tooltips, window movement, audio sync, and Talking Head.", "minimap"),
         CreateAreaRow(frame.overview, "Character", "Items, stat goals, profession helper, talents, and recommendations.", "items"),
         CreateAreaRow(frame.overview, "Combat", "Meters, keybind text, range tint, missing buffs, unit frames, and macros.", "meters"),
@@ -3855,6 +4435,12 @@ local function CreateModernWindow()
     frame.placeholderBody:SetTextColor(0.82, 0.82, 0.78)
 
     UI2.frame = frame
+    UI2.RefreshWarbandDashboard = function()
+        local warbandPage = frame.modernPages and frame.modernPages.warband
+        if warbandPage and warbandPage:IsShown() and warbandPage.Refresh then
+            warbandPage:Refresh()
+        end
+    end
     RestorePosition(frame)
 
     return frame

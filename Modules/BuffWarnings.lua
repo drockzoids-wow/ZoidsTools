@@ -319,7 +319,7 @@ local function GetGroupChatType()
     return nil
 end
 
-local function AnnounceMissingBuff(spellID, buffName)
+local function PrepareMissingBuffMessage(spellID, buffName)
     if IsCombatLocked() then
         refreshAfterCombat = true
         return
@@ -332,15 +332,31 @@ local function AnnounceMissingBuff(spellID, buffName)
     end
 
     local message = "Missing group buff: " .. GetBuffChatLink(spellID, buffName)
-    local sender = C_ChatInfo and C_ChatInfo.SendChatMessage or SendChatMessage
-    if type(sender) ~= "function" then
+    if not ChatFrameUtil or type(ChatFrameUtil.OpenChat) ~= "function" then
         ns:Print(message)
         return
     end
 
-    local ok = pcall(sender, message, chatType)
-    if not ok then
-        ns:Print("Unable to post the missing buff to group chat.")
+    -- SendChatMessage is restricted in 12.1, particularly for automated
+    -- messages during instance encounters. Open Blizzard's edit box instead
+    -- so the player explicitly confirms the prepared message with Enter.
+    local editBox = ChatFrameUtil.OpenChat("")
+    if not editBox then
+        ns:Print(message)
+        return
+    end
+
+    if type(editBox.SetChatType) == "function" then
+        editBox:SetChatType(chatType)
+    end
+    if type(editBox.SetText) == "function" then
+        editBox:SetText(message)
+    end
+    if type(editBox.SetCursorPosition) == "function" then
+        editBox:SetCursorPosition(#message)
+    end
+    if type(editBox.UpdateHeader) == "function" then
+        editBox:UpdateHeader()
     end
 end
 
@@ -612,7 +628,8 @@ local function GetWarningIconButton(frame, index)
             GameTooltip:AddLine("Left-click to cast.", 0.8, 1, 0.8, true)
         else
             GameTooltip:AddLine("Someone in your group can provide this buff.", 1, 0.85, 0.55, true)
-            GameTooltip:AddLine("Left-click to ask the group for it.", 0.8, 1, 0.8, true)
+            GameTooltip:AddLine("Left-click to prepare a group message.", 0.8, 1, 0.8, true)
+            GameTooltip:AddLine("Press Enter to send it.", 0.8, 0.8, 0.8, true)
         end
 
         GameTooltip:AddLine("Drag the popup by the empty space.", 0.8, 0.8, 0.8, true)
@@ -623,7 +640,7 @@ local function GetWarningIconButton(frame, index)
     end)
     button:SetScript("PostClick", function(self, mouseButton)
         if mouseButton == "LeftButton" and not self.canCastBuff and not IsCombatLocked() then
-            AnnounceMissingBuff(self.spellID, self.buffName)
+            PrepareMissingBuffMessage(self.spellID, self.buffName)
         end
     end)
 

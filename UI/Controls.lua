@@ -582,6 +582,7 @@ function UI.CreateMultiSelectDropdown(parent, label, tooltip, options, width)
     local control = CreateFrame("Frame", nil, parent)
     local dropdownWidth = width or 320
     local rowHeight = 26
+    options = type(options) == "table" and options or {}
 
     control:SetSize(dropdownWidth, 48)
 
@@ -700,12 +701,14 @@ function UI.CreateMultiSelectDropdown(parent, label, tooltip, options, width)
 
     control.rows = {}
 
-    for index, option in ipairs(options) do
-        local row = CreateFrame("Button", nil, control.menu, "BackdropTemplate")
+    local function GetOrCreateRow(index)
+        local row = control.rows[index]
+        if row then return row end
+
+        row = CreateFrame("Button", nil, control.menu, "BackdropTemplate")
         row:SetPoint("TOPLEFT", control.menu, "TOPLEFT", 8, -6 - ((index - 1) * rowHeight))
         row:SetSize(dropdownWidth - 16, rowHeight)
         row:RegisterForClicks("LeftButtonUp")
-        row.tooltip = option.tooltip
 
         row.highlight = row:CreateTexture(nil, "BACKGROUND")
         row.highlight:SetPoint("TOPLEFT", 2, -1)
@@ -736,9 +739,11 @@ function UI.CreateMultiSelectDropdown(parent, label, tooltip, options, width)
         row.text:SetPoint("LEFT", row.box, "RIGHT", 8, 0)
         row.text:SetPoint("RIGHT", row, "RIGHT", -8, 0)
         row.text:SetJustifyH("LEFT")
-        row.text:SetText(option.text)
 
         row:SetScript("OnClick", function(self)
+            local option = self.option
+            if not option then return end
+
             local nextValue = not (option.getter and option.getter() == true)
 
             if option.setter then
@@ -754,7 +759,8 @@ function UI.CreateMultiSelectDropdown(parent, label, tooltip, options, width)
             self.highlight:Show()
             self.text:SetTextColor(1, 0.86, 0.18)
 
-            if not self.tooltip then
+            local option = self.option
+            if not option or not self.tooltip then
                 return
             end
 
@@ -773,6 +779,28 @@ function UI.CreateMultiSelectDropdown(parent, label, tooltip, options, width)
         end)
 
         control.rows[index] = row
+        return row
+    end
+
+    function control:SetOptions(newOptions)
+        options = type(newOptions) == "table" and newOptions or {}
+        self.menu:SetHeight(math.max(12, (#options * rowHeight) + 12))
+
+        for index, option in ipairs(options) do
+            local row = GetOrCreateRow(index)
+            row.option = option
+            row.tooltip = option.tooltip
+            row.text:SetText(option.text or tostring(option.value or ""))
+            row:Show()
+        end
+
+        for index = #options + 1, #self.rows do
+            self.rows[index].option = nil
+            self.rows[index].tooltip = nil
+            self.rows[index]:Hide()
+        end
+
+        if self.Refresh then self:Refresh() end
     end
 
     control.button:SetScript("OnClick", function()
@@ -817,7 +845,7 @@ function UI.CreateMultiSelectDropdown(parent, label, tooltip, options, width)
         end
     end
 
-    control:Refresh()
+    control:SetOptions(options)
 
     UI.RegisterSearchControl(parent, control, label, tooltip)
 

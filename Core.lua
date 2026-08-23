@@ -82,6 +82,10 @@ local defaults = {
         legacyExpanded = false,
         minimized = false,
     },
+    warbandWeekly = {
+        showLevelingCharacters = false,
+        characters = {},
+    },
     queueAlerts = {
         backgroundSound = true,
         countdown = true,
@@ -163,6 +167,10 @@ local defaults = {
                 g = 1,
                 b = 1,
             },
+        },
+        flyoutDirections = {
+            defaultDirection = "AUTO",
+            overrides = {},
         },
     },
     macros = {
@@ -441,6 +449,7 @@ local function PrintHelp()
     ns:Print("/zt opens ZoidsTools.")
     ns:Print("/zt2 also opens ZoidsTools.")
     ns:Print("/zt windows on/off toggles movable Blizzard windows.")
+    ns:Print("/zt warband opens the Warband Weekly dashboard.")
     ns:Print("/zt tooltips opens player tooltip options.")
     ns:Print("/zt chat opens chat enhancement options.")
     ns:Print("/zt chatcopy opens a searchable copy window for the active chat tab.")
@@ -491,6 +500,8 @@ local function HandleSlash(input)
         ns:OpenModernConfig()
     elseif input == "windows" then
         ns:OpenConfig("windows")
+    elseif input == "warband" or input == "weekly" or input == "dashboard" then
+        ns:OpenConfig("warband")
     elseif input == "tooltips" or input == "tooltip" then
         ns:OpenConfig("tooltips")
     elseif input == "chat" or input == "chat settings" then
@@ -817,12 +828,14 @@ local moduleInitializers = {
     "InitializeCombatBanner",
     "InitializeMythicInviteBanner",
     "InitializeInstanceLockouts",
+    "InitializeWarbandWeekly",
     "InitializeBuffWarnings",
     "InitializeUnitFrames",
     "InitializeConsumableMacros",
     "InitializeRandomHearthstone",
     "InitializeMounts",
     "InitializeKeybindText",
+    "InitializeFlyoutDirections",
     "InitializePerformanceWidget",
     "InitializeCoordinates",
     "InitializeItemOverlays",

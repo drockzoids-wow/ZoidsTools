@@ -1,15 +1,19 @@
 local _, ns = ...
 
 local PANEL_NAME = "ZoidsToolsInstanceLockoutPanel"
-local PANEL_WIDTH = 304
-local PANEL_MINIMIZED_WIDTH = 184
-local PANEL_MINIMIZED_HEIGHT = 42
+local PANEL_WIDTH = 396
+local PANEL_MINIMIZED_WIDTH = 36
+local PANEL_MINIMIZED_HEIGHT = 36
+local PANEL_BORDER_BUTTON_X_OFFSET = -3
+local PANEL_BORDER_BUTTON_TOP_OFFSET = -43
 local PANEL_MIN_HEIGHT = 360
 local PANEL_GAP = 8
 local RATING_SUMMARY_WIDTH = 128
-local BEST_RUN_COLUMN_WIDTH = 58
-local RESET_COLUMN_WIDTH = 66
-local COLUMN_GAP = 4
+local WEEKLY_RUN_COLUMN_WIDTH = 44
+local SEASON_RUN_COLUMN_WIDTH = 48
+local LOCK_COLUMN_WIDTH = 52
+local RESET_COLUMN_WIDTH = 62
+local COLUMN_GAP = 3
 local ROW_RIGHT_INSET = 7
 local MYTHIC_DUNGEON_DIFFICULTY_ID = 23
 
@@ -212,6 +216,18 @@ local function FormatResetTime(seconds)
         return string.format("%dh %dm", hours, minutes)
     end
     return string.format("%dm", math.max(1, minutes))
+end
+
+local function FormatBestRunLevel(level)
+    level = SafeNumber(level)
+    if not level then
+        return "—"
+    elseif level >= 2 then
+        return string.format("+%d", math.floor(level))
+    elseif level == 0 then
+        return "+0"
+    end
+    return "—"
 end
 
 local function GetCurrentMythicPlusRating()
@@ -423,6 +439,134 @@ local function ReadSavedLockouts()
     return result
 end
 
+local function GetSeasonBestLevel(mapChallengeModeID)
+    if not C_MythicPlus or type(C_MythicPlus.GetSeasonBestForMap) ~= "function" then
+        return nil
+    end
+
+    local ok, inTimeInfo, overtimeInfo = pcall(C_MythicPlus.GetSeasonBestForMap, mapChallengeModeID)
+    if not ok then
+        return nil
+    end
+
+    local bestLevel
+    local function Consider(info)
+        if not IsSecretValue(info) and type(info) == "table" then
+            local level = SafeNumber(info.level)
+            if level then
+                bestLevel = math.max(bestLevel or 0, math.floor(level))
+            end
+        end
+    end
+    Consider(inTimeInfo)
+    Consider(overtimeInfo)
+    return bestLevel
+end
+
+local function GetWeeklyBestLevel(mapChallengeModeID)
+    if not C_MythicPlus or type(C_MythicPlus.GetWeeklyBestForMap) ~= "function" then
+        return nil
+    end
+
+    local ok, _, level = pcall(C_MythicPlus.GetWeeklyBestForMap, mapChallengeModeID)
+    level = ok and SafeNumber(level) or nil
+    return level and math.floor(level) or nil
+end
+
+local function CopyTable(source)
+    local result = {}
+    if type(source) == "table" then
+        for key, value in pairs(source) do
+            result[key] = value
+        end
+    end
+    return result
+end
+
+local function RemoveMatchedLockouts(list, matched)
+    local result = {}
+    for _, info in ipairs(list or {}) do
+        if not matched[info] then
+            result[#result + 1] = info
+        end
+    end
+    return result
+end
+
+local function AddSeasonalMythicPlusDungeons(lockouts)
+    lockouts.seasonalDungeons = {}
+    if not C_ChallengeMode
+        or type(C_ChallengeMode.GetMapTable) ~= "function"
+        or type(C_ChallengeMode.GetMapUIInfo) ~= "function" then
+        return
+    end
+
+    local ok, mapIDs = pcall(C_ChallengeMode.GetMapTable)
+    if not ok or IsSecretValue(mapIDs) or type(mapIDs) ~= "table" then
+        return
+    end
+
+    local savedByInstanceID = {}
+    local savedByName = {}
+    for _, list in ipairs({ lockouts.currentDungeons or {}, lockouts.legacyDungeons or {} }) do
+        for _, info in ipairs(list) do
+            if info.instanceID then
+                savedByInstanceID[info.instanceID] = info
+            end
+            local normalizedName = NormalizeName(info.name)
+            if normalizedName then
+                savedByName[normalizedName] = info
+            end
+        end
+    end
+
+    local matched = {}
+    for _, rawMapID in ipairs(mapIDs) do
+        local mapChallengeModeID = SafeNumber(rawMapID)
+        if mapChallengeModeID then
+            local callOK, name, _, _, _, _, gameMapID = pcall(C_ChallengeMode.GetMapUIInfo, mapChallengeModeID)
+            name = callOK and SafeString(name) or nil
+            gameMapID = callOK and SafeNumber(gameMapID) or nil
+            if name then
+                local normalizedName = NormalizeName(name)
+                local saved = (gameMapID and savedByInstanceID[gameMapID])
+                    or (normalizedName and savedByName[normalizedName])
+                if saved then
+                    matched[saved] = true
+                end
+
+                local info = CopyTable(saved)
+                info.name = name
+                info.mapChallengeModeID = mapChallengeModeID
+                info.instanceID = gameMapID or info.instanceID
+                info.difficultyID = info.difficultyID or MYTHIC_DUNGEON_DIFFICULTY_ID
+                info.difficultyName = info.difficultyName or "Mythic"
+                info.isRaid = false
+                info.isSeasonal = true
+                info.locked = saved ~= nil
+                info.reset = SafeNumber(info.reset) or 0
+                info.numEncounters = SafeNumber(info.numEncounters) or 0
+                info.progress = SafeNumber(info.progress) or 0
+                info.encounters = type(info.encounters) == "table" and info.encounters or {}
+                info.weeklyBestLevel = GetWeeklyBestLevel(mapChallengeModeID)
+                info.seasonBestLevel = GetSeasonBestLevel(mapChallengeModeID)
+
+                -- Base Mythic completion is the floor when the character has
+                -- a saved M0 lock but no keystone run for this map yet.
+                if info.locked then
+                    info.weeklyBestLevel = info.weeklyBestLevel or 0
+                    info.seasonBestLevel = info.seasonBestLevel or 0
+                end
+                lockouts.seasonalDungeons[#lockouts.seasonalDungeons + 1] = info
+            end
+        end
+    end
+
+    table.sort(lockouts.seasonalDungeons, SortLockouts)
+    lockouts.currentDungeons = RemoveMatchedLockouts(lockouts.currentDungeons, matched)
+    lockouts.legacyDungeons = RemoveMatchedLockouts(lockouts.legacyDungeons, matched)
+end
+
 local function SetTextStyle(fontString, size, r, g, b, justify)
     fontString:SetFont(STANDARD_TEXT_FONT or "Fonts\\FRIZQT__.TTF", size, "")
     fontString:SetTextColor(r, g, b)
@@ -439,6 +583,22 @@ local function ShowLockoutTooltip(row)
 
     GameTooltip:SetOwner(row, "ANCHOR_RIGHT")
     GameTooltip:SetText(info.name, 1, 0.82, 0.18)
+
+    if info.isSeasonal then
+        GameTooltip:AddDoubleLine("Best this week", FormatBestRunLevel(info.weeklyBestLevel), 0.85, 0.85, 0.85, 1, 0.82, 0.22)
+        GameTooltip:AddDoubleLine("Best this season", FormatBestRunLevel(info.seasonBestLevel), 0.85, 0.85, 0.85, 1, 0.82, 0.22)
+        if info.locked then
+            GameTooltip:AddDoubleLine("Mythic (M0) loot", "Locked", 0.85, 0.85, 0.85, 1, 0.48, 0.24)
+            GameTooltip:AddDoubleLine("Reset", FormatResetTime(info.reset), 0.85, 0.85, 0.85, 0.58, 0.72, 0.95)
+        else
+            GameTooltip:AddDoubleLine("Mythic (M0) loot", "Open", 0.85, 0.85, 0.85, 0.36, 0.90, 0.52)
+        end
+        GameTooltip:AddLine(" ")
+        GameTooltip:AddLine("Mythic+ remains repeatable. The lock only tracks base Mythic loot for this week.", 0.66, 0.66, 0.70, true)
+        GameTooltip:Show()
+        return
+    end
+
     GameTooltip:AddDoubleLine(info.difficultyName, FormatResetTime(info.reset), 1, 1, 1, 0.75, 0.82, 1)
 
     if info.numEncounters > 0 then
@@ -479,9 +639,17 @@ local function CreateLockoutRow(parent)
     row.name:SetHeight(17)
     SetTextStyle(row.name, 12, 0.95, 0.95, 0.95, "LEFT")
 
-    row.bestRun = row:CreateFontString(nil, "OVERLAY")
-    row.bestRun:SetSize(BEST_RUN_COLUMN_WIDTH, 17)
-    SetTextStyle(row.bestRun, 10, 0.95, 0.72, 0.18, "CENTER")
+    row.weeklyBest = row:CreateFontString(nil, "OVERLAY")
+    row.weeklyBest:SetSize(WEEKLY_RUN_COLUMN_WIDTH, 17)
+    SetTextStyle(row.weeklyBest, 10, 0.95, 0.72, 0.18, "CENTER")
+
+    row.seasonBest = row:CreateFontString(nil, "OVERLAY")
+    row.seasonBest:SetSize(SEASON_RUN_COLUMN_WIDTH, 17)
+    SetTextStyle(row.seasonBest, 10, 0.95, 0.72, 0.18, "CENTER")
+
+    row.lockStatus = row:CreateFontString(nil, "OVERLAY")
+    row.lockStatus:SetSize(LOCK_COLUMN_WIDTH, 17)
+    SetTextStyle(row.lockStatus, 9, 0.72, 0.72, 0.75, "CENTER")
 
     row.reset = row:CreateFontString(nil, "OVERLAY")
     row.reset:SetPoint("TOPRIGHT", -ROW_RIGHT_INSET, -4)
@@ -538,11 +706,16 @@ local function AddLabel(style, text, y, height)
     return y - height, label
 end
 
-local function AddSectionHeader(text, y, showBestRun)
+local function GetSeasonalRightReserve()
+    return RESET_COLUMN_WIDTH + LOCK_COLUMN_WIDTH + SEASON_RUN_COLUMN_WIDTH
+        + WEEKLY_RUN_COLUMN_WIDTH + (COLUMN_GAP * 3) + ROW_RIGHT_INSET
+end
+
+local function AddSectionHeader(text, y, seasonal)
     local label = AcquireLabel("section")
     local rightReserve = RESET_COLUMN_WIDTH + ROW_RIGHT_INSET
-    if showBestRun then
-        rightReserve = rightReserve + BEST_RUN_COLUMN_WIDTH + COLUMN_GAP
+    if seasonal then
+        rightReserve = GetSeasonalRightReserve()
     end
     label:SetPoint("TOPLEFT", panel.content, "TOPLEFT", 4, y)
     label:SetPoint("TOPRIGHT", panel.content, "TOPRIGHT", -rightReserve, y)
@@ -550,12 +723,24 @@ local function AddSectionHeader(text, y, showBestRun)
     SetTextStyle(label, 11, 0.95, 0.72, 0.18, "LEFT")
     label:SetText(text)
 
-    if showBestRun then
-        local bestHeader = AcquireLabel("bestRunHeader")
-        bestHeader:SetPoint("TOPRIGHT", panel.content, "TOPRIGHT", -(RESET_COLUMN_WIDTH + ROW_RIGHT_INSET + COLUMN_GAP), y)
-        bestHeader:SetSize(BEST_RUN_COLUMN_WIDTH, 20)
-        SetTextStyle(bestHeader, 9, 0.95, 0.72, 0.18, "CENTER")
-        bestHeader:SetText("BEST RUN")
+    if seasonal then
+        local lockHeader = AcquireLabel("lockHeader")
+        lockHeader:SetPoint("TOPRIGHT", panel.content, "TOPRIGHT", -(RESET_COLUMN_WIDTH + ROW_RIGHT_INSET + COLUMN_GAP), y)
+        lockHeader:SetSize(LOCK_COLUMN_WIDTH, 20)
+        SetTextStyle(lockHeader, 8, 0.72, 0.72, 0.75, "CENTER")
+        lockHeader:SetText("M0 LOCK")
+
+        local seasonHeader = AcquireLabel("seasonHeader")
+        seasonHeader:SetPoint("TOPRIGHT", panel.content, "TOPRIGHT", -(RESET_COLUMN_WIDTH + LOCK_COLUMN_WIDTH + ROW_RIGHT_INSET + (COLUMN_GAP * 2)), y)
+        seasonHeader:SetSize(SEASON_RUN_COLUMN_WIDTH, 20)
+        SetTextStyle(seasonHeader, 8, 0.95, 0.72, 0.18, "CENTER")
+        seasonHeader:SetText("SEASON")
+
+        local weeklyHeader = AcquireLabel("weeklyHeader")
+        weeklyHeader:SetPoint("TOPRIGHT", panel.content, "TOPRIGHT", -(RESET_COLUMN_WIDTH + LOCK_COLUMN_WIDTH + SEASON_RUN_COLUMN_WIDTH + ROW_RIGHT_INSET + (COLUMN_GAP * 3)), y)
+        weeklyHeader:SetSize(WEEKLY_RUN_COLUMN_WIDTH, 20)
+        SetTextStyle(weeklyHeader, 8, 0.95, 0.72, 0.18, "CENTER")
+        weeklyHeader:SetText("WEEK")
     end
 
     local resetHeader = AcquireLabel("resetHeader")
@@ -578,7 +763,7 @@ local function AcquireRow()
     return row
 end
 
-local function AddLockoutRows(list, emptyText, y, legacy, showBestRun)
+local function AddLockoutRows(list, emptyText, y, legacy, seasonal)
     if #list == 0 then
         return AddLabel("empty", emptyText, y, 22) - 2
     end
@@ -589,17 +774,33 @@ local function AddLockoutRows(list, emptyText, y, legacy, showBestRun)
         row:SetPoint("TOPRIGHT", panel.content, "TOPRIGHT", -2, y)
         row.info = info
         row.name:SetText(info.name)
-        row.reset:SetText(FormatResetTime(info.reset))
+        row.reset:ClearAllPoints()
+        row.reset:SetPoint("TOPRIGHT", row, "TOPRIGHT", -ROW_RIGHT_INSET, -4)
 
         local rightReserve = RESET_COLUMN_WIDTH + ROW_RIGHT_INSET
-        if showBestRun then
-            rightReserve = rightReserve + BEST_RUN_COLUMN_WIDTH + COLUMN_GAP
-            row.bestRun:ClearAllPoints()
-            row.bestRun:SetPoint("TOPRIGHT", row, "TOPRIGHT", -(RESET_COLUMN_WIDTH + ROW_RIGHT_INSET + COLUMN_GAP), -4)
-            row.bestRun:SetText(string.format("+%d", info.bestRunLevel or 0))
-            row.bestRun:Show()
+        if seasonal then
+            rightReserve = GetSeasonalRightReserve()
+            row.lockStatus:ClearAllPoints()
+            row.lockStatus:SetPoint("TOPRIGHT", row, "TOPRIGHT", -(RESET_COLUMN_WIDTH + ROW_RIGHT_INSET + COLUMN_GAP), -4)
+            row.lockStatus:SetText(info.locked and "Locked" or "Open")
+            row.lockStatus:SetTextColor(info.locked and 1 or 0.36, info.locked and 0.48 or 0.90, info.locked and 0.24 or 0.52)
+            row.lockStatus:Show()
+
+            row.seasonBest:ClearAllPoints()
+            row.seasonBest:SetPoint("TOPRIGHT", row, "TOPRIGHT", -(RESET_COLUMN_WIDTH + LOCK_COLUMN_WIDTH + ROW_RIGHT_INSET + (COLUMN_GAP * 2)), -4)
+            row.seasonBest:SetText(FormatBestRunLevel(info.seasonBestLevel))
+            row.seasonBest:Show()
+
+            row.weeklyBest:ClearAllPoints()
+            row.weeklyBest:SetPoint("TOPRIGHT", row, "TOPRIGHT", -(RESET_COLUMN_WIDTH + LOCK_COLUMN_WIDTH + SEASON_RUN_COLUMN_WIDTH + ROW_RIGHT_INSET + (COLUMN_GAP * 3)), -4)
+            row.weeklyBest:SetText(FormatBestRunLevel(info.weeklyBestLevel))
+            row.weeklyBest:Show()
+            row.reset:SetText(info.locked and FormatResetTime(info.reset) or "—")
         else
-            row.bestRun:Hide()
+            row.weeklyBest:Hide()
+            row.seasonBest:Hide()
+            row.lockStatus:Hide()
+            row.reset:SetText(FormatResetTime(info.reset))
         end
 
         row.name:ClearAllPoints()
@@ -610,7 +811,9 @@ local function AddLockoutRows(list, emptyText, y, legacy, showBestRun)
         row.detail:SetPoint("BOTTOMRIGHT", -rightReserve, 4)
 
         local detail
-        if info.numEncounters > 0 then
+        if seasonal then
+            detail = info.locked and "Mythic+  |  M0 loot locked" or "Mythic+  |  M0 loot open"
+        elseif info.numEncounters > 0 then
             detail = string.format("%s  |  %d/%d bosses", info.difficultyName, info.progress, info.numEncounters)
         else
             detail = string.format("%s  |  Weekly lockout", info.difficultyName)
@@ -620,7 +823,13 @@ local function AddLockoutRows(list, emptyText, y, legacy, showBestRun)
         end
         row.detail:SetText(detail)
 
-        if legacy then
+        if seasonal then
+            if info.locked then
+                row.accent:SetColorTexture(0.94, 0.45, 0.16, 0.95)
+            else
+                row.accent:SetColorTexture(0.20, 0.62, 0.92, 0.95)
+            end
+        elseif legacy then
             row.accent:SetColorTexture(0.48, 0.48, 0.52, 0.9)
         elseif info.isRaid then
             row.accent:SetColorTexture(0.94, 0.60, 0.14, 0.95)
@@ -669,8 +878,13 @@ local function RenderLockouts(lockouts)
     panel.ratingSummary:SetText(string.format("M+ RATING  |cffffffff%d|r", GetCurrentMythicPlusRating()))
     panel.ratingSummary:Show()
 
-    y = AddSectionHeader("MYTHIC DUNGEONS", y, true)
-    y = AddLockoutRows(lockouts.currentDungeons, "No current Mythic dungeon lockouts.", y, false, true)
+    y = AddSectionHeader("SEASONAL MYTHIC+", y, true)
+    y = AddLockoutRows(lockouts.seasonalDungeons or {}, "Seasonal Mythic+ data is not available yet.", y, false, true)
+    if #lockouts.currentDungeons > 0 then
+        y = y - 6
+        y = AddSectionHeader("OTHER MYTHIC DUNGEONS", y, false)
+        y = AddLockoutRows(lockouts.currentDungeons, "", y, false, false)
+    end
     y = y - 6
     y = AddSectionHeader("RAIDS", y, false)
     y = AddLockoutRows(lockouts.currentRaids, "No current raid lockouts.", y, false)
@@ -708,7 +922,7 @@ local function RefreshLockouts()
     end
 
     local lockouts = ReadSavedLockouts()
-    AddMythicPlusProgress(lockouts)
+    AddSeasonalMythicPlusDungeons(lockouts)
     RenderLockouts(lockouts)
 end
 
@@ -737,6 +951,9 @@ local function RequestLockoutData()
     if C_MythicPlus and type(C_MythicPlus.RequestMapInfo) == "function" then
         pcall(C_MythicPlus.RequestMapInfo)
     end
+    if C_MythicPlus and type(C_MythicPlus.RequestRewards) == "function" then
+        pcall(C_MythicPlus.RequestRewards)
+    end
     ScheduleRefresh(0.10)
     if C_Timer and type(C_Timer.After) == "function" then
         C_Timer.After(0.75, function()
@@ -746,6 +963,7 @@ local function RequestLockoutData()
 end
 
 local ApplyPanelDisplayState
+local PositionPanel
 
 local function CreatePanel()
     if panel then
@@ -785,7 +1003,7 @@ local function CreatePanel()
     panel.subtitle:SetPoint("TOPRIGHT", panel.title, "BOTTOMRIGHT", 0, -1)
     panel.subtitle:SetHeight(14)
     SetTextStyle(panel.subtitle, 9, 0.56, 0.56, 0.60, "LEFT")
-    panel.subtitle:SetText("Mythic dungeons and saved raids")
+    panel.subtitle:SetText("Seasonal Mythic+ bests and saved raids")
 
     panel.refreshButton = CreateFrame("Button", nil, panel)
     panel.refreshButton:SetPoint("TOPRIGHT", -38, -11)
@@ -815,19 +1033,41 @@ local function CreatePanel()
     panel.minimizeButton.text:SetAllPoints()
     SetTextStyle(panel.minimizeButton.text, 13, 0.92, 0.92, 0.92, "CENTER")
     panel.minimizeButton.text:SetText("-")
+    panel.minimizeButton.gear = panel.minimizeButton:CreateTexture(nil, "OVERLAY")
+    panel.minimizeButton.gear:SetPoint("TOPLEFT", 5, -5)
+    panel.minimizeButton.gear:SetPoint("BOTTOMRIGHT", -5, 5)
+    panel.minimizeButton.gear:SetTexture("Interface\\Icons\\INV_Misc_Gear_01")
+    panel.minimizeButton.gear:SetTexCoord(0.07, 0.93, 0.07, 0.93)
+    panel.minimizeButton.gear:Hide()
     panel.minimizeButton:SetScript("OnEnter", function(self)
-        self.background:SetColorTexture(0.30, 0.24, 0.10, 0.95)
+        if self.gear:IsShown() then
+            self.gear:SetVertexColor(1, 0.84, 0.22, 1)
+            self.background:SetColorTexture(0.30, 0.24, 0.10, 0.95)
+            GameTooltip:SetOwner(self, "ANCHOR_TOP")
+            GameTooltip:SetText("Instance Lockouts")
+            GameTooltip:AddLine("Click to expand.", 1, 1, 1)
+            GameTooltip:Show()
+        else
+            self.background:SetColorTexture(0.30, 0.24, 0.10, 0.95)
+        end
     end)
     panel.minimizeButton:SetScript("OnLeave", function(self)
+        self.gear:SetVertexColor(1, 1, 1, 1)
         self.background:SetColorTexture(0.16, 0.16, 0.18, 0.95)
+        GameTooltip:Hide()
     end)
     panel.minimizeButton:SetScript("OnClick", function()
         local db = EnsureDB()
         if not db then
             return
         end
+        GameTooltip:Hide()
         db.minimized = not db.minimized
-        ApplyPanelDisplayState()
+        if PositionPanel then
+            PositionPanel()
+        else
+            ApplyPanelDisplayState()
+        end
     end)
 
     panel.scroll = CreateFrame("ScrollFrame", nil, panel)
@@ -898,29 +1138,46 @@ ApplyPanelDisplayState = function()
     end
 
     local minimized = db.minimized == true
-    panel.title:ClearAllPoints()
-    panel.title:SetPoint("TOPLEFT", 14, minimized and -11 or -8)
-    panel.title:SetPoint("TOPRIGHT", minimized and -40 or -100, minimized and -11 or -8)
-    panel.header:SetHeight(minimized and 34 or 42)
 
     if minimized then
         panel:SetSize(PANEL_MINIMIZED_WIDTH, PANEL_MINIMIZED_HEIGHT)
-        panel.title:SetText("LOCKOUTS")
+        panel:SetBackdropColor(0.018, 0.020, 0.026, 0.97)
+        panel:SetBackdropBorderColor(0.78, 0.58, 0.18, 0.95)
+        panel.header:Hide()
+        panel.title:Hide()
         panel.subtitle:Hide()
         panel.refreshButton:Hide()
         panel.scroll:Hide()
-        panel.minimizeButton.text:SetText("+")
+        panel.minimizeButton:ClearAllPoints()
+        panel.minimizeButton:SetAllPoints(panel)
+        panel.minimizeButton.background:Show()
+        panel.minimizeButton.text:Hide()
+        panel.minimizeButton.gear:Show()
     else
         panel:SetSize(PANEL_WIDTH, panel.expandedHeight or 510)
+        panel:SetBackdropColor(0.018, 0.020, 0.026, 0.97)
+        panel:SetBackdropBorderColor(0.78, 0.58, 0.18, 0.95)
+        panel.header:Show()
+        panel.header:SetHeight(42)
+        panel.title:ClearAllPoints()
+        panel.title:SetPoint("TOPLEFT", 14, -8)
+        panel.title:SetPoint("TOPRIGHT", -100, -8)
         panel.title:SetText("INSTANCE LOCKOUTS")
+        panel.title:Show()
         panel.subtitle:Show()
         panel.refreshButton:Show()
         panel.scroll:Show()
+        panel.minimizeButton:ClearAllPoints()
+        panel.minimizeButton:SetPoint("TOPRIGHT", -10, -11)
+        panel.minimizeButton:SetSize(22, 22)
+        panel.minimizeButton.background:Show()
+        panel.minimizeButton.text:Show()
+        panel.minimizeButton.gear:Hide()
         panel.minimizeButton.text:SetText("-")
     end
 end
 
-local function PositionPanel()
+PositionPanel = function()
     local pveFrame = _G.PVEFrame
     if not panel or not pveFrame or not pveFrame.GetRight or not pveFrame.GetHeight then
         return false
@@ -943,7 +1200,17 @@ local function PositionPanel()
     end
     panel.expandedHeight = math.max(PANEL_MIN_HEIGHT, pveHeight)
     panel:ClearAllPoints()
-    if right and screenRight and right + PANEL_GAP + PANEL_WIDTH <= screenRight - 4 then
+    local db = EnsureDB()
+    if db and db.minimized == true then
+        panel.anchorSide = "BORDER"
+        panel:SetPoint(
+            "TOPLEFT",
+            pveFrame,
+            "TOPRIGHT",
+            PANEL_BORDER_BUTTON_X_OFFSET,
+            PANEL_BORDER_BUTTON_TOP_OFFSET
+        )
+    elseif right and screenRight and right + PANEL_GAP + PANEL_WIDTH <= screenRight - 4 then
         panel.anchorSide = "RIGHT"
         panel:SetPoint("TOPLEFT", pveFrame, "TOPRIGHT", PANEL_GAP, 0)
     else
@@ -1058,6 +1325,20 @@ function ns:RefreshInstanceLockouts()
     RequestLockoutData()
 end
 
+function ns:GetCurrentExpansionLockoutSnapshot()
+    if not catalogReady then
+        RebuildCurrentExpansionCatalog()
+    end
+
+    local lockouts = ReadSavedLockouts()
+    AddMythicPlusProgress(lockouts)
+    return {
+        expansionName = currentExpansionName,
+        dungeons = lockouts.currentDungeons,
+        raids = lockouts.currentRaids,
+    }
+end
+
 function ns:InitializeInstanceLockouts()
     EnsureDB()
     CreatePanel()
@@ -1075,6 +1356,10 @@ function ns:InitializeInstanceLockouts()
     eventFrame:RegisterEvent("BOSS_KILL")
     eventFrame:RegisterEvent("ENCOUNTER_END")
     eventFrame:RegisterEvent("PLAYER_DIFFICULTY_CHANGED")
+    eventFrame:RegisterEvent("WEEKLY_REWARDS_UPDATE")
+    eventFrame:RegisterEvent("MYTHIC_PLUS_NEW_WEEKLY_RECORD")
+    eventFrame:RegisterEvent("CHALLENGE_MODE_COMPLETED")
+    eventFrame:RegisterEvent("CHALLENGE_MODE_MAPS_UPDATE")
     eventFrame:SetScript("OnEvent", function(_, event, addonName)
         if event == "ADDON_LOADED" then
             if addonName == "Blizzard_EncounterJournal" then
@@ -1093,13 +1378,15 @@ function ns:InitializeInstanceLockouts()
         end
 
         if event == "PLAYER_ENTERING_WORLD" or event == "BOSS_KILL"
-            or event == "ENCOUNTER_END" or event == "PLAYER_DIFFICULTY_CHANGED" then
+            or event == "ENCOUNTER_END" or event == "PLAYER_DIFFICULTY_CHANGED"
+            or event == "MYTHIC_PLUS_NEW_WEEKLY_RECORD" or event == "CHALLENGE_MODE_COMPLETED" then
             if C_Timer and type(C_Timer.After) == "function" then
                 C_Timer.After(1, RequestLockoutData)
             else
                 RequestLockoutData()
             end
-        elseif event == "UPDATE_INSTANCE_INFO" then
+        elseif event == "UPDATE_INSTANCE_INFO" or event == "WEEKLY_REWARDS_UPDATE"
+            or event == "CHALLENGE_MODE_MAPS_UPDATE" then
             ScheduleRefresh(0)
         end
     end)

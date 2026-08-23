@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Replaced the minimized Instance Lockouts side box with a full gear button attached just outside the Dungeons & Raids right border; the button and expanded side panel are mutually exclusive.
+- Replaced the missing-buff popup's restricted automatic group-chat send with a prefilled Blizzard chat message that the player confirms with Enter, preventing protected-action errors in dungeons and encounters.
+- Expanded Instance Lockouts to list every active seasonal Mythic+ dungeon, including separate best-this-week and best-this-season values, explicit base-Mythic loot lock state, and reset time; seasonal dungeons from older expansions no longer duplicate in the legacy section.
+- Added a Warband Weekly dashboard that snapshots each logged-in character's equipped item level, Mythic+ rating, weekly best, owned keystone, Great Vault unlocks, and current-expansion dungeon and raid saves; weekly-only data visibly expires at reset until that character logs in again.
+- Added combat-safe skill-flyout direction controls with a Blizzard-automatic default plus named overrides that follow Summon Demon, Warband, and other known flyouts between action-bar slots; the flyout picker supports multi-selection for applying one direction to several flyouts at once.
 - Corrected missing-group-buff detection for all current persistent class buffs: Blessing of the Bronze now separates its Evoker cast spell from all 13 recipient-class aura IDs, and Shaman's Skyfury is now included alongside Mark of the Wild, Arcane Intellect, Power Word: Fortitude, and Battle Shout.
 - Lowered the Instance Lockouts panel from `DIALOG` to `HIGH` strata so invitation and confirmation popups—and their Accept buttons—remain above it.
 - Placed the Talent Grimoire bar at the intermediate `DIALOG` strata so it remains above the talent window while Blizzard and third-party loadout popups can remain above its dropdown controls.

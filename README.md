@@ -5,8 +5,10 @@ A personal World of Warcraft Retail quality-of-life addon by Drockzoids.
 ## Highlights
 
 - Opens a modern ZoidsTools settings window with `/zt`, `/zoids`, or `/zoidstools`.
+- Adds a Warband Weekly dashboard with per-character item level, Mythic+ rating, weekly best, keystone, Great Vault progress, and current-expansion saves.
+- Adds an Instance Lockouts companion beside Dungeons & Raids with every seasonal Mythic+ dungeon, weekly and season bests, base-Mythic loot locks, raid saves, and reset timers.
 - Moves and scales supported Blizzard windows and default bags, with saved positions.
-- Adds class-colored player mouseover names with Mythic+ rating and equipped item level details beneath the character lines, item overlays, keybind label styling, range tint, and unit frame options.
+- Adds class-colored player mouseover names with Mythic+ rating and equipped item level details beneath the character lines, item overlays, keybind label styling, named skill-flyout directions, range tint, and unit frame options.
 - Adds smart mount tools, service mount buttons, target mount matching, recent mount avoidance, and faction-safe mount filtering.
 - Adds Molinari-style profession actions for modifier-click disenchanting, milling, prospecting, and lockboxes.
 - Adds generated Archon, Icy Veins, Wowhead, and Murlok.io talent recommendations directly to Blizzard's talent window for Mythic+, Raid, and PvP.
@@ -19,7 +21,7 @@ A personal World of Warcraft Retail quality-of-life addon by Drockzoids.
 ## Commands
 
 - `/zt` opens the ZoidsTools window.
-- `/zt tooltips`, `/zt windows`, `/zt chat`, `/zt items`, `/zt professions`, `/zt talents`, `/zt meters`, `/zt combat`, `/zt unitframes`, `/zt macros`, `/zt mounts`, `/zt loot`, or `/zt quests` opens that page.
+- `/zt warband`, `/zt tooltips`, `/zt windows`, `/zt chat`, `/zt items`, `/zt professions`, `/zt talents`, `/zt meters`, `/zt combat`, `/zt unitframes`, `/zt macros`, `/zt mounts`, `/zt loot`, or `/zt quests` opens that page.
 - `/zt chatcopy` opens a searchable copy window for the active chat tab.
 - `/zt windows on/off` toggles movable Blizzard windows.
 - `/zt bags on/off` toggles default bag movement.

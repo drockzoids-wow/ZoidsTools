@@ -31,12 +31,14 @@ Modules\QueueAlerts.lua
 Modules\CombatBanner.lua
 Modules\MythicInviteBanner.lua
 Modules\InstanceLockouts.lua
+Modules\WarbandWeekly.lua
 Modules\BuffWarnings.lua
 Modules\UnitFrames.lua
 Modules\ConsumableMacros.lua
 Modules\RandomHearthstone.lua
 Modules\Mounts.lua
 Modules\KeybindText.lua
+Modules\FlyoutDirection.lua
 Modules\PerformanceWidget.lua
 Modules\Coordinates.lua
 Modules\ItemOverlays.lua

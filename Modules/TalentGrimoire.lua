@@ -18,6 +18,14 @@ local PANEL_ANCHOR_Y = 8
 local CONTROL_GAP = 6
 local PANEL_FRAME_LEVEL_OFFSET = 10
 local CONTROL_FRAME_LEVEL_OFFSET = 2
+local ROTATION_PANEL_WIDTH = 430
+local ROTATION_PANEL_HEIGHT = 420
+local ROTATION_ROW_HEIGHT = 34
+local SPEC_BUTTON_SIZE = 38
+local SPEC_BUTTON_GAP = 8
+local SPEC_BUTTON_OFFSET_X = 40
+local MAX_CLASS_SPECIALIZATIONS = 4
+local SOLID_TEXTURE = "Interface\\Buttons\\WHITE8X8"
 local ZOIDS_LOADOUT_NAME = "ZoidsTools"
 local DUNGEON_PROMPT_DIALOG = "ZOIDSTOOLS_TALENT_GRIMOIRE_DUNGEON_PROMPT"
 local BIT_WIDTH_HEADER_VERSION = 8
@@ -430,6 +438,47 @@ local function GetClassAndSpec()
     end
 
     return classToken, specKey
+end
+
+local function GetCurrentRotationData(context)
+    local classToken, specKey
+
+    if type(context) == "table" and context.classToken and context.specKey then
+        classToken = context.classToken
+        specKey = context.specKey
+    else
+        classToken, specKey = GetClassAndSpec()
+    end
+    local root = GetRoot()
+    local rotation = root
+        and root.rotations
+        and classToken
+        and specKey
+        and root.rotations[classToken]
+        and root.rotations[classToken][specKey]
+
+    if type(rotation) ~= "table" then
+        return nil, classToken, specKey
+    end
+
+    local hasSections = type(rotation.sections) == "table" and #rotation.sections > 0
+    if not hasSections and type(rotation.conditionalSections) == "table" and #rotation.conditionalSections > 0 then
+        hasSections = true
+    end
+    if not hasSections and type(rotation.variants) == "table" then
+        for _, variant in ipairs(rotation.variants) do
+            if type(variant.sections) == "table" and #variant.sections > 0 then
+                hasSections = true
+                break
+            end
+        end
+    end
+
+    if not hasSections then
+        return nil, classToken, specKey
+    end
+
+    return rotation, classToken, specKey
 end
 
 local function GetSpecLabel(specKey)
@@ -959,6 +1008,8 @@ local function GetBuildEntryForTarget(contentType, targetKey, mode)
         provider = providerKey,
         providerLabel = GetOptionText(GetProviderOptions(), providerKey),
         source = (entry and entry.source) or (providerData and providerData.label) or (GetRoot() and GetRoot().source),
+        heroTree = entry and entry.heroTree,
+        buildTitle = entry and entry.title,
     }
 end
 
@@ -2068,7 +2119,7 @@ local function ResetAndPurchaseDeferred(configID, treeID, entryInfo, onComplete)
         end
     end
 
-    local function BuildRows(nodeIDs)
+    local function BuildOrderedNodes(nodeIDs)
         table.sort(nodeIDs, function(leftNodeID, rightNodeID)
             local leftInfo = C_Traits.GetNodeInfo(configID, leftNodeID)
             local rightInfo = C_Traits.GetNodeInfo(configID, rightNodeID)
@@ -2089,29 +2140,12 @@ local function ResetAndPurchaseDeferred(configID, treeID, entryInfo, onComplete)
             return leftNodeID < rightNodeID
         end)
 
-        local rows = {}
-        local currentRow
-        local currentY
-
-        for _, nodeID in ipairs(nodeIDs) do
-            local nodeInfo = C_Traits.GetNodeInfo(configID, nodeID)
-            local nodeY = (nodeInfo and nodeInfo.posY) or 0
-
-            if not currentRow or math.abs(nodeY - currentY) > 0.001 then
-                currentRow = {}
-                rows[#rows + 1] = currentRow
-                currentY = nodeY
-            end
-
-            currentRow[#currentRow + 1] = nodeID
-        end
-
-        return rows
+        return nodeIDs
     end
 
     local stages = {
-        { name = "main", rows = BuildRows(mainNodes) },
-        { name = "hero", rows = BuildRows(heroNodes) },
+        { name = "main", nodes = BuildOrderedNodes(mainNodes) },
+        { name = "hero", nodes = BuildOrderedNodes(heroNodes) },
     }
     local mainTargetRanks = 0
     local heroTargetRanks = 0
@@ -2125,17 +2159,15 @@ local function ResetAndPurchaseDeferred(configID, treeID, entryInfo, onComplete)
     end
 
     LogTalentApplyDiagnostic(
-        "Parsed targets: mainNodes=%d mainRanks=%d mainRows=%d heroSelector=%s heroNodes=%d heroRanks=%d heroRows=%d.",
+        "Parsed targets: mainNodes=%d mainRanks=%d heroSelector=%s heroNodes=%d heroRanks=%d.",
         #mainNodes,
         mainTargetRanks,
-        #stages[1].rows,
         tostring(heroSelectionNodeID),
         #heroNodes,
-        heroTargetRanks,
-        #stages[2].rows
+        heroTargetRanks
     )
     local stageIndex = 1
-    local rowIndex = 1
+    local passIndex = 1
     local ProcessNext
 
     local function QueueProcessNext(delay)
@@ -2181,7 +2213,7 @@ local function ResetAndPurchaseDeferred(configID, treeID, entryInfo, onComplete)
         end
 
         diagnosticStage = stage.name
-        diagnosticRow = rowIndex
+        diagnosticRow = passIndex
 
         -- Select the requested hero tree only after every class and
         -- specialization row is completely finished.
@@ -2213,23 +2245,15 @@ local function ResetAndPurchaseDeferred(configID, treeID, entryInfo, onComplete)
             return
         end
 
-        local row = stage.rows[rowIndex]
-
-        if not row then
-            LogTalentApplyDiagnostic("Completed %s stage.", stage.name)
-            stageIndex = stageIndex + 1
-            rowIndex = 1
-            QueueProcessNext(TALENT_DIAGNOSTIC_ROW_DELAY)
-            return
-        end
-
-
-        LogTalentApplyDiagnostic("Starting %s row %d with %d target node(s).", stage.name, rowIndex, #row)
-
+        LogTalentApplyDiagnostic("Starting %s dependency pass %d with %d target node(s).", stage.name, passIndex, #stage.nodes)
         local unresolved = 0
         local madeProgress = false
 
-        for _, nodeID in ipairs(row) do
+        -- Talent-tree visual rows are not dependency tiers. Paladin and other
+        -- redesigned trees can place a prerequisite or point-gated node beside
+        -- a talent that only becomes available later. Walk every desired node,
+        -- then repeat until the dependency graph reaches a fixed point.
+        for _, nodeID in ipairs(stage.nodes) do
             if entryInfo[nodeID] then
                 local resolved, progressed = TryApplyEntry(nodeID, false)
                 madeProgress = madeProgress or progressed
@@ -2241,36 +2265,36 @@ local function ResetAndPurchaseDeferred(configID, treeID, entryInfo, onComplete)
         end
 
         if unresolved == 0 then
-            LogTalentApplyDiagnostic("Completed %s row %d.", stage.name, rowIndex)
-            rowIndex = rowIndex + 1
+            LogTalentApplyDiagnostic("Completed %s stage after %d dependency pass(es).", stage.name, passIndex)
+            stageIndex = stageIndex + 1
+            passIndex = 1
             QueueProcessNext(TALENT_DIAGNOSTIC_ROW_DELAY)
         elseif madeProgress then
-            -- Stay on this exact row until every requested talent on it
-            -- is purchased; never move downward while a row is incomplete.
+            passIndex = passIndex + 1
             QueueProcessNext(0.25)
         elseif isLevelingCharacter then
-            local deferredThisRow = 0
+            local deferredThisStage = 0
 
-            for _, nodeID in ipairs(row) do
+            for _, nodeID in ipairs(stage.nodes) do
                 if entryInfo[nodeID] then
                     entryInfo[nodeID] = nil
                     levelDeferredNodes = levelDeferredNodes + 1
-                    deferredThisRow = deferredThisRow + 1
+                    deferredThisStage = deferredThisStage + 1
                 end
             end
 
             LogTalentApplyDiagnostic(
-                "Deferred %d unavailable target(s) from %s row %d for level %d/%d; continuing.",
-                deferredThisRow,
+                "Deferred %d unavailable target(s) from the %s stage for level %d/%d; continuing.",
+                deferredThisStage,
                 stage.name,
-                rowIndex,
                 playerLevel,
                 maxPlayerLevel
             )
-            rowIndex = rowIndex + 1
+            stageIndex = stageIndex + 1
+            passIndex = 1
             QueueProcessNext(TALENT_DIAGNOSTIC_ROW_DELAY)
         else
-            LogTalentApplyDiagnostic("No progress was possible on %s row %d; stopping.", stage.name, rowIndex)
+            LogTalentApplyDiagnostic("No progress was possible on the %s stage after %d dependency pass(es); stopping.", stage.name, passIndex)
             Finish()
         end
     end
@@ -2562,6 +2586,47 @@ function ns:ApplyTalentImportString(importString, buildLabel, isContinuation)
             return
         end
 
+        local appliedPlayerLevel = tonumber(applyResult.playerLevel) or 0
+        local appliedMaxLevel = tonumber(applyResult.maxPlayerLevel) or appliedPlayerLevel
+        local isMaxLevel = appliedPlayerLevel > 0 and appliedPlayerLevel >= appliedMaxLevel
+
+        if isMaxLevel then
+            local unspentParts = {}
+
+            if C_ClassTalents.HasUnspentTalentPoints then
+                local ok, hasUnspent, classPoints, specPoints = pcall(C_ClassTalents.HasUnspentTalentPoints)
+
+                if ok and hasUnspent == true then
+                    if (tonumber(classPoints) or 0) > 0 then
+                        unspentParts[#unspentParts + 1] = tostring(classPoints) .. " class"
+                    end
+                    if (tonumber(specPoints) or 0) > 0 then
+                        unspentParts[#unspentParts + 1] = tostring(specPoints) .. " specialization"
+                    end
+                end
+            end
+
+            if C_ClassTalents.HasUnspentHeroTalentPoints then
+                local ok, hasUnspent, heroPoints = pcall(C_ClassTalents.HasUnspentHeroTalentPoints)
+
+                if ok and hasUnspent == true and (tonumber(heroPoints) or 0) > 0 then
+                    unspentParts[#unspentParts + 1] = tostring(heroPoints) .. " hero"
+                end
+            end
+
+            if #unspentParts > 0 then
+                RollbackTalentConfig(activeConfigID)
+                ns._talentApplyInProgress = false
+                ClearPendingApply()
+                PrintTalentMessage(
+                    "The selected build left unspent max-level points (" .. table.concat(unspentParts, ", ") .. "). " ..
+                    "The partial build was discarded instead of being saved."
+                )
+                QueueRefresh(0)
+                return
+            end
+        end
+
         if not C_ClassTalents.CommitConfig then
             RollbackTalentConfig(activeConfigID)
             ns._talentApplyInProgress = false
@@ -2627,29 +2692,52 @@ function ns:ApplyTalentImportString(importString, buildLabel, isContinuation)
     return true
 end
 
+local function RequestSpecializationSwitch(specIndex, specName)
+    if InCombatLockdown and InCombatLockdown() then
+        return nil, "Cannot switch specializations in combat."
+    end
+
+    if ns._talentApplyInProgress then
+        return nil, "Wait for the current talent build to finish applying before switching specializations."
+    end
+
+    specIndex = tonumber(specIndex)
+    specName = tostring(specName or "the selected specialization")
+
+    local activeSpecIndex = C_SpecializationInfo
+        and C_SpecializationInfo.GetSpecialization
+        and C_SpecializationInfo.GetSpecialization()
+        or (GetSpecialization and GetSpecialization())
+
+    if specIndex and activeSpecIndex == specIndex then
+        return true
+    end
+
+    local setter = C_ClassTalents and C_ClassTalents.SwitchToSpecializationByIndex
+
+    if type(setter) ~= "function" then
+        setter = C_SpecializationInfo and C_SpecializationInfo.SetSpecialization or SetSpecialization
+    end
+
+    if not specIndex or type(setter) ~= "function" then
+        return nil, "The game does not currently provide a specialization switch for " .. specName .. "."
+    end
+
+    local result = SecureTalentCall(setter, specIndex)
+    if result == false then
+        return nil, "The game could not switch to " .. specName .. " right now."
+    end
+
+    PrintTalentMessage("Switching to " .. specName .. ".")
+    return true
+end
+
 local function RequestAlternateSpecialization(context)
     if not context or not context.requiresSpecSwitch then
         return nil, "No alternate specialization is selected."
     end
 
-    if InCombatLockdown and InCombatLockdown() then
-        return nil, "Cannot switch specializations in combat."
-    end
-
-    local specIndex = tonumber(context.alternateSpecIndex)
-    local setter = C_SpecializationInfo and C_SpecializationInfo.SetSpecialization or SetSpecialization
-
-    if not specIndex or type(setter) ~= "function" then
-        return nil, "Switch to " .. GetSpecLabel(context.specKey) .. " before applying this build."
-    end
-
-    local result = SecureTalentCall(setter, specIndex)
-    if result == false then
-        return nil, "The game could not switch to " .. GetSpecLabel(context.specKey) .. " right now."
-    end
-
-    PrintTalentMessage("Switching to " .. GetSpecLabel(context.specKey) .. ". Click Apply after the specialization change completes.")
-    return true
+    return RequestSpecializationSwitch(context.alternateSpecIndex, GetSpecLabel(context.specKey))
 end
 
 function ns:ApplyTalentGrimoireCurrentBuild()
@@ -3358,6 +3446,582 @@ local function ShowCopyPopup(copyValue)
     panel.importPopup.editBox:HighlightText()
 end
 
+local function GetRotationSpellTexture(spellId)
+    if C_Spell and C_Spell.GetSpellTexture then
+        local ok, texture = pcall(C_Spell.GetSpellTexture, spellId)
+        if ok and texture then
+            return texture
+        end
+    end
+
+    if GetSpellTexture then
+        local ok, texture = pcall(GetSpellTexture, spellId)
+        if ok and texture then
+            return texture
+        end
+    end
+
+    return 134400
+end
+
+local function IsRotationSpellAvailable(spellId)
+    if not spellId or not C_SpellBook or not C_SpellBook.IsSpellKnownOrInSpellBook then
+        return true
+    end
+
+    local spellBank = Enum and Enum.SpellBookSpellBank and Enum.SpellBookSpellBank.Player
+    if not spellBank then
+        return true
+    end
+
+    local ok, known = pcall(C_SpellBook.IsSpellKnownOrInSpellBook, spellId, spellBank, true)
+    return not ok or known == true
+end
+
+local function GetPreferredRotationSectionIndex(sections, contentType)
+    local preferredKinds
+
+    if contentType == "mythicplus" then
+        preferredKinds = { dungeon = 1, aoe = 2, priority = 3, single = 4, opener = 5 }
+    elseif contentType == "raid" then
+        preferredKinds = { raid = 1, single = 2, priority = 3, opener = 4, aoe = 5 }
+    else
+        preferredKinds = { single = 1, priority = 2, opener = 3, aoe = 4, dungeon = 5, raid = 6 }
+    end
+
+    local bestIndex = 1
+    local bestOrder = math.huge
+
+    for index, section in ipairs(sections or {}) do
+        local order = preferredKinds[section.kind] or 50
+        if order < bestOrder then
+            bestIndex = index
+            bestOrder = order
+        end
+    end
+
+    return bestIndex
+end
+
+local function NormalizeRotationVariantText(value)
+    return tostring(value or ""):lower():gsub("[^%w]+", "")
+end
+
+local function GetPreferredRotationVariant(rotation, context, contentType)
+    local variants = type(rotation) == "table" and rotation.variants
+    if type(variants) ~= "table" or #variants == 0 then
+        return nil
+    end
+
+    local desiredHeroTree = type(context) == "table" and context.heroTree or nil
+    local desiredHeroKey = NormalizeRotationVariantText(desiredHeroTree)
+    local buildTitleKey = NormalizeRotationVariantText(type(context) == "table" and context.buildTitle or nil)
+
+    if desiredHeroKey == "" and buildTitleKey ~= "" then
+        for _, variant in ipairs(variants) do
+            local heroKey = NormalizeRotationVariantText(variant.heroTree)
+            if heroKey ~= "" and buildTitleKey:find(heroKey, 1, true) then
+                desiredHeroKey = heroKey
+                break
+            end
+        end
+    end
+
+    local scenarioOrder
+    if contentType == "mythicplus" then
+        scenarioOrder = { aoe = 100, dungeon = 90, priority = 70, single = 20 }
+    elseif contentType == "raid" then
+        scenarioOrder = { single = 100, raid = 90, priority = 70, aoe = 20 }
+    else
+        scenarioOrder = { single = 100, priority = 80, aoe = 60, dungeon = 50, raid = 50 }
+    end
+
+    local bestVariant
+    local bestScore = -math.huge
+
+    for _, variant in ipairs(variants) do
+        local score = scenarioOrder[variant.scenario] or 0
+        local heroKey = NormalizeRotationVariantText(variant.heroTree)
+
+        if desiredHeroKey ~= "" then
+            if heroKey == desiredHeroKey then
+                score = score + 1000
+            else
+                score = score - 1000
+            end
+        end
+
+        if variant.recommended == true then
+            score = score + 10
+        end
+        if variant.selected == true then
+            score = score + 1
+        end
+
+        local hasSections = type(variant.sections) == "table" and #variant.sections > 0
+        local hasConditionalSections = type(rotation.conditionalSections) == "table" and #rotation.conditionalSections > 0
+        if (hasSections or hasConditionalSections) and score > bestScore then
+            bestVariant = variant
+            bestScore = score
+        end
+    end
+
+    return bestVariant
+end
+
+local function RotationStepMatchesVariant(step, enabledStates)
+    local conditions = type(step) == "table" and step.conditions
+    if type(conditions) ~= "table" or #conditions == 0 then
+        return true
+    end
+
+    local matched = 0
+    for _, condition in ipairs(conditions) do
+        local key
+        local expected
+        if type(condition) == "string" then
+            key, expected = condition:match("^(.*):(%a+)$")
+        elseif type(condition) == "table" then
+            key = condition.key
+            expected = condition.state
+        end
+
+        local actual = enabledStates[key] and "on" or "off"
+        if key and actual == expected then
+            matched = matched + 1
+        end
+    end
+
+    if step.logic == "OR" then
+        return matched > 0
+    end
+
+    return matched == #conditions
+end
+
+local function GetRotationSectionsForVariant(rotation, variant)
+    if type(variant) ~= "table" then
+        return type(rotation) == "table" and rotation.sections or {}
+    end
+
+    if type(variant.sections) == "table" and #variant.sections > 0 then
+        return variant.sections
+    end
+
+    if type(rotation.conditionalSections) ~= "table" or #rotation.conditionalSections == 0 then
+        return rotation.sections or {}
+    end
+
+    local sections = {}
+    local enabledStates = {}
+    for _, token in ipairs(variant.stateTokens or {}) do
+        enabledStates[token] = true
+    end
+
+    for _, rawSection in ipairs(rotation.conditionalSections) do
+        local section = {
+            key = rawSection.key,
+            label = rawSection.label,
+            kind = rawSection.kind,
+            steps = {},
+        }
+        local seenSpellIds = {}
+
+        for _, step in ipairs(rawSection.steps or {}) do
+            local spellId = tonumber(step.spellId)
+            local duplicate = rawSection.kind ~= "opener" and spellId and seenSpellIds[spellId]
+            if not duplicate and RotationStepMatchesVariant(step, enabledStates) then
+                section.steps[#section.steps + 1] = step
+                if spellId then
+                    seenSpellIds[spellId] = true
+                end
+            end
+        end
+
+        if #section.steps > 0 then
+            sections[#sections + 1] = section
+        end
+    end
+
+    return sections
+end
+
+local function CreateRotationRow(parent, index)
+    local row = CreateFrame("Button", nil, parent)
+    row:SetHeight(ROTATION_ROW_HEIGHT - 2)
+
+    row.bg = row:CreateTexture(nil, "BACKGROUND")
+    row.bg:SetAllPoints()
+    row.bg:SetColorTexture(0.08, 0.075, 0.065, index % 2 == 0 and 0.52 or 0.34)
+
+    row.number = row:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    row.number:SetPoint("LEFT", row, "LEFT", 6, 0)
+    row.number:SetWidth(24)
+    row.number:SetJustifyH("RIGHT")
+
+    row.icon = row:CreateTexture(nil, "ARTWORK")
+    row.icon:SetSize(26, 26)
+    row.icon:SetPoint("LEFT", row.number, "RIGHT", 7, 0)
+    row.icon:SetTexCoord(0.08, 0.92, 0.08, 0.92)
+
+    row.name = row:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+    row.name:SetPoint("LEFT", row.icon, "RIGHT", 9, 0)
+    row.name:SetPoint("RIGHT", row, "RIGHT", -8, 0)
+    row.name:SetJustifyH("LEFT")
+    row.name:SetWordWrap(false)
+
+    row:SetScript("OnEnter", function(self)
+        if not GameTooltip then
+            return
+        end
+
+        GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+        local shown = false
+
+        if self.spellId and GameTooltip.SetSpellByID then
+            shown = pcall(GameTooltip.SetSpellByID, GameTooltip, self.spellId)
+        end
+
+        if not shown then
+            GameTooltip:SetText(self.spellName or "Rotation ability", 1, 0.82, 0.2)
+        end
+
+        GameTooltip:Show()
+    end)
+    row:SetScript("OnLeave", function()
+        if GameTooltip then
+            GameTooltip:Hide()
+        end
+    end)
+
+    return row
+end
+
+local RefreshRotationPopup
+
+local function CreateRotationPopup(parent)
+    local popup = CreateFrame("Frame", "ZoidsToolsTalentRotationPopup", UIParent, "BackdropTemplate")
+    popup:SetSize(ROTATION_PANEL_WIDTH, ROTATION_PANEL_HEIGHT)
+    popup:SetFrameStrata("DIALOG")
+    popup:SetBackdrop({
+        bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
+        edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
+        tile = true,
+        tileSize = 16,
+        edgeSize = 12,
+        insets = { left = 3, right = 3, top = 3, bottom = 3 },
+    })
+    popup:SetBackdropColor(0.02, 0.018, 0.014, 0.98)
+    popup:SetBackdropBorderColor(0.72, 0.57, 0.22, 0.9)
+    popup:EnableMouse(true)
+    popup:SetClampedToScreen(true)
+    popup:SetPoint("BOTTOMLEFT", parent, "TOPLEFT", 0, 6)
+
+    popup.title = popup:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+    popup.title:SetPoint("TOPLEFT", popup, "TOPLEFT", 14, -13)
+    popup.title:SetTextColor(1, 0.82, 0.2)
+
+    popup.closeButton = CreateFrame("Button", nil, popup, "UIPanelCloseButton")
+    popup.closeButton:SetPoint("TOPRIGHT", popup, "TOPRIGHT", -2, -2)
+    popup.closeButton:SetScript("OnClick", function()
+        popup:Hide()
+    end)
+
+    popup.subtitle = popup:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    popup.subtitle:SetPoint("TOPLEFT", popup.title, "BOTTOMLEFT", 0, -3)
+    popup.subtitle:SetPoint("RIGHT", popup, "RIGHT", -38, 0)
+    popup.subtitle:SetJustifyH("LEFT")
+    popup.subtitle:SetTextColor(0.72, 0.76, 0.82)
+
+    popup.sectionDropdown = CreateOptionDropdown("ZoidsToolsTalentRotationSectionDropdown", popup, 210)
+    popup.sectionDropdown:SetPoint("TOPLEFT", popup.subtitle, "BOTTOMLEFT", -2, -10)
+
+    popup.sourceButton = CreateButton(popup, "Source", 72)
+    popup.sourceButton:SetPoint("LEFT", popup.sectionDropdown, "RIGHT", 8, 0)
+    popup.sourceButton:SetScript("OnClick", function()
+        if popup.sourceUrl and popup.sourceUrl ~= "" then
+            ShowCopyPopup(popup.sourceUrl)
+        end
+    end)
+
+    popup.scroll = CreateFrame("ScrollFrame", "ZoidsToolsTalentRotationScrollFrame", popup, "UIPanelScrollFrameTemplate")
+    popup.scroll:SetPoint("TOPLEFT", popup.sectionDropdown, "BOTTOMLEFT", 2, -10)
+    popup.scroll:SetPoint("BOTTOMRIGHT", popup, "BOTTOMRIGHT", -30, 42)
+
+    popup.content = CreateFrame("Frame", nil, popup.scroll)
+    popup.content:SetSize(ROTATION_PANEL_WIDTH - 50, 1)
+    popup.scroll:SetScrollChild(popup.content)
+    popup.rows = {}
+
+    popup.footer = popup:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
+    popup.footer:SetPoint("BOTTOMLEFT", popup, "BOTTOMLEFT", 14, 14)
+    popup.footer:SetPoint("RIGHT", popup, "RIGHT", -14, 0)
+    popup.footer:SetJustifyH("LEFT")
+    popup.footer:SetText("Static priority reference; it does not read combat or recommend abilities live.")
+
+    popup:Hide()
+    return popup
+end
+
+local function RefreshRotationRows(popup, section)
+    for _, row in ipairs(popup.rows) do
+        row:Hide()
+    end
+
+    local steps = type(section) == "table" and section.steps or {}
+
+    local visibleCount = 0
+
+    for _, step in ipairs(steps) do
+        local spellId = tonumber(step.spellId)
+        local showStep = popup.showAllSpells or IsRotationSpellAvailable(spellId)
+
+        if showStep then
+            visibleCount = visibleCount + 1
+        end
+
+        if showStep then
+            local row = popup.rows[visibleCount]
+            if not row then
+                row = CreateRotationRow(popup.content, visibleCount)
+                row:SetPoint("TOPLEFT", popup.content, "TOPLEFT", 0, -((visibleCount - 1) * ROTATION_ROW_HEIGHT))
+                row:SetPoint("RIGHT", popup.content, "RIGHT", 0, 0)
+                popup.rows[visibleCount] = row
+            end
+
+            row.spellId = spellId
+            row.spellName = step.name
+            row.number:SetText(visibleCount .. ".")
+            row.icon:SetTexture(GetRotationSpellTexture(row.spellId))
+            row.name:SetText(step.name or ("Spell " .. tostring(row.spellId or "")))
+            row:Show()
+        end
+    end
+
+    popup.content:SetHeight(math.max(1, visibleCount * ROTATION_ROW_HEIGHT))
+    popup.scroll:SetVerticalScroll(0)
+end
+
+RefreshRotationPopup = function(resetSection)
+    if not panel or not panel.rotationPopup then
+        return
+    end
+
+    local popup = panel.rotationPopup
+    local rotation, classToken, specKey = GetCurrentRotationData(panel.rotationContext)
+
+    if not rotation then
+        popup:Hide()
+        return
+    end
+
+    local db = EnsureDB()
+    local contentType = db and db.contentType or "mythicplus"
+    local variant = GetPreferredRotationVariant(rotation, panel.rotationContext, contentType)
+    local sections = GetRotationSectionsForVariant(rotation, variant)
+    local signature = table.concat({
+        tostring(classToken),
+        tostring(specKey),
+        tostring(contentType),
+        tostring(variant and variant.key or "default"),
+    }, ":")
+
+    if resetSection or popup.rotationSignature ~= signature or not sections[popup.sectionIndex or 0] then
+        popup.sectionIndex = GetPreferredRotationSectionIndex(sections, contentType)
+    end
+
+    popup.rotationSignature = signature
+    popup.sourceUrl = rotation.sourceUrl
+    popup.showAllSpells = panel.rotationContext and panel.rotationContext.requiresSpecSwitch == true
+    popup.title:SetText(GetSpecLabel(specKey) .. " Rotation")
+    local subtitleParts = {
+        rotation.source or "Rotation reference",
+        GetOptionText(CONTENT_OPTIONS, contentType),
+    }
+    if variant and variant.heroTree and variant.heroTree ~= "" then
+        subtitleParts[#subtitleParts + 1] = variant.heroTree
+    end
+    if variant and variant.scenarioLabel and variant.scenarioLabel ~= "" then
+        subtitleParts[#subtitleParts + 1] = variant.scenarioLabel
+    end
+    popup.subtitle:SetText(table.concat(subtitleParts, "  |  "))
+    if variant then
+        popup.footer:SetText("Static priority reference for this selected build. The source page may open on its own default hero-tree selection.")
+    else
+        popup.footer:SetText("Static priority reference; it does not read combat or recommend abilities live.")
+    end
+
+    local options = {}
+    for index, section in ipairs(sections) do
+        options[#options + 1] = {
+            value = index,
+            text = section.label or ("Section " .. index),
+        }
+    end
+
+    popup.sectionDropdown:SetOptions(options, popup.sectionIndex, function(value)
+        popup.sectionIndex = value
+        RefreshRotationPopup(false)
+    end)
+    popup.sourceButton:SetEnabled(type(rotation.sourceUrl) == "string" and rotation.sourceUrl ~= "")
+    popup.sourceButton:SetAlpha(type(rotation.sourceUrl) == "string" and rotation.sourceUrl ~= "" and 1 or 0.45)
+    RefreshRotationRows(popup, sections[popup.sectionIndex])
+end
+
+local function GetPlayerSpecializationInfo(specIndex)
+    local getter = C_SpecializationInfo and C_SpecializationInfo.GetSpecializationInfo or GetSpecializationInfo
+
+    if type(getter) ~= "function" then
+        return nil
+    end
+
+    local ok, specID, name, description, icon = pcall(getter, specIndex)
+
+    if not ok or not specID then
+        return nil
+    end
+
+    return specID, name, description, icon
+end
+
+local function GetPlayerSpecializationCount()
+    local _, _, classID = UnitClass("player")
+    local count
+
+    if classID and C_SpecializationInfo and C_SpecializationInfo.GetNumSpecializationsForClassID then
+        local ok, value = pcall(C_SpecializationInfo.GetNumSpecializationsForClassID, classID)
+        if ok then count = value end
+    elseif GetNumSpecializations then
+        local ok, value = pcall(GetNumSpecializations, false, false)
+        if ok then count = value end
+    end
+
+    count = tonumber(count) or 0
+    return math.min(MAX_CLASS_SPECIALIZATIONS, math.max(0, count))
+end
+
+local function GetActiveSpecializationIndex()
+    local getter = C_SpecializationInfo and C_SpecializationInfo.GetSpecialization or GetSpecialization
+
+    if type(getter) ~= "function" then
+        return nil
+    end
+
+    local ok, specIndex = pcall(getter)
+    return ok and tonumber(specIndex) or nil
+end
+
+local function CreateSpecializationButton(parent, index)
+    local button = CreateFrame("Button", nil, parent, "BackdropTemplate")
+    button:SetSize(SPEC_BUTTON_SIZE, SPEC_BUTTON_SIZE)
+    button:SetBackdrop({
+        bgFile = SOLID_TEXTURE,
+        edgeFile = SOLID_TEXTURE,
+        edgeSize = 2,
+        insets = { left = 2, right = 2, top = 2, bottom = 2 },
+    })
+    button:SetBackdropColor(0.025, 0.025, 0.025, 0.92)
+
+    button.icon = button:CreateTexture(nil, "ARTWORK")
+    button.icon:SetPoint("TOPLEFT", button, "TOPLEFT", 3, -3)
+    button.icon:SetPoint("BOTTOMRIGHT", button, "BOTTOMRIGHT", -3, 3)
+    button.icon:SetTexCoord(0.08, 0.92, 0.08, 0.92)
+
+    button.selection = button:CreateTexture(nil, "OVERLAY")
+    button.selection:SetAllPoints(button.icon)
+    button.selection:SetColorTexture(1, 0.82, 0.16, 0.22)
+    button.selection:SetBlendMode("ADD")
+    button.selection:Hide()
+
+    button.highlight = button:CreateTexture(nil, "HIGHLIGHT")
+    button.highlight:SetAllPoints(button.icon)
+    button.highlight:SetColorTexture(1, 1, 1, 0.16)
+
+    if index == 1 then
+        button:SetPoint("LEFT", parent, "RIGHT", SPEC_BUTTON_OFFSET_X, 0)
+    else
+        button:SetPoint("LEFT", parent.specButtons[index - 1], "RIGHT", SPEC_BUTTON_GAP, 0)
+    end
+
+    button:SetScript("OnClick", function(self)
+        if self.isActive or not self.specIndex then
+            return
+        end
+
+        local switched, switchError = RequestSpecializationSwitch(self.specIndex, self.specName)
+        if not switched and switchError then
+            PrintTalentMessage(switchError)
+        end
+    end)
+    button:SetScript("OnEnter", function(self)
+        if not GameTooltip or not self.specName then
+            return
+        end
+
+        GameTooltip:SetOwner(self, "ANCHOR_TOP")
+        GameTooltip:SetText(self.specName, 1, 0.82, 0.2)
+
+        if self.isActive then
+            GameTooltip:AddLine("Current specialization", 0.56, 0.86, 0.56)
+        elseif InCombatLockdown and InCombatLockdown() then
+            GameTooltip:AddLine("Specializations cannot be changed in combat.", 1, 0.35, 0.25, true)
+        else
+            GameTooltip:AddLine("Click to switch specialization without leaving the Talents page.", 1, 1, 1, true)
+        end
+
+        if self.specDescription and self.specDescription ~= "" then
+            GameTooltip:AddLine(self.specDescription, 0.72, 0.76, 0.82, true)
+        end
+
+        GameTooltip:Show()
+    end)
+    button:SetScript("OnLeave", function()
+        if GameTooltip then
+            GameTooltip:Hide()
+        end
+    end)
+
+    return button
+end
+
+local function RefreshSpecializationButtons(readOnly)
+    if not panel or not panel.specButtons then
+        return
+    end
+
+    local activeSpecIndex = GetActiveSpecializationIndex()
+    local specCount = GetPlayerSpecializationCount()
+
+    for index, button in ipairs(panel.specButtons) do
+        if index <= specCount then
+            local specID, name, description, icon = GetPlayerSpecializationInfo(index)
+
+            if specID then
+                button.specIndex = index
+                button.specID = specID
+                button.specName = name or ("Specialization " .. index)
+                button.specDescription = description
+                button.isActive = index == activeSpecIndex
+                button.icon:SetTexture(icon or 134400)
+                button.selection:SetShown(button.isActive)
+                button:SetBackdropBorderColor(
+                    button.isActive and 1 or 0.35,
+                    button.isActive and 0.82 or 0.35,
+                    button.isActive and 0.16 or 0.35,
+                    button.isActive and 1 or 0.9
+                )
+                button:SetEnabled(readOnly ~= true)
+                button:SetAlpha(readOnly and 0.5 or (button.isActive and 1 or 0.88))
+                button:Show()
+            else
+                button:Hide()
+            end
+        else
+            button:Hide()
+        end
+    end
+end
+
 local function RefreshPanel()
     if not panel then
         return
@@ -3382,6 +4046,9 @@ local function RefreshPanel()
     local importString = entry and entry.importString or ""
     local copyValue = importString ~= "" and importString or (entry and entry.sourceUrl or "")
     local targetOptions = GetTargetDropdownOptions(contentType, mode, targetKey)
+    local rotation = GetCurrentRotationData(context)
+    panel.rotationContext = context
+    RefreshSpecializationButtons(false)
 
     panel.providerDropdown:SetOptions(GetProviderOptions(), GetProviderKey(), function(value)
         ns:SetTalentGrimoireProvider(value)
@@ -3399,6 +4066,8 @@ local function RefreshPanel()
     panel.copyButton:SetText(context.requiresSpecSwitch and "Switch Spec" or (importString ~= "" and "Apply" or "Source"))
     panel.copyButton:SetEnabled(copyValue ~= "")
     panel.copyButton:SetAlpha(copyValue ~= "" and 1 or 0.45)
+    panel.helpButton:SetEnabled(rotation ~= nil)
+    panel.helpButton:SetAlpha(rotation and 1 or 0.45)
     if context.requiresSpecSwitch then
         panel.statusText:SetText(GetSpecLabel(context.specKey) .. " build available. Switch specialization, then apply it.")
     else
@@ -3408,6 +4077,10 @@ local function RefreshPanel()
     if panel.importPopup then
         panel.importPopup.editBox:SetText(copyValue)
         panel.importPopup.editBox:SetCursorPosition(0)
+    end
+
+    if panel.rotationPopup and panel.rotationPopup:IsShown() then
+        RefreshRotationPopup(false)
     end
 
     panel:Show()
@@ -3448,11 +4121,48 @@ local function CreatePanel()
     panel.modeDropdown = CreateOptionDropdown("ZoidsToolsTalentModeDropdown", panel, 132)
     panel.modeDropdown:SetPoint("LEFT", panel.contentDropdown, "RIGHT", CONTROL_GAP, 0)
 
-    panel.targetDropdown = CreateOptionDropdown("ZoidsToolsTalentTargetDropdown", panel, 220)
+    panel.targetDropdown = CreateOptionDropdown("ZoidsToolsTalentTargetDropdown", panel, 190)
     panel.targetDropdown:SetPoint("LEFT", panel.modeDropdown, "RIGHT", CONTROL_GAP, 0)
 
+    panel.helpButton = CreateButton(panel, "?", 28)
+    panel.helpButton:SetPoint("LEFT", panel.targetDropdown, "RIGHT", 8, 0)
+    panel.helpButton:SetScript("OnClick", function()
+        local popup = panel.rotationPopup
+        if not popup then
+            return
+        end
+
+        if popup:IsShown() then
+            popup:Hide()
+        else
+            RefreshRotationPopup(true)
+            popup:Show()
+        end
+    end)
+    panel.helpButton:SetScript("OnEnter", function(self)
+        if not GameTooltip then
+            return
+        end
+
+        GameTooltip:SetOwner(self, "ANCHOR_TOP")
+        GameTooltip:SetText("Suggested Rotation", 1, 0.82, 0.2)
+
+        if GetCurrentRotationData(panel.rotationContext) then
+            GameTooltip:AddLine("Show the sourced, static priority reference for this specialization.", 1, 1, 1, true)
+        else
+            GameTooltip:AddLine("No rotation was imported for this specialization. Run the LocalTools talent updater to refresh it.", 0.75, 0.75, 0.75, true)
+        end
+
+        GameTooltip:Show()
+    end)
+    panel.helpButton:SetScript("OnLeave", function()
+        if GameTooltip then
+            GameTooltip:Hide()
+        end
+    end)
+
     panel.copyButton = CreateButton(panel, "Apply", 88)
-    panel.copyButton:SetPoint("LEFT", panel.targetDropdown, "RIGHT", 8, 0)
+    panel.copyButton:SetPoint("LEFT", panel.helpButton, "RIGHT", 6, 0)
     panel.copyButton:RegisterForClicks("LeftButtonUp", "RightButtonUp")
     panel.copyButton:SetScript("OnClick", function(_, button)
         local entry, context = ns:GetTalentGrimoireCurrentBuild()
@@ -3474,6 +4184,11 @@ local function CreatePanel()
         end
     end)
 
+    panel.specButtons = {}
+    for index = 1, MAX_CLASS_SPECIALIZATIONS do
+        panel.specButtons[index] = CreateSpecializationButton(panel, index)
+    end
+
     panel.statusText = panel:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
     panel.statusText:SetPoint("TOPLEFT", panel.providerDropdown, "BOTTOMLEFT", 2, -1)
     panel.statusText:SetPoint("RIGHT", panel.copyButton, "RIGHT", 0, 0)
@@ -3481,6 +4196,12 @@ local function CreatePanel()
     panel.statusText:SetTextColor(0.75, 0.82, 0.9)
 
     CreateImportPopup(panel)
+    panel.rotationPopup = CreateRotationPopup(panel)
+    panel:SetScript("OnHide", function()
+        if panel.rotationPopup then
+            panel.rotationPopup:Hide()
+        end
+    end)
     panel:Hide()
 
     return panel
@@ -3512,6 +4233,13 @@ local function AnchorPanel(talentFrame)
     panel:SetFrameStrata("DIALOG")
     panel:SetFrameLevel((hostFrame:GetFrameLevel() or 1) + PANEL_FRAME_LEVEL_OFFSET)
 
+    if panel.rotationPopup then
+        panel.rotationPopup:SetFrameStrata("DIALOG")
+        panel.rotationPopup:SetFrameLevel((panel:GetFrameLevel() or 1) + 6)
+        panel.rotationPopup:ClearAllPoints()
+        panel.rotationPopup:SetPoint("BOTTOMLEFT", panel, "TOPLEFT", 0, 6)
+    end
+
     local controlLevel = (panel:GetFrameLevel() or 1) + CONTROL_FRAME_LEVEL_OFFSET
 
     for _, control in ipairs({
@@ -3519,11 +4247,16 @@ local function AnchorPanel(talentFrame)
         panel.providerDropdown,
         panel.modeDropdown,
         panel.targetDropdown,
+        panel.helpButton,
         panel.copyButton,
     }) do
         if control and control.SetFrameLevel then
             control:SetFrameLevel(controlLevel)
         end
+    end
+
+    for _, specButton in ipairs(panel.specButtons or {}) do
+        specButton:SetFrameLevel(controlLevel)
     end
 end
 
@@ -3572,6 +4305,10 @@ local function RefreshPanelForCombat(talentFrame)
     panel.copyButton:SetText("In Combat")
     panel.copyButton:SetEnabled(false)
     panel.copyButton:SetAlpha(0.45)
+    local rotation = GetCurrentRotationData(panel.rotationContext)
+    panel.helpButton:SetEnabled(rotation ~= nil)
+    panel.helpButton:SetAlpha(rotation and 1 or 0.45)
+    RefreshSpecializationButtons(true)
     panel.statusText:SetText("Build helper is read-only during combat. Selection and Apply unlock automatically afterward.")
 
     if panel.importPopup then

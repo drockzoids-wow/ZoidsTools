@@ -291,73 +291,28 @@ local function SafeAPICall(func, ...)
     return nil
 end
 
-local function GetBuffChatLink(spellID, fallbackName)
-    if C_Spell and C_Spell.GetSpellLink then
-        local link = SafeAPICall(C_Spell.GetSpellLink, spellID)
-        if link then return link end
-    end
-
-    if GetSpellLink then
-        local link = SafeAPICall(GetSpellLink, spellID)
-        if link then return link end
-    end
-
-    return "[" .. tostring(fallbackName or "Unknown buff") .. "]"
-end
-
-local function GetGroupChatType()
+local function GetGroupChatSlashCommand()
     if IsInGroup and LE_PARTY_CATEGORY_INSTANCE
         and IsInGroup(LE_PARTY_CATEGORY_INSTANCE) then
-        return "INSTANCE_CHAT"
+        return "/instance"
     end
     if IsInRaid and IsInRaid() then
-        return "RAID"
+        return "/raid"
     end
     if IsInGroup and IsInGroup() then
-        return "PARTY"
+        return "/party"
     end
     return nil
 end
 
-local function PrepareMissingBuffMessage(spellID, buffName)
-    if IsCombatLocked() then
-        refreshAfterCombat = true
-        return
-    end
+local function GetMissingBuffMacroText(buffName)
+    local slashCommand = GetGroupChatSlashCommand()
+    if not slashCommand then return nil end
 
-    local chatType = GetGroupChatType()
-    if not chatType then
-        ns:Print("Unable to announce the missing buff because you are not in a group.")
-        return
-    end
-
-    local message = "Missing group buff: " .. GetBuffChatLink(spellID, buffName)
-    if not ChatFrameUtil or type(ChatFrameUtil.OpenChat) ~= "function" then
-        ns:Print(message)
-        return
-    end
-
-    -- SendChatMessage is restricted in 12.1, particularly for automated
-    -- messages during instance encounters. Open Blizzard's edit box instead
-    -- so the player explicitly confirms the prepared message with Enter.
-    local editBox = ChatFrameUtil.OpenChat("")
-    if not editBox then
-        ns:Print(message)
-        return
-    end
-
-    if type(editBox.SetChatType) == "function" then
-        editBox:SetChatType(chatType)
-    end
-    if type(editBox.SetText) == "function" then
-        editBox:SetText(message)
-    end
-    if type(editBox.SetCursorPosition) == "function" then
-        editBox:SetCursorPosition(#message)
-    end
-    if type(editBox.UpdateHeader) == "function" then
-        editBox:UpdateHeader()
-    end
+    -- The secure button executes this macro from the player's hardware click.
+    -- This avoids calling the restricted SendChatMessage API or requiring a
+    -- second confirmation in Blizzard's chat edit box.
+    return slashCommand .. " Missing group buff: " .. tostring(buffName or "Unknown buff")
 end
 
 local function GetSpellName(spellID, fallbackName)
@@ -628,8 +583,7 @@ local function GetWarningIconButton(frame, index)
             GameTooltip:AddLine("Left-click to cast.", 0.8, 1, 0.8, true)
         else
             GameTooltip:AddLine("Someone in your group can provide this buff.", 1, 0.85, 0.55, true)
-            GameTooltip:AddLine("Left-click to prepare a group message.", 0.8, 1, 0.8, true)
-            GameTooltip:AddLine("Press Enter to send it.", 0.8, 0.8, 0.8, true)
+            GameTooltip:AddLine("Left-click to request it in group chat.", 0.8, 1, 0.8, true)
         end
 
         GameTooltip:AddLine("Drag the popup by the empty space.", 0.8, 0.8, 0.8, true)
@@ -638,12 +592,6 @@ local function GetWarningIconButton(frame, index)
     button:SetScript("OnLeave", function()
         GameTooltip:Hide()
     end)
-    button:SetScript("PostClick", function(self, mouseButton)
-        if mouseButton == "LeftButton" and not self.canCastBuff and not IsCombatLocked() then
-            PrepareMissingBuffMessage(self.spellID, self.buffName)
-        end
-    end)
-
     frame.buffIcons[index] = button
 
     return button
@@ -676,13 +624,16 @@ local function UpdateWarningIcons(frame, missing)
             button:SetAttribute("type1", "spell")
             button:SetAttribute("spell1", buff.name or buff.spellID)
             button:SetAttribute("unit1", "player")
+            button:SetAttribute("macrotext1", nil)
         else
-            button:SetAttribute("type1", nil)
+            local macroText = GetMissingBuffMacroText(buff.name)
+
+            button:SetAttribute("type1", macroText and "macro" or nil)
             button:SetAttribute("spell1", nil)
             button:SetAttribute("unit1", nil)
+            button:SetAttribute("macrotext1", macroText)
         end
 
-        button:SetAttribute("macrotext1", nil)
         button:SetAttribute("type2", nil)
         button:SetAttribute("spell2", nil)
         button:SetAttribute("unit2", nil)

@@ -2,8 +2,17 @@
 
 ## Unreleased
 
+- Added a dedicated Professions section with automatic Midnight 12.1 Knowledge tracking for trainer quests, treatises, weekly treasures, gathering and disenchanting drops, Darkmoon quests, catch-up currency, eight one-time profession treasures, and the Zul'jarra rank 6 book. A compact goal-selectable tracker can be shown, moved, locked click-through, hidden, and reset from the same page.
+- Darkmoon profession goals now show the Faire's live monthly status in the progress tracker, including the faction-appropriate Goldshire (SW) or Thunder Bluff (TB) entrance.
+- Clarified Profession Weekly tracker counters with earned Knowledge values and source-specific catch-up backlog labels for gathering, disenchanting, and patron orders.
+- Added plain-language mouseover help to every Profession Weekly tracker row while preserving click-through behavior when the tracker is locked.
+- Increased the Core > Minimap settings card height so the expansion-button size slider and its label remain fully inside the panel border.
+- Added a sourced Suggested Rotation help button to the Talent Grimoire bar. The popup provides compact Icy Veins specialization priorities, automatically favors dungeon/AoE or raid/single-target sections, includes spell tooltips and a source link, and remains a static reference rather than a live combat assistant.
+- Fixed Suggested Rotations mixing hidden Icy Veins hero-tree and talent branches. Rotation help now follows the selected build's hero tree and content preset, labels that choice in the popup, and preserves repeated casts only when they belong to the same exact sequence.
+- Made dungeon rows in Instance Lockouts open Premade Groups > Dungeons and immediately select and search the matching Blizzard activity when left-clicked; a customized dungeon checklist re-enables only the clicked dungeon while preserving every other advanced-filter choice.
+- Made the Instance Lockouts Week and Season headers clickable, with remembered lowest-to-highest or highest-to-lowest seasonal Mythic+ sorting and alphabetical tie-breaking.
 - Replaced the minimized Instance Lockouts side box with a full gear button attached just outside the Dungeons & Raids right border; the button and expanded side panel are mutually exclusive.
-- Replaced the missing-buff popup's restricted automatic group-chat send with a prefilled Blizzard chat message that the player confirms with Enter, preventing protected-action errors in dungeons and encounters.
+- Changed missing-buff requests to one-click secure group-chat actions, removing the blank chat-edit-box handoff and Enter-key confirmation without calling restricted chat APIs.
 - Expanded Instance Lockouts to list every active seasonal Mythic+ dungeon, including separate best-this-week and best-this-season values, explicit base-Mythic loot lock state, and reset time; seasonal dungeons from older expansions no longer duplicate in the legacy section.
 - Added a Warband Weekly dashboard that snapshots each logged-in character's equipped item level, Mythic+ rating, weekly best, owned keystone, Great Vault unlocks, and current-expansion dungeon and raid saves; weekly-only data visibly expires at reset until that character logs in again.
 - Added combat-safe skill-flyout direction controls with a Blizzard-automatic default plus named overrides that follow Summon Demon, Warband, and other known flyouts between action-bar slots; the flyout picker supports multi-selection for applying one direction to several flyouts at once.

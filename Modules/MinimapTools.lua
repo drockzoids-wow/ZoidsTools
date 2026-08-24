@@ -46,6 +46,12 @@ local COLLECTED_BUTTON_GAP = 6
 local DEFAULT_COLLECTOR_ANGLE = -45
 local COLLECTOR_RADIUS = COLLECTOR_SIZE / 2
 local INFO_BAR_HEIGHT = 32
+local INFO_BAR_TEXT_SIDE_INSET = 72
+local INFO_BAR_ZONE_LINE_HEIGHT = 14
+local INFO_BAR_SUBZONE_LINE_HEIGHT = 11
+local INFO_BAR_ZONE_TOP_OFFSET = -2
+local INFO_BAR_SUBZONE_TOP_OFFSET = -17
+local INFO_BAR_MIN_FONT_SIZE = 8
 local TRACKING_BUTTON_SIZE = 24
 local ADDON_COMPARTMENT_SIZE = 22
 local MAIL_ICON_SIZE = 32
@@ -580,23 +586,89 @@ local function GetMinimapLocationText()
     return zone, subZone
 end
 
+local function IsSecretValue(value)
+    return issecretvalue and issecretvalue(value) or false
+end
+
+local function CaptureFontInfo(fontString, fallbackSize)
+    local font, size, flags = fontString:GetFont()
+
+    return {
+        font = font or STANDARD_TEXT_FONT or "Fonts\\FRIZQT__.TTF",
+        size = (not IsSecretValue(size) and tonumber(size)) or fallbackSize,
+        flags = flags or "",
+    }
+end
+
+local function SetSingleLineText(fontString)
+    fontString:SetWordWrap(false)
+
+    if fontString.SetMaxLines then
+        fontString:SetMaxLines(1)
+    end
+end
+
+local function SetFittedInfoBarText(fontString, text, fontInfo, availableWidth)
+    text = text or ""
+    fontString:SetText(text)
+
+    if not fontInfo then
+        return
+    end
+
+    local fontSize = fontInfo.size
+    fontString:SetFont(fontInfo.font, fontSize, fontInfo.flags)
+
+    if text == "" or IsSecretValue(availableWidth) or type(availableWidth) ~= "number" or availableWidth <= 0 then
+        return
+    end
+
+    local textWidth = fontString:GetUnboundedStringWidth()
+
+    if IsSecretValue(textWidth) or type(textWidth) ~= "number" or textWidth <= availableWidth then
+        return
+    end
+
+    fontSize = math.max(INFO_BAR_MIN_FONT_SIZE, math.floor(fontSize * availableWidth / textWidth))
+    fontString:SetFont(fontInfo.font, fontSize, fontInfo.flags)
+
+    -- Font metrics round differently at some UI scales. Walk down the final
+    -- few pixels so the location can never wrap into the subzone line.
+    while fontSize > INFO_BAR_MIN_FONT_SIZE do
+        textWidth = fontString:GetUnboundedStringWidth()
+
+        if IsSecretValue(textWidth) or type(textWidth) ~= "number" or textWidth <= availableWidth then
+            break
+        end
+
+        fontSize = fontSize - 1
+        fontString:SetFont(fontInfo.font, fontSize, fontInfo.flags)
+    end
+end
+
 local function EnsureInfoBarText(bar)
     if not bar or bar.zoneText then
         return
     end
 
     bar.zoneText = bar:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    bar.zoneText:SetPoint("TOPLEFT", bar, "TOPLEFT", 72, -4)
-    bar.zoneText:SetPoint("TOPRIGHT", bar, "TOPRIGHT", -72, -4)
+    bar.zoneText:SetPoint("TOPLEFT", bar, "TOPLEFT", INFO_BAR_TEXT_SIDE_INSET, INFO_BAR_ZONE_TOP_OFFSET)
+    bar.zoneText:SetPoint("TOPRIGHT", bar, "TOPRIGHT", -INFO_BAR_TEXT_SIDE_INSET, INFO_BAR_ZONE_TOP_OFFSET)
+    bar.zoneText:SetHeight(INFO_BAR_ZONE_LINE_HEIGHT)
     bar.zoneText:SetJustifyH("CENTER")
     bar.zoneText:SetJustifyV("MIDDLE")
+    SetSingleLineText(bar.zoneText)
+    bar.zoneFont = CaptureFontInfo(bar.zoneText, 14)
 
     bar.subZoneText = bar:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-    bar.subZoneText:SetPoint("TOPLEFT", bar.zoneText, "BOTTOMLEFT", 0, -1)
-    bar.subZoneText:SetPoint("TOPRIGHT", bar.zoneText, "BOTTOMRIGHT", 0, -1)
+    bar.subZoneText:SetPoint("TOPLEFT", bar, "TOPLEFT", INFO_BAR_TEXT_SIDE_INSET, INFO_BAR_SUBZONE_TOP_OFFSET)
+    bar.subZoneText:SetPoint("TOPRIGHT", bar, "TOPRIGHT", -INFO_BAR_TEXT_SIDE_INSET, INFO_BAR_SUBZONE_TOP_OFFSET)
+    bar.subZoneText:SetHeight(INFO_BAR_SUBZONE_LINE_HEIGHT)
     bar.subZoneText:SetJustifyH("CENTER")
     bar.subZoneText:SetJustifyV("MIDDLE")
     bar.subZoneText:SetTextColor(0.78, 0.90, 1)
+    SetSingleLineText(bar.subZoneText)
+    bar.subZoneFont = CaptureFontInfo(bar.subZoneText, 10)
 end
 
 local function UpdateInfoBarText()
@@ -607,24 +679,40 @@ local function UpdateInfoBarText()
     EnsureInfoBarText(infoBar)
 
     local zone, subZone = GetMinimapLocationText()
+    local barWidth = infoBar:GetWidth()
+    local availableWidth
+
+    if not IsSecretValue(barWidth) then
+        local numericWidth = tonumber(barWidth)
+
+        if numericWidth and numericWidth > (INFO_BAR_TEXT_SIDE_INSET * 2) then
+            availableWidth = numericWidth - (INFO_BAR_TEXT_SIDE_INSET * 2)
+        end
+    end
 
     if infoBar.zoneText then
         infoBar.zoneText:ClearAllPoints()
 
         if subZone and subZone ~= "" then
-            infoBar.zoneText:SetPoint("TOPLEFT", infoBar, "TOPLEFT", 72, -4)
-            infoBar.zoneText:SetPoint("TOPRIGHT", infoBar, "TOPRIGHT", -72, -4)
-            infoBar.zoneText:SetText(zone)
+            infoBar.zoneText:SetPoint("TOPLEFT", infoBar, "TOPLEFT", INFO_BAR_TEXT_SIDE_INSET, INFO_BAR_ZONE_TOP_OFFSET)
+            infoBar.zoneText:SetPoint("TOPRIGHT", infoBar, "TOPRIGHT", -INFO_BAR_TEXT_SIDE_INSET, INFO_BAR_ZONE_TOP_OFFSET)
+            infoBar.zoneText:SetHeight(INFO_BAR_ZONE_LINE_HEIGHT)
         else
-            infoBar.zoneText:SetPoint("LEFT", infoBar, "LEFT", 72, 0)
-            infoBar.zoneText:SetPoint("RIGHT", infoBar, "RIGHT", -72, 0)
-            infoBar.zoneText:SetText(zone)
+            infoBar.zoneText:SetPoint("LEFT", infoBar, "LEFT", INFO_BAR_TEXT_SIDE_INSET, 0)
+            infoBar.zoneText:SetPoint("RIGHT", infoBar, "RIGHT", -INFO_BAR_TEXT_SIDE_INSET, 0)
+            infoBar.zoneText:SetHeight(INFO_BAR_HEIGHT - 4)
         end
+
+        SetFittedInfoBarText(infoBar.zoneText, zone, infoBar.zoneFont, availableWidth)
     end
 
     if infoBar.subZoneText then
         if subZone and subZone ~= "" then
-            infoBar.subZoneText:SetText(subZone)
+            infoBar.subZoneText:ClearAllPoints()
+            infoBar.subZoneText:SetPoint("TOPLEFT", infoBar, "TOPLEFT", INFO_BAR_TEXT_SIDE_INSET, INFO_BAR_SUBZONE_TOP_OFFSET)
+            infoBar.subZoneText:SetPoint("TOPRIGHT", infoBar, "TOPRIGHT", -INFO_BAR_TEXT_SIDE_INSET, INFO_BAR_SUBZONE_TOP_OFFSET)
+            infoBar.subZoneText:SetHeight(INFO_BAR_SUBZONE_LINE_HEIGHT)
+            SetFittedInfoBarText(infoBar.subZoneText, subZone, infoBar.subZoneFont, availableWidth)
             infoBar.subZoneText:Show()
         else
             infoBar.subZoneText:SetText("")
@@ -876,6 +964,11 @@ local function EnsureInfoBar()
     })
     StyleInfoBar(infoBar)
     EnsureInfoBarText(infoBar)
+    infoBar:SetScript("OnSizeChanged", function(self)
+        if self:IsShown() then
+            UpdateInfoBarText()
+        end
+    end)
     infoBar:Hide()
 
     return infoBar

@@ -15,13 +15,14 @@ local ROW_HEIGHT = 44
 local pages = {
     overview = { key = "overview", label = "Overview", icon = "ZT", page = nil, sectionKey = "overview", description = "Status, quick actions, and common ZoidsTools areas." },
     warband = { key = "warband", label = "Warband Weekly", icon = "WB", page = "warband", sectionKey = "warband", description = "Account-wide Mythic+, Great Vault, keystone, and current-expansion lockout snapshots." },
+    professionweekly = { key = "professionweekly", label = "Weekly Progress", icon = "PK", page = "professionweekly", sectionKey = "profession_area", description = "Midnight profession Knowledge weeklies, catch-up progress, and one-time goals." },
     minimap = { key = "minimap", label = "Minimap", icon = "N", page = "general", sectionKey = "core", description = "Minimap shape, title bar, addon buttons, and expansion button tools." },
     general = { key = "general", label = "Interface", icon = "G", page = "general", sectionKey = "core", description = "Widgets, audio sync, Talking Head, and general interface tools." },
     tooltips = { key = "tooltips", label = "Tooltips", icon = "T", page = "tooltips", sectionKey = "core", description = "Class-colored player names, Mythic+ rating, and equipped item level." },
     windows = { key = "windows", label = "Windows", icon = "W", page = "windows", sectionKey = "core", description = "Move and scale Blizzard windows and default bag frames." },
     chat = { key = "chat", label = "Chat", icon = "H", page = "chat", sectionKey = "chat", description = "Chat copy, saved history, input styling, scrolling, and message awareness." },
     items = { key = "items", label = "Items", icon = "I", page = "items", sectionKey = "character", description = "Item level, gems, enchants, bind text, and stat goal overlays." },
-    professions = { key = "professions", label = "Professions", icon = "P", page = "professions", sectionKey = "character", description = "Molinari-style disenchant, mill, prospect, and lockbox helpers." },
+    professions = { key = "professions", label = "Tools", icon = "P", page = "professions", sectionKey = "profession_area", description = "Molinari-style disenchant, mill, prospect, and lockbox helpers." },
     talents = { key = "talents", label = "Talents", icon = "B", page = "builds", sectionKey = "character", description = "Talent recommendations, source selection, and application helpers." },
     meters = { key = "meters", label = "Meters", icon = "M", page = "meters", sectionKey = "combat_area", description = "Custom damage meters and Blizzard meter profile tools." },
     combat = { key = "combat", label = "Combat", icon = "C", page = "combat", sectionKey = "combat_area", description = "Keybind text, skill flyouts, range tinting, missing buffs, and combat notifications." },
@@ -37,8 +38,9 @@ local pages = {
 local sections = {
     { key = "overview", label = "Overview", icon = "ZT", iconTexture = "Interface\\Icons\\INV_Misc_Map_01", defaultPageKey = "overview", tabs = { pages.overview } },
     { key = "warband", label = "Warband", icon = "WB", iconTexture = "Interface\\Icons\\INV_Misc_GroupLooking", defaultPageKey = "warband", tabs = { pages.warband } },
+    { key = "profession_area", label = "Professions", icon = "PK", iconTexture = "Interface\\Icons\\Trade_Engineering", defaultPageKey = "professionweekly", tabs = { pages.professionweekly, pages.professions } },
     { key = "core", label = "Core", icon = "UI", iconTexture = "Interface\\Icons\\INV_Misc_Gear_01", defaultPageKey = "minimap", tabs = { pages.minimap, pages.general, pages.tooltips, pages.windows } },
-    { key = "character", label = "Character", icon = "CHAR", iconTexture = "Interface\\Icons\\INV_Misc_GroupLooking", defaultPageKey = "items", tabs = { pages.items, pages.professions, pages.talents } },
+    { key = "character", label = "Character", icon = "CHAR", iconTexture = "Interface\\Icons\\INV_Misc_GroupLooking", defaultPageKey = "items", tabs = { pages.items, pages.talents } },
     { key = "chat", label = "Chat", icon = "CHAT", iconTexture = "Interface\\Icons\\INV_Letter_15", defaultPageKey = "chat", tabs = { pages.chat } },
     { key = "combat_area", label = "Combat", icon = "CBT", iconTexture = "Interface\\Icons\\Ability_DualWield", defaultPageKey = "meters", tabs = { pages.meters, pages.combat, pages.unitframes, pages.macros } },
     { key = "mounts", label = "Mounts", icon = "MNT", iconTexture = "Interface\\Icons\\Ability_Mount_RidingHorse", defaultPageKey = "mounts", tabs = { pages.mounts } },
@@ -50,7 +52,9 @@ local pageAliases = {
     builds = "talents",
     build = "talents",
     tooltip = "tooltips",
-    profession = "professions",
+    profession = "professionweekly",
+    knowledge = "professionweekly",
+    professiontracker = "professionweekly",
     unitframe = "unitframes",
     frames = "unitframes",
     mount = "mounts",
@@ -367,6 +371,16 @@ local WARBAND_COLUMNS = {
     { key = "vault", label = "VAULT", width = 66, align = "CENTER" },
     { key = "saves", label = "SAVES", width = 58, align = "CENTER" },
     { key = "updated", label = "UPDATED", width = 94, align = "RIGHT" },
+}
+
+local PROFESSION_WEEKLY_COLUMNS = {
+    { key = "profession", label = "PROFESSION", width = 190, align = "LEFT" },
+    { key = "trainer", label = "TRAINER", width = 76, align = "CENTER" },
+    { key = "treatise", label = "TREATISE", width = 76, align = "CENTER" },
+    { key = "field", label = "DROPS", width = 92, align = "CENTER" },
+    { key = "weekly", label = "WEEKLY KP", width = 92, align = "CENTER" },
+    { key = "onetime", label = "ONE-TIME", width = 104, align = "CENTER" },
+    { key = "catchup", label = "CATCH-UP", width = 112, align = "CENTER" },
 }
 
 local function WarbandNow()
@@ -752,6 +766,374 @@ local function CreateWarbandPage(parent)
     return page
 end
 
+local function CreateProfessionWeeklyPage(parent)
+    local UI = ns.UI
+    local page = CreateFrame("Frame", nil, parent)
+    page:SetAllPoints()
+    page:Hide()
+
+    local function FormatGoal(goal, usePoints)
+        if type(goal) ~= "table" then
+            return "—"
+        end
+        if goal.id == "catchup" then
+            if not goal.known then return "—" end
+            return goal.complete and "Caught up" or string.format("%d KP backlog", tonumber(goal.remaining) or 0)
+        end
+        if goal.complete then
+            return "Done"
+        elseif goal.ready then
+            return "Ready"
+        elseif usePoints then
+            return string.format("%d/%d", tonumber(goal.points) or 0, tonumber(goal.pointsTotal) or 0)
+        end
+        return string.format("%d/%d", tonumber(goal.current) or 0, tonumber(goal.total) or 0)
+    end
+
+    local function SetGoalColor(fontString, goal)
+        if type(goal) ~= "table" or (goal.id == "catchup" and not goal.known) then
+            fontString:SetTextColor(0.55, 0.55, 0.58)
+        elseif goal.complete then
+            fontString:SetTextColor(0.36, 0.92, 0.52)
+        elseif goal.ready then
+            fontString:SetTextColor(1, 0.76, 0.24)
+        else
+            fontString:SetTextColor(0.84, 0.84, 0.82)
+        end
+    end
+
+    local summary = CreateSectionCard(page, "Current Week", 760, 68)
+    summary:SetPoint("TOPLEFT", page, "TOPLEFT", 0, 0)
+
+    summary.reset = summary:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    summary.reset:SetPoint("TOPLEFT", summary, "TOPLEFT", 18, -40)
+    summary.reset:SetWidth(230)
+    summary.reset:SetJustifyH("LEFT")
+
+    summary.professions = summary:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    summary.professions:SetPoint("LEFT", summary.reset, "RIGHT", 12, 0)
+    summary.professions:SetWidth(190)
+    summary.professions:SetJustifyH("LEFT")
+
+    summary.knowledge = summary:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    summary.knowledge:SetPoint("LEFT", summary.professions, "RIGHT", 12, 0)
+    summary.knowledge:SetWidth(190)
+    summary.knowledge:SetJustifyH("LEFT")
+
+    local refreshButton = CreateButton(summary, "Refresh", 96, 24)
+    refreshButton:SetPoint("RIGHT", summary, "RIGHT", -12, -8)
+    refreshButton:SetScript("OnClick", function()
+        if ns.RequestProfessionWeeklyRefresh then
+            ns:RequestProfessionWeeklyRefresh()
+        end
+    end)
+
+    local trackerCard = CreateSectionCard(page, "Progress Tracker", 760, 150)
+    trackerCard:SetPoint("TOPLEFT", summary, "BOTTOMLEFT", 0, -12)
+
+    local trackerShown = UI.CreateCheckbox(
+        trackerCard,
+        "Show profession tracker",
+        "Shows the compact selected-goal tracker outside the settings window.",
+        function() return ns.IsProfessionWeeklyTrackerShown and ns:IsProfessionWeeklyTrackerShown() end,
+        function(value) if ns.SetProfessionWeeklyTrackerShown then ns:SetProfessionWeeklyTrackerShown(value) end end
+    )
+    trackerShown:SetPoint("TOPLEFT", trackerCard, "TOPLEFT", 18, -40)
+
+    local trackerLocked = UI.CreateCheckbox(
+        trackerCard,
+        "Lock tracker click-through",
+        "Locks the profession tracker in place and lets mouse clicks pass through it.",
+        function() return ns.IsProfessionWeeklyTrackerLocked and ns:IsProfessionWeeklyTrackerLocked() end,
+        function(value) if ns.SetProfessionWeeklyTrackerLocked then ns:SetProfessionWeeklyTrackerLocked(value) end end
+    )
+    trackerLocked:SetPoint("TOPLEFT", trackerShown, "BOTTOMLEFT", 0, -4)
+
+    local moveTracker = CreateButton(trackerCard, "Show & Move", 120, 25)
+    moveTracker:SetPoint("TOPLEFT", trackerCard, "TOPLEFT", 18, -112)
+    moveTracker:SetScript("OnClick", function()
+        if ns.MoveProfessionWeeklyTracker then
+            ns:MoveProfessionWeeklyTracker()
+        end
+        if page.Refresh then page:Refresh() end
+    end)
+
+    local resetTracker = CreateButton(trackerCard, "Reset Position", 126, 25)
+    resetTracker:SetPoint("LEFT", moveTracker, "RIGHT", 10, 0)
+    resetTracker:SetScript("OnClick", function()
+        if ns.ResetProfessionWeeklyTrackerPosition then
+            ns:ResetProfessionWeeklyTrackerPosition()
+        end
+    end)
+
+    local goalOptions = {}
+    for _, option in ipairs(ns.GetProfessionWeeklyGoalOptions and ns:GetProfessionWeeklyGoalOptions() or {}) do
+        local goalID = option.value
+        goalOptions[#goalOptions + 1] = {
+            value = goalID,
+            text = option.text,
+            shortText = option.shortText,
+            getter = function()
+                return ns.GetProfessionWeeklyGoalEnabled and ns:GetProfessionWeeklyGoalEnabled(goalID)
+            end,
+            setter = function(value)
+                if ns.SetProfessionWeeklyGoalEnabled then
+                    ns:SetProfessionWeeklyGoalEnabled(goalID, value)
+                end
+            end,
+        }
+    end
+
+    local goalSelector = UI.CreateMultiSelectDropdown(
+        trackerCard,
+        "Goals shown in tracker",
+        "Choose the profession goals displayed beneath each learned profession.",
+        goalOptions,
+        350
+    )
+    goalSelector:SetPoint("TOPLEFT", trackerCard, "TOPLEFT", 392, -40)
+
+    trackerCard.note = trackerCard:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
+    trackerCard.note:SetPoint("TOPLEFT", trackerCard, "TOPLEFT", 392, -101)
+    trackerCard.note:SetWidth(340)
+    trackerCard.note:SetJustifyH("LEFT")
+    trackerCard.note:SetText("Monthly, catch-up, and one-time goals are optional and do not inflate the fixed weekly total.")
+
+    page.header = CreateFrame("Frame", nil, page, "BackdropTemplate")
+    page.header:SetPoint("TOPLEFT", trackerCard, "BOTTOMLEFT", 0, -12)
+    page.header:SetSize(760, 24)
+    ApplyBackdrop(page.header, 0.56)
+
+    local columnX = 10
+    for _, column in ipairs(PROFESSION_WEEKLY_COLUMNS) do
+        local label = page.header:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
+        label:SetPoint("LEFT", page.header, "LEFT", columnX, 0)
+        label:SetWidth(column.width)
+        label:SetJustifyH(column.align)
+        label:SetTextColor(0.68, 0.69, 0.72)
+        label:SetText(column.label)
+        columnX = columnX + column.width
+    end
+
+    page.scroll = CreateFrame("ScrollFrame", nil, page)
+    page.scroll:SetPoint("TOPLEFT", page.header, "BOTTOMLEFT", 0, -5)
+    page.scroll:SetPoint("BOTTOMRIGHT", page, "BOTTOMRIGHT", -2, 10)
+    page.scroll:SetClipsChildren(true)
+    page.scroll:EnableMouseWheel(true)
+
+    page.content = CreateFrame("Frame", nil, page.scroll)
+    page.content:SetSize(760, 1)
+    page.scroll:SetScrollChild(page.content)
+    page.rows = {}
+
+    local function ShowProfessionTooltip(row)
+        local info = row and row.info
+        if not info or not GameTooltip then return end
+
+        GameTooltip:SetOwner(row, "ANCHOR_RIGHT")
+        GameTooltip:SetText(tostring(info.name or "Profession"), 1, 0.82, 0.18)
+        local skillText = (tonumber(info.maxSkillLevel) or 0) > 0
+            and string.format("%d/%d", tonumber(info.skillLevel) or 0, tonumber(info.maxSkillLevel) or 0)
+            or "Unavailable"
+        GameTooltip:AddDoubleLine("Midnight skill", skillText, 0.82, 0.82, 0.82, 1, 1, 1)
+        GameTooltip:AddDoubleLine("Unspent Knowledge", tostring(tonumber(info.unspentKnowledge) or 0), 0.82, 0.82, 0.82, 1, 0.82, 0.18)
+        GameTooltip:AddLine(" ")
+        GameTooltip:AddDoubleLine("Fixed weekly Knowledge", string.format("%d/%d", tonumber(info.weeklyPoints) or 0, tonumber(info.weeklyTotal) or 0), 1, 0.82, 0.18, 1, 1, 1)
+        for _, goalID in ipairs({ "trainer", "treatise", "field" }) do
+            local goal = info.goals and info.goals[goalID]
+            if goal then
+                GameTooltip:AddDoubleLine(goal.label or goalID, string.format("%s  •  %d/%d KP", FormatGoal(goal, false), tonumber(goal.points) or 0, tonumber(goal.pointsTotal) or 0), 0.82, 0.82, 0.82, goal.complete and 0.36 or 0.92, goal.complete and 0.92 or 0.82, goal.complete and 0.52 or 0.72)
+            end
+        end
+
+        local darkmoon = info.goals and info.goals.darkmoon
+        if darkmoon then
+            local activity = darkmoon.active
+                and string.format("Active %s", darkmoon.location or "SW")
+                or "Inactive"
+            GameTooltip:AddDoubleLine(
+                "Darkmoon Faire (monthly)",
+                string.format("%s  •  %s", activity, darkmoon.complete and "Complete" or "0/1"),
+                0.82, 0.82, 0.82,
+                darkmoon.active and 0.36 or 1,
+                darkmoon.active and 0.92 or 0.30,
+                darkmoon.active and 0.52 or 0.30
+            )
+        end
+
+        local onetime = info.goals and info.goals.onetime
+        if onetime then
+            GameTooltip:AddLine(" ")
+            GameTooltip:AddLine("One-time Midnight Knowledge", 1, 0.82, 0.18)
+            GameTooltip:AddDoubleLine("Midnight world treasures", string.format("%d/%d", tonumber(onetime.treasureCurrent) or 0, tonumber(onetime.treasureTotal) or 0), 0.82, 0.82, 0.82, 1, 1, 1)
+            GameTooltip:AddDoubleLine("Zul'jarra rank 6 book", onetime.bookComplete and "Collected" or "Not collected", 0.82, 0.82, 0.82, onetime.bookComplete and 0.36 or 1, onetime.bookComplete and 0.92 or 0.64, onetime.bookComplete and 0.52 or 0.32)
+        end
+
+        local catchup = info.goals and info.goals.catchup
+        if catchup then
+            local catchupText = catchup.known
+                and (catchup.complete
+                    and "Caught up"
+                    or string.format("%d KP via %s", tonumber(catchup.remaining) or 0, catchup.method or "profession activities"))
+                or "Unavailable"
+            GameTooltip:AddDoubleLine("Catch-up backlog", catchupText, 0.82, 0.82, 0.82, 0.72, 0.84, 1)
+            GameTooltip:AddLine("Blizzard's catch-up allowance is separate from weekly goals and treatises.", 0.65, 0.67, 0.72, true)
+            if catchup.method == "gathering" then
+                GameTooltip:AddLine("Finish the normal weekly gathering goals first; bonus 1-KP items can then appear while gathering.", 0.65, 0.67, 0.72, true)
+            elseif catchup.method == "disenchanting" then
+                GameTooltip:AddLine("After the normal weekly goals, bonus 1-KP items can appear while disenchanting.", 0.65, 0.67, 0.72, true)
+            elseif catchup.method == "patron orders" then
+                GameTooltip:AddLine("Catch-up Knowledge is offered through eligible patron crafting orders over time.", 0.65, 0.67, 0.72, true)
+            end
+        end
+        GameTooltip:Show()
+    end
+
+    local function CreateRow()
+        local row = CreateFrame("Button", nil, page.content, "BackdropTemplate")
+        row:SetSize(760, 58)
+        ApplyBackdrop(row, 0.42)
+
+        row.accent = row:CreateTexture(nil, "ARTWORK")
+        row.accent:SetPoint("TOPLEFT", row, "TOPLEFT", 4, -5)
+        row.accent:SetPoint("BOTTOMLEFT", row, "BOTTOMLEFT", 4, 5)
+        row.accent:SetWidth(3)
+        row.accent:SetColorTexture(0.96, 0.72, 0.20, 0.95)
+
+        row.icon = row:CreateTexture(nil, "ARTWORK")
+        row.icon:SetPoint("LEFT", row, "LEFT", 13, 0)
+        row.icon:SetSize(28, 28)
+        row.icon:SetTexCoord(0.08, 0.92, 0.08, 0.92)
+
+        row.name = row:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+        row.name:SetPoint("TOPLEFT", row, "TOPLEFT", 48, -9)
+        row.name:SetWidth(PROFESSION_WEEKLY_COLUMNS[1].width - 48)
+        row.name:SetJustifyH("LEFT")
+        row.name:SetWordWrap(false)
+
+        row.detail = row:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
+        row.detail:SetPoint("TOPLEFT", row.name, "BOTTOMLEFT", 0, -3)
+        row.detail:SetWidth(PROFESSION_WEEKLY_COLUMNS[1].width - 48)
+        row.detail:SetJustifyH("LEFT")
+        row.detail:SetWordWrap(false)
+
+        row.values = {}
+        local valueX = 10 + PROFESSION_WEEKLY_COLUMNS[1].width
+        for index = 2, #PROFESSION_WEEKLY_COLUMNS do
+            local column = PROFESSION_WEEKLY_COLUMNS[index]
+            local value = row:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+            value:SetPoint("CENTER", row, "LEFT", valueX + column.width / 2, 0)
+            value:SetWidth(column.width - 4)
+            value:SetJustifyH(column.align)
+            value:SetWordWrap(false)
+            row.values[column.key] = value
+            valueX = valueX + column.width
+        end
+
+        row:SetScript("OnEnter", function(self)
+            self:SetBackdropBorderColor(0.84, 0.64, 0.22, 0.82)
+            ShowProfessionTooltip(self)
+        end)
+        row:SetScript("OnLeave", function(self)
+            self:SetBackdropBorderColor(0.25, 0.28, 0.33, 0.58)
+            GameTooltip:Hide()
+        end)
+        return row
+    end
+
+    page.empty = page:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+    page.empty:SetPoint("TOP", page.header, "BOTTOM", 0, -55)
+    page.empty:SetWidth(700)
+    page.empty:SetJustifyH("CENTER")
+    page.empty:SetTextColor(0.72, 0.72, 0.74)
+    page.empty:SetText("No Midnight primary professions were found on this character.")
+
+    page.scroll:SetScript("OnSizeChanged", function(self, width)
+        width = tonumber(width)
+        if width then
+            page.content:SetWidth(math.max(1, width))
+            for _, row in ipairs(page.rows) do
+                row:SetWidth(math.max(1, width))
+            end
+        end
+    end)
+    page.scroll:SetScript("OnMouseWheel", function(self, delta)
+        local current = tonumber(self:GetVerticalScroll()) or 0
+        local range = tonumber(self:GetVerticalScrollRange()) or 0
+        self:SetVerticalScroll(math.max(0, math.min(range, current - (tonumber(delta) or 0) * 61)))
+    end)
+
+    function page:Refresh()
+        trackerShown:Refresh()
+        trackerLocked:Refresh()
+        goalSelector:Refresh()
+
+        local dashboard = ns.GetProfessionWeeklyDashboard and ns:GetProfessionWeeklyDashboard() or {}
+        local professions = type(dashboard.professions) == "table" and dashboard.professions or {}
+        local resetAt = ns.GetProfessionWeeklyResetAt and ns:GetProfessionWeeklyResetAt()
+        summary.reset:SetText("RESET  |cffffffff" .. (resetAt and FormatWarbandDuration(resetAt - WarbandNow()) or "Unavailable") .. "|r")
+        summary.professions:SetText(string.format("PROFESSIONS  |cffffffff%d|r", #professions))
+        summary.knowledge:SetText(string.format("WEEKLY KP  |cffffffff%d/%d|r", tonumber(dashboard.weeklyPoints) or 0, tonumber(dashboard.weeklyTotal) or 0))
+
+        for index, info in ipairs(professions) do
+            local row = page.rows[index]
+            if not row then
+                row = CreateRow()
+                page.rows[index] = row
+            end
+            row:ClearAllPoints()
+            row:SetPoint("TOPLEFT", page.content, "TOPLEFT", 0, -((index - 1) * 61))
+            row:SetWidth(page.content:GetWidth() or 760)
+            row.info = info
+            row.name:SetText(tostring(info.name or "Profession"))
+            row.name:SetTextColor(1, 0.82, 0.18)
+            row.icon:SetTexture(info.icon or "Interface\\Icons\\INV_Misc_QuestionMark")
+            local skillText = (tonumber(info.maxSkillLevel) or 0) > 0
+                and string.format("Skill %d/%d", tonumber(info.skillLevel) or 0, tonumber(info.maxSkillLevel) or 0)
+                or "Midnight skill"
+            row.detail:SetText(string.format("%s  •  %d unspent", skillText, tonumber(info.unspentKnowledge) or 0))
+
+            local goals = info.goals or {}
+            row.values.trainer:SetText(FormatGoal(goals.trainer, false))
+            SetGoalColor(row.values.trainer, goals.trainer)
+            row.values.treatise:SetText(FormatGoal(goals.treatise, false))
+            SetGoalColor(row.values.treatise, goals.treatise)
+            row.values.field:SetText(FormatGoal(goals.field, false))
+            SetGoalColor(row.values.field, goals.field)
+            row.values.weekly:SetText(string.format("%d/%d", tonumber(info.weeklyPoints) or 0, tonumber(info.weeklyTotal) or 0))
+            row.values.weekly:SetTextColor(info.weeklyComplete and 0.36 or 1, info.weeklyComplete and 0.92 or 0.78, info.weeklyComplete and 0.52 or 0.20)
+            row.values.onetime:SetText(FormatGoal(goals.onetime, false))
+            SetGoalColor(row.values.onetime, goals.onetime)
+            row.values.catchup:SetText(FormatGoal(goals.catchup, false))
+            SetGoalColor(row.values.catchup, goals.catchup)
+            row:Show()
+        end
+
+        for index = #professions + 1, #page.rows do
+            page.rows[index].info = nil
+            page.rows[index]:Hide()
+        end
+        page.empty:SetShown(#professions == 0)
+        page.content:SetHeight(math.max(1, #professions * 61))
+    end
+
+    page:SetScript("OnShow", function(self)
+        self:Refresh()
+        if ns.RequestProfessionWeeklyRefresh then
+            ns:RequestProfessionWeeklyRefresh()
+        end
+    end)
+    local updateElapsed = 0
+    page:SetScript("OnUpdate", function(self, elapsed)
+        updateElapsed = updateElapsed + (tonumber(elapsed) or 0)
+        if updateElapsed >= 60 then
+            updateElapsed = 0
+            self:Refresh()
+        end
+    end)
+    return page
+end
+
 local function CreateMinimapPage(parent)
     local page = CreateFrame("Frame", nil, parent)
     page:SetAllPoints()
@@ -759,7 +1141,7 @@ local function CreateMinimapPage(parent)
 
     local cardW = 374
 
-    local minimapCard = CreateSectionCard(page, "Minimap", cardW, 224)
+    local minimapCard = CreateSectionCard(page, "Minimap", cardW, 248)
     minimapCard:SetPoint("TOPLEFT", page, "TOPLEFT", 0, 0)
 
     local showMinimap = ns.UI.CreateCheckbox(
@@ -4299,7 +4681,7 @@ local function CreateModernWindow()
             UI2.Show(section.defaultPageKey)
         end)
         frame.navButtons[section.key] = button
-        y = y - 54
+        y = y - 52
     end
 
     frame.subnavButtons = {}
@@ -4307,7 +4689,7 @@ local function CreateModernWindow()
         frame.subnavButtons[section.key] = {}
         local previous
         for index, tabInfo in ipairs(section.tabs or {}) do
-            local width = tabInfo.label == "Unit Frames" and 128 or 118
+            local width = tabInfo.label == "Weekly Progress" and 142 or (tabInfo.label == "Unit Frames" and 128 or 118)
             local button = CreateButton(frame.subnav, tabInfo.label, width, 27)
             if index == 1 then
                 button:SetPoint("TOPLEFT", frame.subnav, "TOPLEFT", 0, 0)
@@ -4328,6 +4710,7 @@ local function CreateModernWindow()
     frame.overview.ZTPageKey = "overview"
     frame.modernPages = {
         warband = CreateModernPage(frame.pageHost, "warband", CreateWarbandPage),
+        professionweekly = CreateModernPage(frame.pageHost, "professionweekly", CreateProfessionWeeklyPage),
         minimap = CreateModernPage(frame.pageHost, "minimap", CreateMinimapPage),
         general = CreateModernPage(frame.pageHost, "general", CreateInterfacePage),
         tooltips = CreateModernPage(frame.pageHost, "tooltips", CreateTooltipsPage),
@@ -4402,8 +4785,9 @@ local function CreateModernWindow()
 
     frame.areaRows = {
         CreateAreaRow(frame.overview, "Warband Weekly", "Mythic+, Great Vault, keystones, and current-expansion saves across your characters.", "warband"),
+        CreateAreaRow(frame.overview, "Professions", "Midnight Knowledge weeklies, catch-up progress, one-time goals, and profession item tools.", "professionweekly"),
         CreateAreaRow(frame.overview, "Core", "Minimap, player tooltips, window movement, audio sync, and Talking Head.", "minimap"),
-        CreateAreaRow(frame.overview, "Character", "Items, stat goals, profession helper, talents, and recommendations.", "items"),
+        CreateAreaRow(frame.overview, "Character", "Items, stat goals, talents, and recommendations.", "items"),
         CreateAreaRow(frame.overview, "Combat", "Meters, keybind text, range tint, missing buffs, unit frames, and macros.", "meters"),
         CreateAreaRow(frame.overview, "Automation", "Fast loot, vendor tools, quest automation, tracker styling, and quest item button.", "loot"),
     }
@@ -4439,6 +4823,12 @@ local function CreateModernWindow()
         local warbandPage = frame.modernPages and frame.modernPages.warband
         if warbandPage and warbandPage:IsShown() and warbandPage.Refresh then
             warbandPage:Refresh()
+        end
+    end
+    UI2.RefreshProfessionWeeklyDashboard = function()
+        local professionPage = frame.modernPages and frame.modernPages.professionweekly
+        if professionPage and professionPage:IsShown() and professionPage.Refresh then
+            professionPage:Refresh()
         end
     end
     RestorePosition(frame)

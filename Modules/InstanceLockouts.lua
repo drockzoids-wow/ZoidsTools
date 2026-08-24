@@ -16,6 +16,7 @@ local RESET_COLUMN_WIDTH = 62
 local COLUMN_GAP = 3
 local ROW_RIGHT_INSET = 7
 local MYTHIC_DUNGEON_DIFFICULTY_ID = 23
+local GROUP_FINDER_DUNGEON_CATEGORY_ID = 2
 
 local panel
 local eventFrame
@@ -79,6 +80,12 @@ local function EnsureDB()
     end
     if db.minimized == nil then
         db.minimized = false
+    end
+    if db.sortColumn ~= "week" and db.sortColumn ~= "season" then
+        db.sortColumn = "name"
+    end
+    if db.sortDirection ~= "desc" then
+        db.sortDirection = "asc"
     end
     return db
 end
@@ -575,6 +582,215 @@ local function SetTextStyle(fontString, size, r, g, b, justify)
     fontString:SetWordWrap(false)
 end
 
+local function PrintDungeonSearchError(dungeonName, detail)
+    if type(ns.Print) ~= "function" then
+        return
+    end
+
+    local message = string.format("Could not search Premade Groups for %s.", dungeonName or "that dungeon")
+    if detail then
+        message = message .. " " .. detail
+    end
+    ns:Print(message)
+end
+
+local function FindDungeonSearchActivityID(info, categoryID, baseFilters)
+    if not C_LFGList
+        or type(C_LFGList.GetAvailableActivities) ~= "function"
+        or type(C_LFGList.GetActivityInfoTable) ~= "function" then
+        return nil
+    end
+
+    local activityFilters = baseFilters
+    local recommendedFilter = Enum and Enum.LFGListFilter and SafeNumber(Enum.LFGListFilter.Recommended)
+    if recommendedFilter then
+        if bit and type(bit.bor) == "function" then
+            activityFilters = bit.bor(activityFilters, recommendedFilter)
+        else
+            activityFilters = activityFilters + recommendedFilter
+        end
+    end
+
+    local activitiesOK, activityIDs = pcall(
+        C_LFGList.GetAvailableActivities,
+        categoryID,
+        nil,
+        activityFilters
+    )
+    if not activitiesOK or IsSecretValue(activityIDs) or type(activityIDs) ~= "table" then
+        return nil
+    end
+
+    local wantedMapID = SafeNumber(info.instanceID)
+    local wantedName = NormalizeName(info.name)
+    local fallbackID
+    local fallbackGroupID
+    for _, rawActivityID in ipairs(activityIDs) do
+        local activityID = SafeNumber(rawActivityID)
+        if activityID then
+            local activityOK, activityInfo = pcall(C_LFGList.GetActivityInfoTable, activityID)
+            if activityOK and not IsSecretValue(activityInfo) and type(activityInfo) == "table" then
+                local activityMapID = SafeNumber(activityInfo.mapID)
+                local shortName = NormalizeName(activityInfo.shortName)
+                local fullName = NormalizeName(activityInfo.fullName)
+                local mapMatches = wantedMapID and activityMapID == wantedMapID
+                local nameMatches = wantedName and (
+                    shortName == wantedName
+                    or fullName == wantedName
+                    or (fullName and fullName:find(wantedName, 1, true) == 1)
+                )
+                if mapMatches or nameMatches then
+                    fallbackID = fallbackID or activityID
+                    fallbackGroupID = fallbackGroupID or SafeNumber(activityInfo.groupFinderActivityGroupID)
+                    if SafeBoolean(activityInfo.isMythicPlusActivity) == true then
+                        return activityID, SafeNumber(activityInfo.groupFinderActivityGroupID)
+                    end
+                end
+            end
+        end
+    end
+
+    return fallbackID, fallbackGroupID
+end
+
+local function EnsureDungeonSelectedInAdvancedFilter(activityGroupID)
+    if not C_LFGList
+        or type(C_LFGList.GetAdvancedFilter) ~= "function"
+        or type(C_LFGList.SaveAdvancedFilter) ~= "function" then
+        return false
+    end
+
+    local filterOK, enabled = pcall(C_LFGList.GetAdvancedFilter)
+    if not filterOK or IsSecretValue(enabled) or type(enabled) ~= "table" then
+        return false
+    end
+
+    if type(enabled.activities) ~= "table" then
+        enabled.activities = {}
+    end
+
+    -- Blizzard treats an empty dungeon list as "all dungeons." Once a player
+    -- customizes the list, add only the clicked dungeon's activity group so
+    -- every other role, rating, difficulty, playstyle, and dungeon choice stays intact.
+    if #enabled.activities == 0 then
+        return true
+    end
+
+    if activityGroupID then
+        for _, rawGroupID in ipairs(enabled.activities) do
+            if SafeNumber(rawGroupID) == activityGroupID then
+                return true
+            end
+        end
+
+        enabled.activities[#enabled.activities + 1] = activityGroupID
+        local saveOK = pcall(C_LFGList.SaveAdvancedFilter, enabled)
+        if saveOK then
+            return true
+        end
+    end
+
+    -- Compatibility fallback for a changed or unavailable activity-group ID:
+    -- an empty list restores Blizzard's native "all dungeons" behavior without
+    -- resetting any of the other advanced-filter fields.
+    enabled.activities = {}
+    return pcall(C_LFGList.SaveAdvancedFilter, enabled)
+end
+
+local function SearchPremadeGroupsForDungeon(info)
+    if not info or info.isRaid == true then
+        return
+    end
+
+    local dungeonName = SafeString(info.name)
+    if not dungeonName then
+        return
+    end
+
+    if C_LFGList and type(C_LFGList.HasActiveEntryInfo) == "function" then
+        local activeOK, hasActiveEntry = pcall(C_LFGList.HasActiveEntryInfo)
+        if activeOK and SafeBoolean(hasActiveEntry) == true then
+            PrintDungeonSearchError(dungeonName, "Leave your active listing first.")
+            return
+        end
+    end
+
+    if type(_G.PVEFrame_ShowFrame) ~= "function" or not _G.LFGListPVEStub then
+        PrintDungeonSearchError(dungeonName, "Blizzard's Group Finder is not available yet.")
+        return
+    end
+
+    local openOK = pcall(_G.PVEFrame_ShowFrame, "GroupFinderFrame", _G.LFGListPVEStub)
+    if not openOK then
+        PrintDungeonSearchError(dungeonName, "Blizzard's Group Finder could not be opened.")
+        return
+    end
+
+    local lfgFrame = _G.LFGListFrame
+    local categoryPanel = lfgFrame and lfgFrame.CategorySelection
+    local searchPanel = lfgFrame and lfgFrame.SearchPanel
+    local searchBox = searchPanel and searchPanel.SearchBox
+    if not lfgFrame or not categoryPanel or not searchPanel or not searchBox then
+        PrintDungeonSearchError(dungeonName, "The dungeon search panel is not available yet.")
+        return
+    end
+
+    if type(_G.LFGListCategorySelection_SelectCategory) ~= "function"
+        or type(_G.LFGListSearchPanel_Clear) ~= "function"
+        or type(_G.LFGListSearchPanel_SetCategory) ~= "function"
+        or type(_G.LFGListSearchPanel_DoSearch) ~= "function"
+        or type(_G.LFGListFrame_SetActivePanel) ~= "function"
+        or not C_LFGList
+        or type(C_LFGList.SetSearchToActivity) ~= "function" then
+        PrintDungeonSearchError(dungeonName, "The dungeon search controls are not available yet.")
+        return
+    end
+
+    local categoryID = SafeNumber(_G.GROUP_FINDER_CATEGORY_ID_DUNGEONS) or GROUP_FINDER_DUNGEON_CATEGORY_ID
+    local filters = 0 -- Blizzard's Dungeon category button uses 0 and resolves Recommended internally.
+    local baseFilters = SafeNumber(lfgFrame.baseFilters) or 0
+    local activityID, activityGroupID = FindDungeonSearchActivityID(info, categoryID, baseFilters)
+    if not activityID then
+        PrintDungeonSearchError(dungeonName, "Blizzard did not return a matching dungeon activity.")
+        return
+    end
+
+    if not EnsureDungeonSelectedInAdvancedFilter(activityGroupID) then
+        PrintDungeonSearchError(dungeonName, "Blizzard's dungeon filter could not be updated.")
+        return
+    end
+
+    local setupOK = pcall(function()
+        _G.LFGListCategorySelection_SelectCategory(categoryPanel, categoryID, filters)
+        if SafeNumber(categoryPanel.selectedCategory) ~= categoryID then
+            error("Dungeon category was not available")
+        end
+
+        _G.LFGListSearchPanel_Clear(searchPanel)
+        _G.LFGListSearchPanel_SetCategory(searchPanel, categoryID, filters, baseFilters)
+        _G.LFGListFrame_SetActivePanel(lfgFrame, searchPanel)
+        C_LFGList.SetSearchToActivity(activityID)
+    end)
+
+    if not setupOK then
+        PrintDungeonSearchError(dungeonName, "Blizzard's dungeon search could not be prepared.")
+        return
+    end
+
+    local searchOK = pcall(_G.LFGListSearchPanel_DoSearch, searchPanel)
+    if not searchOK then
+        if type(searchBox.SetFocus) == "function" then
+            pcall(searchBox.SetFocus, searchBox)
+        end
+        PrintDungeonSearchError(dungeonName, "Press Enter in Blizzard's prepared search box to finish the search.")
+        return
+    end
+
+    if GameTooltip then
+        GameTooltip:Hide()
+    end
+end
+
 local function ShowLockoutTooltip(row)
     local info = row and row.info
     if not info or not GameTooltip then
@@ -595,6 +811,8 @@ local function ShowLockoutTooltip(row)
         end
         GameTooltip:AddLine(" ")
         GameTooltip:AddLine("Mythic+ remains repeatable. The lock only tracks base Mythic loot for this week.", 0.66, 0.66, 0.70, true)
+        GameTooltip:AddLine(" ")
+        GameTooltip:AddLine("Left-click to search Premade Groups for this dungeon.", 0.35, 0.82, 1, true)
         GameTooltip:Show()
         return
     end
@@ -618,6 +836,10 @@ local function ShowLockoutTooltip(row)
             GameTooltip:AddDoubleLine(encounter.name, marker, 1, 1, 1, 1, 1, 1)
         end
     end
+    if info.isRaid ~= true then
+        GameTooltip:AddLine(" ")
+        GameTooltip:AddLine("Left-click to search Premade Groups for this dungeon.", 0.35, 0.82, 1, true)
+    end
     GameTooltip:Show()
 end
 
@@ -625,6 +847,7 @@ local function CreateLockoutRow(parent)
     local row = CreateFrame("Button", nil, parent)
     row:SetHeight(40)
     row:EnableMouse(true)
+    row:RegisterForClicks("LeftButtonUp")
 
     row.background = row:CreateTexture(nil, "BACKGROUND")
     row.background:SetAllPoints()
@@ -667,6 +890,11 @@ local function CreateLockoutRow(parent)
     row:SetScript("OnLeave", function(self)
         self.background:SetColorTexture(1, 1, 1, 0.035)
         GameTooltip:Hide()
+    end)
+    row:SetScript("OnClick", function(self, button)
+        if button == "LeftButton" then
+            SearchPremadeGroupsForDungeon(self.info)
+        end
     end)
     return row
 end
@@ -711,6 +939,116 @@ local function GetSeasonalRightReserve()
         + WEEKLY_RUN_COLUMN_WIDTH + (COLUMN_GAP * 3) + ROW_RIGHT_INSET
 end
 
+local RenderLockouts
+
+local function GetSeasonalSortHeaderText(column, label)
+    local db = EnsureDB()
+    if not db or db.sortColumn ~= column then
+        return label
+    end
+    return label .. (db.sortDirection == "desc" and " v" or " ^")
+end
+
+local function SortSeasonalDungeons(list)
+    local db = EnsureDB()
+    local column = db and db.sortColumn
+    if column ~= "week" and column ~= "season" then
+        return list
+    end
+
+    local sorted = {}
+    for index, info in ipairs(list or {}) do
+        sorted[index] = info
+    end
+
+    local valueKey = column == "week" and "weeklyBestLevel" or "seasonBestLevel"
+    local descending = db.sortDirection == "desc"
+    table.sort(sorted, function(left, right)
+        local leftValue = left and SafeNumber(left[valueKey]) or nil
+        local rightValue = right and SafeNumber(right[valueKey]) or nil
+
+        if leftValue ~= rightValue then
+            if leftValue == nil then
+                return not descending
+            elseif rightValue == nil then
+                return descending
+            elseif descending then
+                return leftValue > rightValue
+            else
+                return leftValue < rightValue
+            end
+        end
+
+        return tostring(left and left.name or ""):lower() < tostring(right and right.name or ""):lower()
+    end)
+    return sorted
+end
+
+local function CreateSeasonalSortButton(parent, column, label)
+    local button = CreateFrame("Button", nil, parent)
+    button.column = column
+    button.label = label
+    button:RegisterForClicks("LeftButtonUp")
+
+    button.background = button:CreateTexture(nil, "BACKGROUND")
+    button.background:SetAllPoints()
+    button.background:SetColorTexture(0.90, 0.68, 0.16, 0)
+
+    button.text = button:CreateFontString(nil, "OVERLAY")
+    button.text:SetAllPoints()
+    SetTextStyle(button.text, 8, 0.95, 0.72, 0.18, "CENTER")
+
+    button:SetScript("OnEnter", function(self)
+        self.background:SetColorTexture(0.90, 0.68, 0.16, 0.12)
+        if not GameTooltip then
+            return
+        end
+        local db = EnsureDB()
+        local nextDirection = "asc"
+        if db and db.sortColumn == self.column and db.sortDirection == "asc" then
+            nextDirection = "desc"
+        end
+        GameTooltip:SetOwner(self, "ANCHOR_TOP")
+        GameTooltip:SetText("Sort by " .. (self.column == "week" and "weekly best" or "season best"))
+        GameTooltip:AddLine(
+            nextDirection == "desc" and "Click for highest to lowest." or "Click for lowest to highest.",
+            1,
+            1,
+            1
+        )
+        GameTooltip:AddLine("No recorded run sorts below +0.", 0.68, 0.68, 0.72)
+        GameTooltip:Show()
+    end)
+    button:SetScript("OnLeave", function(self)
+        self.background:SetColorTexture(0.90, 0.68, 0.16, 0)
+        if GameTooltip then
+            GameTooltip:Hide()
+        end
+    end)
+    button:SetScript("OnClick", function(self)
+        local db = EnsureDB()
+        if not db then
+            return
+        end
+        if db.sortColumn == self.column then
+            db.sortDirection = db.sortDirection == "asc" and "desc" or "asc"
+        else
+            db.sortColumn = self.column
+            db.sortDirection = "asc"
+        end
+        if GameTooltip then
+            GameTooltip:Hide()
+        end
+        if panel and panel.scroll then
+            panel.scroll:SetVerticalScroll(0)
+        end
+        if RenderLockouts then
+            RenderLockouts(panel and panel.lockouts)
+        end
+    end)
+    return button
+end
+
 local function AddSectionHeader(text, y, seasonal)
     local label = AcquireLabel("section")
     local rightReserve = RESET_COLUMN_WIDTH + ROW_RIGHT_INSET
@@ -730,17 +1068,19 @@ local function AddSectionHeader(text, y, seasonal)
         SetTextStyle(lockHeader, 8, 0.72, 0.72, 0.75, "CENTER")
         lockHeader:SetText("M0 LOCK")
 
-        local seasonHeader = AcquireLabel("seasonHeader")
+        local seasonHeader = panel.seasonSortButton
+        seasonHeader:ClearAllPoints()
         seasonHeader:SetPoint("TOPRIGHT", panel.content, "TOPRIGHT", -(RESET_COLUMN_WIDTH + LOCK_COLUMN_WIDTH + ROW_RIGHT_INSET + (COLUMN_GAP * 2)), y)
         seasonHeader:SetSize(SEASON_RUN_COLUMN_WIDTH, 20)
-        SetTextStyle(seasonHeader, 8, 0.95, 0.72, 0.18, "CENTER")
-        seasonHeader:SetText("SEASON")
+        seasonHeader.text:SetText(GetSeasonalSortHeaderText("season", "SEASON"))
+        seasonHeader:Show()
 
-        local weeklyHeader = AcquireLabel("weeklyHeader")
+        local weeklyHeader = panel.weeklySortButton
+        weeklyHeader:ClearAllPoints()
         weeklyHeader:SetPoint("TOPRIGHT", panel.content, "TOPRIGHT", -(RESET_COLUMN_WIDTH + LOCK_COLUMN_WIDTH + SEASON_RUN_COLUMN_WIDTH + ROW_RIGHT_INSET + (COLUMN_GAP * 3)), y)
         weeklyHeader:SetSize(WEEKLY_RUN_COLUMN_WIDTH, 20)
-        SetTextStyle(weeklyHeader, 8, 0.95, 0.72, 0.18, "CENTER")
-        weeklyHeader:SetText("WEEK")
+        weeklyHeader.text:SetText(GetSeasonalSortHeaderText("week", "WEEK"))
+        weeklyHeader:Show()
     end
 
     local resetHeader = AcquireLabel("resetHeader")
@@ -854,7 +1194,7 @@ local function HideUnusedElements()
     end
 end
 
-local function RenderLockouts(lockouts)
+RenderLockouts = function(lockouts)
     if not panel then
         return
     end
@@ -879,7 +1219,7 @@ local function RenderLockouts(lockouts)
     panel.ratingSummary:Show()
 
     y = AddSectionHeader("SEASONAL MYTHIC+", y, true)
-    y = AddLockoutRows(lockouts.seasonalDungeons or {}, "Seasonal Mythic+ data is not available yet.", y, false, true)
+    y = AddLockoutRows(SortSeasonalDungeons(lockouts.seasonalDungeons or {}), "Seasonal Mythic+ data is not available yet.", y, false, true)
     if #lockouts.currentDungeons > 0 then
         y = y - 6
         y = AddSectionHeader("OTHER MYTHIC DUNGEONS", y, false)
@@ -1099,6 +1439,9 @@ local function CreatePanel()
     panel.labelUse = {}
     panel.rowPool = {}
     panel.rowUse = 0
+
+    panel.weeklySortButton = CreateSeasonalSortButton(panel.content, "week", "WEEK")
+    panel.seasonSortButton = CreateSeasonalSortButton(panel.content, "season", "SEASON")
 
     panel.legacyToggle = CreateFrame("Button", nil, panel.content)
     panel.legacyToggle:SetHeight(27)

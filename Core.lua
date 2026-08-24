@@ -81,10 +81,30 @@ local defaults = {
         enabled = true,
         legacyExpanded = false,
         minimized = false,
+        sortColumn = "name",
+        sortDirection = "asc",
     },
     warbandWeekly = {
         showLevelingCharacters = false,
         characters = {},
+    },
+    professionWeekly = {
+        tracker = {
+            shown = false,
+            locked = false,
+            point = "CENTER",
+            relativePoint = "CENTER",
+            x = 330,
+            y = 40,
+            goals = {
+                trainer = true,
+                treatise = true,
+                field = true,
+                darkmoon = false,
+                catchup = false,
+                onetime = false,
+            },
+        },
     },
     queueAlerts = {
         backgroundSound = true,
@@ -478,7 +498,8 @@ local function PrintHelp()
     ns:Print("/zt talents opens talent build options.")
     ns:Print("/zt talents on/off toggles talent build controls.")
     ns:Print("/zt meters opens Blizzard damage meter profile options.")
-    ns:Print("/zt professions opens profession helper options.")
+    ns:Print("/zt professions opens profession weekly progress and tracker options.")
+    ns:Print("/zt molinari opens profession item helper options.")
     ns:Print("/zt loot opens loot options.")
     ns:Print("/zt fastloot on/off toggles fast auto loot.")
     ns:Print("/zt autosell on/off toggles auto-sell grey items at vendors.")
@@ -526,7 +547,9 @@ local function HandleSlash(input)
         ns:OpenConfig("builds")
     elseif input == "meters" or input == "meter" or input == "damagemeter" or input == "damage meters" then
         ns:OpenConfig("meters")
-    elseif input == "professions" or input == "profession" or input == "molinari" then
+    elseif input == "professions" or input == "profession" or input == "knowledge" then
+        ns:OpenConfig("professionweekly")
+    elseif input == "molinari" or input == "profession tools" then
         ns:OpenConfig("professions")
     elseif input == "quests" or input == "quest" then
         ns:OpenConfig("quests")
@@ -829,6 +852,7 @@ local moduleInitializers = {
     "InitializeMythicInviteBanner",
     "InitializeInstanceLockouts",
     "InitializeWarbandWeekly",
+    "InitializeProfessionWeekly",
     "InitializeBuffWarnings",
     "InitializeUnitFrames",
     "InitializeConsumableMacros",

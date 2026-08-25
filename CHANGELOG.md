@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Reduced Talent Grimoire memory after login by retaining generated build and rotation data only for the player's class while preserving all of that class's specializations and alternate-spec recommendations.
 - Added a dedicated Professions section with automatic Midnight 12.1 Knowledge tracking for trainer quests, treatises, weekly treasures, gathering and disenchanting drops, Darkmoon quests, catch-up currency, eight one-time profession treasures, and the Zul'jarra rank 6 book. A compact goal-selectable tracker can be shown, moved, locked click-through, hidden, and reset from the same page.
 - Darkmoon profession goals now show the Faire's live monthly status in the progress tracker, including the faction-appropriate Goldshire (SW) or Thunder Bluff (TB) entrance.
 - Clarified Profession Weekly tracker counters with earned Knowledge values and source-specific catch-up backlog labels for gathering, disenchanting, and patron orders.

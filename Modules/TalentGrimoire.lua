@@ -6,6 +6,7 @@ local applyFrame
 local QueueRefresh
 local refreshQueued = false
 local pendingCombatRefresh = false
+local talentDataPruned = false
 local talentDataCompacted = false
 local talentFrameHooks = {}
 local talentCheckRefreshQueued = false
@@ -353,6 +354,45 @@ end
 
 local function GetRoot()
     return _G.ZoidsToolsTalentGrimoire
+end
+
+local function PruneTalentGrimoireToPlayerClass()
+    if talentDataPruned then
+        return
+    end
+
+    if type(UnitClass) ~= "function" then
+        return
+    end
+
+    local classOK, _, classToken = pcall(UnitClass, "player")
+    if not classOK
+        or (issecretvalue and issecretvalue(classToken))
+        or type(classToken) ~= "string"
+        or classToken == ""
+    then
+        return
+    end
+
+    local root = GetRoot()
+    if type(root) ~= "table" then
+        return
+    end
+
+    -- A character can only use talent builds and rotation references for its
+    -- own class. Keep every specialization for that class, including alternate
+    -- specialization PvP recommendations, and release the other class tables.
+    for _, branch in ipairs({ root.data, root.rotations }) do
+        if type(branch) == "table" then
+            for candidateClass in pairs(branch) do
+                if candidateClass ~= classToken then
+                    branch[candidateClass] = nil
+                end
+            end
+        end
+    end
+
+    talentDataPruned = true
 end
 
 local function BuildEntriesEquivalent(left, right)
@@ -4648,6 +4688,7 @@ end
 
 function ns:InitializeTalentGrimoire()
     EnsureDB()
+    PruneTalentGrimoireToPlayerClass()
     CompactTalentGrimoireData()
     InstallTalentFrameHooks()
 

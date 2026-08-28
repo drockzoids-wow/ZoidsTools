@@ -291,28 +291,59 @@ local function SafeAPICall(func, ...)
     return nil
 end
 
-local function GetGroupChatSlashCommand()
+local function GetGroupChatType()
     if IsInGroup and LE_PARTY_CATEGORY_INSTANCE
         and IsInGroup(LE_PARTY_CATEGORY_INSTANCE) then
-        return "/instance"
+        return "INSTANCE_CHAT"
     end
     if IsInRaid and IsInRaid() then
-        return "/raid"
+        return "RAID"
     end
     if IsInGroup and IsInGroup() then
-        return "/party"
+        return "PARTY"
     end
     return nil
 end
 
-local function GetMissingBuffMacroText(buffName)
-    local slashCommand = GetGroupChatSlashCommand()
-    if not slashCommand then return nil end
+local function CanSendMissingBuffRequest()
+    if IsCombatLocked()
+        or (UnitAffectingCombat and UnitAffectingCombat("player")) then
+        refreshAfterCombat = true
+        return false
+    end
 
-    -- The secure button executes this macro from the player's hardware click.
-    -- This avoids calling the restricted SendChatMessage API or requiring a
-    -- second confirmation in Blizzard's chat edit box.
-    return slashCommand .. " Missing group buff: " .. tostring(buffName or "Unknown buff")
+    if C_ChatInfo and type(C_ChatInfo.InChatMessagingLockdown) == "function" then
+        local chatLocked = SafeAPICall(C_ChatInfo.InChatMessagingLockdown)
+        if IsSecretValue(chatLocked) or chatLocked == true then
+            refreshAfterCombat = true
+            return false
+        end
+    end
+
+    if C_SocialRestrictions and type(C_SocialRestrictions.CanSendChat) == "function" then
+        local canSend = SafeAPICall(C_SocialRestrictions.CanSendChat)
+        if IsSecretValue(canSend) or canSend == false then
+            return false
+        end
+    end
+
+    return true
+end
+
+local function AnnounceMissingBuff(buffName)
+    local chatType = GetGroupChatType()
+    if not chatType or not CanSendMissingBuffRequest() then
+        return
+    end
+
+    local sender = C_ChatInfo and C_ChatInfo.SendChatMessage or SendChatMessage
+    if type(sender) ~= "function" then
+        return
+    end
+
+    -- This runs only from the icon's physical PostClick and only after both
+    -- combat and chat-message lockdown checks have passed.
+    sender("Missing group buff: " .. tostring(buffName or "Unknown buff"), chatType)
 end
 
 local function GetSpellName(spellID, fallbackName)
@@ -395,6 +426,11 @@ local function IsWarningAllowed()
     local db = EnsureDB()
 
     if not db or db.enabled ~= true then
+        return false
+    end
+
+    if IsCombatLocked() then
+        refreshAfterCombat = true
         return false
     end
 
@@ -592,6 +628,11 @@ local function GetWarningIconButton(frame, index)
     button:SetScript("OnLeave", function()
         GameTooltip:Hide()
     end)
+    button:SetScript("PostClick", function(self, mouseButton)
+        if mouseButton == "LeftButton" and not self.canCastBuff then
+            AnnounceMissingBuff(self.buffName)
+        end
+    end)
     frame.buffIcons[index] = button
 
     return button
@@ -626,12 +667,10 @@ local function UpdateWarningIcons(frame, missing)
             button:SetAttribute("unit1", "player")
             button:SetAttribute("macrotext1", nil)
         else
-            local macroText = GetMissingBuffMacroText(buff.name)
-
-            button:SetAttribute("type1", macroText and "macro" or nil)
+            button:SetAttribute("type1", nil)
             button:SetAttribute("spell1", nil)
             button:SetAttribute("unit1", nil)
-            button:SetAttribute("macrotext1", macroText)
+            button:SetAttribute("macrotext1", nil)
         end
 
         button:SetAttribute("type2", nil)

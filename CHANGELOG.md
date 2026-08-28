@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+- Restored one-click missing-buff requests in instance, raid, and party chat. Requests now use the previously reliable direct click path while explicitly refusing Blizzard combat and chat-message lockdown states, avoiding both the empty chat box and the intermittent protected-action error.
+- Added a saved minimize/expand control to the Weekly Goals tracker. Minimized mode keeps only the title bar, lock/unlock button, and expand button visible, including while the tracker is locked click-through.
+- Excluded Blizzard's Guild Control panel from the generic window mover so its protected account-authorization check remains untainted.
+- Made the detached Suggested Rotation window close with Escape when it is the active front window.
+- Changed Weekly Goals to scroll as one continuous page, allowing its summary and tracker controls to move upward while bringing the profession table into a more natural viewing position.
+- Synchronized the addon-wide settings schema, Weekly Goals naming and slash routing, current specialization-switch API, and settings-tab sizing; obsolete saved chat filters and the unused legacy main-window position key are migrated away.
+- Expanded the Profession Weekly tracker into configurable Weekly Goals. It now tracks Great Vault choices, Spark of Tides catch-up, Nymrissa, recurring 12.1 quests, the rotating Housing weekly, active Timewalking, and profession Knowledge, with mouseover explanations and an option to hide completed goals.
+- Fixed Instance Lockouts retaining the wrong left/right attachment after Blizzard moved the Dungeons & Raids window to accommodate other open panels. It now rechecks available screen space whenever that window is repositioned.
+- Added compact Lock and Unlock controls directly to the Profession Weekly tracker header. The header now says "Locked" when secured and keeps only the small Unlock button clickable while the rest of the tracker remains click-through.
+- Fixed the Instance Lockouts dungeon-search shortcut tainting Blizzard's Group Finder state. Blizzard's original category, panel, and search helpers now run through a secure boundary so restricted 12.1 listing data remains readable inside dungeons and raids.
 - Reduced Talent Grimoire memory after login by retaining generated build and rotation data only for the player's class while preserving all of that class's specializations and alternate-spec recommendations.
 - Added a dedicated Professions section with automatic Midnight 12.1 Knowledge tracking for trainer quests, treatises, weekly treasures, gathering and disenchanting drops, Darkmoon quests, catch-up currency, eight one-time profession treasures, and the Zul'jarra rank 6 book. A compact goal-selectable tracker can be shown, moved, locked click-through, hidden, and reset from the same page.
 - Darkmoon profession goals now show the Faire's live monthly status in the progress tracker, including the faction-appropriate Goldshire (SW) or Thunder Bluff (TB) entrance.
@@ -9,7 +19,8 @@
 - Added plain-language mouseover help to every Profession Weekly tracker row while preserving click-through behavior when the tracker is locked.
 - Increased the Core > Minimap settings card height so the expansion-button size slider and its label remain fully inside the panel border.
 - Added a sourced Suggested Rotation help button to the Talent Grimoire bar. The popup provides compact Icy Veins specialization priorities, automatically favors dungeon/AoE or raid/single-target sections, includes spell tooltips and a source link, and remains a static reference rather than a live combat assistant.
-- Fixed Suggested Rotations mixing hidden Icy Veins hero-tree and talent branches. Rotation help now follows the selected build's hero tree and content preset, labels that choice in the popup, and preserves repeated casts only when they belong to the same exact sequence.
+- Fixed Suggested Rotations mixing hidden Icy Veins hero-tree and talent branches. Rotation help now follows the selected build's hero tree and content preset and labels that choice in the popup.
+- Expanded Suggested Rotations to retain every numbered source step and its full usage text, including repeated abilities and non-spell guidance. The helper is now a detached, movable window with a saved screen position and can remain open after the Talents window closes.
 - Made dungeon rows in Instance Lockouts open Premade Groups > Dungeons and immediately select and search the matching Blizzard activity when left-clicked; a customized dungeon checklist re-enables only the clicked dungeon while preserving every other advanced-filter choice.
 - Made the Instance Lockouts Week and Season headers clickable, with remembered lowest-to-highest or highest-to-lowest seasonal Mythic+ sorting and alphabetical tie-breaking.
 - Replaced the minimized Instance Lockouts side box with a full gear button attached just outside the Dungeons & Raids right border; the button and expanded side panel are mutually exclusive.

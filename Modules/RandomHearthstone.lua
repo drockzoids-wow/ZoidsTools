@@ -3,10 +3,11 @@ local _, ns = ...
 local BUTTON_NAME = "ZoidsToolsRandomHearthstoneButton"
 local MACRO_NAME = "ZT Hearth"
 local MACRO_ICON = 134414
+local ACTION_BUTTON_USE_KEY_DOWN = "ActionButtonUseKeyDown"
 local lastChoice
-local macroChoice
 local selector
 local eventFrame
+local clickRegistrationPending = false
 
 -- Curated genuine Hearthstone replacements only. Similar-looking teleport
 -- toys (notably Tome of Town Portal) are intentionally not included.
@@ -115,16 +116,44 @@ local function ChooseRandom()
     return choice
 end
 
+local function CastsOnKeyDown()
+    if C_CVar and type(C_CVar.GetCVarBool) == "function" then
+        return C_CVar.GetCVarBool(ACTION_BUTTON_USE_KEY_DOWN) == true
+    end
+
+    local value = type(GetCVar) == "function" and GetCVar(ACTION_BUTTON_USE_KEY_DOWN)
+    return value == "1" or value == 1 or value == true or value == "true"
+end
+
+local function RegisterPreferredClick(button)
+    if not button then
+        return false
+    end
+
+    if InCombatLockdown and InCombatLockdown() then
+        clickRegistrationPending = true
+        return false
+    end
+
+    clickRegistrationPending = false
+    local useKeyDown = CastsOnKeyDown()
+    button:RegisterForClicks(useKeyDown and "AnyDown" or "AnyUp")
+    button:SetAttribute("pressAndHoldAction", useKeyDown or nil)
+    return true
+end
+
 local function EnsureButton()
     local button = _G[BUTTON_NAME]
-    if button then return button end
+    if button then
+        RegisterPreferredClick(button)
+        return button
+    end
     button = CreateFrame("Button", BUTTON_NAME, UIParent, "SecureActionButtonTemplate")
-    -- Accept both forms: keybindings fire on button-down, while existing or
-    -- user-written /click macros commonly simulate a button release.
-    button:RegisterForClicks("AnyDown", "AnyUp")
+    -- One physical key press must execute exactly once. Registering for both
+    -- transitions caused the secure action and random selection to run twice.
+    RegisterPreferredClick(button)
     button:SetAttribute("type1", "macro")
     button:SetAttribute("type", "macro")
-    button:SetAttribute("pressAndHoldAction", true)
     button:SetAttribute("macrotext1", "/stopmacro")
     button:SetAttribute("macrotext", "/stopmacro")
     button:SetScript("PreClick", function(self)
@@ -156,7 +185,6 @@ local function RefreshMacro()
     -- randomizer. Keep the generated macro fully secure with a direct item
     -- action, then choose a new item after the resulting loading transition.
     local entry = ChooseRandom()
-    macroChoice = entry
     local body
     if entry then
         body = "#showtooltip item:" .. entry.id .. "\n/use item:" .. entry.id
@@ -297,17 +325,39 @@ function ns:InitializeRandomHearthstone()
     eventFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
     eventFrame:RegisterEvent("NEW_TOY_ADDED")
     eventFrame:RegisterEvent("BAG_UPDATE_DELAYED")
+    eventFrame:RegisterEvent("CVAR_UPDATE")
     eventFrame:RegisterEvent("UNIT_SPELLCAST_INTERRUPTED")
-    eventFrame:RegisterEvent("UNIT_SPELLCAST_FAILED")
-    eventFrame:RegisterEvent("UNIT_SPELLCAST_FAILED_QUIET")
-    eventFrame:SetScript("OnEvent", function(_, event, unit, _, spellID)
-        if event == "PLAYER_REGEN_ENABLED" or event == "PLAYER_ENTERING_WORLD" then RefreshMacro() end
-        if (event == "UNIT_SPELLCAST_INTERRUPTED" or event == "UNIT_SPELLCAST_FAILED" or event == "UNIT_SPELLCAST_FAILED_QUIET")
-            and unit == "player" and macroChoice and spellID == macroChoice.spell then
-            if C_Timer and C_Timer.After then
-                C_Timer.After(0, RefreshMacro)
-            else
-                RefreshMacro()
+    eventFrame:SetScript("OnEvent", function(_, event, arg1, _, spellID)
+        if event == "PLAYER_REGEN_ENABLED" then
+            if clickRegistrationPending then
+                EnsureButton()
+            end
+            RefreshMacro()
+        elseif event == "PLAYER_ENTERING_WORLD" then
+            EnsureButton()
+            RefreshMacro()
+        elseif event == "CVAR_UPDATE" and arg1 == ACTION_BUTTON_USE_KEY_DOWN then
+            EnsureButton()
+        end
+
+        -- Only a real interrupted Hearthstone cast should rotate the generated
+        -- macro. Ordinary failed presses (cooldown, movement, spam) must not
+        -- rewrite an action while the player is actively pressing it.
+        if event == "UNIT_SPELLCAST_INTERRUPTED" and arg1 == "player" then
+            local isHearthstone = false
+            for _, entry in ipairs(HEARTHSTONES) do
+                if entry.spell == spellID then
+                    isHearthstone = true
+                    break
+                end
+            end
+
+            if isHearthstone then
+                if C_Timer and C_Timer.After then
+                    C_Timer.After(0.1, RefreshMacro)
+                else
+                    RefreshMacro()
+                end
             end
         end
         if selector and selector:IsShown() then RefreshSelector() end

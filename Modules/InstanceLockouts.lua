@@ -24,6 +24,7 @@ local updateQueued = false
 local catalogReady = false
 local pveWasShown = false
 local pveHooksInstalled = false
+local positionSyncQueued = false
 local currentExpansionName = "Current Expansion"
 local currentCatalog = {
     instanceIDs = {},
@@ -54,6 +55,19 @@ local function SafeString(value)
         return value
     end
     return nil
+end
+
+local function SecureCallBlizzard(func, ...)
+    if type(securecallfunction) ~= "function" or type(func) ~= "function" then
+        return false
+    end
+
+    -- Calling Blizzard's Group Finder helpers through ordinary addon execution
+    -- taints the state they store on LFGListFrame. In restricted instances that
+    -- later prevents Blizzard from reading secret search-result fields. Restore
+    -- each original Blizzard function's secure execution context instead.
+    securecallfunction(func, ...)
+    return true
 end
 
 local function NormalizeName(value)
@@ -720,8 +734,7 @@ local function SearchPremadeGroupsForDungeon(info)
         return
     end
 
-    local openOK = pcall(_G.PVEFrame_ShowFrame, "GroupFinderFrame", _G.LFGListPVEStub)
-    if not openOK then
+    if not SecureCallBlizzard(_G.PVEFrame_ShowFrame, "GroupFinderFrame", _G.LFGListPVEStub) then
         PrintDungeonSearchError(dungeonName, "Blizzard's Group Finder could not be opened.")
         return
     end
@@ -760,29 +773,19 @@ local function SearchPremadeGroupsForDungeon(info)
         return
     end
 
-    local setupOK = pcall(function()
-        _G.LFGListCategorySelection_SelectCategory(categoryPanel, categoryID, filters)
-        if SafeNumber(categoryPanel.selectedCategory) ~= categoryID then
-            error("Dungeon category was not available")
-        end
-
-        _G.LFGListSearchPanel_Clear(searchPanel)
-        _G.LFGListSearchPanel_SetCategory(searchPanel, categoryID, filters, baseFilters)
-        _G.LFGListFrame_SetActivePanel(lfgFrame, searchPanel)
-        C_LFGList.SetSearchToActivity(activityID)
-    end)
-
-    if not setupOK then
+    if not SecureCallBlizzard(_G.LFGListCategorySelection_SelectCategory, categoryPanel, categoryID, filters)
+        or SafeNumber(categoryPanel.selectedCategory) ~= categoryID then
         PrintDungeonSearchError(dungeonName, "Blizzard's dungeon search could not be prepared.")
         return
     end
 
-    local searchOK = pcall(_G.LFGListSearchPanel_DoSearch, searchPanel)
-    if not searchOK then
-        if type(searchBox.SetFocus) == "function" then
-            pcall(searchBox.SetFocus, searchBox)
-        end
-        PrintDungeonSearchError(dungeonName, "Press Enter in Blizzard's prepared search box to finish the search.")
+    if not SecureCallBlizzard(_G.LFGListSearchPanel_Clear, searchPanel)
+        or not SecureCallBlizzard(_G.LFGListSearchPanel_SetCategory, searchPanel, categoryID, filters, baseFilters)
+        or SafeNumber(searchPanel.categoryID) ~= categoryID
+        or not SecureCallBlizzard(C_LFGList.SetSearchToActivity, activityID)
+        or not SecureCallBlizzard(_G.LFGListSearchPanel_DoSearch, searchPanel)
+        or not SecureCallBlizzard(_G.LFGListFrame_SetActivePanel, lfgFrame, searchPanel) then
+        PrintDungeonSearchError(dungeonName, "Blizzard's dungeon search could not be started.")
         return
     end
 
@@ -1619,10 +1622,20 @@ local function InstallPVEHooks()
     end
 
     local function SyncAfterBlizzardUpdate()
-        if C_Timer and type(C_Timer.After) == "function" then
-            C_Timer.After(0, SyncPanelVisibility)
-        else
+        if positionSyncQueued then
+            return
+        end
+        positionSyncQueued = true
+
+        local function RunSync()
+            positionSyncQueued = false
             SyncPanelVisibility()
+        end
+
+        if C_Timer and type(C_Timer.After) == "function" then
+            C_Timer.After(0, RunSync)
+        else
+            RunSync()
         end
     end
 
@@ -1635,6 +1648,14 @@ local function InstallPVEHooks()
                 panel:Hide()
             end
         end)
+    end
+
+    -- Blizzard's panel manager reanchors PVEFrame when other large windows
+    -- open or close without changing its size. Re-evaluate which side has room
+    -- after every such move so the lockout panel does not remain on the side
+    -- chosen for a temporary crowded layout.
+    if type(hooksecurefunc) == "function" and type(pveFrame.SetPoint) == "function" then
+        pcall(hooksecurefunc, pveFrame, "SetPoint", SyncAfterBlizzardUpdate)
     end
 
     if type(hooksecurefunc) == "function" and type(_G.PVEFrame_ShowFrame) == "function" then

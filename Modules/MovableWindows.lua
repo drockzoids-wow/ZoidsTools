@@ -22,6 +22,11 @@ local blockedFrames = {
     -- protected quest-pin mouse setup (SetPassThroughButtons), so it must stay
     -- entirely under Blizzard's control.
     FlightMapFrame = true,
+    -- Guild Control performs protected account-authorization checks from its
+    -- Blizzard OnShow path. Adding movement, scale, anchor, or script hooks to
+    -- either the control panel or its legacy host taints IsUserOAuthed().
+    GuildControlUI = true,
+    GuildFrame = true,
     -- The generic mover changes scale, anchors, placement state, and frame
     -- scripts. Keep those operations away from MapCanvas; WorldMapFrame gets
     -- a dedicated position-only title-bar mover below.
@@ -53,7 +58,6 @@ local commonFrames = {
     "FriendsFrame",
     "GameMenuFrame",
     "GossipFrame",
-    "GuildFrame",
     "InspectFrame",
     "ItemTextFrame",
     "ItemUpgradeFrame",

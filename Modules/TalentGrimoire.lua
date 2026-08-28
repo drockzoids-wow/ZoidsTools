@@ -21,7 +21,7 @@ local PANEL_FRAME_LEVEL_OFFSET = 10
 local CONTROL_FRAME_LEVEL_OFFSET = 2
 local ROTATION_PANEL_WIDTH = 430
 local ROTATION_PANEL_HEIGHT = 420
-local ROTATION_ROW_HEIGHT = 34
+local ROTATION_ROW_MIN_HEIGHT = 38
 local SPEC_BUTTON_SIZE = 38
 local SPEC_BUTTON_GAP = 8
 local SPEC_BUTTON_OFFSET_X = 40
@@ -333,6 +333,7 @@ local function EnsureDB()
 
     db.contentType = NormalizeContentType(db.contentType)
     db.provider = db.provider or DEFAULT_PROVIDER
+    db.rotationWindow = db.rotationWindow or {}
 
     db.mythicPlusTarget = db.mythicPlusTarget or DEFAULT_TARGET_BY_CONTENT.mythicplus
     db.raidTarget = db.raidTarget or DEFAULT_TARGET_BY_CONTENT.raid
@@ -2753,11 +2754,7 @@ local function RequestSpecializationSwitch(specIndex, specName)
         return true
     end
 
-    local setter = C_ClassTalents and C_ClassTalents.SwitchToSpecializationByIndex
-
-    if type(setter) ~= "function" then
-        setter = C_SpecializationInfo and C_SpecializationInfo.SetSpecialization or SetSpecialization
-    end
+    local setter = C_SpecializationInfo and C_SpecializationInfo.SetSpecialization or SetSpecialization
 
     if not specIndex or type(setter) ~= "function" then
         return nil, "The game does not currently provide a specialization switch for " .. specName .. "."
@@ -3456,6 +3453,7 @@ local function CreateImportPopup(parent)
     popup:SetBackdropColor(0.02, 0.02, 0.025, 0.98)
     popup:SetBackdropBorderColor(0.85, 0.7, 0.38, 0.65)
     popup:EnableMouse(true)
+    popup:SetClampedToScreen(true)
 
     popup.editBox = CreateFrame("EditBox", nil, popup, "InputBoxTemplate")
     popup.editBox:SetPoint("LEFT", popup, "LEFT", 12, 0)
@@ -3472,13 +3470,13 @@ local function CreateImportPopup(parent)
     parent.importPopup = popup
 end
 
-local function ShowCopyPopup(copyValue)
+local function ShowCopyPopup(copyValue, anchorFrame)
     if not panel or not panel.importPopup or copyValue == "" then
         return
     end
 
     panel.importPopup:ClearAllPoints()
-    panel.importPopup:SetPoint("BOTTOM", panel, "TOP", 0, 6)
+    panel.importPopup:SetPoint("BOTTOM", anchorFrame or panel, "TOP", 0, 6)
     panel.importPopup.editBox:SetText(copyValue)
     panel.importPopup.editBox:SetCursorPosition(0)
     panel.importPopup:Show()
@@ -3502,20 +3500,6 @@ local function GetRotationSpellTexture(spellId)
     end
 
     return 134400
-end
-
-local function IsRotationSpellAvailable(spellId)
-    if not spellId or not C_SpellBook or not C_SpellBook.IsSpellKnownOrInSpellBook then
-        return true
-    end
-
-    local spellBank = Enum and Enum.SpellBookSpellBank and Enum.SpellBookSpellBank.Player
-    if not spellBank then
-        return true
-    end
-
-    local ok, known = pcall(C_SpellBook.IsSpellKnownOrInSpellBook, spellId, spellBank, true)
-    return not ok or known == true
 end
 
 local function GetPreferredRotationSectionIndex(sections, contentType)
@@ -3665,16 +3649,9 @@ local function GetRotationSectionsForVariant(rotation, variant)
             kind = rawSection.kind,
             steps = {},
         }
-        local seenSpellIds = {}
-
         for _, step in ipairs(rawSection.steps or {}) do
-            local spellId = tonumber(step.spellId)
-            local duplicate = rawSection.kind ~= "opener" and spellId and seenSpellIds[spellId]
-            if not duplicate and RotationStepMatchesVariant(step, enabledStates) then
+            if RotationStepMatchesVariant(step, enabledStates) then
                 section.steps[#section.steps + 1] = step
-                if spellId then
-                    seenSpellIds[spellId] = true
-                end
             end
         end
 
@@ -3688,7 +3665,7 @@ end
 
 local function CreateRotationRow(parent, index)
     local row = CreateFrame("Button", nil, parent)
-    row:SetHeight(ROTATION_ROW_HEIGHT - 2)
+    row:SetHeight(ROTATION_ROW_MIN_HEIGHT)
 
     row.bg = row:CreateTexture(nil, "BACKGROUND")
     row.bg:SetAllPoints()
@@ -3708,7 +3685,8 @@ local function CreateRotationRow(parent, index)
     row.name:SetPoint("LEFT", row.icon, "RIGHT", 9, 0)
     row.name:SetPoint("RIGHT", row, "RIGHT", -8, 0)
     row.name:SetJustifyH("LEFT")
-    row.name:SetWordWrap(false)
+    row.name:SetJustifyV("MIDDLE")
+    row.name:SetWordWrap(true)
 
     row:SetScript("OnEnter", function(self)
         if not GameTooltip then
@@ -3739,7 +3717,35 @@ end
 
 local RefreshRotationPopup
 
-local function CreateRotationPopup(parent)
+local function SaveRotationPopupPosition(popup)
+    local db = EnsureDB()
+    if not db or not popup then
+        return
+    end
+
+    local point, _, relativePoint, x, y = popup:GetPoint(1)
+    db.rotationWindow = db.rotationWindow or {}
+    db.rotationWindow.point = point or "CENTER"
+    db.rotationWindow.relativePoint = relativePoint or point or "CENTER"
+    db.rotationWindow.x = x or 0
+    db.rotationWindow.y = y or 0
+end
+
+local function RestoreRotationPopupPosition(popup)
+    local db = EnsureDB()
+    local position = db and db.rotationWindow or nil
+
+    popup:ClearAllPoints()
+    popup:SetPoint(
+        position and position.point or "CENTER",
+        UIParent,
+        position and position.relativePoint or "CENTER",
+        position and tonumber(position.x) or -360,
+        position and tonumber(position.y) or 0
+    )
+end
+
+local function CreateRotationPopup()
     local popup = CreateFrame("Frame", "ZoidsToolsTalentRotationPopup", UIParent, "BackdropTemplate")
     popup:SetSize(ROTATION_PANEL_WIDTH, ROTATION_PANEL_HEIGHT)
     popup:SetFrameStrata("DIALOG")
@@ -3754,8 +3760,18 @@ local function CreateRotationPopup(parent)
     popup:SetBackdropColor(0.02, 0.018, 0.014, 0.98)
     popup:SetBackdropBorderColor(0.72, 0.57, 0.22, 0.9)
     popup:EnableMouse(true)
+    popup:SetMovable(true)
+    popup:SetToplevel(true)
     popup:SetClampedToScreen(true)
-    popup:SetPoint("BOTTOMLEFT", parent, "TOPLEFT", 0, 6)
+    popup:RegisterForDrag("LeftButton")
+    popup:SetScript("OnDragStart", function(self)
+        self:StartMoving()
+    end)
+    popup:SetScript("OnDragStop", function(self)
+        self:StopMovingOrSizing()
+        SaveRotationPopupPosition(self)
+    end)
+    RestoreRotationPopupPosition(popup)
 
     popup.title = popup:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
     popup.title:SetPoint("TOPLEFT", popup, "TOPLEFT", 14, -13)
@@ -3780,7 +3796,7 @@ local function CreateRotationPopup(parent)
     popup.sourceButton:SetPoint("LEFT", popup.sectionDropdown, "RIGHT", 8, 0)
     popup.sourceButton:SetScript("OnClick", function()
         if popup.sourceUrl and popup.sourceUrl ~= "" then
-            ShowCopyPopup(popup.sourceUrl)
+            ShowCopyPopup(popup.sourceUrl, popup)
         end
     end)
 
@@ -3797,9 +3813,21 @@ local function CreateRotationPopup(parent)
     popup.footer:SetPoint("BOTTOMLEFT", popup, "BOTTOMLEFT", 14, 14)
     popup.footer:SetPoint("RIGHT", popup, "RIGHT", -14, 0)
     popup.footer:SetJustifyH("LEFT")
-    popup.footer:SetText("Static priority reference; it does not read combat or recommend abilities live.")
+    popup.footer:SetText("Drag the window to move it. Static priority reference; it does not recommend abilities live.")
 
     popup:Hide()
+    if UISpecialFrames then
+        local alreadyRegistered = false
+        for _, frameName in ipairs(UISpecialFrames) do
+            if frameName == "ZoidsToolsTalentRotationPopup" then
+                alreadyRegistered = true
+                break
+            end
+        end
+        if not alreadyRegistered then
+            UISpecialFrames[#UISpecialFrames + 1] = "ZoidsToolsTalentRotationPopup"
+        end
+    end
     return popup
 end
 
@@ -3811,34 +3839,36 @@ local function RefreshRotationRows(popup, section)
     local steps = type(section) == "table" and section.steps or {}
 
     local visibleCount = 0
+    local yOffset = 0
 
     for _, step in ipairs(steps) do
         local spellId = tonumber(step.spellId)
-        local showStep = popup.showAllSpells or IsRotationSpellAvailable(spellId)
+        visibleCount = visibleCount + 1
 
-        if showStep then
-            visibleCount = visibleCount + 1
+        local row = popup.rows[visibleCount]
+        if not row then
+            row = CreateRotationRow(popup.content, visibleCount)
+            row:SetPoint("RIGHT", popup.content, "RIGHT", 0, 0)
+            popup.rows[visibleCount] = row
         end
 
-        if showStep then
-            local row = popup.rows[visibleCount]
-            if not row then
-                row = CreateRotationRow(popup.content, visibleCount)
-                row:SetPoint("TOPLEFT", popup.content, "TOPLEFT", 0, -((visibleCount - 1) * ROTATION_ROW_HEIGHT))
-                row:SetPoint("RIGHT", popup.content, "RIGHT", 0, 0)
-                popup.rows[visibleCount] = row
-            end
+        row:ClearAllPoints()
+        row:SetPoint("TOPLEFT", popup.content, "TOPLEFT", 0, -yOffset)
+        row:SetPoint("RIGHT", popup.content, "RIGHT", 0, 0)
+        row.spellId = spellId
+        row.spellName = step.name
+        row.number:SetText(visibleCount .. ".")
+        row.icon:SetTexture(GetRotationSpellTexture(row.spellId))
+        row.name:SetText(step.text or step.name or ("Spell " .. tostring(row.spellId or "")))
 
-            row.spellId = spellId
-            row.spellName = step.name
-            row.number:SetText(visibleCount .. ".")
-            row.icon:SetTexture(GetRotationSpellTexture(row.spellId))
-            row.name:SetText(step.name or ("Spell " .. tostring(row.spellId or "")))
-            row:Show()
-        end
+        local textHeight = tonumber(row.name:GetStringHeight()) or 0
+        local rowHeight = math.max(ROTATION_ROW_MIN_HEIGHT, math.ceil(textHeight) + 12)
+        row:SetHeight(rowHeight)
+        row:Show()
+        yOffset = yOffset + rowHeight
     end
 
-    popup.content:SetHeight(math.max(1, visibleCount * ROTATION_ROW_HEIGHT))
+    popup.content:SetHeight(math.max(1, yOffset))
     popup.scroll:SetVerticalScroll(0)
 end
 
@@ -3872,7 +3902,6 @@ RefreshRotationPopup = function(resetSection)
 
     popup.rotationSignature = signature
     popup.sourceUrl = rotation.sourceUrl
-    popup.showAllSpells = panel.rotationContext and panel.rotationContext.requiresSpecSwitch == true
     popup.title:SetText(GetSpecLabel(specKey) .. " Rotation")
     local subtitleParts = {
         rotation.source or "Rotation reference",
@@ -3886,9 +3915,9 @@ RefreshRotationPopup = function(resetSection)
     end
     popup.subtitle:SetText(table.concat(subtitleParts, "  |  "))
     if variant then
-        popup.footer:SetText("Static priority reference for this selected build. The source page may open on its own default hero-tree selection.")
+        popup.footer:SetText("Drag to move. Static reference for the selected build; the source may open on its default hero-tree selection.")
     else
-        popup.footer:SetText("Static priority reference; it does not read combat or recommend abilities live.")
+        popup.footer:SetText("Drag to move. Static priority reference; it does not read combat or recommend abilities live.")
     end
 
     local options = {}
@@ -4188,7 +4217,7 @@ local function CreatePanel()
         GameTooltip:SetText("Suggested Rotation", 1, 0.82, 0.2)
 
         if GetCurrentRotationData(panel.rotationContext) then
-            GameTooltip:AddLine("Show the sourced, static priority reference for this specialization.", 1, 1, 1, true)
+            GameTooltip:AddLine("Show the sourced, static priority reference in its own movable window.", 1, 1, 1, true)
         else
             GameTooltip:AddLine("No rotation was imported for this specialization. Run the LocalTools talent updater to refresh it.", 0.75, 0.75, 0.75, true)
         end
@@ -4236,12 +4265,7 @@ local function CreatePanel()
     panel.statusText:SetTextColor(0.75, 0.82, 0.9)
 
     CreateImportPopup(panel)
-    panel.rotationPopup = CreateRotationPopup(panel)
-    panel:SetScript("OnHide", function()
-        if panel.rotationPopup then
-            panel.rotationPopup:Hide()
-        end
-    end)
+    panel.rotationPopup = CreateRotationPopup()
     panel:Hide()
 
     return panel
@@ -4276,8 +4300,6 @@ local function AnchorPanel(talentFrame)
     if panel.rotationPopup then
         panel.rotationPopup:SetFrameStrata("DIALOG")
         panel.rotationPopup:SetFrameLevel((panel:GetFrameLevel() or 1) + 6)
-        panel.rotationPopup:ClearAllPoints()
-        panel.rotationPopup:SetPoint("BOTTOMLEFT", panel, "TOPLEFT", 0, 6)
     end
 
     local controlLevel = (panel:GetFrameLevel() or 1) + CONTROL_FRAME_LEVEL_OFFSET
@@ -4309,7 +4331,15 @@ local function RefreshPanelForCombat(talentFrame)
 
     local db = EnsureDB()
 
-    if not db or db.enabled ~= true or not talentFrame then
+    if not db or db.enabled ~= true then
+        panel:Hide()
+        if panel.rotationPopup then
+            panel.rotationPopup:Hide()
+        end
+        return
+    end
+
+    if not talentFrame then
         panel:Hide()
         return
     end
@@ -4373,7 +4403,21 @@ local function UpdatePanelVisibility()
 
     pendingCombatRefresh = false
 
-    if not db or db.enabled ~= true or not talentFrame then
+    if not db or db.enabled ~= true then
+        panel:Hide()
+        ClearTalentChecks()
+        if panel.rotationPopup then
+            panel.rotationPopup:Hide()
+        end
+
+        if panel.importPopup then
+            panel.importPopup:Hide()
+        end
+
+        return
+    end
+
+    if not talentFrame then
         panel:Hide()
         ClearTalentChecks()
 

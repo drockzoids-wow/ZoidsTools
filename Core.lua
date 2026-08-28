@@ -9,10 +9,10 @@ elseif GetAddOnMetadata then
     metadataVersion = GetAddOnMetadata(ADDON_NAME, "Version")
 end
 ns.version = metadataVersion and not metadataVersion:find("@", 1, true) and metadataVersion or "Development"
-local CURRENT_MIGRATION_VERSION = 4
+local CURRENT_MIGRATION_VERSION = 5
 
 local defaults = {
-    migrationVersion = 4,
+    migrationVersion = 5,
     windows = {
         enabled = true,
         moveBags = true,
@@ -88,10 +88,23 @@ local defaults = {
         showLevelingCharacters = false,
         characters = {},
     },
+    weeklyGoals = {
+        hideCompleted = false,
+        goals = {
+            vault = true,
+            spark = true,
+            lair = true,
+            seasonal = true,
+            housing = true,
+            timewalking = true,
+            professions = true,
+        },
+    },
     professionWeekly = {
         tracker = {
             shown = false,
             locked = false,
+            minimized = false,
             point = "CENTER",
             relativePoint = "CENTER",
             x = 330,
@@ -136,11 +149,6 @@ local defaults = {
         historyEnabled = false,
         historyLimit = 250,
         historyRestore = true,
-        historyPublic = true,
-        historyGroup = true,
-        historyGuild = true,
-        historySystem = false,
-        historyWhispers = false,
         historyByCharacter = {},
         layoutProfiles = {
             profiles = {},
@@ -293,6 +301,12 @@ local defaults = {
         pvpTarget = "3v3",
         pvpMode = "popular",
         mode = "popular",
+        rotationWindow = {
+            point = "CENTER",
+            relativePoint = "CENTER",
+            x = -360,
+            y = 0,
+        },
     },
     damageMeterProfiles = {
         profiles = {},
@@ -330,11 +344,13 @@ local defaults = {
     },
     performance = {
         enabled = true,
+        displayMode = "both",
         updateInterval = 1,
         point = "BOTTOM",
         relativePoint = "BOTTOM",
         x = -15,
         y = 205,
+        scale = 1,
         locked = false,
     },
     coordinates = {
@@ -369,7 +385,7 @@ local defaults = {
             hideAddonButtons = false,
             collectAddonButtons = false,
         },
-        mainWindow = {
+        modernWindow = {
             point = "CENTER",
             relativePoint = "CENTER",
             x = 0,
@@ -425,6 +441,21 @@ local function RunMigrations(db)
         db.tooltips = nil
     end
 
+    if version < 5 then
+        db.chat = type(db.chat) == "table" and db.chat or {}
+        db.chat.historyPublic = nil
+        db.chat.historyGroup = nil
+        db.chat.historyGuild = nil
+        db.chat.historySystem = nil
+        db.chat.historyWhispers = nil
+
+        db.ui = type(db.ui) == "table" and db.ui or {}
+        if type(db.ui.modernWindow) ~= "table" and type(db.ui.mainWindow) == "table" then
+            db.ui.modernWindow = db.ui.mainWindow
+        end
+        db.ui.mainWindow = nil
+    end
+
     db.migrationVersion = CURRENT_MIGRATION_VERSION
 end
 
@@ -470,6 +501,7 @@ local function PrintHelp()
     ns:Print("/zt2 also opens ZoidsTools.")
     ns:Print("/zt windows on/off toggles movable Blizzard windows.")
     ns:Print("/zt warband opens the Warband Weekly dashboard.")
+    ns:Print("/zt goals opens Weekly Goals and profession progress options.")
     ns:Print("/zt tooltips opens player tooltip options.")
     ns:Print("/zt chat opens chat enhancement options.")
     ns:Print("/zt chatcopy opens a searchable copy window for the active chat tab.")
@@ -498,7 +530,7 @@ local function PrintHelp()
     ns:Print("/zt talents opens talent build options.")
     ns:Print("/zt talents on/off toggles talent build controls.")
     ns:Print("/zt meters opens Blizzard damage meter profile options.")
-    ns:Print("/zt professions opens profession weekly progress and tracker options.")
+    ns:Print("/zt professions opens Weekly Goals and profession progress options.")
     ns:Print("/zt molinari opens profession item helper options.")
     ns:Print("/zt loot opens loot options.")
     ns:Print("/zt fastloot on/off toggles fast auto loot.")
@@ -547,7 +579,8 @@ local function HandleSlash(input)
         ns:OpenConfig("builds")
     elseif input == "meters" or input == "meter" or input == "damagemeter" or input == "damage meters" then
         ns:OpenConfig("meters")
-    elseif input == "professions" or input == "profession" or input == "knowledge" then
+    elseif input == "goals" or input == "weekly goals" or input == "weeklygoals"
+        or input == "professions" or input == "profession" or input == "knowledge" then
         ns:OpenConfig("professionweekly")
     elseif input == "molinari" or input == "profession tools" then
         ns:OpenConfig("professions")
@@ -852,6 +885,7 @@ local moduleInitializers = {
     "InitializeMythicInviteBanner",
     "InitializeInstanceLockouts",
     "InitializeWarbandWeekly",
+    "InitializeWeeklyGoals",
     "InitializeProfessionWeekly",
     "InitializeBuffWarnings",
     "InitializeUnitFrames",
@@ -907,10 +941,6 @@ eventFrame:SetScript("OnEvent", function(_, event, addonName)
                     initializer(ns)
                 end)
             end
-        end
-
-        if ns.UI and ns.UI.Initialize then
-            RunInitializer("UI.Initialize", ns.UI.Initialize)
         end
 
         if ns.InitializeMinimapButton then

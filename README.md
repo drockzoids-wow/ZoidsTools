@@ -6,7 +6,7 @@ A personal World of Warcraft Retail quality-of-life addon by Drockzoids.
 
 - Opens a modern ZoidsTools settings window with `/zt`, `/zoids`, or `/zoidstools`.
 - Adds a Warband Weekly dashboard with per-character item level, Mythic+ rating, weekly best, keystone, Great Vault progress, and current-expansion saves.
-- Adds a Profession Weekly page and compact selectable-goal tracker for Midnight trainer quests, treatises, weekly Knowledge drops, Darkmoon quests, catch-up progress, and one-time profession Knowledge.
+- Adds a configurable Weekly Goals page and compact tracker for Great Vault progress, Spark catch-up, the current Lair boss, patch weeklies, Housing, Timewalking, and Midnight profession Knowledge.
 - Adds an Instance Lockouts companion beside Dungeons & Raids with every seasonal Mythic+ dungeon, weekly and season bests, base-Mythic loot locks, raid saves, and reset timers.
 - Moves and scales supported Blizzard windows and default bags, with saved positions.
 - Adds class-colored player mouseover names with Mythic+ rating and equipped item level details beneath the character lines, item overlays, keybind label styling, named skill-flyout directions, range tint, and unit frame options.
@@ -22,7 +22,7 @@ A personal World of Warcraft Retail quality-of-life addon by Drockzoids.
 ## Commands
 
 - `/zt` opens the ZoidsTools window.
-- `/zt warband`, `/zt tooltips`, `/zt windows`, `/zt chat`, `/zt items`, `/zt professions`, `/zt talents`, `/zt meters`, `/zt combat`, `/zt unitframes`, `/zt macros`, `/zt mounts`, `/zt loot`, or `/zt quests` opens that page.
+- `/zt warband`, `/zt goals`, `/zt tooltips`, `/zt windows`, `/zt chat`, `/zt items`, `/zt professions`, `/zt talents`, `/zt meters`, `/zt combat`, `/zt unitframes`, `/zt macros`, `/zt mounts`, `/zt loot`, or `/zt quests` opens that page.
 - `/zt chatcopy` opens a searchable copy window for the active chat tab.
 - `/zt windows on/off` toggles movable Blizzard windows.
 - `/zt bags on/off` toggles default bag movement.
@@ -55,6 +55,6 @@ CurseForge uploads are handled by GitHub Actions when a version tag is pushed.
 
 1. Update `CHANGELOG.md`.
 2. Commit and push the changes.
-3. Create and push a tag like `v3.1207.21`.
+3. Create and push the next version tag, such as `v4.12.20`.
 
 The release packager replaces `@project-version@` in `ZoidsTools.toc` with the pushed tag automatically.

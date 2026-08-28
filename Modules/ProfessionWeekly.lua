@@ -5,7 +5,7 @@ local DEFAULT_POINT = "CENTER"
 local DEFAULT_RELATIVE_POINT = "CENTER"
 local DEFAULT_X = 330
 local DEFAULT_Y = 40
-local TRACKER_WIDTH = 286
+local TRACKER_WIDTH = 340
 
 local tracker
 local eventFrame
@@ -223,6 +223,7 @@ local function EnsureDB()
 
     if trackerDB.shown == nil then trackerDB.shown = false end
     if trackerDB.locked == nil then trackerDB.locked = false end
+    if trackerDB.minimized == nil then trackerDB.minimized = false end
     trackerDB.point = trackerDB.point or DEFAULT_POINT
     trackerDB.relativePoint = trackerDB.relativePoint or DEFAULT_RELATIVE_POINT
     trackerDB.x = SafeNumber(trackerDB.x) or DEFAULT_X
@@ -749,6 +750,19 @@ local function RestoreTrackerPosition()
     )
 end
 
+local function UpdateTrackerHeaderControls()
+    local db = EnsureDB()
+    if not db or not tracker or not tracker.hint or not tracker.lockButton then return end
+
+    local locked = db.tracker.locked == true
+    tracker.hint:SetText(locked and "Locked" or "Drag to move")
+    tracker.lockButton:SetText(locked and "Unlock" or "Lock")
+    tracker.lockButton:SetWidth(locked and 48 or 36)
+    if tracker.minimizeButton then
+        tracker.minimizeButton:SetText(db.tracker.minimized == true and "+" or "-")
+    end
+end
+
 local function ApplyTrackerMouseBehavior()
     local db = EnsureDB()
     if not db or not tracker then return end
@@ -772,6 +786,20 @@ local function ApplyTrackerMouseBehavior()
             line:EnableMouse(not locked)
         end
     end
+
+    -- Keep the small header controls clickable while the rest of a locked
+    -- tracker remains click-through.
+    for _, button in ipairs({ tracker.lockButton, tracker.minimizeButton }) do
+        if button then
+            button:EnableMouse(true)
+            if type(button.SetMouseMotionEnabled) == "function"
+                and type(button.SetMouseClickEnabled) == "function" then
+                button:SetMouseMotionEnabled(true)
+                button:SetMouseClickEnabled(true)
+            end
+        end
+    end
+    UpdateTrackerHeaderControls()
 end
 
 local function GetOrCreateTrackerLine(index)
@@ -834,53 +862,103 @@ local function UpdateTracker()
         return
     end
 
+    if db.tracker.minimized == true then
+        local tooltipOwner = GameTooltip and GameTooltip:GetOwner()
+        local hideTrackerTooltip = tooltipOwner == tracker
+            or tooltipOwner == tracker.lockButton
+            or tooltipOwner == tracker.minimizeButton
+        for _, line in ipairs(tracker.lines or {}) do
+            if tooltipOwner == line then
+                hideTrackerTooltip = true
+            end
+            line.tooltipTitle = nil
+            line.tooltipLines = nil
+            line:Hide()
+        end
+        if hideTrackerTooltip then
+            GameTooltip:Hide()
+        end
+        tracker:SetHeight(36)
+        UpdateTrackerHeaderControls()
+        tracker:Show()
+        return
+    end
+
     local dashboard = GetDashboard()
     local lines = {}
-    for _, profession in ipairs(dashboard.professions) do
-        local weeklyColor = profession.weeklyComplete and "|cff59dd7a" or "|cffffc857"
-        lines[#lines + 1] = {
-            text = string.format("|cffffd34e%s weekly|r  %s%d/%d KP|r", profession.name, weeklyColor, profession.weeklyPoints, profession.weeklyTotal),
-            tooltipTitle = profession.name .. " weekly Knowledge",
-            tooltipLines = {
-                "Progress from recurring trainer, treatise, and weekly item goals.",
-                "Darkmoon, catch-up, and one-time Knowledge are tracked separately and do not increase this total.",
-            },
-        }
-        for _, goalID in ipairs(GOAL_ORDER) do
-            if db.tracker.goals[goalID] == true then
-                local goal = profession.goals[goalID]
-                if goal then
-                    local tooltipTitle, tooltipLines = GetTrackerGoalTooltip(profession, goal)
-                    local text
-                    if goal.id == "darkmoon" then
-                        local activity = goal.active
-                            and string.format("|cff59dd7a(Active %s)|r", goal.location or "SW")
-                            or "|cffff4d4d(Inactive)|r"
-                        text = string.format(
-                            "   |cffc9c9c9%s|r %s: %s%s|r",
-                            goal.label,
-                            activity,
-                            GoalColor(goal),
-                            GoalStatusText(goal)
-                        )
-                    else
-                        text = string.format("   %s%s: %s|r", GoalColor(goal), goal.label, GoalStatusText(goal))
-                    end
-                    lines[#lines + 1] = {
-                        text = text,
-                        tooltipTitle = tooltipTitle,
-                        tooltipLines = tooltipLines,
-                    }
-                end
+    if type(ns.GetWeeklyGoalTrackerLines) == "function" then
+        local ok, generalLines = pcall(ns.GetWeeklyGoalTrackerLines, ns)
+        if ok and type(generalLines) == "table" then
+            for _, lineInfo in ipairs(generalLines) do
+                lines[#lines + 1] = lineInfo
             end
         end
     end
 
-    if #dashboard.professions == 0 then
+    local showProfessions = type(ns.GetWeeklyGoalEnabled) ~= "function" or ns:GetWeeklyGoalEnabled("professions")
+    local hideCompleted = type(ns.GetWeeklyGoalsHideCompleted) == "function" and ns:GetWeeklyGoalsHideCompleted() or false
+    if showProfessions then
+        for _, profession in ipairs(dashboard.professions) do
+            local professionLines = {}
+            for _, goalID in ipairs(GOAL_ORDER) do
+                if db.tracker.goals[goalID] == true then
+                    local goal = profession.goals[goalID]
+                    if goal and not (hideCompleted and goal.complete) then
+                        local tooltipTitle, tooltipLines = GetTrackerGoalTooltip(profession, goal)
+                        local text
+                        if goal.id == "darkmoon" then
+                            local activity = goal.active
+                                and string.format("|cff59dd7a(Active %s)|r", goal.location or "SW")
+                                or "|cffff4d4d(Inactive)|r"
+                            text = string.format(
+                                "   |cffc9c9c9%s|r %s: %s%s|r",
+                                goal.label,
+                                activity,
+                                GoalColor(goal),
+                                GoalStatusText(goal)
+                            )
+                        else
+                            text = string.format("   %s%s: %s|r", GoalColor(goal), goal.label, GoalStatusText(goal))
+                        end
+                        professionLines[#professionLines + 1] = {
+                            text = text,
+                            tooltipTitle = tooltipTitle,
+                            tooltipLines = tooltipLines,
+                        }
+                    end
+                end
+            end
+
+            if not hideCompleted or not profession.weeklyComplete or #professionLines > 0 then
+                local weeklyColor = profession.weeklyComplete and "|cff59dd7a" or "|cffffc857"
+                lines[#lines + 1] = {
+                    text = string.format("|cffffd34e%s weekly|r  %s%d/%d KP|r", profession.name, weeklyColor, profession.weeklyPoints, profession.weeklyTotal),
+                    tooltipTitle = profession.name .. " weekly Knowledge",
+                    tooltipLines = {
+                        "Progress from recurring trainer, treatise, and weekly item goals.",
+                        "Darkmoon, catch-up, and one-time Knowledge are tracked separately and do not increase this total.",
+                    },
+                }
+                for _, lineInfo in ipairs(professionLines) do
+                    lines[#lines + 1] = lineInfo
+                end
+            end
+        end
+
+        if #dashboard.professions == 0 then
+            lines[#lines + 1] = {
+                text = "|cffb8b8b8No Midnight professions learned.|r",
+                tooltipTitle = "Profession Knowledge",
+                tooltipLines = { "Learn a Midnight primary profession to begin tracking Knowledge goals." },
+            }
+        end
+    end
+
+    if #lines == 0 then
         lines[1] = {
-            text = "|cffb8b8b8No Midnight professions learned.|r",
-            tooltipTitle = "Profession Weekly",
-            tooltipLines = { "Learn a Midnight primary profession to begin tracking Knowledge goals." },
+            text = "|cff59dd7aAll selected weekly goals complete.|r",
+            tooltipTitle = "Weekly Goals",
+            tooltipLines = { "Completed entries are currently hidden in the Weekly Goals settings." },
         }
     end
 
@@ -898,6 +976,7 @@ local function UpdateTracker()
     end
 
     tracker:SetHeight(math.max(50, 39 + (#lines * 17)))
+    UpdateTrackerHeaderControls()
     tracker:Show()
 end
 
@@ -926,10 +1005,51 @@ local function CreateTracker()
     tracker.title = tracker:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     tracker.title:SetPoint("TOPLEFT", tracker, "TOPLEFT", 12, -10)
     tracker.title:SetTextColor(1, 0.82, 0.18)
-    tracker.title:SetText("Profession Weekly")
+    tracker.title:SetText("Weekly Goals")
+
+    tracker.lockButton = CreateFrame("Button", nil, tracker, "UIPanelButtonTemplate")
+    tracker.lockButton:SetSize(36, 18)
+    tracker.lockButton:SetText("Lock")
+    tracker.lockButton:SetNormalFontObject("GameFontNormalSmall")
+    tracker.lockButton:SetHighlightFontObject("GameFontHighlightSmall")
+    tracker.lockButton:SetDisabledFontObject("GameFontDisableSmall")
+    tracker.lockButton:SetScript("OnClick", function()
+        local db = EnsureDB()
+        if db and ns.SetProfessionWeeklyTrackerLocked then
+            ns:SetProfessionWeeklyTrackerLocked(db.tracker.locked ~= true)
+        end
+    end)
+
+    tracker.minimizeButton = CreateFrame("Button", nil, tracker, "UIPanelButtonTemplate")
+    tracker.minimizeButton:SetSize(22, 18)
+    tracker.minimizeButton:SetPoint("TOPRIGHT", tracker, "TOPRIGHT", -8, -6)
+    tracker.minimizeButton:SetText("-")
+    tracker.minimizeButton:SetNormalFontObject("GameFontNormalSmall")
+    tracker.minimizeButton:SetHighlightFontObject("GameFontHighlightSmall")
+    tracker.minimizeButton:SetDisabledFontObject("GameFontDisableSmall")
+    tracker.minimizeButton:SetScript("OnClick", function()
+        local db = EnsureDB()
+        if db and ns.SetProfessionWeeklyTrackerMinimized then
+            ns:SetProfessionWeeklyTrackerMinimized(db.tracker.minimized ~= true)
+        end
+    end)
+    tracker.minimizeButton:SetScript("OnEnter", function(self)
+        local db = EnsureDB()
+        if not db or not GameTooltip then return end
+        GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+        GameTooltip:SetText(db.tracker.minimized == true and "Expand Weekly Goals" or "Minimize Weekly Goals")
+        GameTooltip:Show()
+    end)
+    tracker.minimizeButton:SetScript("OnLeave", function(self)
+        if GameTooltip and GameTooltip:GetOwner() == self then
+            GameTooltip:Hide()
+        end
+    end)
+
+    tracker.lockButton:SetPoint("RIGHT", tracker.minimizeButton, "LEFT", -4, 0)
 
     tracker.hint = tracker:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
-    tracker.hint:SetPoint("TOPRIGHT", tracker, "TOPRIGHT", -12, -11)
+    tracker.hint:SetPoint("RIGHT", tracker.lockButton, "LEFT", -5, 0)
     tracker.hint:SetText("Drag to move")
 
     tracker.divider = tracker:CreateTexture(nil, "ARTWORK")
@@ -953,8 +1073,8 @@ local function CreateTracker()
         local db = EnsureDB()
         if not db or db.tracker.locked == true then return end
         GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-        GameTooltip:SetText("ZoidsTools Profession Weekly")
-        GameTooltip:AddLine("Drag to move. Lock or hide it from /zt > Professions.", 0.82, 0.82, 0.82, true)
+        GameTooltip:SetText("ZoidsTools Weekly Goals")
+        GameTooltip:AddLine("Drag to move. Choose goals, lock, or hide it from /zt > Weekly.", 0.82, 0.82, 0.82, true)
         GameTooltip:Show()
     end)
     tracker:SetScript("OnLeave", function(self)
@@ -1055,6 +1175,18 @@ function ns:SetProfessionWeeklyTrackerLocked(value)
     local db = EnsureDB()
     if not db then return end
     db.tracker.locked = value == true
+    RefreshAll()
+end
+
+function ns:IsProfessionWeeklyTrackerMinimized()
+    local db = EnsureDB()
+    return db and db.tracker.minimized == true
+end
+
+function ns:SetProfessionWeeklyTrackerMinimized(value)
+    local db = EnsureDB()
+    if not db then return end
+    db.tracker.minimized = value == true
     RefreshAll()
 end
 

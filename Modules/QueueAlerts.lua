@@ -2,6 +2,7 @@ local _, ns = ...
 
 local PROPOSAL_DURATION = 40
 local BACKGROUND_SOUND_CVAR = "Sound_EnableSoundWhenGameIsInBG"
+local PVP_READY_POPUP = "CONFIRM_BATTLEFIELD_ENTRY"
 
 local eventFrame
 local countdownFrame
@@ -29,6 +30,7 @@ local function EnsureDB()
     if db.backgroundSound == nil then db.backgroundSound = true end
     if db.countdown == nil then db.countdown = true end
     if db.safeQueue == nil then db.safeQueue = false end
+    if db.safeQueueDungeons == nil then db.safeQueueDungeons = false end
 
     return db
 end
@@ -152,16 +154,64 @@ local function UpdateCountdownVisibility()
     end
 end
 
-local function ApplySafeQueue()
+local function ApplyDungeonSafeQueue()
     local button = _G.LFGDungeonReadyDialog and _G.LFGDungeonReadyDialog.leaveButton
     if not CanAccessFrame(button) or (InCombatLockdown and InCombatLockdown()) then return end
 
     local db = EnsureDB()
-    if db and db.safeQueue and ProposalIsVisible() then
+    if db and db.safeQueueDungeons and ProposalIsVisible() then
         pcall(button.Hide, button)
     else
         pcall(button.Show, button)
     end
+end
+
+local function GetStaticPopupButton(frame, buttonIndex)
+    if not frame then return nil end
+
+    local getter = frame["GetButton" .. buttonIndex]
+    if type(getter) == "function" then
+        local ok, button = pcall(getter, frame)
+        if ok and button then return button end
+    end
+
+    local direct = frame["button" .. buttonIndex] or frame["Button" .. buttonIndex]
+    if direct then return direct end
+
+    local ok, frameName = pcall(frame.GetName, frame)
+    if ok and type(frameName) == "string" then
+        return _G[frameName .. "Button" .. buttonIndex]
+    end
+
+    return nil
+end
+
+local function ApplyPvPSafeQueue()
+    local db = EnsureDB()
+    local hideLeaveQueue = db and db.safeQueue == true
+    local popupCount = tonumber(_G.STATICPOPUP_NUMDIALOGS) or 4
+
+    for index = 1, popupCount do
+        local popup = _G["StaticPopup" .. index]
+        if CanAccessFrame(popup) then
+            local whichOK, which = pcall(function() return popup.which end)
+            if whichOK and which == PVP_READY_POPUP then
+                local button = GetStaticPopupButton(popup, 2)
+                if CanAccessFrame(button) and not (InCombatLockdown and InCombatLockdown()) then
+                    if hideLeaveQueue then
+                        pcall(button.Hide, button)
+                    else
+                        pcall(button.Show, button)
+                    end
+                end
+            end
+        end
+    end
+end
+
+local function ApplySafeQueues()
+    ApplyDungeonSafeQueue()
+    ApplyPvPSafeQueue()
 end
 
 local function ScheduleStateRefresh()
@@ -170,7 +220,7 @@ local function ScheduleStateRefresh()
 
     local function Refresh()
         if generation ~= updateGeneration then return end
-        ApplySafeQueue()
+        ApplySafeQueues()
         UpdateCountdownVisibility()
     end
 
@@ -240,6 +290,18 @@ function ns:SetSafeQueueEnabled(value)
     ScheduleStateRefresh()
 end
 
+function ns:IsDungeonSafeQueueEnabled()
+    local db = EnsureDB()
+    return db and db.safeQueueDungeons == true
+end
+
+function ns:SetDungeonSafeQueueEnabled(value)
+    local db = EnsureDB()
+    if not db then return end
+    db.safeQueueDungeons = value == true
+    ScheduleStateRefresh()
+end
+
 function ns:InitializeQueueAlerts()
     EnsureDB()
 
@@ -250,10 +312,13 @@ function ns:InitializeQueueAlerts()
         eventFrame:RegisterEvent("LFG_PROPOSAL_DONE")
         eventFrame:RegisterEvent("LFG_PROPOSAL_FAILED")
         eventFrame:RegisterEvent("LFG_PROPOSAL_SUCCEEDED")
+        eventFrame:RegisterEvent("UPDATE_BATTLEFIELD_STATUS")
         eventFrame:SetScript("OnEvent", function(_, event)
             if event == "LFG_PROPOSAL_SHOW" then
                 StartProposal()
             elseif event == "LFG_PROPOSAL_UPDATE" then
+                ScheduleStateRefresh()
+            elseif event == "UPDATE_BATTLEFIELD_STATUS" then
                 ScheduleStateRefresh()
             else
                 StopProposal()

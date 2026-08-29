@@ -62,12 +62,7 @@ local function SecureCallBlizzard(func, ...)
         return false
     end
 
-    -- Calling Blizzard's Group Finder helpers through ordinary addon execution
-    -- taints the state they store on LFGListFrame. In restricted instances that
-    -- later prevents Blizzard from reading secret search-result fields. Restore
-    -- each original Blizzard function's secure execution context instead.
-    securecallfunction(func, ...)
-    return true
+    return pcall(securecallfunction, func, ...)
 end
 
 local function NormalizeName(value)
@@ -596,19 +591,19 @@ local function SetTextStyle(fontString, size, r, g, b, justify)
     fontString:SetWordWrap(false)
 end
 
-local function PrintDungeonSearchError(dungeonName, detail)
+local function PrintGroupFinderOpenError(dungeonName, detail)
     if type(ns.Print) ~= "function" then
         return
     end
 
-    local message = string.format("Could not search Premade Groups for %s.", dungeonName or "that dungeon")
+    local message = string.format("Could not open Premade Groups for %s.", dungeonName or "that dungeon")
     if detail then
         message = message .. " " .. detail
     end
     ns:Print(message)
 end
 
-local function FindDungeonSearchActivityID(info, categoryID, baseFilters)
+local function FindDungeonActivityGroupID(info, categoryID, baseFilters)
     if not C_LFGList
         or type(C_LFGList.GetAvailableActivities) ~= "function"
         or type(C_LFGList.GetActivityInfoTable) ~= "function" then
@@ -617,12 +612,10 @@ local function FindDungeonSearchActivityID(info, categoryID, baseFilters)
 
     local activityFilters = baseFilters
     local recommendedFilter = Enum and Enum.LFGListFilter and SafeNumber(Enum.LFGListFilter.Recommended)
-    if recommendedFilter then
-        if bit and type(bit.bor) == "function" then
-            activityFilters = bit.bor(activityFilters, recommendedFilter)
-        else
-            activityFilters = activityFilters + recommendedFilter
-        end
+    if recommendedFilter and bit and type(bit.bor) == "function" then
+        activityFilters = bit.bor(activityFilters, recommendedFilter)
+    elseif recommendedFilter then
+        activityFilters = activityFilters + recommendedFilter
     end
 
     local activitiesOK, activityIDs = pcall(
@@ -637,7 +630,6 @@ local function FindDungeonSearchActivityID(info, categoryID, baseFilters)
 
     local wantedMapID = SafeNumber(info.instanceID)
     local wantedName = NormalizeName(info.name)
-    local fallbackID
     local fallbackGroupID
     for _, rawActivityID in ipairs(activityIDs) do
         local activityID = SafeNumber(rawActivityID)
@@ -654,21 +646,22 @@ local function FindDungeonSearchActivityID(info, categoryID, baseFilters)
                     or (fullName and fullName:find(wantedName, 1, true) == 1)
                 )
                 if mapMatches or nameMatches then
-                    fallbackID = fallbackID or activityID
-                    fallbackGroupID = fallbackGroupID or SafeNumber(activityInfo.groupFinderActivityGroupID)
-                    if SafeBoolean(activityInfo.isMythicPlusActivity) == true then
-                        return activityID, SafeNumber(activityInfo.groupFinderActivityGroupID)
+                    local activityGroupID = SafeNumber(activityInfo.groupFinderActivityGroupID)
+                    fallbackGroupID = fallbackGroupID or activityGroupID
+                    if activityGroupID and SafeBoolean(activityInfo.isMythicPlusActivity) == true then
+                        return activityGroupID
                     end
                 end
             end
         end
     end
 
-    return fallbackID, fallbackGroupID
+    return fallbackGroupID
 end
 
-local function EnsureDungeonSelectedInAdvancedFilter(activityGroupID)
-    if not C_LFGList
+local function SelectOnlyDungeonInAdvancedFilter(activityGroupID)
+    if not activityGroupID
+        or not C_LFGList
         or type(C_LFGList.GetAdvancedFilter) ~= "function"
         or type(C_LFGList.SaveAdvancedFilter) ~= "function" then
         return false
@@ -679,39 +672,24 @@ local function EnsureDungeonSelectedInAdvancedFilter(activityGroupID)
         return false
     end
 
-    if type(enabled.activities) ~= "table" then
-        enabled.activities = {}
+    -- This is the same activity-group list Blizzard's dungeon checklist saves.
+    -- Replace only that list so role, rating, difficulty, and playstyle choices
+    -- remain exactly as the player configured them.
+    enabled.activities = { activityGroupID }
+    if not SecureCallBlizzard(C_LFGList.SaveAdvancedFilter, enabled) then
+        return false
     end
 
-    -- Blizzard treats an empty dungeon list as "all dungeons." Once a player
-    -- customizes the list, add only the clicked dungeon's activity group so
-    -- every other role, rating, difficulty, playstyle, and dungeon choice stays intact.
-    if #enabled.activities == 0 then
-        return true
+    local verifyOK, saved = pcall(C_LFGList.GetAdvancedFilter)
+    if not verifyOK or IsSecretValue(saved) or type(saved) ~= "table"
+        or type(saved.activities) ~= "table" or #saved.activities ~= 1 then
+        return false
     end
 
-    if activityGroupID then
-        for _, rawGroupID in ipairs(enabled.activities) do
-            if SafeNumber(rawGroupID) == activityGroupID then
-                return true
-            end
-        end
-
-        enabled.activities[#enabled.activities + 1] = activityGroupID
-        local saveOK = pcall(C_LFGList.SaveAdvancedFilter, enabled)
-        if saveOK then
-            return true
-        end
-    end
-
-    -- Compatibility fallback for a changed or unavailable activity-group ID:
-    -- an empty list restores Blizzard's native "all dungeons" behavior without
-    -- resetting any of the other advanced-filter fields.
-    enabled.activities = {}
-    return pcall(C_LFGList.SaveAdvancedFilter, enabled)
+    return SafeNumber(saved.activities[1]) == activityGroupID
 end
 
-local function SearchPremadeGroupsForDungeon(info)
+local function OpenPremadeGroupsForDungeon(info)
     if not info or info.isRaid == true then
         return
     end
@@ -721,71 +699,85 @@ local function SearchPremadeGroupsForDungeon(info)
         return
     end
 
+    if InCombatLockdown and InCombatLockdown() then
+        PrintGroupFinderOpenError(dungeonName, "Try again after combat.")
+        return
+    end
+
     if C_LFGList and type(C_LFGList.HasActiveEntryInfo) == "function" then
         local activeOK, hasActiveEntry = pcall(C_LFGList.HasActiveEntryInfo)
         if activeOK and SafeBoolean(hasActiveEntry) == true then
-            PrintDungeonSearchError(dungeonName, "Leave your active listing first.")
+            PrintGroupFinderOpenError(dungeonName, "Leave your active listing first.")
             return
         end
     end
 
     if type(_G.PVEFrame_ShowFrame) ~= "function" or not _G.LFGListPVEStub then
-        PrintDungeonSearchError(dungeonName, "Blizzard's Group Finder is not available yet.")
+        PrintGroupFinderOpenError(dungeonName, "Blizzard's Group Finder is not available yet.")
         return
     end
 
     if not SecureCallBlizzard(_G.PVEFrame_ShowFrame, "GroupFinderFrame", _G.LFGListPVEStub) then
-        PrintDungeonSearchError(dungeonName, "Blizzard's Group Finder could not be opened.")
+        PrintGroupFinderOpenError(dungeonName, "Blizzard's Group Finder could not be opened.")
         return
     end
 
     local lfgFrame = _G.LFGListFrame
     local categoryPanel = lfgFrame and lfgFrame.CategorySelection
     local searchPanel = lfgFrame and lfgFrame.SearchPanel
-    local searchBox = searchPanel and searchPanel.SearchBox
-    if not lfgFrame or not categoryPanel or not searchPanel or not searchBox then
-        PrintDungeonSearchError(dungeonName, "The dungeon search panel is not available yet.")
+    if not lfgFrame or not categoryPanel or not searchPanel then
+        PrintGroupFinderOpenError(dungeonName, "The dungeon search panel is not available yet.")
         return
     end
 
-    if type(_G.LFGListCategorySelection_SelectCategory) ~= "function"
-        or type(_G.LFGListSearchPanel_Clear) ~= "function"
-        or type(_G.LFGListSearchPanel_SetCategory) ~= "function"
-        or type(_G.LFGListSearchPanel_DoSearch) ~= "function"
-        or type(_G.LFGListFrame_SetActivePanel) ~= "function"
-        or not C_LFGList
-        or type(C_LFGList.SetSearchToActivity) ~= "function" then
-        PrintDungeonSearchError(dungeonName, "The dungeon search controls are not available yet.")
+    if type(_G.LFGListCategorySelectionButton_OnClick) ~= "function"
+        or type(_G.LFGListCategorySelection_StartFindGroup) ~= "function" then
+        PrintGroupFinderOpenError(dungeonName, "Blizzard's dungeon search controls are not available yet.")
         return
     end
 
     local categoryID = SafeNumber(_G.GROUP_FINDER_CATEGORY_ID_DUNGEONS) or GROUP_FINDER_DUNGEON_CATEGORY_ID
-    local filters = 0 -- Blizzard's Dungeon category button uses 0 and resolves Recommended internally.
     local baseFilters = SafeNumber(lfgFrame.baseFilters) or 0
-    local activityID, activityGroupID = FindDungeonSearchActivityID(info, categoryID, baseFilters)
-    if not activityID then
-        PrintDungeonSearchError(dungeonName, "Blizzard did not return a matching dungeon activity.")
+    local activityGroupID = FindDungeonActivityGroupID(info, categoryID, baseFilters)
+    if not activityGroupID then
+        PrintGroupFinderOpenError(dungeonName, "Blizzard did not return a matching dungeon filter.")
         return
     end
 
-    if not EnsureDungeonSelectedInAdvancedFilter(activityGroupID) then
-        PrintDungeonSearchError(dungeonName, "Blizzard's dungeon filter could not be updated.")
+    if not SelectOnlyDungeonInAdvancedFilter(activityGroupID) then
+        PrintGroupFinderOpenError(dungeonName, "Blizzard's dungeon checklist could not be updated.")
         return
     end
 
-    if not SecureCallBlizzard(_G.LFGListCategorySelection_SelectCategory, categoryPanel, categoryID, filters)
-        or SafeNumber(categoryPanel.selectedCategory) ~= categoryID then
-        PrintDungeonSearchError(dungeonName, "Blizzard's dungeon search could not be prepared.")
+    if type(_G.LFGListCategorySelection_UpdateCategoryButtons) == "function" then
+        SecureCallBlizzard(_G.LFGListCategorySelection_UpdateCategoryButtons, categoryPanel)
+    end
+
+    local dungeonCategoryButton
+    if type(categoryPanel.CategoryButtons) == "table" then
+        for _, button in ipairs(categoryPanel.CategoryButtons) do
+            if SafeNumber(button and button.categoryID) == categoryID then
+                local buttonFilters = SafeNumber(button.filters) or 0
+                if buttonFilters == 0 or not dungeonCategoryButton then
+                    dungeonCategoryButton = button
+                end
+                if buttonFilters == 0 then
+                    break
+                end
+            end
+        end
+    end
+    if not dungeonCategoryButton then
+        PrintGroupFinderOpenError(dungeonName, "Blizzard's Dungeons category is not available yet.")
         return
     end
 
-    if not SecureCallBlizzard(_G.LFGListSearchPanel_Clear, searchPanel)
-        or not SecureCallBlizzard(_G.LFGListSearchPanel_SetCategory, searchPanel, categoryID, filters, baseFilters)
-        or SafeNumber(searchPanel.categoryID) ~= categoryID
-        or not SecureCallBlizzard(C_LFGList.SetSearchToActivity, activityID)
-        or not SecureCallBlizzard(_G.LFGListSearchPanel_DoSearch, searchPanel)
-        or not SecureCallBlizzard(_G.LFGListFrame_SetActivePanel, lfgFrame, searchPanel) then
-        PrintDungeonSearchError(dungeonName, "Blizzard's dungeon search could not be started.")
+    -- Let Blizzard's own Dungeons button and Find Group handler populate every
+    -- Lua-side panel field from Blizzard-owned values. Passing category values
+    -- from addon code into those fields is what can taint the 12.1 result rows.
+    if not SecureCallBlizzard(_G.LFGListCategorySelectionButton_OnClick, dungeonCategoryButton)
+        or not SecureCallBlizzard(_G.LFGListCategorySelection_StartFindGroup, categoryPanel) then
+        PrintGroupFinderOpenError(dungeonName, "Blizzard's dungeon results could not be opened.")
         return
     end
 
@@ -815,7 +807,7 @@ local function ShowLockoutTooltip(row)
         GameTooltip:AddLine(" ")
         GameTooltip:AddLine("Mythic+ remains repeatable. The lock only tracks base Mythic loot for this week.", 0.66, 0.66, 0.70, true)
         GameTooltip:AddLine(" ")
-        GameTooltip:AddLine("Left-click to search Premade Groups for this dungeon.", 0.35, 0.82, 1, true)
+        GameTooltip:AddLine("Left-click to open Premade Groups with only this dungeon checked.", 0.35, 0.82, 1, true)
         GameTooltip:Show()
         return
     end
@@ -841,7 +833,7 @@ local function ShowLockoutTooltip(row)
     end
     if info.isRaid ~= true then
         GameTooltip:AddLine(" ")
-        GameTooltip:AddLine("Left-click to search Premade Groups for this dungeon.", 0.35, 0.82, 1, true)
+        GameTooltip:AddLine("Left-click to open Premade Groups with only this dungeon checked.", 0.35, 0.82, 1, true)
     end
     GameTooltip:Show()
 end
@@ -896,7 +888,7 @@ local function CreateLockoutRow(parent)
     end)
     row:SetScript("OnClick", function(self, button)
         if button == "LeftButton" then
-            SearchPremadeGroupsForDungeon(self.info)
+            OpenPremadeGroupsForDungeon(self.info)
         end
     end)
     return row

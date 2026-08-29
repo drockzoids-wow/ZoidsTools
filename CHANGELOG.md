@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Added a mailbox character Rolodex beside Blizzard's recipient field, populated from Warband character snapshots, with an optional last-successful-recipient memory that never sends or confirms mail automatically.
+- Added Hearthkeeper's Wandering Caravan to the selectable repair and vendor mount group.
+- Refocused Safe Queue on PvP ready dialogs by hiding their Leave Queue button without auto-accepting. Dungeon Decline protection is now a separate, off-by-default option.
+- Made Instance Lockouts dungeon clicks leave only the clicked dungeon checked in Blizzard's saved dungeon filter, without opening the filter menu or touching its protected search box/API. Role, rating, difficulty, and playstyle filters remain unchanged before Blizzard's native Dungeons results open.
 - Restored one-click missing-buff requests in instance, raid, and party chat. Requests now use the previously reliable direct click path while explicitly refusing Blizzard combat and chat-message lockdown states, avoiding both the empty chat box and the intermittent protected-action error.
 - Added a saved minimize/expand control to the Weekly Goals tracker. Minimized mode keeps only the title bar, lock/unlock button, and expand button visible, including while the tracker is locked click-through.
 - Excluded Blizzard's Guild Control panel from the generic window mover so its protected account-authorization check remains untainted.
@@ -11,7 +15,6 @@
 - Expanded the Profession Weekly tracker into configurable Weekly Goals. It now tracks Great Vault choices, Spark of Tides catch-up, Nymrissa, recurring 12.1 quests, the rotating Housing weekly, active Timewalking, and profession Knowledge, with mouseover explanations and an option to hide completed goals.
 - Fixed Instance Lockouts retaining the wrong left/right attachment after Blizzard moved the Dungeons & Raids window to accommodate other open panels. It now rechecks available screen space whenever that window is repositioned.
 - Added compact Lock and Unlock controls directly to the Profession Weekly tracker header. The header now says "Locked" when secured and keeps only the small Unlock button clickable while the rest of the tracker remains click-through.
-- Fixed the Instance Lockouts dungeon-search shortcut tainting Blizzard's Group Finder state. Blizzard's original category, panel, and search helpers now run through a secure boundary so restricted 12.1 listing data remains readable inside dungeons and raids.
 - Reduced Talent Grimoire memory after login by retaining generated build and rotation data only for the player's class while preserving all of that class's specializations and alternate-spec recommendations.
 - Added a dedicated Professions section with automatic Midnight 12.1 Knowledge tracking for trainer quests, treatises, weekly treasures, gathering and disenchanting drops, Darkmoon quests, catch-up currency, eight one-time profession treasures, and the Zul'jarra rank 6 book. A compact goal-selectable tracker can be shown, moved, locked click-through, hidden, and reset from the same page.
 - Darkmoon profession goals now show the Faire's live monthly status in the progress tracker, including the faction-appropriate Goldshire (SW) or Thunder Bluff (TB) entrance.

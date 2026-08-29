@@ -97,6 +97,7 @@ local SERVICE_MOUNT_PRIORITY = {
         "grizzly hills packmaster",
         "traveler's tundra mammoth",
         "traveller's tundra mammoth",
+        "hearthkeeper's wandering caravan",
     },
     auctionHouse = {
         "mighty caravan brutosaur",

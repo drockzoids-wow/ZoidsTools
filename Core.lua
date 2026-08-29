@@ -88,6 +88,10 @@ local defaults = {
         showLevelingCharacters = false,
         characters = {},
     },
+    mail = {
+        recipientRolodex = true,
+        rememberLastRecipient = false,
+    },
     weeklyGoals = {
         hideCompleted = false,
         goals = {
@@ -123,6 +127,7 @@ local defaults = {
         backgroundSound = true,
         countdown = true,
         safeQueue = false,
+        safeQueueDungeons = false,
     },
     tooltips = {
         classColoredNames = true,
@@ -885,6 +890,7 @@ local moduleInitializers = {
     "InitializeMythicInviteBanner",
     "InitializeInstanceLockouts",
     "InitializeWarbandWeekly",
+    "InitializeMailRecipients",
     "InitializeWeeklyGoals",
     "InitializeProfessionWeekly",
     "InitializeBuffWarnings",

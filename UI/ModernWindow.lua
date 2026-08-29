@@ -17,7 +17,7 @@ local pages = {
     warband = { key = "warband", label = "Warband Weekly", icon = "WB", page = "warband", sectionKey = "warband", description = "Account-wide Mythic+, Great Vault, keystone, and current-expansion lockout snapshots." },
     professionweekly = { key = "professionweekly", label = "Weekly Goals", icon = "WK", page = "professionweekly", sectionKey = "profession_area", description = "Popular weekly goals, Great Vault progress, and Midnight profession Knowledge." },
     minimap = { key = "minimap", label = "Minimap", icon = "N", page = "general", sectionKey = "core", description = "Minimap shape, title bar, addon buttons, and expansion button tools." },
-    general = { key = "general", label = "Interface", icon = "G", page = "general", sectionKey = "core", description = "Widgets, audio sync, Talking Head, and general interface tools." },
+    general = { key = "general", label = "Interface", icon = "G", page = "general", sectionKey = "core", description = "Widgets, mailbox recipients, audio sync, Talking Head, and general interface tools." },
     tooltips = { key = "tooltips", label = "Tooltips", icon = "T", page = "tooltips", sectionKey = "core", description = "Class-colored player names, Mythic+ rating, and equipped item level." },
     windows = { key = "windows", label = "Windows", icon = "W", page = "windows", sectionKey = "core", description = "Move and scale Blizzard windows and default bag frames." },
     chat = { key = "chat", label = "Chat", icon = "H", page = "chat", sectionKey = "chat", description = "Chat copy, saved history, input styling, scrolling, and message awareness." },
@@ -1366,7 +1366,7 @@ local function CreateInterfacePage(parent)
         end
     end)
 
-    local queueCard = CreateSectionCard(page, "Queue Alerts", cardW, 130)
+    local queueCard = CreateSectionCard(page, "Queue Alerts", cardW, 158)
     queueCard:SetPoint("TOPLEFT", widgetsCard, "BOTTOMLEFT", 0, -10)
 
     local queueSound = ns.UI.CreateCheckbox(
@@ -1389,12 +1389,21 @@ local function CreateInterfacePage(parent)
 
     local safeQueue = ns.UI.CreateCheckbox(
         queueCard,
-        "Safe queue (hide Decline)",
-        "Hides the Decline button on the dungeon-ready response dialog. ZoidsTools never accepts automatically.",
+        "Safe PvP queues (hide Leave Queue)",
+        "Hides Leave Queue on battleground and arena ready dialogs. ZoidsTools never accepts automatically.",
         function() return ns.IsSafeQueueEnabled and ns:IsSafeQueueEnabled() end,
         function(value) if ns.SetSafeQueueEnabled then ns:SetSafeQueueEnabled(value) end end
     )
     PlaceBelow(safeQueue, queueCountdown)
+
+    local safeDungeonQueue = ns.UI.CreateCheckbox(
+        queueCard,
+        "Safe dungeon queues (hide Decline)",
+        "Also hides Decline on dungeon-ready dialogs. This is separate and disabled by default.",
+        function() return ns.IsDungeonSafeQueueEnabled and ns:IsDungeonSafeQueueEnabled() end,
+        function(value) if ns.SetDungeonSafeQueueEnabled then ns:SetDungeonSafeQueueEnabled(value) end end
+    )
+    PlaceBelow(safeDungeonQueue, safeQueue)
 
     local qualityCard = CreateSectionCard(page, "Quality of Life", cardW, 224)
     qualityCard:SetPoint("TOPLEFT", page, "TOPLEFT", 0, 0)
@@ -1443,6 +1452,24 @@ local function CreateInterfacePage(parent)
         function(value) if ns.SetCinematicAutoSkipEnabled then ns:SetCinematicAutoSkipEnabled(value) end end
     )
     PlaceBelow(cinematicAutoSkip, cinematicFastSkip)
+
+    local mailRolodex = ns.UI.CreateCheckbox(
+        qualityCard,
+        "Mailbox Rolodex",
+        "Adds a character picker to Blizzard's recipient field using characters recorded by the Warband dashboard.",
+        function() return ns.IsMailRecipientRolodexEnabled and ns:IsMailRecipientRolodexEnabled() end,
+        function(value) if ns.SetMailRecipientRolodexEnabled then ns:SetMailRecipientRolodexEnabled(value) end end
+    )
+    PlaceBelow(mailRolodex, cinematicAutoSkip)
+
+    local rememberMailRecipient = ns.UI.CreateCheckbox(
+        qualityCard,
+        "Remember last recipient",
+        "After Blizzard confirms a mail was sent, restores that recipient for the next message and lists it at the top of the picker.",
+        function() return ns.IsMailLastRecipientEnabled and ns:IsMailLastRecipientEnabled() end,
+        function(value) if ns.SetMailLastRecipientEnabled then ns:SetMailLastRecipientEnabled(value) end end
+    )
+    rememberMailRecipient:SetPoint("TOPLEFT", mailRolodex, "TOPLEFT", 170, 0)
 
     local talkingHeadCard = CreateSectionCard(page, "Talking Head", cardW, 190)
     talkingHeadCard:SetPoint("TOPLEFT", qualityCard, "BOTTOMLEFT", 0, -10)
@@ -1534,6 +1561,9 @@ local function CreateInterfacePage(parent)
         queueSound:Refresh()
         queueCountdown:Refresh()
         safeQueue:Refresh()
+        safeDungeonQueue:Refresh()
+        mailRolodex:Refresh()
+        rememberMailRecipient:Refresh()
 
         if ns.UI and ns.UI.SetControlEnabled then
             local talkingHeadActive = subtleTalkingHead:GetChecked() == true

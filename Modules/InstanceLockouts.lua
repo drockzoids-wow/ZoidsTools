@@ -8,7 +8,9 @@ local PANEL_BORDER_BUTTON_X_OFFSET = -3
 local PANEL_BORDER_BUTTON_TOP_OFFSET = -43
 local PANEL_MIN_HEIGHT = 360
 local PANEL_GAP = 8
-local RATING_SUMMARY_WIDTH = 128
+local RATING_SUMMARY_WIDTH = 116
+local AFFIX_ICON_SIZE = 26
+local AFFIX_ICON_GAP = 3
 local WEEKLY_RUN_COLUMN_WIDTH = 44
 local SEASON_RUN_COLUMN_WIDTH = 48
 local LOCK_COLUMN_WIDTH = 52
@@ -247,6 +249,15 @@ local function FormatBestRunLevel(level)
 end
 
 local function GetCurrentMythicPlusRating()
+    if C_ChallengeMode
+        and type(C_ChallengeMode.GetOverallDungeonScore) == "function" then
+        local ok, score = pcall(C_ChallengeMode.GetOverallDungeonScore)
+        score = ok and SafeNumber(score) or nil
+        if score then
+            return math.max(0, math.floor(score + 0.5))
+        end
+    end
+
     if not C_PlayerInfo
         or type(C_PlayerInfo.GetPlayerMythicPlusRatingSummary) ~= "function" then
         return 0
@@ -259,6 +270,239 @@ local function GetCurrentMythicPlusRating()
 
     local score = SafeNumber(summary.currentSeasonScore)
     return score and math.max(0, math.floor(score + 0.5)) or 0
+end
+
+local function GetMythicPlusRatingColorCode(score)
+    local r, g, b = 1, 1, 1
+    if C_ChallengeMode
+        and type(C_ChallengeMode.GetDungeonScoreRarityColor) == "function" then
+        local ok, color = pcall(C_ChallengeMode.GetDungeonScoreRarityColor, score)
+        if ok and not IsSecretValue(color) and type(color) == "table" then
+            r = SafeNumber(color.r) or r
+            g = SafeNumber(color.g) or g
+            b = SafeNumber(color.b) or b
+        end
+    end
+
+    local function ToByte(value)
+        return math.floor(math.max(0, math.min(1, value)) * 255 + 0.5)
+    end
+    return string.format("|cff%02x%02x%02x", ToByte(r), ToByte(g), ToByte(b))
+end
+
+local function AddTooltipTitle(tooltip, text)
+    if type(GameTooltip_SetTitle) == "function" then
+        GameTooltip_SetTitle(tooltip, text)
+    else
+        tooltip:SetText(text, 1, 1, 1)
+    end
+end
+
+local function AddTooltipNormalLine(tooltip, text)
+    if type(GameTooltip_AddNormalLine) == "function" then
+        GameTooltip_AddNormalLine(tooltip, text)
+    else
+        tooltip:AddLine(text, 1, 0.82, 0, true)
+    end
+end
+
+local function AddTooltipColoredLine(tooltip, text, color)
+    if type(GameTooltip_AddColoredLine) == "function" and color then
+        GameTooltip_AddColoredLine(tooltip, text, color)
+    else
+        tooltip:AddLine(text, color and color.r or 0.20, color and color.g or 1, color and color.b or 0.20, true)
+    end
+end
+
+local function AddTooltipBlankLine(tooltip)
+    if type(GameTooltip_AddBlankLineToTooltip) == "function" then
+        GameTooltip_AddBlankLineToTooltip(tooltip)
+    else
+        tooltip:AddLine(" ")
+    end
+end
+
+local function ShowMythicPlusRatingTooltip(owner)
+    if not GameTooltip then return end
+    GameTooltip:SetOwner(owner, "ANCHOR_RIGHT", 0, 0)
+    AddTooltipTitle(GameTooltip, DUNGEON_SCORE or "Mythic+ Rating")
+    AddTooltipNormalLine(GameTooltip, DUNGEON_SCORE_DESC or "An overall score based on your best run for each dungeon.")
+    GameTooltip:Show()
+end
+
+local function ShowGreatVaultTooltip(owner)
+    if not GameTooltip then return end
+    GameTooltip:SetOwner(owner, "ANCHOR_RIGHT", 0, 0)
+    AddTooltipTitle(GameTooltip, GREAT_VAULT_REWARDS or "Great Vault Rewards")
+
+    local hasAvailableRewards = false
+    if C_WeeklyRewards and type(C_WeeklyRewards.HasAvailableRewards) == "function" then
+        local ok, available = pcall(C_WeeklyRewards.HasAvailableRewards)
+        hasAvailableRewards = ok and SafeBoolean(available) == true
+    end
+    if hasAvailableRewards then
+        AddTooltipColoredLine(GameTooltip, GREAT_VAULT_REWARDS_WAITING or "You have rewards waiting in the Great Vault.", GREEN_FONT_COLOR)
+        AddTooltipBlankLine(GameTooltip)
+    end
+
+    local lastCompletedActivityInfo
+    local nextActivityInfo
+    if WeeklyRewardsUtil and type(WeeklyRewardsUtil.GetActivitiesProgress) == "function" then
+        local ok, lastCompleted, nextActivity = pcall(WeeklyRewardsUtil.GetActivitiesProgress)
+        if ok then
+            lastCompletedActivityInfo = lastCompleted
+            nextActivityInfo = nextActivity
+        end
+    end
+
+    if not lastCompletedActivityInfo then
+        AddTooltipNormalLine(GameTooltip, GREAT_VAULT_REWARDS_MYTHIC_INCOMPLETE or "Complete Mythic dungeons to unlock a Great Vault reward.")
+    elseif nextActivityInfo then
+        local lastIndex = SafeNumber(lastCompletedActivityInfo.index) or 1
+        local threshold = SafeNumber(nextActivityInfo.threshold) or 0
+        local progress = SafeNumber(nextActivityInfo.progress) or 0
+        local formatText = lastIndex == 1 and GREAT_VAULT_REWARDS_MYTHIC_COMPLETED_FIRST or GREAT_VAULT_REWARDS_MYTHIC_COMPLETED_SECOND
+        if type(formatText) == "string" then
+            AddTooltipNormalLine(GameTooltip, formatText:format(math.max(0, threshold - progress)))
+        end
+    else
+        AddTooltipNormalLine(GameTooltip, GREAT_VAULT_REWARDS_MYTHIC_COMPLETED_THIRD or "You've unlocked all available dungeon rewards for this week.")
+        AddTooltipBlankLine(GameTooltip)
+        AddTooltipColoredLine(GameTooltip, GREAT_VAULT_IMPROVE_REWARD or "Improve Your Reward", GREEN_FONT_COLOR)
+
+        if type(WeeklyRewardsUtil.GetLowestLevelInTopDungeonRuns) == "function" then
+            local threshold = SafeNumber(lastCompletedActivityInfo.threshold)
+            local ok, level, count = false, nil, nil
+            if threshold then
+                ok, level, count = pcall(WeeklyRewardsUtil.GetLowestLevelInTopDungeonRuns, threshold)
+            end
+            level = ok and SafeNumber(level) or nil
+            count = ok and SafeNumber(count) or nil
+            if level and count then
+                if level == WeeklyRewardsUtil.HeroicLevel and type(GREAT_VAULT_REWARDS_HEROIC_IMPROVE) == "string" then
+                    AddTooltipNormalLine(GameTooltip, GREAT_VAULT_REWARDS_HEROIC_IMPROVE:format(count))
+                elseif type(WeeklyRewardsUtil.GetNextMythicLevel) == "function"
+                    and type(GREAT_VAULT_REWARDS_MYTHIC_IMPROVE) == "string" then
+                    local nextLevel = WeeklyRewardsUtil.GetNextMythicLevel(level)
+                    AddTooltipNormalLine(GameTooltip, GREAT_VAULT_REWARDS_MYTHIC_IMPROVE:format(count, nextLevel))
+                end
+            end
+        end
+    end
+
+    local instruction = WEEKLY_REWARDS_CLICK_TO_PREVIEW_INSTRUCTIONS or "Click to preview the Great Vault."
+    if type(GameTooltip_AddInstructionLine) == "function" then
+        GameTooltip_AddInstructionLine(GameTooltip, instruction)
+    else
+        GameTooltip:AddLine(instruction, 0.20, 1, 0.20, true)
+    end
+    GameTooltip:Show()
+end
+
+local function OpenGreatVault()
+    if GameTooltip then GameTooltip:Hide() end
+    if type(WeeklyRewards_ShowUI) ~= "function" then return end
+    if type(securecallfunction) == "function" then
+        securecallfunction(WeeklyRewards_ShowUI)
+    else
+        WeeklyRewards_ShowUI()
+    end
+end
+
+local function ShowWeeklyAffixTooltip(owner)
+    if not GameTooltip or not owner or not owner.affixID or not C_ChallengeMode
+        or type(C_ChallengeMode.GetAffixInfo) ~= "function" then
+        return
+    end
+
+    local ok, name, description = pcall(C_ChallengeMode.GetAffixInfo, owner.affixID)
+    name = ok and SafeString(name) or nil
+    description = ok and SafeString(description) or nil
+    if not name then return end
+
+    GameTooltip:SetOwner(owner, "ANCHOR_RIGHT")
+    GameTooltip:SetText(name, 1, 1, 1, 1, true)
+    if description then
+        GameTooltip:AddLine(description, nil, nil, nil, true)
+    end
+    GameTooltip:Show()
+end
+
+local function GetCurrentWeeklyAffixes()
+    if not C_MythicPlus or type(C_MythicPlus.GetCurrentAffixes) ~= "function" then
+        return {}
+    end
+
+    local ok, affixes = pcall(C_MythicPlus.GetCurrentAffixes)
+    if not ok or IsSecretValue(affixes) or type(affixes) ~= "table" then
+        return {}
+    end
+    return affixes
+end
+
+local function UpdateWeeklyAffixes()
+    if not panel or not panel.affixesContainer then return 0 end
+
+    local affixes = GetCurrentWeeklyAffixes()
+    local validAffixes = {}
+    for _, affix in ipairs(affixes) do
+        local affixID = not IsSecretValue(affix) and type(affix) == "table" and SafeNumber(affix.id) or nil
+        if affixID then
+            validAffixes[#validAffixes + 1] = affixID
+        end
+    end
+
+    local width = #validAffixes > 0
+        and (#validAffixes * AFFIX_ICON_SIZE + (#validAffixes - 1) * AFFIX_ICON_GAP)
+        or 0
+    panel.affixesContainer:SetSize(math.max(1, width), AFFIX_ICON_SIZE)
+    panel.affixesContainer:ClearAllPoints()
+    panel.affixesContainer:SetPoint("TOPRIGHT", panel.ratingButton, "TOPLEFT", 10, -1)
+
+    panel.affixButtons = panel.affixButtons or {}
+    for index, affixID in ipairs(validAffixes) do
+        local button = panel.affixButtons[index]
+        if not button then
+            button = CreateFrame("Button", nil, panel.affixesContainer)
+            button:SetSize(AFFIX_ICON_SIZE, AFFIX_ICON_SIZE)
+            button.icon = button:CreateTexture(nil, "ARTWORK")
+            button.icon:SetPoint("CENTER")
+            button.icon:SetSize(AFFIX_ICON_SIZE - 2, AFFIX_ICON_SIZE - 2)
+            button.border = button:CreateTexture(nil, "OVERLAY")
+            if button.border.SetAtlas then
+                button.border:SetAtlas("ChallengeMode-AffixRing-Lg", true)
+            end
+            button.border:SetAllPoints()
+            button:SetScript("OnEnter", function(self)
+                ShowWeeklyAffixTooltip(self)
+            end)
+            button:SetScript("OnLeave", function()
+                if GameTooltip then GameTooltip:Hide() end
+            end)
+            panel.affixButtons[index] = button
+        end
+
+        button.affixID = affixID
+        local fileID
+        if C_ChallengeMode and type(C_ChallengeMode.GetAffixInfo) == "function" then
+            local ok, _, _, texture = pcall(C_ChallengeMode.GetAffixInfo, affixID)
+            fileID = ok and SafeNumber(texture) or nil
+        end
+        button.icon:SetTexture(fileID or "Interface\\Icons\\INV_Misc_QuestionMark")
+        button:ClearAllPoints()
+        if index == 1 then
+            button:SetPoint("LEFT", panel.affixesContainer, "LEFT", 0, 0)
+        else
+            button:SetPoint("LEFT", panel.affixButtons[index - 1], "RIGHT", AFFIX_ICON_GAP, 0)
+        end
+        button:Show()
+    end
+    for index = #validAffixes + 1, #panel.affixButtons do
+        panel.affixButtons[index]:Hide()
+    end
+
+    panel.affixesContainer:SetShown(#validAffixes > 0)
+    return width
 end
 
 local function RecordBestRun(bestByMapID, bestByName, mapID, level)
@@ -1205,13 +1449,15 @@ RenderLockouts = function(lockouts)
     y, expansionLabel = AddLabel("expansion", currentExpansionName, y, 24)
     expansionLabel:ClearAllPoints()
     expansionLabel:SetPoint("TOPLEFT", panel.content, "TOPLEFT", 4, expansionY)
-    expansionLabel:SetPoint("TOPRIGHT", panel.content, "TOPRIGHT", -(RATING_SUMMARY_WIDTH + 8), expansionY)
 
-    panel.ratingSummary:ClearAllPoints()
-    panel.ratingSummary:SetPoint("TOPRIGHT", panel.content, "TOPRIGHT", -4, expansionY)
-    panel.ratingSummary:SetSize(RATING_SUMMARY_WIDTH, 24)
-    panel.ratingSummary:SetText(string.format("M+ RATING  |cffffffff%d|r", GetCurrentMythicPlusRating()))
-    panel.ratingSummary:Show()
+    panel.ratingButton:ClearAllPoints()
+    panel.ratingButton:SetPoint("TOPRIGHT", panel.content, "TOPRIGHT", -4, expansionY)
+    panel.ratingButton:SetSize(RATING_SUMMARY_WIDTH, 24)
+    local rating = GetCurrentMythicPlusRating()
+    panel.ratingSummary:SetText(string.format("M+ RATING  %s%d|r", GetMythicPlusRatingColorCode(rating), rating))
+    panel.ratingButton:Show()
+    local affixWidth = UpdateWeeklyAffixes()
+    expansionLabel:SetPoint("TOPRIGHT", panel.content, "TOPRIGHT", -(RATING_SUMMARY_WIDTH + 4 + affixWidth + (affixWidth > 0 and 2 or 0)), expansionY)
 
     y = AddSectionHeader("SEASONAL MYTHIC+", y, true)
     y = AddLockoutRows(SortSeasonalDungeons(lockouts.seasonalDungeons or {}), "Seasonal Mythic+ data is not available yet.", y, false, true)
@@ -1328,7 +1574,7 @@ local function CreatePanel()
 
     panel.title = panel:CreateFontString(nil, "OVERLAY")
     panel.title:SetPoint("TOPLEFT", 14, -8)
-    panel.title:SetPoint("TOPRIGHT", -100, -8)
+    panel.title:SetPoint("TOPRIGHT", -154, -8)
     panel.title:SetHeight(18)
     SetTextStyle(panel.title, 14, 1, 0.80, 0.22, "LEFT")
     panel.title:SetText("INSTANCE LOCKOUTS")
@@ -1357,6 +1603,26 @@ local function CreatePanel()
         self.background:SetColorTexture(0.16, 0.16, 0.18, 0.95)
     end)
     panel.refreshButton:SetScript("OnClick", RequestLockoutData)
+
+    panel.vaultButton = CreateFrame("Button", nil, panel)
+    panel.vaultButton:SetPoint("RIGHT", panel.refreshButton, "LEFT", -6, 0)
+    panel.vaultButton:SetSize(48, 22)
+    panel.vaultButton.background = panel.vaultButton:CreateTexture(nil, "BACKGROUND")
+    panel.vaultButton.background:SetAllPoints()
+    panel.vaultButton.background:SetColorTexture(0.16, 0.16, 0.18, 0.95)
+    panel.vaultButton.text = panel.vaultButton:CreateFontString(nil, "OVERLAY")
+    panel.vaultButton.text:SetAllPoints()
+    SetTextStyle(panel.vaultButton.text, 10, 0.92, 0.92, 0.92, "CENTER")
+    panel.vaultButton.text:SetText("Vault")
+    panel.vaultButton:SetScript("OnEnter", function(self)
+        self.background:SetColorTexture(0.30, 0.24, 0.10, 0.95)
+        ShowGreatVaultTooltip(self)
+    end)
+    panel.vaultButton:SetScript("OnLeave", function(self)
+        self.background:SetColorTexture(0.16, 0.16, 0.18, 0.95)
+        if GameTooltip then GameTooltip:Hide() end
+    end)
+    panel.vaultButton:SetScript("OnClick", OpenGreatVault)
 
     panel.minimizeButton = CreateFrame("Button", nil, panel)
     panel.minimizeButton:SetPoint("TOPRIGHT", -10, -11)
@@ -1415,8 +1681,19 @@ local function CreatePanel()
     panel.content:SetSize(PANEL_WIDTH - 24, 1)
     panel.scroll:SetScrollChild(panel.content)
 
-    panel.ratingSummary = panel.content:CreateFontString(nil, "OVERLAY")
+    panel.ratingButton = CreateFrame("Button", nil, panel.content)
+    panel.ratingButton:EnableMouse(true)
+    panel.ratingSummary = panel.ratingButton:CreateFontString(nil, "OVERLAY")
+    panel.ratingSummary:SetAllPoints()
     SetTextStyle(panel.ratingSummary, 10, 0.95, 0.72, 0.18, "RIGHT")
+    panel.ratingButton:SetScript("OnEnter", function(self)
+        ShowMythicPlusRatingTooltip(self)
+    end)
+    panel.ratingButton:SetScript("OnLeave", function()
+        if GameTooltip then GameTooltip:Hide() end
+    end)
+    panel.affixesContainer = CreateFrame("Frame", nil, panel.content)
+    panel.affixesContainer:Hide()
     panel.scroll:SetScript("OnSizeChanged", function(self, width)
         width = SafeNumber(width)
         if width then
@@ -1485,6 +1762,7 @@ ApplyPanelDisplayState = function()
         panel.title:Hide()
         panel.subtitle:Hide()
         panel.refreshButton:Hide()
+        panel.vaultButton:Hide()
         panel.scroll:Hide()
         panel.minimizeButton:ClearAllPoints()
         panel.minimizeButton:SetAllPoints(panel)
@@ -1499,11 +1777,12 @@ ApplyPanelDisplayState = function()
         panel.header:SetHeight(42)
         panel.title:ClearAllPoints()
         panel.title:SetPoint("TOPLEFT", 14, -8)
-        panel.title:SetPoint("TOPRIGHT", -100, -8)
+        panel.title:SetPoint("TOPRIGHT", -154, -8)
         panel.title:SetText("INSTANCE LOCKOUTS")
         panel.title:Show()
         panel.subtitle:Show()
         panel.refreshButton:Show()
+        panel.vaultButton:Show()
         panel.scroll:Show()
         panel.minimizeButton:ClearAllPoints()
         panel.minimizeButton:SetPoint("TOPRIGHT", -10, -11)

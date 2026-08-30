@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Added the current weekly Mythic+ affix icons and Blizzard-matched hover tooltips to the Instance Lockouts header, positioned immediately left of the color-coded rating.
+- Matched Instance Lockouts' Mythic+ rating color and tooltip to Blizzard's Mythic+ Dungeons page, and added a Great Vault button with Blizzard's live reward-progress tooltip.
 - Fixed Custom Damage Meter's Current Segment view matching Overall after a dungeon. Outside combat, Current now uses Blizzard's newest discrete combat-session ID while Overall continues using the aggregate session; source drilldowns follow the same selection.
 - Added a mailbox character Rolodex beside Blizzard's recipient field, populated from Warband character snapshots, with an optional last-successful-recipient memory that never sends or confirms mail automatically.
 - Added Hearthkeeper's Wandering Caravan to the selectable repair and vendor mount group.

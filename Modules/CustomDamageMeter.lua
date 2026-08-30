@@ -335,6 +335,47 @@ local function ApplyFrameAppearance(frame)
     end
 end
 
+local function GetLatestCombatSessionID()
+    if not C_DamageMeter or type(C_DamageMeter.GetAvailableCombatSessions) ~= "function" then
+        return nil
+    end
+
+    local ok, sessions = pcall(C_DamageMeter.GetAvailableCombatSessions)
+    if not ok or IsSecret(sessions) or type(sessions) ~= "table" then return nil end
+
+    local latestSessionID
+    for _, availableSession in ipairs(sessions) do
+        if not IsSecret(availableSession) and type(availableSession) == "table" then
+            local rawSessionID = availableSession.sessionID
+            local sessionID = not IsSecret(rawSessionID) and tonumber(rawSessionID) or nil
+            if sessionID and sessionID > 0 and (not latestSessionID or sessionID > latestSessionID) then
+                latestSessionID = sessionID
+            end
+        end
+    end
+    return latestSessionID
+end
+
+local function GetDamageSessionSelection(windowIndex)
+    local selected = GetSelectedRecentSession(windowIndex)
+    if selected then return nil, selected.sessionID end
+
+    if GetSessionType(windowIndex) == "overall" then
+        return Enum.DamageMeterSessionType.Overall, nil
+    end
+
+    -- Blizzard's Current session can remain the active instance aggregate after
+    -- combat ends. Use the newest discrete history entry out of combat so Current
+    -- Segment represents the most recent pull, while preserving live combat data.
+    local inCombat = UnitAffectingCombat and UnitAffectingCombat("player") == true
+    if not inCombat then
+        local latestSessionID = GetLatestCombatSessionID()
+        if latestSessionID then return nil, latestSessionID end
+    end
+
+    return Enum.DamageMeterSessionType.Current, nil
+end
+
 local function GetDamageSession(windowIndex)
     if not C_DamageMeter then return nil end
     if not Enum or not Enum.DamageMeterSessionType or not Enum.DamageMeterType then return nil end
@@ -342,14 +383,13 @@ local function GetDamageSession(windowIndex)
     local meterType = GetMeterEnum(GetMeterType(windowIndex))
     if meterType == nil then return nil end
 
-    local selected = GetSelectedRecentSession(windowIndex)
-    if selected then
+    local sessionType, sessionID = GetDamageSessionSelection(windowIndex)
+    if sessionID then
         if not C_DamageMeter.GetCombatSessionFromID then return nil end
-        return C_DamageMeter.GetCombatSessionFromID(selected.sessionID, meterType)
+        return C_DamageMeter.GetCombatSessionFromID(sessionID, meterType)
     end
 
     if not C_DamageMeter.GetCombatSessionFromType then return nil end
-    local sessionType = GetSessionType(windowIndex) == "overall" and Enum.DamageMeterSessionType.Overall or Enum.DamageMeterSessionType.Current
     if sessionType == nil then return nil end
 
     return C_DamageMeter.GetCombatSessionFromType(sessionType, meterType)
@@ -1431,14 +1471,13 @@ local function GetSourceDetails(frame, source)
     end
     if sourceGUID == nil and sourceCreatureID == nil and not isLocalPlayer then return nil end
 
-    local selected = GetSelectedRecentSession(frame.windowIndex)
-    local sessionType = not selected and (GetSessionType(frame.windowIndex) == "overall" and Enum.DamageMeterSessionType.Overall or Enum.DamageMeterSessionType.Current) or nil
-    if not selected and (sessionType == nil or not C_DamageMeter.GetCombatSessionSourceFromType) then return nil end
-    if selected and not C_DamageMeter.GetCombatSessionSourceFromID then return nil end
+    local sessionType, sessionID = GetDamageSessionSelection(frame.windowIndex)
+    if not sessionID and (sessionType == nil or not C_DamageMeter.GetCombatSessionSourceFromType) then return nil end
+    if sessionID and not C_DamageMeter.GetCombatSessionSourceFromID then return nil end
 
     local function Query(guid, creatureID)
-        if selected then
-            return C_DamageMeter.GetCombatSessionSourceFromID(selected.sessionID, meterType, guid, creatureID)
+        if sessionID then
+            return C_DamageMeter.GetCombatSessionSourceFromID(sessionID, meterType, guid, creatureID)
         end
         return C_DamageMeter.GetCombatSessionSourceFromType(sessionType, meterType, guid, creatureID)
     end

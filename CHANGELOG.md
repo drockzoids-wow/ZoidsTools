@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Fixed Custom Damage Meter's Current Segment view matching Overall after a dungeon. Outside combat, Current now uses Blizzard's newest discrete combat-session ID while Overall continues using the aggregate session; source drilldowns follow the same selection.
 - Added a mailbox character Rolodex beside Blizzard's recipient field, populated from Warband character snapshots, with an optional last-successful-recipient memory that never sends or confirms mail automatically.
 - Added Hearthkeeper's Wandering Caravan to the selectable repair and vendor mount group.
 - Refocused Safe Queue on PvP ready dialogs by hiding their Leave Queue button without auto-accepting. Dungeon Decline protection is now a separate, off-by-default option.

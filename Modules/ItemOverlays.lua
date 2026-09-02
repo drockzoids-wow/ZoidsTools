@@ -7,6 +7,8 @@ local hookedContainerFrames = {}
 local pendingCharacterRefresh = false
 local pendingCharacterForceRefresh = false
 local pendingCharacterSettleRefresh = false
+local pendingCharacterDataRetry = false
+local characterDataRetryCount = 0
 local pendingBagRefresh = false
 local pendingBankRefresh = false
 local pendingBagForceClear = false
@@ -17,6 +19,7 @@ local pendingCombatBagRefresh = false
 local pendingCombatBankRefresh = false
 local pendingCombatBagForceClear = false
 local pendingCombatBankForceClear = false
+local QueueCharacterDataRetry
 local qualityColorCache = {}
 local qualityColorCacheCount = 0
 
@@ -27,6 +30,8 @@ local CHARACTER_GEM_SIZE = 13
 local CHARACTER_GEM_SPACING = 1
 local CHARACTER_REFRESH_DELAY = 0.05
 local CHARACTER_SETTLE_REFRESH_DELAY = 0.45
+local CHARACTER_DATA_RETRY_DELAY = 0.20
+local CHARACTER_DATA_RETRY_MAX = 3
 local EMPTY_SOCKET_TEXTURE = "Interface\\ItemSocketingFrame\\UI-EmptySocket-Prismatic"
 
 local function IsCombatLocked()
@@ -76,6 +81,15 @@ local characterSlots = {
     { slot = 16, frameName = "CharacterMainHandSlot", side = "bottom" },
     { slot = 17, frameName = "CharacterSecondaryHandSlot", side = "bottom" },
 }
+
+local inspectSlots = {}
+for index, slotInfo in ipairs(characterSlots) do
+    inspectSlots[index] = {
+        slot = slotInfo.slot,
+        frameName = string.gsub(slotInfo.frameName, "^Character", "Inspect"),
+        side = slotInfo.side,
+    }
+end
 
 local function PackResults(...)
     return { n = select("#", ...), ... }
@@ -419,14 +433,14 @@ end
 
 local function CountSockets(itemLink)
     if not itemLink or not C_Item or not C_Item.GetItemStats then
-        return 0
+        return 0, false
     end
 
     local stats = SafeCall(C_Item.GetItemStats, itemLink)
     local count = 0
 
     if type(stats) ~= "table" then
-        return 0
+        return 0, false
     end
 
     for statName, statValue in pairs(stats) do
@@ -435,7 +449,7 @@ local function CountSockets(itemLink)
         end
     end
 
-    return count
+    return count, true
 end
 
 local function GetGemLink(itemLink, index)
@@ -609,15 +623,20 @@ local function UpdateCharacterGems(button, itemLink, slot, side)
 
     if not db or not db.enabled or not db.character.gems then
         HideGemFrames(button)
-        return
+        return true
     end
 
-    local socketCount = CountSockets(itemLink)
+    local socketCount, statsReady = CountSockets(itemLink)
+
+    if not statsReady then
+        HideGemFrames(button)
+        return false
+    end
     local displayCount = socketCount
 
     if displayCount <= 0 then
         HideGemFrames(button)
-        return
+        return true
     end
 
     EnsureGemFrames(button, displayCount)
@@ -645,9 +664,11 @@ local function UpdateCharacterGems(button, itemLink, slot, side)
             frame:Hide()
         end
     end
+
+    return true
 end
 
-local function UpdateCharacterEnchant(button, itemLink, slot, side)
+local function UpdateCharacterEnchant(button, itemLink, slot, side, showMissing)
     local db = EnsureDB()
 
     if not db or not db.enabled or not db.character.enchants then
@@ -666,7 +687,7 @@ local function UpdateCharacterEnchant(button, itemLink, slot, side)
     PositionEnchantText(button, side)
 
     local hasEnchant = ExtractEnchantID(itemLink) ~= nil
-    local missingEnchant = not hasEnchant and SlotShouldHaveEnchant(slot)
+    local missingEnchant = showMissing ~= false and not hasEnchant and SlotShouldHaveEnchant(slot)
 
     if hasEnchant then
         button.ZTEnchantText:SetText("Ench")
@@ -686,7 +707,7 @@ local function UpdateCharacterEnchant(button, itemLink, slot, side)
     end
 end
 
-local function UpdateCharacterSlot(slotInfo)
+local function UpdateCharacterSlot(slotInfo, unit, isInspect)
     local db = EnsureDB()
     local button = _G[slotInfo.frameName]
 
@@ -701,7 +722,8 @@ local function UpdateCharacterSlot(slotInfo)
         return
     end
 
-    local itemLink = GetInventoryItemLink and GetInventoryItemLink("player", slotInfo.slot) or nil
+    unit = unit or "player"
+    local itemLink = GetInventoryItemLink and GetInventoryItemLink(unit, slotInfo.slot) or nil
 
     if not itemLink then
         ClearCharacterButton(button)
@@ -715,12 +737,13 @@ local function UpdateCharacterSlot(slotInfo)
             return
         end
 
-        if GetInventoryItemLink and GetInventoryItemLink("player", slotInfo.slot) ~= itemLink then
+        if GetInventoryItemLink and GetInventoryItemLink(unit, slotInfo.slot) ~= itemLink then
             return
         end
 
         if db.character.itemLevel then
-            local itemLevel = GetEquipmentItemLevel(slotInfo.slot, itemObject)
+            local itemLevel = isInspect and nil or GetEquipmentItemLevel(slotInfo.slot, itemObject)
+            itemLevel = itemLevel or (GetDetailedItemLevelInfo and SafeCall(GetDetailedItemLevelInfo, itemLink))
 
             if itemLevel and itemLevel > 0 then
                 button.ZTItemLevelText:SetText(math.floor(itemLevel + 0.5))
@@ -735,28 +758,41 @@ local function UpdateCharacterSlot(slotInfo)
             button.ZTItemLevelText:Hide()
         end
 
-        UpdateCharacterEnchant(button, itemLink, slotInfo.slot, slotInfo.side)
-        UpdateCharacterGems(button, itemLink, slotInfo.slot, slotInfo.side)
+        UpdateCharacterEnchant(button, itemLink, slotInfo.slot, slotInfo.side, not isInspect)
+        local gemsReady = UpdateCharacterGems(button, itemLink, slotInfo.slot, slotInfo.side)
+
+        if not gemsReady then
+            QueueCharacterDataRetry()
+        end
     end
 
-    if Item and Item.CreateFromEquipmentSlot then
-        local itemObject = SafeCall(Item.CreateFromEquipmentSlot, Item, slotInfo.slot)
+    local itemObject
 
-        if itemObject and type(itemObject.ContinueOnItemLoad) == "function" then
-            itemObject:ContinueOnItemLoad(function()
-                ApplyLoadedItem(itemObject)
-            end)
-        else
+    if isInspect and Item and Item.CreateFromItemLink then
+        itemObject = SafeCall(Item.CreateFromItemLink, Item, itemLink)
+    elseif not isInspect and Item and Item.CreateFromEquipmentSlot then
+        itemObject = SafeCall(Item.CreateFromEquipmentSlot, Item, slotInfo.slot)
+    end
+
+    if itemObject and type(itemObject.ContinueOnItemLoad) == "function" then
+        itemObject:ContinueOnItemLoad(function()
             ApplyLoadedItem(itemObject)
-        end
+        end)
     else
-        ApplyLoadedItem(nil)
+        ApplyLoadedItem(itemObject)
     end
 end
 
 local function RefreshCharacterSlots()
     for _, slotInfo in ipairs(characterSlots) do
-        UpdateCharacterSlot(slotInfo)
+        UpdateCharacterSlot(slotInfo, "player", false)
+    end
+
+    local inspectUnit = InspectFrame and InspectFrame.unit
+    if inspectUnit then
+        for _, slotInfo in ipairs(inspectSlots) do
+            UpdateCharacterSlot(slotInfo, inspectUnit, true)
+        end
     end
 end
 
@@ -769,6 +805,17 @@ local function IsCharacterFrameVisible()
 
     if PaperDollFrame and type(PaperDollFrame.IsShown) == "function" and PaperDollFrame:IsShown() then
         return true
+    end
+
+    if InspectFrame and type(InspectFrame.IsShown) == "function" and InspectFrame:IsShown() then
+        return true
+    end
+
+    if PlayerSpellsFrame and type(PlayerSpellsFrame.IsInspecting) == "function" then
+        local ok, inspecting = pcall(PlayerSpellsFrame.IsInspecting, PlayerSpellsFrame)
+        if ok and inspecting == true then
+            return true
+        end
     end
 
     return false
@@ -1157,6 +1204,7 @@ local function QueueCharacterRefresh(delay, force)
     pendingCharacterRefresh = true
 
     local function Run()
+        if ns.RecordDiagnosticActivity then ns:RecordDiagnosticActivity("ItemOverlays.CharacterQueue") end
         local shouldForce = pendingCharacterForceRefresh
 
         pendingCharacterRefresh = false
@@ -1169,6 +1217,36 @@ local function QueueCharacterRefresh(delay, force)
 
     if C_Timer and C_Timer.After then
         C_Timer.After(delay, Run)
+    else
+        Run()
+    end
+end
+
+-- Item stats can become available shortly after the item object itself loads.
+-- Retry only a few times, and only while the character panel is visible.
+QueueCharacterDataRetry = function()
+    if pendingCharacterDataRetry or characterDataRetryCount >= CHARACTER_DATA_RETRY_MAX then
+        return
+    end
+
+    if not IsCharacterFrameVisible() then
+        return
+    end
+
+    pendingCharacterDataRetry = true
+    characterDataRetryCount = characterDataRetryCount + 1
+
+    local function Run()
+        if ns.RecordDiagnosticActivity then ns:RecordDiagnosticActivity("ItemOverlays.CharacterDataRetry") end
+        pendingCharacterDataRetry = false
+
+        if IsCharacterFrameVisible() then
+            QueueCharacterRefresh(0, true)
+        end
+    end
+
+    if C_Timer and C_Timer.After then
+        C_Timer.After(CHARACTER_DATA_RETRY_DELAY, Run)
     else
         Run()
     end
@@ -1189,6 +1267,7 @@ local function QueueCharacterSettleRefresh()
     pendingCharacterSettleRefresh = true
 
     local function Run()
+        if ns.RecordDiagnosticActivity then ns:RecordDiagnosticActivity("ItemOverlays.CharacterSettle") end
         pendingCharacterSettleRefresh = false
         QueueCharacterRefresh(0.02)
     end
@@ -1211,6 +1290,7 @@ local function QueueBagRefresh(forceClear)
     local delay = IsCombatLocked() and 0.16 or 0.10
 
     local function Run()
+        if ns.RecordDiagnosticActivity then ns:RecordDiagnosticActivity("ItemOverlays.BagQueue") end
         local shouldForceClear = pendingBagForceClear
 
         pendingBagRefresh = false
@@ -1241,6 +1321,7 @@ local function QueueBankRefresh(forceClear)
     pendingBankRefresh = true
 
     local function Run()
+        if ns.RecordDiagnosticActivity then ns:RecordDiagnosticActivity("ItemOverlays.BankQueue") end
         local shouldForceClear = pendingBankForceClear
 
         pendingBankRefresh = false
@@ -1307,12 +1388,29 @@ local function HookCharacterFrame()
     local installed = false
 
     if CharacterFrame and type(CharacterFrame.HookScript) == "function" then
-        CharacterFrame:HookScript("OnShow", QueueCharacterRefresh)
+        CharacterFrame:HookScript("OnShow", function()
+            characterDataRetryCount = 0
+            QueueCharacterRefresh()
+        end)
         installed = true
     end
 
     if PaperDollFrame and type(PaperDollFrame.HookScript) == "function" then
-        PaperDollFrame:HookScript("OnShow", QueueCharacterRefresh)
+        PaperDollFrame:HookScript("OnShow", function()
+            characterDataRetryCount = 0
+            QueueCharacterRefresh()
+        end)
+        installed = true
+    end
+
+    if InspectFrame and type(InspectFrame.HookScript) == "function" then
+        InspectFrame:HookScript("OnShow", function()
+            characterDataRetryCount = 0
+            QueueCharacterRefresh()
+        end)
+        InspectFrame:HookScript("OnHide", function()
+            QueueCharacterRefresh()
+        end)
         installed = true
     end
 
@@ -1359,6 +1457,7 @@ local function RegisterItemOverlayWorkEvents()
     RegisterEventSafe(eventFrame, "SOCKET_INFO_UPDATE")
     RegisterEventSafe(eventFrame, "SOCKET_INFO_SUCCESS")
     RegisterEventSafe(eventFrame, "SOCKET_INFO_CLOSE")
+    RegisterEventSafe(eventFrame, "INSPECT_READY")
 end
 
 local function UnregisterItemOverlayWorkEvents()
@@ -1375,6 +1474,7 @@ local function UnregisterItemOverlayWorkEvents()
     eventFrame:UnregisterEvent("SOCKET_INFO_UPDATE")
     eventFrame:UnregisterEvent("SOCKET_INFO_SUCCESS")
     eventFrame:UnregisterEvent("SOCKET_INFO_CLOSE")
+    eventFrame:UnregisterEvent("INSPECT_READY")
 end
 
 function ns:SetItemOverlaysEnabled(value)
@@ -1546,12 +1646,20 @@ function ns:InitializeItemOverlays()
 
             return
         elseif event == "PLAYER_EQUIPMENT_CHANGED" then
+            characterDataRetryCount = 0
             QueueCharacterSettleRefresh()
         elseif event == "UNIT_INVENTORY_CHANGED" then
             local unit = ...
 
             if unit == "player" then
+                characterDataRetryCount = 0
                 QueueCharacterSettleRefresh()
+            end
+        elseif event == "INSPECT_READY" then
+            InstallHooks()
+            if InspectFrame and InspectFrame:IsShown() then
+                characterDataRetryCount = 0
+                QueueCharacterRefresh(0, true)
             end
         elseif event == "SOCKET_INFO_UPDATE" or event == "SOCKET_INFO_SUCCESS" or event == "SOCKET_INFO_CLOSE" then
             QueueCharacterSettleRefresh()

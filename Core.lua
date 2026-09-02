@@ -275,6 +275,8 @@ local defaults = {
         fontSize = 12,
         useQualityColor = true,
         statTargetContext = "mythicplus",
+        bisEnabled = true,
+        bisContext = "mythicplus",
         statGoalsPanelShown = true,
         character = {
             itemLevel = true,
@@ -525,7 +527,7 @@ local function PrintHelp()
     ns:Print("/zt perf unlock unlocks the click-through performance widget.")
     ns:Print("/zt coords on/off toggles the coordinates widget.")
     ns:Print("/zt coords reset resets the coordinates widget position.")
-    ns:Print("/zt diag start/stop/report/reset controls performance diagnostics.")
+    ns:Print("/zt diag start/stop/report/copy/reset controls the bounded activity and memory recorder.")
     ns:Print("/zt talentdiag start/report/stop/reset diagnoses talent application failures.")
     ns:Print("/zt talentpaneldiag reports and repairs the talent helper panel.")
     ns:Print("/zt chatdiag reports Blizzard chat-link interaction state.")
@@ -547,6 +549,20 @@ local function PrintHelp()
     ns:Print("/zt resetwindows clears saved window positions.")
     ns:Print("/zt resetscales clears saved window scales.")
     ns:Print("Hold Ctrl and mouse-wheel over a movable window to scale it.")
+end
+
+local function RunDiagnosticSlashAction(action)
+    if type(action) ~= "function" then
+        return
+    end
+
+    -- Slash commands run inside Blizzard's chat edit-box handler. Move diagnostic
+    -- work to the next frame so chat's restricted execution state is not inherited.
+    if C_Timer and type(C_Timer.After) == "function" then
+        C_Timer.After(0, action)
+    else
+        action()
+    end
 end
 
 local function HandleSlash(input)
@@ -807,21 +823,35 @@ local function HandleSlash(input)
         ns:SetMinimapShown(false)
         ns:Print("Minimap button hidden.")
     elseif input == "diag" or input == "diag status" or input == "diag report" then
-        if ns.ReportDiagnostics then
-            ns:ReportDiagnostics()
-        end
+        RunDiagnosticSlashAction(function()
+            if ns.ReportDiagnostics then
+                ns:ReportDiagnostics()
+            end
+        end)
+    elseif input == "diag copy" then
+        RunDiagnosticSlashAction(function()
+            if ns.ShowDiagnosticsReport then
+                ns:ShowDiagnosticsReport()
+            end
+        end)
     elseif input == "diag start" then
-        if ns.StartDiagnostics then
-            ns:StartDiagnostics()
-        end
+        RunDiagnosticSlashAction(function()
+            if ns.StartDiagnostics then
+                ns:StartDiagnostics()
+            end
+        end)
     elseif input == "diag stop" then
-        if ns.StopDiagnostics then
-            ns:StopDiagnostics()
-        end
+        RunDiagnosticSlashAction(function()
+            if ns.StopDiagnostics then
+                ns:StopDiagnostics()
+            end
+        end)
     elseif input == "diag reset" then
-        if ns.ResetDiagnostics then
-            ns:ResetDiagnostics()
-        end
+        RunDiagnosticSlashAction(function()
+            if ns.ResetDiagnostics then
+                ns:ResetDiagnostics()
+            end
+        end)
     elseif input == "talentdiag start" or input == "talent diag start" then
         if ns.SetTalentApplyDiagnostics then
             ns:SetTalentApplyDiagnostics(true)
@@ -903,6 +933,7 @@ local moduleInitializers = {
     "InitializePerformanceWidget",
     "InitializeCoordinates",
     "InitializeItemOverlays",
+    "InitializeBiSTooltips",
     "InitializeStatTargets",
     "InitializeTalentGrimoire",
     "InitializeBlizzardDamageMeterProfiles",
@@ -919,6 +950,10 @@ local function RunInitializer(label, callback)
         return message
     end
     local ok = xpcall(callback, errorHandler)
+
+    if ns.RecordDiagnosticActivity then
+        ns:RecordDiagnosticActivity("Core.Initialize." .. tostring(label))
+    end
 
     if not ok then
         ns:Print(string.format("%s failed to initialize; the remaining modules will continue loading.", label))

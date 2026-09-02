@@ -380,6 +380,57 @@ local function PruneTalentGrimoireToPlayerClass()
         return
     end
 
+    -- Generated talent data is split into per-class loader functions. This
+    -- avoids constructing thousands of tables for classes the current
+    -- character cannot use. Older generated files still follow the pruning
+    -- path below, so an updater and addon can be rolled out independently.
+    if type(root.dataLoaders) == "table" or type(root.rotationLoaders) == "table" then
+        local dataLoader = type(root.dataLoaders) == "table" and root.dataLoaders[classToken] or nil
+        local rotationLoader = type(root.rotationLoaders) == "table" and root.rotationLoaders[classToken] or nil
+        root.data = {}
+        root.rotations = {}
+
+        if type(dataLoader) == "function" then
+            local ok, classData = pcall(dataLoader)
+            if ok and type(classData) == "table" then
+                root.data[classToken] = classData
+            elseif ns.Print then
+                ns:Print("Talent build recommendations for " .. tostring(classToken) .. " could not be loaded.")
+            end
+        end
+        if type(rotationLoader) == "function" then
+            local ok, classRotations = pcall(rotationLoader)
+            if ok and type(classRotations) == "table" then
+                root.rotations[classToken] = classRotations
+            elseif ns.Print then
+                ns:Print("Talent rotation references for " .. tostring(classToken) .. " could not be loaded.")
+            end
+        end
+
+        root.dataLoaders = nil
+        root.rotationLoaders = nil
+    elseif type(root.classLoaders) == "table" then
+        local loader = root.classLoaders[classToken]
+        root.data = {}
+        root.rotations = {}
+
+        if type(loader) == "function" then
+            local ok, classData, classRotations = pcall(loader)
+            if ok then
+                if type(classData) == "table" then
+                    root.data[classToken] = classData
+                end
+                if type(classRotations) == "table" then
+                    root.rotations[classToken] = classRotations
+                end
+            elseif ns.Print then
+                ns:Print("Talent recommendations for " .. tostring(classToken) .. " could not be loaded.")
+            end
+        end
+
+        root.classLoaders = nil
+    end
+
     -- A character can only use talent builds and rotation references for its
     -- own class. Keep every specialization for that class, including alternate
     -- specialization PvP recommendations, and release the other class tables.
@@ -3356,6 +3407,7 @@ local function QueueTalentCheckRefresh(delay)
     talentCheckRefreshQueued = true
 
     local function Run()
+        if ns.RecordDiagnosticActivity then ns:RecordDiagnosticActivity("TalentGrimoire.OverlayRefresh") end
         talentCheckRefreshQueued = false
         RefreshTalentCheckOverlays()
     end

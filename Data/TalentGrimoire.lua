@@ -4,7 +4,7 @@
 
 ZoidsToolsTalentGrimoire = ZoidsToolsTalentGrimoire or {}
 ZoidsToolsTalentGrimoire.schemaVersion = 3
-ZoidsToolsTalentGrimoire.generatedAt = "2026-08-30 08:37:30 -05:00"
+ZoidsToolsTalentGrimoire.generatedAt = "2026-09-01 18:58:31 -05:00"
 ZoidsToolsTalentGrimoire.source = "Archon + Icy Veins + Wowhead + Murlok.io"
 ZoidsToolsTalentGrimoire.providers = {
     archon = {
@@ -44,8 +44,10 @@ ZoidsToolsTalentGrimoire.targets = {
         murlok = "Murlok.io",
     },
 }
-ZoidsToolsTalentGrimoire.rotations = {
-    DEATHKNIGHT = {
+ZoidsToolsTalentGrimoire.rotations = {}
+ZoidsToolsTalentGrimoire.rotationLoaders = {
+    DEATHKNIGHT = function()
+        return {
         blood = {
             source = "Icy Veins",
             sourceUrl = "https://www.icy-veins.com/wow/blood-death-knight-pve-tank-rotation-cooldowns-abilities",
@@ -1401,8 +1403,10 @@ ZoidsToolsTalentGrimoire.rotations = {
                 },
             },
         },
-    },
-    DEMONHUNTER = {
+    }
+    end,
+    DEMONHUNTER = function()
+        return {
         devourer = {
             source = "Icy Veins",
             sourceUrl = "https://www.icy-veins.com/wow/devourer-demon-hunter-pve-dps-rotation-cooldowns-abilities",
@@ -2480,8 +2484,8 @@ ZoidsToolsTalentGrimoire.rotations = {
                     heroTree = "Aldrachi Reaver",
                     scenario = "single",
                     scenarioLabel = "Raid / Single Target",
-                    recommended = true,
-                    selected = true,
+                    recommended = false,
+                    selected = false,
                     stateTokens = {
                         "preset-1",
                         "talent-2",
@@ -2504,11 +2508,26 @@ ZoidsToolsTalentGrimoire.rotations = {
                     },
                 },
                 {
+                    key = "fel-scarred-raid-cleave",
+                    heroTree = "Fel-Scarred",
+                    scenario = "raid",
+                    scenarioLabel = "Raid / Cleave",
+                    recommended = true,
+                    selected = true,
+                    stateTokens = {
+                        "preset-2",
+                        "talent-2",
+                        "talent-3",
+                        "talent-0",
+                        "talent-1",
+                    },
+                },
+                {
                     key = "fel-scarred-raid-single-target",
                     heroTree = "Fel-Scarred",
                     scenario = "single",
                     scenarioLabel = "Raid / Single Target",
-                    recommended = false,
+                    recommended = true,
                     selected = false,
                     stateTokens = {
                         "preset-2",
@@ -2629,6 +2648,15 @@ ZoidsToolsTalentGrimoire.rotations = {
                             },
                         },
                         {
+                            name = "Immolation Aura",
+                            text = "Cast Immolation Aura if at 2 charges - Click for Notes If Metamorphosis is almost ready, dump both charges to make use of the reset.",
+                            spellId = 258920,
+                            conditions = {
+                                "talent-1:on",
+                                "preset-2:on",
+                            },
+                        },
+                        {
                             name = "Death Sweep",
                             text = "Cast Death Sweep during Essence Break or with Demonsurge active",
                             spellId = 210152,
@@ -2644,15 +2672,6 @@ ZoidsToolsTalentGrimoire.rotations = {
                             conditions = {
                                 "talent-0:on",
                                 "preset-1:on",
-                            },
-                        },
-                        {
-                            name = "Immolation Aura",
-                            text = "Cast Immolation Aura if at 2 charges - Click for Notes If Metamorphosis is almost ready, dump both charges to make use of the reset.",
-                            spellId = 258920,
-                            conditions = {
-                                "talent-1:on",
-                                "preset-2:on",
                             },
                         },
                         {
@@ -2892,6 +2911,15 @@ ZoidsToolsTalentGrimoire.rotations = {
                             },
                         },
                         {
+                            name = "Immolation Aura",
+                            text = "Cast Immolation Aura if at 2 charges - Click for Notes If Metamorphosis is almost ready, dump both charges to make use of the reset.",
+                            spellId = 258920,
+                            conditions = {
+                                "talent-1:on",
+                                "preset-2:on",
+                            },
+                        },
+                        {
                             name = "Death Sweep",
                             text = "Cast Death Sweep during Essence Break or with Demonsurge active",
                             spellId = 210152,
@@ -2907,15 +2935,6 @@ ZoidsToolsTalentGrimoire.rotations = {
                             conditions = {
                                 "talent-0:on",
                                 "preset-1:on",
-                            },
-                        },
-                        {
-                            name = "Immolation Aura",
-                            text = "Cast Immolation Aura if at 2 charges - Click for Notes If Metamorphosis is almost ready, dump both charges to make use of the reset.",
-                            spellId = 258920,
-                            conditions = {
-                                "talent-1:on",
-                                "preset-2:on",
                             },
                         },
                         {
@@ -4265,8 +4284,10 @@ ZoidsToolsTalentGrimoire.rotations = {
                 },
             },
         },
-    },
-    DRUID = {
+    }
+    end,
+    DRUID = function()
+        return {
         balance = {
             source = "Icy Veins",
             sourceUrl = "https://www.icy-veins.com/wow/balance-druid-pve-dps-rotation-cooldowns-abilities",
@@ -5761,8 +5782,10 @@ ZoidsToolsTalentGrimoire.rotations = {
                 },
             },
         },
-    },
-    EVOKER = {
+    }
+    end,
+    EVOKER = function()
+        return {
         augmentation = {
             source = "Icy Veins",
             sourceUrl = "https://www.icy-veins.com/wow/augmentation-evoker-pve-dps-rotation-cooldowns-abilities",
@@ -6520,6 +6543,11 @@ ZoidsToolsTalentGrimoire.rotations = {
                             spellId = 359073,
                         },
                         {
+                            name = "Disintegrate",
+                            text = "Cast Disintegrate to spend your Essence",
+                            spellId = 356995,
+                        },
+                        {
                             name = "Azure Sweep",
                             text = "Cast Azure Sweep when available",
                             spellId = 1265867,
@@ -6990,8 +7018,10 @@ ZoidsToolsTalentGrimoire.rotations = {
                 },
             },
         },
-    },
-    HUNTER = {
+    }
+    end,
+    HUNTER = function()
+        return {
         ["beast-mastery"] = {
             source = "Icy Veins",
             sourceUrl = "https://www.icy-veins.com/wow/beast-mastery-hunter-pve-dps-rotation-cooldowns-abilities",
@@ -8072,7 +8102,7 @@ ZoidsToolsTalentGrimoire.rotations = {
                         },
                         {
                             name = "Trueshot",
-                            text = "Before you press Trueshot, swap to a target that does not already have Sentinel's Mark - Click for Details Feathered Frenzy makes Trueshot apply Sentinel's Mark to whatever you have targeted when you press it, as pressing Trueshot on a target that is already marked wastes it. In an opener, you Trueshot on one target, Rapid Fire on a second, and a Multi-Shot on a third clipping the end of that Rapid Fire channel. One Aimed Shot then consumes all three Marks at once, which is three Lunar Storm s from a single cast. Spending Precise Shots applies a Mark around 40% of the time, and around 90% of the time inside Trueshot. This is somewhat difficult to perform and it breaks the flow of the rotation. Without some practice to perform it smoothly and consistently, the swapping will cost you more damage than the extra Marks are worth.",
+                            text = "Before you press Trueshot, swap to a target that does not already have Sentinel's Mark - Click for Details Feathered Frenzy makes Trueshot apply Sentinel's Mark to whatever you have targeted when you press it, as pressing Trueshot on a target that is already marked wastes it.",
                             spellId = 288613,
                             conditions = {
                                 "preset-2:on",
@@ -8080,7 +8110,7 @@ ZoidsToolsTalentGrimoire.rotations = {
                         },
                         {
                             name = "Moonlight Chakram",
-                            text = "Cast Moonlight Chakram with around 5 seconds left on Trueshot, as it takes around 5 sec to do all of its damage on single-target.",
+                            text = "Cast Moonlight Chakram with around 5 seconds left on Trueshot.",
                             spellId = 1264902,
                             conditions = {
                                 "preset-2:on",
@@ -8097,7 +8127,7 @@ ZoidsToolsTalentGrimoire.rotations = {
                         },
                         {
                             name = "Rapid Fire",
-                            text = "Cast Rapid Fire on cooldown at a target without Sentinel's Mark - Click for Details Precise Shots gets spent twice here. The first shot Unload fires consumes the proc you went in with, No Scope reapplies it immediately thereafter, and the last shot of the channel consumes the fresh one. Unlike Multi-Shot, swapping targets for Rapid Fire does cost you significant priority target damage, so stay on the priority target when there is one.",
+                            text = "Cast Rapid Fire on cooldown at a target without Sentinel's Mark - Click for Details Precise Shots gets spent twice here. The first shot Unload fires consumes the proc you went in with, No Scope reapplies it immediately thereafter, and the last shot of the channel consumes the fresh one. If there is a priority target, focus on that instead of casting Rapid Fire on different targets for Marks.",
                             spellId = 257044,
                             conditions = {
                                 "preset-2:on",
@@ -8106,7 +8136,7 @@ ZoidsToolsTalentGrimoire.rotations = {
                         },
                         {
                             name = "Kill Shot",
-                            text = "Cast Kill Shot to spend Precise Shots, preferring targets without Sentinel's Mark unless you are focusing a priority target.",
+                            text = "Cast Kill Shot to spend Precise Shots.",
                             spellId = 53351,
                             conditions = {
                                 "talent-10:on",
@@ -8115,7 +8145,7 @@ ZoidsToolsTalentGrimoire.rotations = {
                         },
                         {
                             name = "Multi-Shot",
-                            text = "Cast Multi-Shot instead of Arcane Shot to spend Precise Shots on more than one target, unless you are focusing a priority target. Use the Target Swap Multi-Shot macro on the Macros page for it. Multi-Shot deals the same damage to everything it hits, so swapping targets for it costs you nothing.",
+                            text = "Cast Multi-Shot instead of Arcane Shot to spend Precise Shots on more than one target, unless you are focusing a priority target.",
                             spellId = 257620,
                             conditions = {
                                 "preset-2:on",
@@ -8124,7 +8154,7 @@ ZoidsToolsTalentGrimoire.rotations = {
                         },
                         {
                             name = "Arcane Shot",
-                            text = "Cast Arcane Shot to spend Precise Shots, preferring targets without Sentinel's Mark unless you are focusing a priority target.",
+                            text = "Cast Arcane Shot to spend Precise Shots.",
                             spellId = 185358,
                             conditions = {
                                 "preset-2:on",
@@ -8238,7 +8268,7 @@ ZoidsToolsTalentGrimoire.rotations = {
                         },
                         {
                             name = "Rapid Fire",
-                            text = "Cast Rapid Fire on cooldown at a target without Spotter's Mark, and let the channel finish - Click for Details Unlike Multi-Shot, swapping targets for Rapid Fire does cost you significant priority target damage, so stay on the priority target when there is one.",
+                            text = "Cast Rapid Fire on cooldown at a target without Spotter's Mark. - Click for Details Keep it on your priority target when there is one.",
                             spellId = 257044,
                             conditions = {
                                 "preset-1:on",
@@ -8255,7 +8285,7 @@ ZoidsToolsTalentGrimoire.rotations = {
                         },
                         {
                             name = "Multi-Shot",
-                            text = "Cast Multi-Shot instead of Arcane Shot to spend Precise Shots on more than one target, unless you are focusing a priority target. Use the Target Swap Multi-Shot macro on the Macros page for it. Multi-Shot deals the same damage to everything it hits, so swapping targets for it costs you nothing.",
+                            text = "Cast Multi-Shot instead of Arcane Shot to spend Precise Shots on more than one target, unless you are focusing a priority target.",
                             spellId = 257620,
                             conditions = {
                                 "preset-1:on",
@@ -8637,7 +8667,7 @@ ZoidsToolsTalentGrimoire.rotations = {
                         },
                         {
                             name = "Multi-Shot",
-                            text = "Cast Multi-Shot to spend Precise Shots, or to activate Trick Shots if it is down. Use the Target Swap Multi-Shot macro on the Macros page for it. Multi-Shot deals the same damage to everything it hits, so swapping targets for it costs you nothing.",
+                            text = "Cast Multi-Shot to spend Precise Shots, or to activate Trick Shots if it is down. Use the Mouseover Multi-Shot macro on the Macros page for it. Always prefer to use it on targets that do not already have Sentinel's Mark.",
                             spellId = 257620,
                             conditions = {
                                 "preset-2:on",
@@ -8646,7 +8676,7 @@ ZoidsToolsTalentGrimoire.rotations = {
                         },
                         {
                             name = "Rapid Fire",
-                            text = "Cast Rapid Fire on cooldown with Trick Shots up at a target without Sentinel's Mark, and clip the end of the channel with Multi-Shot - Click for Details Multi-Shot is nearly always the button you press after Rapid Fire anyway, so cast it just before the channel finishes and you will lose only the last tick of Rapid Fire. That Multi-Shot should be mouseovered on on targets your Rapid Fire was not hitting to spread more Sentinel's Mark s around. Multi-Shot does the same damage on all targets hit, so there is no priority damage lost here.",
+                            text = "Cast Rapid Fire on cooldown with Trick Shots up at a target without Sentinel's Mark, and mouseover-clip the end of the channel with Multi-Shot on a target with no Sentinel's Mark. - Click for Details That clipping Multi-Shot spends a Precise Shots proc, generating a Sentinel's Mark proc chance on the Multi's primary target. We recommend using the mouseover macro from our Macros page to do so easily. If your Rapid Fire procced Mark on your current target at the beginning of its cast, you will want to mouseover-clip the Multi-Shot to a target without Mark. If Rapid Fire did not proc a Mark, you do not need to mouseover the Multi-Shot.",
                             spellId = 257044,
                             conditions = {
                                 "preset-2:on",
@@ -8797,7 +8827,7 @@ ZoidsToolsTalentGrimoire.rotations = {
                         },
                         {
                             name = "Multi-Shot",
-                            text = "Cast Multi-Shot to activate Trick Shots if it is down. Use the Target Swap Multi-Shot macro on the Macros page for it. Multi-Shot deals the same damage to everything it hits, so swapping targets for it costs you nothing.",
+                            text = "Cast Multi-Shot to activate Trick Shots if it is down.",
                             spellId = 257620,
                             conditions = {
                                 "preset-1:on",
@@ -8854,7 +8884,7 @@ ZoidsToolsTalentGrimoire.rotations = {
                         },
                         {
                             name = "Multi-Shot",
-                            text = "Cast Multi-Shot to spend Precise Shots. Use the Target Swap Multi-Shot macro on the Macros page for it. Multi-Shot deals the same damage to everything it hits, so swapping targets for it costs you nothing.",
+                            text = "Cast Multi-Shot to spend Precise Shots. Use the Mouseover Multi-Shot macro on the Macros page for it. Always prefer to use it on targets that do not already have Spotter's Mark.",
                             spellId = 257620,
                             conditions = {
                                 "preset-1:on",
@@ -8925,7 +8955,7 @@ ZoidsToolsTalentGrimoire.rotations = {
                     scenario = "single",
                     scenarioLabel = "Single Target",
                     recommended = true,
-                    selected = true,
+                    selected = false,
                     stateTokens = {
                         "preset-2",
                         "talent-7",
@@ -8937,7 +8967,7 @@ ZoidsToolsTalentGrimoire.rotations = {
                     scenario = "aoe",
                     scenarioLabel = "AoE",
                     recommended = true,
-                    selected = false,
+                    selected = true,
                     stateTokens = {
                         "preset-2",
                         "talent-7",
@@ -9208,8 +9238,17 @@ ZoidsToolsTalentGrimoire.rotations = {
                             },
                         },
                         {
+                            name = "Boomstick",
+                            text = "Boomstick, alongside your Potion, on-use Trinket, Racials, etc.",
+                            spellId = 1261193,
+                            conditions = {
+                                "preset-2:on",
+                                "talent-7:on",
+                            },
+                        },
+                        {
                             name = "Takedown",
-                            text = "Takedown, alongside your Potion, on-use Trinket, Racials, etc.",
+                            text = "Takedown",
                             spellId = 1250646,
                             conditions = {
                                 "preset-2:on",
@@ -9347,7 +9386,7 @@ ZoidsToolsTalentGrimoire.rotations = {
                         },
                         {
                             name = "Boomstick",
-                            text = "Cast Boomstick if the target has no Sentinel's Mark.",
+                            text = "Cast Boomstick on cooldown.",
                             spellId = 1261193,
                             conditions = {
                                 "preset-2:on",
@@ -9355,7 +9394,7 @@ ZoidsToolsTalentGrimoire.rotations = {
                         },
                         {
                             name = "Wildfire Bomb",
-                            text = "Cast Wildfire Bomb if the target has Sentinel's Mark, or if it is within 5 seconds of reaching 2 charges.",
+                            text = "Cast Wildfire Bomb if the target has Sentinel's Mark, or if it is within 4 seconds of reaching 2 charges.",
                             spellId = 259495,
                             conditions = {
                                 "preset-2:on",
@@ -9389,14 +9428,6 @@ ZoidsToolsTalentGrimoire.rotations = {
                             },
                         },
                         {
-                            name = "Boomstick",
-                            text = "Cast Boomstick on cooldown.",
-                            spellId = 1261193,
-                            conditions = {
-                                "preset-2:on",
-                            },
-                        },
-                        {
                             name = "Moonlight Chakram",
                             text = "Cast Moonlight Chakram.",
                             spellId = 1264902,
@@ -9406,7 +9437,7 @@ ZoidsToolsTalentGrimoire.rotations = {
                         },
                         {
                             name = "Raptor Strike",
-                            text = "Cast Raptor Strike. You must have Tip if it is a Raptor Swipe. If not, it does not matter to Tip it. Every 2nd Raptor is a Swipe.",
+                            text = "Cast Raptor Strike. Every 2nd Raptor is a Raptor Swipe.",
                             spellId = 186270,
                             conditions = {
                                 "preset-2:on",
@@ -9414,8 +9445,16 @@ ZoidsToolsTalentGrimoire.rotations = {
                         },
                         {
                             name = "Kill Command",
-                            text = "Cast Kill Command if Takedown is on cooldown.",
+                            text = "Cast Kill Command as a filler, but prefer Takedown if available.",
                             spellId = 259489,
+                            conditions = {
+                                "preset-2:on",
+                            },
+                        },
+                        {
+                            name = "Wildfire Bomb",
+                            text = "Cast Wildfire Bomb.",
+                            spellId = 259495,
                             conditions = {
                                 "preset-2:on",
                             },
@@ -9825,8 +9864,10 @@ ZoidsToolsTalentGrimoire.rotations = {
                 },
             },
         },
-    },
-    MAGE = {
+    }
+    end,
+    MAGE = function()
+        return {
         arcane = {
             source = "Icy Veins",
             sourceUrl = "https://www.icy-veins.com/wow/arcane-mage-pve-dps-rotation-cooldowns-abilities",
@@ -11103,8 +11144,10 @@ ZoidsToolsTalentGrimoire.rotations = {
                 },
             },
         },
-    },
-    MONK = {
+    }
+    end,
+    MONK = function()
+        return {
         brewmaster = {
             source = "Icy Veins",
             sourceUrl = "https://www.icy-veins.com/wow/brewmaster-monk-pve-tank-rotation-cooldowns-abilities",
@@ -12586,8 +12629,10 @@ ZoidsToolsTalentGrimoire.rotations = {
                 },
             },
         },
-    },
-    PALADIN = {
+    }
+    end,
+    PALADIN = function()
+        return {
         holy = {
             source = "Icy Veins",
             sourceUrl = "https://www.icy-veins.com/wow/holy-paladin-pve-healing-rotation-cooldowns-abilities",
@@ -13742,8 +13787,10 @@ ZoidsToolsTalentGrimoire.rotations = {
                 },
             },
         },
-    },
-    PRIEST = {
+    }
+    end,
+    PRIEST = function()
+        return {
         discipline = {
             source = "Icy Veins",
             sourceUrl = "https://www.icy-veins.com/wow/discipline-priest-pve-healing-rotation-cooldowns-abilities",
@@ -15381,8 +15428,10 @@ ZoidsToolsTalentGrimoire.rotations = {
                 },
             },
         },
-    },
-    ROGUE = {
+    }
+    end,
+    ROGUE = function()
+        return {
         assassination = {
             source = "Icy Veins",
             sourceUrl = "https://www.icy-veins.com/wow/assassination-rogue-pve-dps-rotation-cooldowns-abilities",
@@ -16244,8 +16293,10 @@ ZoidsToolsTalentGrimoire.rotations = {
                 },
             },
         },
-    },
-    SHAMAN = {
+    }
+    end,
+    SHAMAN = function()
+        return {
         elemental = {
             source = "Icy Veins",
             sourceUrl = "https://www.icy-veins.com/wow/elemental-shaman-pve-dps-rotation-cooldowns-abilities",
@@ -18200,8 +18251,10 @@ ZoidsToolsTalentGrimoire.rotations = {
                 },
             },
         },
-    },
-    WARLOCK = {
+    }
+    end,
+    WARLOCK = function()
+        return {
         affliction = {
             source = "Icy Veins",
             sourceUrl = "https://www.icy-veins.com/wow/affliction-warlock-pve-dps-rotation-cooldowns-abilities",
@@ -18370,15 +18423,6 @@ ZoidsToolsTalentGrimoire.rotations = {
                     steps = {
                         {
                             name = "Agony",
-                            text = "Maintain Agony on up to",
-                            spellId = 980,
-                            conditions = {
-                                "preset-1:on",
-                                "talent-9:off",
-                            },
-                        },
-                        {
-                            name = "Agony",
                             text = "Maintain Agony on up to 10 targets.",
                             spellId = 980,
                             conditions = {
@@ -18387,10 +18431,9 @@ ZoidsToolsTalentGrimoire.rotations = {
                         },
                         {
                             name = "Agony",
-                            text = "Maintain Agony on up to 10 targets.",
+                            text = "Maintain Agony on up to 14 targets.",
                             spellId = 980,
                             conditions = {
-                                "talent-9:on",
                                 "preset-1:on",
                             },
                         },
@@ -18451,7 +18494,7 @@ ZoidsToolsTalentGrimoire.rotations = {
                         },
                         {
                             name = "Seed of Corruption",
-                            text = "Cast Seed of Corruption if already at 5 Soul Shards and 2 targets are close.",
+                            text = "Cast Seed of Corruption if already at 5 Soul Shards and 3 targets are close.",
                             spellId = 27243,
                             conditions = {
                                 "talent-9:on",
@@ -18469,7 +18512,7 @@ ZoidsToolsTalentGrimoire.rotations = {
                         },
                         {
                             name = "Seed of Corruption",
-                            text = "Cast Seed of Corruption if already at 5 Soul Shards and at least 3 targets are close.",
+                            text = "Cast Seed of Corruption if already at 5 Soul Shards and at least 6 targets are close.",
                             spellId = 27243,
                             conditions = {
                                 "preset-2:on",
@@ -18478,7 +18521,7 @@ ZoidsToolsTalentGrimoire.rotations = {
                         },
                         {
                             name = "Seed of Corruption",
-                            text = "Cast Seed of Corruption if already at 5 Soul Shards and at least 7 targets are close.",
+                            text = "Cast Seed of Corruption if already at 5 Soul Shards and at least 6 targets are close.",
                             spellId = 27243,
                             conditions = {
                                 "preset-1:on",
@@ -18496,7 +18539,7 @@ ZoidsToolsTalentGrimoire.rotations = {
                         },
                         {
                             name = "Seed of Corruption",
-                            text = "Cast Seed of Corruption if above 2 shards before Dark Harvest comes off cooldown and there are 3 targets.",
+                            text = "Cast Seed of Corruption if above 2 shards before Dark Harvest comes off cooldown and there are 6 targets.",
                             spellId = 27243,
                             conditions = {
                                 "preset-2:on",
@@ -18597,8 +18640,28 @@ ZoidsToolsTalentGrimoire.rotations = {
                             },
                         },
                         {
+                            name = "Unstable Affliction",
+                            text = "Cast Unstable Affliction spending all Soul Shards",
+                            spellId = 1259790,
+                            conditions = {
+                                "talent-6:on",
+                                "preset-1:on",
+                            },
+                        },
+                        {
                             name = "Cast Dark Harvest.",
                             text = "Cast Dark Harvest.",
+                            conditions = {
+                                "preset-2:on",
+                            },
+                        },
+                        {
+                            name = "Cast Dark Harvest.",
+                            text = "Cast Dark Harvest.",
+                            conditions = {
+                                "preset-1:on",
+                                "talent-6:off",
+                            },
                         },
                         {
                             name = "Summon Darkglare",
@@ -18616,6 +18679,23 @@ ZoidsToolsTalentGrimoire.rotations = {
                             name = "Unstable Affliction",
                             text = "Spend all shards on Unstable Affliction.",
                             spellId = 1259790,
+                        },
+                        {
+                            name = "Cast Dark Harvest.",
+                            text = "Cast Dark Harvest.",
+                            conditions = {
+                                "talent-7:on",
+                                "preset-1:on",
+                            },
+                        },
+                        {
+                            name = "Unstable Affliction",
+                            text = "Spend all shards on Unstable Affliction.",
+                            spellId = 1259790,
+                            conditions = {
+                                "talent-7:on",
+                                "preset-1:on",
+                            },
                         },
                         {
                             name = "Nightfall",
@@ -19292,8 +19372,16 @@ ZoidsToolsTalentGrimoire.rotations = {
                             },
                         },
                         {
+                            name = "Chaos Bolt",
+                            text = "Use Chaos Bolt or Shadowburn if available to trigger Diabolic Ritual",
+                            spellId = 116858,
+                            conditions = {
+                                "preset-1:on",
+                            },
+                        },
+                        {
                             name = "Rain of Fire",
-                            text = "Cast Rain of Fire if there are 5+ targets.",
+                            text = "Cast Rain of Fire if there are 4+ targets.",
                             spellId = 1214467,
                             conditions = {
                                 "preset-2:on",
@@ -19470,8 +19558,10 @@ ZoidsToolsTalentGrimoire.rotations = {
                 },
             },
         },
-    },
-    WARRIOR = {
+    }
+    end,
+    WARRIOR = function()
+        return {
         arms = {
             source = "Icy Veins",
             sourceUrl = "https://www.icy-veins.com/wow/arms-warrior-pve-dps-rotation-cooldowns-abilities",
@@ -21890,10 +21980,13 @@ ZoidsToolsTalentGrimoire.rotations = {
                 },
             },
         },
-    },
+    }
+    end,
 }
-ZoidsToolsTalentGrimoire.data = {
-    DEATHKNIGHT = {
+ZoidsToolsTalentGrimoire.data = {}
+ZoidsToolsTalentGrimoire.dataLoaders = {
+    DEATHKNIGHT = function()
+        return {
         blood = {
             mythicplus = {
                 ["all-dungeons"] = {
@@ -22654,7 +22747,7 @@ ZoidsToolsTalentGrimoire.data = {
                                 solo = {
                                     title = "Murlok Solo Shuffle",
                                     modeLabel = "Solo Shuffle",
-                                    importString = "CsPAAAAAAAAAAAAAAAAAAAAAAMDYmBjZmZYWmZmZYbGjmZMzMDzYGjZGMzMzMDAAAAAAAAAjZbgBsAWGmAjFjZGmZADghZGAGM",
+                                    importString = "CsPAAAAAAAAAAAAAAAAAAAAAAMDYmBjZmZYWmZmZYbGjmZMzMDzYGzMzgZmZMDAAAAAAAAAjZbgBsAWGmAjFjZGmZADghZGAGM",
                                     sampleSize = 50,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
@@ -22664,7 +22757,7 @@ ZoidsToolsTalentGrimoire.data = {
                                     title = "Murlok 2v2",
                                     modeLabel = "2v2",
                                     importString = "CsPAAAAAAAAAAAAAAAAAAAAAAMDYmBjZmZYWmZmZYbGjmZMzMDzYGjZGMzMzMDAAAAAAAAAjZbgBsAWGmAjFjZGmZADghZGAGM",
-                                    sampleSize = 16,
+                                    sampleSize = 30,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
                                     heroTree = "Deathbringer",
@@ -22672,8 +22765,8 @@ ZoidsToolsTalentGrimoire.data = {
                                 ["3v3"] = {
                                     title = "Murlok 3v3",
                                     modeLabel = "3v3",
-                                    importString = "CsPAAAAAAAAAAAAAAAAAAAAAAMDYmZYMzMDzyYmZYbGjmZMzMDzwYmZGMzMzMDAAAAAAAAAjZbgBsAWGmAjFjZGmZADghZGAGM",
-                                    sampleSize = 14,
+                                    importString = "CsPAAAAAAAAAAAAAAAAAAAAAAMDYmBjZmZYWmZmZYbGjmZMzMDzYGzMzgZmZMDAAAAAAAAAjZbgBsAWGmAjFjZGmZADghZGAGM",
+                                    sampleSize = 26,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
                                     heroTree = "Deathbringer",
@@ -22690,8 +22783,8 @@ ZoidsToolsTalentGrimoire.data = {
                                 rbg = {
                                     title = "Murlok Rated Battlegrounds",
                                     modeLabel = "Rated Battlegrounds",
-                                    importString = "CsPAAAAAAAAAAAAAAAAAAAAAAMDYmBjZmZYWmZmZYbGjmZMzMDzYYmZGMzMzMDAAAAAAAAAjZbgBsAWGmAjFjZGmZADghZGAGM",
-                                    sampleSize = 1,
+                                    importString = "CsPAAAAAAAAAAAAAAAAAAAAAAMDYmZYMzMDzyYmZYbGjmZMzMDzYYmZGMzMzMDAAAAAAAAAjZbgBsAWGmAjFjZGmZADghZGAGM",
+                                    sampleSize = 5,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
                                     heroTree = "Deathbringer",
@@ -23103,7 +23196,7 @@ ZoidsToolsTalentGrimoire.data = {
                                 solo = {
                                     title = "Murlok Solo Shuffle",
                                     modeLabel = "Solo Shuffle",
-                                    importString = "CwPAAAAAAAAAAAAAAAAAAAAAAAYmBjZGDzyYmZa2mxYmhZAAAAAAAAMzYmZAwyMmZYmxMzA2MbGGYgZjhGLMAzAwYmZMDwMzYGD",
+                                    importString = "CwPAAAAAAAAAAAAAAAAAAAAAAAYmBjZMDzyYmZa2mxYmhZAAAAAAAAMzYmZAwyMmZYmxMzA2MbGGYgZjhGLMAzAwYmZMDwMzYGD",
                                     sampleSize = 50,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
@@ -23140,7 +23233,7 @@ ZoidsToolsTalentGrimoire.data = {
                                     title = "Murlok Rated Battlegrounds",
                                     modeLabel = "Rated Battlegrounds",
                                     importString = "CwPAAAAAAAAAAAAAAAAAAAAAAAYmBjZmZYWGzMTz2MGjhZAAAAAAAAMzYmZAwyMmZYmxMzA2MbGGYgZjhGLMAzAwYmZMDwMzYGD",
-                                    sampleSize = 16,
+                                    sampleSize = 22,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
                                     heroTree = "Rider of the Apocalypse",
@@ -23153,8 +23246,10 @@ ZoidsToolsTalentGrimoire.data = {
                 },
             },
         },
-    },
-    DEMONHUNTER = {
+    }
+    end,
+    DEMONHUNTER = function()
+        return {
         devourer = {
             mythicplus = {
                 ["all-dungeons"] = {
@@ -23589,7 +23684,7 @@ ZoidsToolsTalentGrimoire.data = {
                                 solo = {
                                     title = "Murlok Solo Shuffle",
                                     modeLabel = "Solo Shuffle",
-                                    importString = "CgcBAAAAAAAAAAAAAAAAAAAAAAAMzMzMzMmZMMAAAAAAAYMGzMDAAAAAAAAzYGmxMzMmZmZMz2Mjxi2WYmZmZrtZmZGgZMAAMzww4BA",
+                                    importString = "CgcBAAAAAAAAAAAAAAAAAAAAAAAMzMzMzMmZMMAAAAAAAYMGzMDAAAAAAAAzYGmZmZmxMzMMz2Mjxi2WYmZmZrtZmZGgZMAAMzMGGA",
                                     sampleSize = 50,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
@@ -23598,8 +23693,8 @@ ZoidsToolsTalentGrimoire.data = {
                                 ["2v2"] = {
                                     title = "Murlok 2v2",
                                     modeLabel = "2v2",
-                                    importString = "CgcBAAAAAAAAAAAAAAAAAAAAAAAMzMzMzMmZMMAAAAAAAYMGzMDAAAAAAAAzYGmxMzMmZmxMz2Mjxm2WAAgBYGzMzyMz0sMzyMzYYA",
-                                    sampleSize = 35,
+                                    importString = "CgcBAAAAAAAAAAAAAAAAAAAAAAAMzMzMzMmZMMAAAAAAAYMGzMDAAAAAAAAzYGmZmZmxMzMMz2Mjxm2WAAgBYGzMzyMz0sMzyMzYYA",
+                                    sampleSize = 48,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
                                     heroTree = "Void-Scarred",
@@ -23607,16 +23702,16 @@ ZoidsToolsTalentGrimoire.data = {
                                 ["3v3"] = {
                                     title = "Murlok 3v3",
                                     modeLabel = "3v3",
-                                    importString = "CgcBAAAAAAAAAAAAAAAAAAAAAAAMjZmZmxMjhZAAAAAAAYMGzMDAAAAAAAAzYGmZmZmxMzMMz2Mjxi2WYmZmZrtZmZGgZMAAMzww4BA",
-                                    sampleSize = 33,
+                                    importString = "CgcBAAAAAAAAAAAAAAAAAAAAAAAMjZmZmxMjhBAAAAAAAjZbMzMAAAAAAAAMjZYGzMzYmZGzMbzMGbabBAAGgZMzMLzMTzyMLzMjhBA",
+                                    sampleSize = 41,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
-                                    heroTree = "Annihilator",
+                                    heroTree = "Void-Scarred",
                                 },
                                 blitz = {
                                     title = "Murlok Battleground Blitz",
                                     modeLabel = "Battleground Blitz",
-                                    importString = "CgcBAAAAAAAAAAAAAAAAAAAAAAAMjZmZMmZMMDAAAAAAwixYMzMAAAAAAAAMjZYGzMzYmZGmZbmxYTbLAAwAMjZmZZmZa2mZZmhhxFA",
+                                    importString = "CgcBAAAAAAAAAAAAAAAAAAAAAAAMjZmZMmZMMDAAAAAAwixYMzMAAAAAAAAMjZYmZmZGzMzwMbzMGbabBAAGgZMzMLzMTz2MLzMjhBA",
                                     sampleSize = 50,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
@@ -23625,11 +23720,11 @@ ZoidsToolsTalentGrimoire.data = {
                                 rbg = {
                                     title = "Murlok Rated Battlegrounds",
                                     modeLabel = "Rated Battlegrounds",
-                                    importString = "CgcBAAAAAAAAAAAAAAAAAAAAAAAYMzMjZmZMMDAAAAAAwixYMzMAAAAAAAAMjZYeAzMzYmZmxMbzMGbaZBAAGgZMzMLzMTzyMLzMMMzDA",
-                                    sampleSize = 4,
+                                    importString = "CgcBAAAAAAAAAAAAAAAAAAAAAAAMjZmZMmZMMDAAAAAAwixYMzMAAAAAAAAMjZYGzMzYmZmxMbzMGLaZhZmZmt2mZmZAmxAAwMDDjHA",
+                                    sampleSize = 9,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
-                                    heroTree = "Void-Scarred",
+                                    heroTree = "Annihilator",
                                 },
                             },
                             label = "Murlok.io (Reconstructed)",
@@ -23668,17 +23763,17 @@ ZoidsToolsTalentGrimoire.data = {
                         },
                         icyveins = {
                             builds = {
-                                ["aldrachi-reaver-aoe-build"] = {
-                                    title = "Aldrachi Reaver AoE Build",
-                                    modeLabel = "Aldrachi Reaver AoE Build",
-                                    importString = "CEkAAAAAAAAAAAAAAAAAAAAAAYgZmZ2mxMzMGzkxMDAAAAAAYWMmtZYmZ2mZGLzMmxyMDzsMz2MYYssxEGzMmxCAAAAAAAYmBYAAAAYA",
-                                    difficulty = "Mythic+",
-                                    source = "Icy Veins",
-                                },
                                 ["fel-scarred-aoe-build"] = {
                                     title = "Fel-Scarred AoE Build",
                                     modeLabel = "Fel-Scarred AoE Build",
                                     importString = "CEkAAAAAAAAAAAAAAAAAAAAAAYmZGzMz2MmZmxYmMmZAAAAAAAzixsNDzMwMWmZmZYmBzyAbzmZMMbMNmZGzYDAAAYAAAAMzgBAAAgB",
+                                    difficulty = "Mythic+",
+                                    source = "Icy Veins",
+                                },
+                                ["aldrachi-reaver-aoe-build"] = {
+                                    title = "Aldrachi Reaver AoE Build",
+                                    modeLabel = "Aldrachi Reaver AoE Build",
+                                    importString = "CEkAAAAAAAAAAAAAAAAAAAAAAYgZmZ2mxMzMGzkxMDAAAAAAYWMmtZYmZ2mZGLzMmxyMDzsMz2MYYssxEGzMmxCAAAAAAAYmBYAAAAYA",
                                     difficulty = "Mythic+",
                                     source = "Icy Veins",
                                 },
@@ -23973,10 +24068,10 @@ ZoidsToolsTalentGrimoire.data = {
                         },
                         icyveins = {
                             builds = {
-                                ["aldrachi-reaver-single-target-build"] = {
-                                    title = "Aldrachi Reaver Single-Target Build",
-                                    modeLabel = "Aldrachi Reaver Single-Target Build",
-                                    importString = "CEkAAAAAAAAAAAAAAAAAAAAAAYgZmZMjZmZmxMZMzAAAAAAAmNjZbmxYmtZmxyMjZsMzwMLzsMDGGLbMhxMjhFAAAAAAAwMDwAAAAwA",
+                                ["fel-scarred-raid-cleave-build"] = {
+                                    title = "Fel-Scarred Raid Cleave Build",
+                                    modeLabel = "Fel-Scarred Raid Cleave Build",
+                                    importString = "CEkAAAAAAAAAAAAAAAAAAAAAAYmZGzMjZMzMzMmJjZGAAAAAAwsZMbzMGDmZsMz8AzwMDmlB2mFzYY2YaMzMG2AAAAAAAAYmBDAAAAD",
                                     difficulty = "Raid",
                                     source = "Icy Veins",
                                 },
@@ -23987,10 +24082,10 @@ ZoidsToolsTalentGrimoire.data = {
                                     difficulty = "Raid",
                                     source = "Icy Veins",
                                 },
-                                ["fel-scarred-raid-cleave-build"] = {
-                                    title = "Fel-Scarred Raid Cleave Build",
-                                    modeLabel = "Fel-Scarred Raid Cleave Build",
-                                    importString = "CEkAAAAAAAAAAAAAAAAAAAAAAYmZGzMjZMzMzMmJjZGAAAAAAwsZMbzMGDegZsMz8AzwMjxsMw2sZGDzGTjZmxwGAAAAAAAAzMYAAAAYA",
+                                ["aldrachi-reaver-single-target-build"] = {
+                                    title = "Aldrachi Reaver Single-Target Build",
+                                    modeLabel = "Aldrachi Reaver Single-Target Build",
+                                    importString = "CEkAAAAAAAAAAAAAAAAAAAAAAYgZmZMjZmZmxMZMzAAAAAAAmNjZbmxYmtZmxyMjZsMzwMLzsMDGGLbMhxMjhFAAAAAAAwMDwAAAAwA",
                                     difficulty = "Raid",
                                     source = "Icy Veins",
                                 },
@@ -24093,17 +24188,17 @@ ZoidsToolsTalentGrimoire.data = {
                                 blitz = {
                                     title = "Murlok Battleground Blitz",
                                     modeLabel = "Battleground Blitz",
-                                    importString = "CEkAAAAAAAAAAAAAAAAAAAAAAwgZmZYMmZMzMZYGAAAAAAws8AjxMzMzMbzMjlZGzwMjZmtB2mFzYYWYaYmxM2AAAAAAAAYmBDAAAAD",
+                                    importString = "CEkAAAAAAAAAAAAAAAAAAAAAAwgZmZYMmZMzMZYGAAAAAAws8AjZbMzMzsNzMWmZMjlZGmZbmlZwwYZjJMmZMjFAAAAAAAwMDwAAAAwA",
                                     sampleSize = 50,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
-                                    heroTree = "Fel-Scarred",
+                                    heroTree = "Aldrachi Reaver",
                                 },
                                 rbg = {
                                     title = "Murlok Rated Battlegrounds",
                                     modeLabel = "Rated Battlegrounds",
-                                    importString = "CEkAAAAAAAAAAAAAAAAAAAAAAwgZmZMjZmZMzMZYGAAAAAAwsYMGzMzMbzMjlZGzYZmxY2GYbWMjhZhphZGzYDAAAAAAAgZGMAAAAM",
-                                    sampleSize = 9,
+                                    importString = "CEkAAAAAAAAAAAAAAAAAAAAAAYGMzMjZMzMjZmJDzAAAAAAAmFjxMjZmZbmZsMzYGmZMmtBWmFzYYWYaYmxM2AAAAAAAAYmBDAAAAD",
+                                    sampleSize = 16,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
                                     heroTree = "Fel-Scarred",
@@ -24486,8 +24581,10 @@ ZoidsToolsTalentGrimoire.data = {
                 },
             },
         },
-    },
-    DRUID = {
+    }
+    end,
+    DRUID = function()
+        return {
         balance = {
             mythicplus = {
                 ["all-dungeons"] = {
@@ -24887,7 +24984,7 @@ ZoidsToolsTalentGrimoire.data = {
                                 solo = {
                                     title = "Murlok Solo Shuffle",
                                     modeLabel = "Solo Shuffle",
-                                    importString = "CYGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWoMLNjxMDwsZmZmZjxwMLjlZMjZwsMjZmZwGGAMAbbjNMNzsMAAAAYzMzMzgNDjxMAmZAgBA",
+                                    importString = "CYGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWoMLNjxMDwsZmZmZjxwMLjlhZMzwsMjZmZwGGAMAbbjNMNzsMAAAAYzMzMzgNDjxMAmZAgBA",
                                     sampleSize = 50,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
@@ -24897,7 +24994,7 @@ ZoidsToolsTalentGrimoire.data = {
                                     title = "Murlok 2v2",
                                     modeLabel = "2v2",
                                     importString = "CYGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWoMLNjxMDwsZmZmZhxwMLjlZMjZGmlZMzMD2wAgBYbbshpZmlBAAAAbmZmZGsZYMGAmZAgBA",
-                                    sampleSize = 40,
+                                    sampleSize = 38,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
                                     heroTree = "Keeper of the Grove",
@@ -24905,7 +25002,7 @@ ZoidsToolsTalentGrimoire.data = {
                                 ["3v3"] = {
                                     title = "Murlok 3v3",
                                     modeLabel = "3v3",
-                                    importString = "CYGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWoMLNjxMDwsZmZmZhxwMLjlZMjZGmlZMzMD2wAgBYbbshpZmlBAAAAbmZmZGsZYMGAmZAgBA",
+                                    importString = "CYGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWoMLNjxMDwsZmZmZhxwMLjlhZMzwsMjZmZwGGAMAbbjNMNzsMAAAAYzMzMzgNDjxMAmZAgBA",
                                     sampleSize = 50,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
@@ -24914,7 +25011,7 @@ ZoidsToolsTalentGrimoire.data = {
                                 blitz = {
                                     title = "Murlok Battleground Blitz",
                                     modeLabel = "Battleground Blitz",
-                                    importString = "CYGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWGlZpZMmZAmtZmZmZBeAMLjlZWmxMDzyMLzMzgNMAYA22GbYamZZAAAAwmZmZmBbGGjBgZGAYA",
+                                    importString = "CYGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWGlZpZMmZAmNzMzMLwDgZZsMjZMzYmlZWmZmBbYAwAstN2w0MzyAAAAgNzMzMD2MmxYAYmBAGA",
                                     sampleSize = 50,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
@@ -24923,8 +25020,8 @@ ZoidsToolsTalentGrimoire.data = {
                                 rbg = {
                                     title = "Murlok Rated Battlegrounds",
                                     modeLabel = "Rated Battlegrounds",
-                                    importString = "CYGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWGlZpZMmZAmtZmZmZBgZZsMWmxMjZWmZZmZGshBADw22YDTzMLDAAAA2MzMzMYzYGjBgZGAYA",
-                                    sampleSize = 38,
+                                    importString = "CYGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWGlZpZMmZAmtZmZmZBgZZsMzyMmZMzyMLzMzgNMAYA22GbYamZZAAAAwmZmZMYzYGjBgZGAYA",
+                                    sampleSize = 50,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
                                     heroTree = "Keeper of the Grove",
@@ -25343,7 +25440,7 @@ ZoidsToolsTalentGrimoire.data = {
                                 solo = {
                                     title = "Murlok Solo Shuffle",
                                     modeLabel = "Solo Shuffle",
-                                    importString = "CcGAAAAAAAAAAAAAAAAAAAAAAAAAAAAwYMDGzMzMmtFWmZZmZGzMDAAAALBzmBmZmaGzmZmZmlxMjBAAAAAAYAAAAAAmtZWa2mZZDMzAswgBAwMDAGA",
+                                    importString = "CcGAAAAAAAAAAAAAAAAAAAAAAAAAAAAwYMzCjZmZG2WYZmlZmZMzMAAAAsEMbGYmZqZMbmZmZWGzMGAAAAAAgBAAAAAY2mZpZbmlNwMDwCDGAAzMAYA",
                                     sampleSize = 50,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
@@ -25379,8 +25476,8 @@ ZoidsToolsTalentGrimoire.data = {
                                 rbg = {
                                     title = "Murlok Rated Battlegrounds",
                                     modeLabel = "Rated Battlegrounds",
-                                    importString = "CcGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAjZWYmZmZGz2CLzsMjZMzMAAAAsEMbGYmZqZMbm5BmZWGz8AGAAAAAAgBAAAAAY2mZrZbmlNYmZAWYGGAAzMAYA",
-                                    sampleSize = 3,
+                                    importString = "CcGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAjZWYMzMzY2WYZmlZMzMzMAAAAsEMbGYmZqZMbmZmZWGzMGAAAAAAgBAAAAAY2mZrZbmlNwMDwCDGAAzMAYA",
+                                    sampleSize = 6,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
                                     heroTree = "Wildstalker",
@@ -26160,7 +26257,7 @@ ZoidsToolsTalentGrimoire.data = {
                                 solo = {
                                     title = "Murlok Solo Shuffle",
                                     modeLabel = "Solo Shuffle",
-                                    importString = "CkGAAAAAAAAAAAAAAAAAAAAAAMMmZDjxMzsMmZMmNmNbzAAAAAAAAAAglZIbmx0MzMwsZmZmZzgZAAAAAMAAGw22YBTzMLDAAAgFYmZYGbgmBAzMAgB",
+                                    importString = "CkGAAAAAAAAAAAAAAAAAAAAAAMMmZDjxMzsMmZMmNmNbzAAAAAAAAAAglZIbmx0MzMwsZmZmZzgBAAAAgBAwA22GLYamZZAAAAswYmZYGbgmBAzMAgB",
                                     sampleSize = 50,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
@@ -26178,7 +26275,7 @@ ZoidsToolsTalentGrimoire.data = {
                                 ["3v3"] = {
                                     title = "Murlok 3v3",
                                     modeLabel = "3v3",
-                                    importString = "CkGAAAAAAAAAAAAAAAAAAAAAAMMmZBjxMzsMmZMmNmNbzAAAAAAAAAAglZIbmx0MzMwsZmZmZxgZAAAAAMAAGw22YBTzMLDAAAgFYmZYGbgmBAzMAgB",
+                                    importString = "CkGAAAAAAAAAAAAAAAAAAAAAAMMmZBjxMzsMmZMmNmNbzAAAAAAAAAAglZIbmx0MzMwsZmZmZzgBAAAAgBAwA22GLYamZZAAAAswYmZYGbgmBAzMAgB",
                                     sampleSize = 50,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
@@ -26196,8 +26293,8 @@ ZoidsToolsTalentGrimoire.data = {
                                 rbg = {
                                     title = "Murlok Rated Battlegrounds",
                                     modeLabel = "Rated Battlegrounds",
-                                    importString = "CkGAAAAAAAAAAAAAAAAAAAAAAMMmZjZMzMmlxMjxsxsZbGAAAAAAAAAAsMDZzMmmZmBmNzMzMLGMAAAAAMAAGw22YBTzMLDAAAgFGzMDzYD0MAYmBAMA",
-                                    sampleSize = 11,
+                                    importString = "CkGAAAAAAAAAAAAAAAAAAAAAAMMmZBjxMzsMmZMmNmNbzAAAAAAAAAAglZoZzMmmZAmNzMzMLGegBAAAAgBAwA22GLYamZZAAAAswYmZYGbgmBAzMAgB",
+                                    sampleSize = 19,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
                                     heroTree = "Keeper of the Grove",
@@ -26210,8 +26307,10 @@ ZoidsToolsTalentGrimoire.data = {
                 },
             },
         },
-    },
-    EVOKER = {
+    }
+    end,
+    EVOKER = function()
+        return {
         augmentation = {
             mythicplus = {
                 ["all-dungeons"] = {
@@ -26590,8 +26689,17 @@ ZoidsToolsTalentGrimoire.data = {
                                 solo = {
                                     title = "Murlok Solo Shuffle",
                                     modeLabel = "Solo Shuffle",
-                                    importString = "CEcBAAAAAAAAAAAAAAAAAAAAAMMzMbzMzMWmBzsNjZmxMAAAAAAAAwMMzwYM1YmZGAAAAYmZGmZWGzMwMMGsALjhx2AYGEbYMwMDMM",
-                                    sampleSize = 15,
+                                    importString = "CEcBAAAAAAAAAAAAAAAAAAAAAMMzMbzMzMWmBzsNMzMmBAAAAAAAAmhZGGjpGzMzAAAAAzMzwMzyYmBmZxYwCsMGGbDgZQshxAzMwwA",
+                                    sampleSize = 21,
+                                    difficulty = "PvP",
+                                    source = "Murlok.io (Reconstructed)",
+                                    heroTree = "Scalecommander",
+                                },
+                                ["3v3"] = {
+                                    title = "Murlok 3v3",
+                                    modeLabel = "3v3",
+                                    importString = "CEcBAAAAAAAAAAAAAAAAAAAAAMMzMbzMzMWmBzsNMzMmBAAAAAAAAmhZGGjpGzMzAAAAAzMzwMzyYmBmZxYwCsMGGbDgZQshxAzMwwA",
+                                    sampleSize = 4,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
                                     heroTree = "Scalecommander",
@@ -26599,8 +26707,8 @@ ZoidsToolsTalentGrimoire.data = {
                                 blitz = {
                                     title = "Murlok Battleground Blitz",
                                     modeLabel = "Battleground Blitz",
-                                    importString = "CEcBAAAAAAAAAAAAAAAAAAAAAMMzMbzMzMWmhZGDzMjZAAAAAgBAAzMz4Bm5BMGTNMzMAAAAwMjhZmlxMDMzCGsALjhx2AYGEbYMwMDgB",
-                                    sampleSize = 9,
+                                    importString = "CEcBAAAAAAAAAAAAAAAAAAAAAMMzMbzMzMWmhZGDzMjZAAAAAgBAAMzwMjxYqZmZmBAAAAmZMMzsMmZgZWwgFYZMM2GAzgYDjBmZAM",
+                                    sampleSize = 17,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
                                     heroTree = "Scalecommander",
@@ -26673,7 +26781,7 @@ ZoidsToolsTalentGrimoire.data = {
                                 ["mythic-talents-scalecommander"] = {
                                     title = "Mythic+ Talents - Scalecommander",
                                     modeLabel = "Mythic+ Talents - Scalecommander",
-                                    importString = "CsbBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAjZAPgZGmBGGjZaMzMNjx2MmZmZmZmZGwMzMGzMbzMDMwYwGsMGN2GQmBBbYGMzghB",
+                                    importString = "CsbBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAjZAMzwMwAjZaMzMNjZ2mxMzMzMzMzAmZmZGzMLzMDMwYwGsMGN2GQmBBbYGMzghB",
                                     difficulty = "Mythic+",
                                     source = "Wowhead",
                                 },
@@ -27014,7 +27122,7 @@ ZoidsToolsTalentGrimoire.data = {
                                 solo = {
                                     title = "Murlok Solo Shuffle",
                                     modeLabel = "Solo Shuffle",
-                                    importString = "CsbBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAjZgZYGmhZmxY8ATjZmpZmxyMMzMzMzMzAMzMDzMLjZgBGD2glxox2AYGA2wAzMAD",
+                                    importString = "CsbBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAjZgZYGmhZmHwYMTjZmpZmxyMMzMzMzMzAMzMDzMLjZgBGD2glxox2AYGA2wAzMAD",
                                     sampleSize = 50,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
@@ -27023,8 +27131,8 @@ ZoidsToolsTalentGrimoire.data = {
                                 ["2v2"] = {
                                     title = "Murlok 2v2",
                                     modeLabel = "2v2",
-                                    importString = "CsbBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAzMzgZYGmhZmBjZaMzMNzMWmhZmZGzMzAMzMDzMLjZgBGD2glxox2AYGA2wAzMAD",
-                                    sampleSize = 20,
+                                    importString = "CsbBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAjZgZYGmhZmHwYMTjZmpZmxyMMzMzMzMzAMzMDzMLjZgBGD2glxox2AYGA2wAzMAD",
+                                    sampleSize = 29,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
                                     heroTree = "Scalecommander",
@@ -27032,7 +27140,7 @@ ZoidsToolsTalentGrimoire.data = {
                                 ["3v3"] = {
                                     title = "Murlok 3v3",
                                     modeLabel = "3v3",
-                                    importString = "CsbBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAjZgZYGmhZmHwYMTjZmpZmxyMMzMzMzMzAMzMDzMLjZgBGD2glxox2AYGA2wAzMAD",
+                                    importString = "CsbBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAjZgZYGmhZGGjZaMzMNzMWmhZmZmZmZGgZmZYmZZMDMwYwGsMGN2GAzAwGGYmBGD",
                                     sampleSize = 50,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
@@ -27041,7 +27149,7 @@ ZoidsToolsTalentGrimoire.data = {
                                 blitz = {
                                     title = "Murlok Battleground Blitz",
                                     modeLabel = "Battleground Blitz",
-                                    importString = "CsbBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAzMzgZYGmZMzMGjZaMzMNzMWmhZmZGzMzAMzYYmZZMDMAD2glxox2AYGA2wAzMAD",
+                                    importString = "CsbBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAzMzgZYGmZMzMGjZaMzMNjxyMMzMz8AzMzAMzYYmZZMDMAD2glxox2AYGA2wAzMAD",
                                     sampleSize = 50,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
@@ -27050,8 +27158,8 @@ ZoidsToolsTalentGrimoire.data = {
                                 rbg = {
                                     title = "Murlok Rated Battlegrounds",
                                     modeLabel = "Rated Battlegrounds",
-                                    importString = "CsbBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAzMzgZYGmZMzMYMTjZmpZMWmxMzMzYmZGwMzYYmZZMDMAD2glxox2AYGA2wAzMAD",
-                                    sampleSize = 17,
+                                    importString = "CsbBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAzMzgZYGmZMzMGjZaMzMNzMWmhZmZGzMzAmZGDmZZMDMAD2glxox2AYGA2wAzMAD",
+                                    sampleSize = 26,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
                                     heroTree = "Scalecommander",
@@ -27394,14 +27502,14 @@ ZoidsToolsTalentGrimoire.data = {
                                 ["flameshaper-raid-build"] = {
                                     title = "Flameshaper Raid Build",
                                     modeLabel = "Flameshaper Raid Build",
-                                    importString = "CwbBAAAAAAAAAAAAAAAAAAAAAAAAAAAMzMDmZMYGzmhZmZbYAAwMjZMDGzIzMDAAAwMzMZGzMmtZGAYGzALgFwMMB2MsZYAMzMGA",
+                                    importString = "CwbBAAAAAAAAAAAAAAAAAAAAAAAAAAAMzMDmZMYGzmhZmZbAAAMjZMYGzIzMDAAAwMzMZmZmxsNzMAYGzALgFwMMB2MsZYAMzMGA",
                                     difficulty = "Raid",
                                     source = "Icy Veins",
                                 },
                                 ["chronowarden-raid-build"] = {
                                     title = "Chronowarden Raid Build",
                                     modeLabel = "Chronowarden Raid Build",
-                                    importString = "CwbBAAAAAAAAAAAAAAAAAAAAAAAAAAAmZmZwMjBzY2MMzMbYAAwMjZMDGzIzMDAAAwMzMZGzMmtZGAYgxM2YBGYGGawYBGzMAjB",
+                                    importString = "CwbBAAAAAAAAAAAAAAAAAAAAAAAAAAAmZmZwMjBzY2MMzMbYAAgZMjBzYGZmZAAAAmZmJzYmxsNzMAYgxM2YBGYGGawYBGzMAjB",
                                     difficulty = "Raid",
                                     source = "Icy Veins",
                                 },
@@ -27463,7 +27571,7 @@ ZoidsToolsTalentGrimoire.data = {
                                 solo = {
                                     title = "Murlok Solo Shuffle",
                                     modeLabel = "Solo Shuffle",
-                                    importString = "CwbBAAAAAAAAAAAAAAAAAAAAAAAAAAAmZmZ22GYYmZYmBmthBAAmhZmxYYmYmZAAAgtZmZaGjZmZZMDAMmBWALgZYCsZYzwAYmhB",
+                                    importString = "CwbBAAAAAAAAAAAAAAAAAAAAAAAAAAAmZmZ22GYYmZYmxDgthBAAzMMzMGDzEmZAAAgtZmZaGjZmZZMDAMmBWALgZYCsZYzwAYmhB",
                                     sampleSize = 50,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
@@ -27472,7 +27580,7 @@ ZoidsToolsTalentGrimoire.data = {
                                 ["2v2"] = {
                                     title = "Murlok 2v2",
                                     modeLabel = "2v2",
-                                    importString = "CwbBAAAAAAAAAAAAAAAAAAAAAAAAAAAmZmZ22GYYmZYmBsNMAAwMMzMGDzEzMDAAAsNzMTzYMzMLjZAAYMjNWgBmhhGmxCMmZAYA",
+                                    importString = "CwbBAAAAAAAAAAAAAAAAAAAAAAAAAAAmZmZ22GYYmZYmBsNMAAYmhZmxYYmwMDAAAsNzMTzYMzMLjZAAYMjNWgBmhhGmxCMmZAYA",
                                     sampleSize = 50,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
@@ -27481,7 +27589,7 @@ ZoidsToolsTalentGrimoire.data = {
                                 ["3v3"] = {
                                     title = "Murlok 3v3",
                                     modeLabel = "3v3",
-                                    importString = "CwbBAAAAAAAAAAAAAAAAAAAAAAAAAAAmZmZ22GYYmZYmBmthBAAmhZmxYYmYmZAAAgtZmZaGjZmZZMDAMmBWALgZYCsZYzwAYmhB",
+                                    importString = "CwbBAAAAAAAAAAAAAAAAAAAAAAAAAAAmZmZ22GYYmZYmBmthBAAzMMzMGDzEzMDAAAsNzMTzgZmZZMDAMmBWALgZYCsZYzwAYmhB",
                                     sampleSize = 50,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
@@ -27499,8 +27607,8 @@ ZoidsToolsTalentGrimoire.data = {
                                 rbg = {
                                     title = "Murlok Rated Battlegrounds",
                                     modeLabel = "Rated Battlegrounds",
-                                    importString = "CwbBAAAAAAAAAAAAAAAAAAAAAAAAAAAmZmZ22GYYmZYmxgthBAAmZMzMYMzkZMDAAAsNzMTzgZmZZMDAAjZsxCMwMM0AWgxMDAD",
-                                    sampleSize = 21,
+                                    importString = "CwbBAAAAAAAAAAAAAAAAAAAAAAAAAAAmZmZ22GYYmZYmxgthBAAmZMzMGjHYmYMDAAAsNzMTzYMzMLjZAAYMjNWgBmhhGwCMmZAYA",
+                                    sampleSize = 34,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
                                     heroTree = "Chronowarden",
@@ -27513,8 +27621,10 @@ ZoidsToolsTalentGrimoire.data = {
                 },
             },
         },
-    },
-    HUNTER = {
+    }
+    end,
+    HUNTER = function()
+        return {
         ["beast-mastery"] = {
             mythicplus = {
                 ["all-dungeons"] = {
@@ -27554,7 +27664,7 @@ ZoidsToolsTalentGrimoire.data = {
                                 ["pack-leader-mythic-talents"] = {
                                     title = "Pack Leader Mythic+ Talents",
                                     modeLabel = "Pack Leader Mythic+ Talents",
-                                    importString = "C0PAAAAAAAAAAAAAAAAAAAAAAAMmxwCsAzwQDbAAYGzMzsYGzMzMjZGMzYmhZGzMzYbmZMjZYZMNDAAAAAAAA8AjxAmZDAzCYbAYA",
+                                    importString = "C0PAAAAAAAAAAAAAAAAAAAAAAAMmxwCsAzwQDbAAYGzMzs8AzYmZmZMzgZGzMMzYmZGbzMjZMDLjpZAAAAAAAAgHYMGwMbAYWAbDAA",
                                     difficulty = "Mythic+",
                                     source = "Icy Veins",
                                 },
@@ -27923,7 +28033,7 @@ ZoidsToolsTalentGrimoire.data = {
                                 ["2v2"] = {
                                     title = "Murlok 2v2",
                                     modeLabel = "2v2",
-                                    importString = "C0PAAAAAAAAAAAAAAAAAAAAAAAMmxwCsAzwQDbAAYGzYmFzwMmZY8AzMGmxMzMGzYxMjZmZMMaGAAAAwMAAAMDzMgZ2gFMzCYZAYA",
+                                    importString = "C0PAAAAAAAAAAAAAAAAAAAAAAAMmxwCsBzwQDbAAYGzYmFzwMmZY8AzMGmxMzMGzYxMjZmZMMaGAAAAwMAAAMDzMgZ2gFMzCYZAYA",
                                     sampleSize = 50,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
@@ -27950,8 +28060,8 @@ ZoidsToolsTalentGrimoire.data = {
                                 rbg = {
                                     title = "Murlok Rated Battlegrounds",
                                     modeLabel = "Rated Battlegrounds",
-                                    importString = "C0PAAAAAAAAAAAAAAAAAAAAAAAMmxwCsAzwQDbAAYGzYmFzwMmZYMzMGmxMzMGzYxMjZmZMMaGAAAAwMAAAMDzMgZ2gFMzCY5DAYA",
-                                    sampleSize = 6,
+                                    importString = "C0PAAAAAAAAAAAAAAAAAAAAAAAMmxwCsAzwQDbAAYGzYmFzwMmZY8AzMGmxMzMGzYxMjZmZMMaGAAAAwMAAAMDzMgZ2gFMzCYZAYA",
+                                    sampleSize = 7,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
                                     heroTree = "Pack Leader",
@@ -28370,7 +28480,7 @@ ZoidsToolsTalentGrimoire.data = {
                                 solo = {
                                     title = "Murlok Solo Shuffle",
                                     modeLabel = "Solo Shuffle",
-                                    importString = "C4PAAAAAAAAAAAAAAAAAAAAAAwCMwMGNWGAzgNAAAAAAAAwMMmxixMzMzgHY0MmZMbWmZwMPwMjtxMLDzAAAMzYmZGgZstgZAWYmlZMA",
+                                    importString = "C4PAAAAAAAAAAAAAAAAAAAAAAwCMwMGNWGAzgNAAAAAAAAwMMmxixMzMzYY0MmZmZDzgZmZmZbMzywMAAAzMmZGAzYbBzAswMLzYA",
                                     sampleSize = 50,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
@@ -28379,7 +28489,7 @@ ZoidsToolsTalentGrimoire.data = {
                                 ["2v2"] = {
                                     title = "Murlok 2v2",
                                     modeLabel = "2v2",
-                                    importString = "C4PAAAAAAAAAAAAAAAAAAAAAAwCMwMGNWGAzgNAAAAAAAAwMMmxixMzMzYY0MmHYMbMzwMzMzYbMzywMAAAzMmZmBYGbLYGgFmZZGD",
+                                    importString = "C4PAAAAAAAAAAAAAAAAAAAAAAwCMwMGNWGAzgNAAAAAAAAwMMmxixMzMzYY0MmZmZDzgZmZGbjZWGmBAAYmxMzMAzYbBzAswMLzYA",
                                     sampleSize = 50,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
@@ -28388,7 +28498,7 @@ ZoidsToolsTalentGrimoire.data = {
                                 ["3v3"] = {
                                     title = "Murlok 3v3",
                                     modeLabel = "3v3",
-                                    importString = "C4PAAAAAAAAAAAAAAAAAAAAAAwCMwMGNWGAzgNAAAAAAAAwMMmxixMzMzYY0MmZmZjZwMzMzMbjZWGmBAAYmxMDAzYbBzAswMLzYA",
+                                    importString = "C4PAAAAAAAAAAAAAAAAAAAAAAwCMwMGNWGAzgNAAAAAAAAwMMmxixMzMzYY0MmZmZz2MYmZmZmtxMLDzAAAMzYmBgZstgZAWYmFjB",
                                     sampleSize = 50,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
@@ -28397,7 +28507,7 @@ ZoidsToolsTalentGrimoire.data = {
                                 blitz = {
                                     title = "Murlok Battleground Blitz",
                                     modeLabel = "Battleground Blitz",
-                                    importString = "C4PAAAAAAAAAAAAAAAAAAAAAAwCMwMGNWGAzgNAAAAAAAAwMMmxixMzMzghmxgZbxMzMzMzMjNmZZYGAAgZGzMzAMjtFMDwCzsMjB",
+                                    importString = "C4PAAAAAAAAAAAAAAAAAAAAAAwCMwMGNWGAzgNAAAAAAAAwMMmxixMzMzgHY0MmHgZbxMzYmZmZsxMLDzAAAMzYmZGgZstgZAWYmlZMA",
                                     sampleSize = 50,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
@@ -28406,8 +28516,8 @@ ZoidsToolsTalentGrimoire.data = {
                                 rbg = {
                                     title = "Murlok Rated Battlegrounds",
                                     modeLabel = "Rated Battlegrounds",
-                                    importString = "C4PAAAAAAAAAAAAAAAAAAAAAAwCMwMGNWGAzgNAAAAAAAAwMMmxixMzMzYY0MGMbLmZmZmZmZsxMLDzAAAMzYmZGgZstwyMAYmlZMA",
-                                    sampleSize = 17,
+                                    importString = "C4PAAAAAAAAAAAAAAAAAAAAAAwCMwMGNWGAzgNAAAAAAAAwMMmxixMzMzYY0MGMbLmZmZmZmZsxMLDzAAAMzYmZGgZstgZAWYmlZMA",
+                                    sampleSize = 26,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
                                     heroTree = "Sentinel",
@@ -28838,7 +28948,7 @@ ZoidsToolsTalentGrimoire.data = {
                                     title = "Murlok 3v3",
                                     modeLabel = "3v3",
                                     importString = "C8PAAAAAAAAAAAAAAAAAAAAAAM2gBmxoxyAYGw2MmZYMbzAAAAAAYGGzYZGjZ8ADmRzAAAAMAALbzYWMzMzMzYmBgZstgZMmZWMAA",
-                                    sampleSize = 42,
+                                    sampleSize = 50,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
                                     heroTree = "Sentinel",
@@ -28846,7 +28956,7 @@ ZoidsToolsTalentGrimoire.data = {
                                 blitz = {
                                     title = "Murlok Battleground Blitz",
                                     modeLabel = "Battleground Blitz",
-                                    importString = "C8PAAAAAAAAAAAAAAAAAAAAAAM2gBmxoxyAYGw2MmZYMbzAAAAAAYGGzssMjxMMYGNDAAAwAAssNjZxMzMzMjZGAmx2CmxYmZxAA",
+                                    importString = "C8PAAAAAAAAAAAAAAAAAAAAAAM2gBmxoxyAYGw2MmZYMbzAAAAAAYGGzYZGjZ8ADmRzAAAAMAALbzYWMzMzMzYmBgZstgZMmZWMAA",
                                     sampleSize = 50,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
@@ -28855,11 +28965,11 @@ ZoidsToolsTalentGrimoire.data = {
                                 rbg = {
                                     title = "Murlok Rated Battlegrounds",
                                     modeLabel = "Rated Battlegrounds",
-                                    importString = "C8PAAAAAAAAAAAAAAAAAAAAAAMgxMG2gFYGGawiZmZmZYZAAAAAAYGzMzYZGDjZMGaGAAAgBADLLzMzCzMjZGzAMzGAzYMzwAA",
+                                    importString = "C8PAAAAAAAAAAAAAAAAAAAAAAM2gBmxoxyAYGw2MmZYmZbGAAAAAAzMGzstMjxMMYGNDAAAwAAssNjZxMzMzMMzAwM2WwMGzYxAA",
                                     sampleSize = 1,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
-                                    heroTree = "Pack Leader",
+                                    heroTree = "Sentinel",
                                 },
                             },
                             label = "Murlok.io (Reconstructed)",
@@ -28869,8 +28979,10 @@ ZoidsToolsTalentGrimoire.data = {
                 },
             },
         },
-    },
-    MAGE = {
+    }
+    end,
+    MAGE = function()
+        return {
         arcane = {
             mythicplus = {
                 ["all-dungeons"] = {
@@ -29280,7 +29392,7 @@ ZoidsToolsTalentGrimoire.data = {
                                     title = "Murlok 2v2",
                                     modeLabel = "2v2",
                                     importString = "C4DAAAAAAAAAAAAAAAAAAAAAAMstMzyMzMbYG0MjZAAAMAgZmpZZZZGAAbAAsAzMDbWmZmZZGjZMzMswMmZmBAYAAAGgZGYMAYYMD",
-                                    sampleSize = 23,
+                                    sampleSize = 36,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
                                     heroTree = "Sunfury",
@@ -29289,7 +29401,7 @@ ZoidsToolsTalentGrimoire.data = {
                                     title = "Murlok 3v3",
                                     modeLabel = "3v3",
                                     importString = "C4DAAAAAAAAAAAAAAAAAAAAAAMstMzyMzMbYG0MjZAAAMAgZmpZZZZGAAbAAsAzMDbWmZmZZGjZMzMswMmZmBAYAAAGgZGYMAYYMD",
-                                    sampleSize = 38,
+                                    sampleSize = 50,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
                                     heroTree = "Sunfury",
@@ -29297,7 +29409,7 @@ ZoidsToolsTalentGrimoire.data = {
                                 blitz = {
                                     title = "Murlok Battleground Blitz",
                                     modeLabel = "Battleground Blitz",
-                                    importString = "C4DAAAAAAAAAAAAAAAAAAAAAAMstMzyMzMbYmhmZMDAAgBAMzMNLLLzAAYDAgFYmZYzyMmZZGjZmZmhFmZmxMAADAAwAMzAjBADjZA",
+                                    importString = "C4DAAAAAAAAAAAAAAAAAAAAAAMstMzyMzMbYmhmZMDAAgBAMzMNLLLzAAYDAglBzMDbWmxMLGjZmZmhFmZmxMAADAAwAMzAjBADjZA",
                                     sampleSize = 50,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
@@ -29306,8 +29418,8 @@ ZoidsToolsTalentGrimoire.data = {
                                 rbg = {
                                     title = "Murlok Rated Battlegrounds",
                                     modeLabel = "Rated Battlegrounds",
-                                    importString = "C4DAAAAAAAAAAAAAAAAAAAAAAMstMzyMzMbYmhmZMDAAgBAAAmZmZZZmJWAAYZwMzwmlZMzixYmZmZYhZmZMDAwAAAMzsBAjBADjZA",
-                                    sampleSize = 12,
+                                    importString = "C4DAAAAAAAAAAAAAAAAAAAAAAMstMzyMzMbYmhmZMDAAgBAAAmZmZZZmJWAAYBmZG2sMjZWmxYmZmZYhZmZMDAwAAAMzsBAjBADjZA",
+                                    sampleSize = 17,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
                                     heroTree = "Spellslinger",
@@ -29733,7 +29845,7 @@ ZoidsToolsTalentGrimoire.data = {
                                 solo = {
                                     title = "Murlok Solo Shuffle",
                                     modeLabel = "Solo Shuffle",
-                                    importString = "C8DAAAAAAAAAAAAAAAAAAAAAAMmtlZWmZmZzmZGZeAmBAAwAAmZmmtllZAA2MzY2mxYmZBAAAAALmZmZAAgZMmBDzsNDgZGYMGGmhBA",
+                                    importString = "C8DAAAAAAAAAAAAAAAAAAAAAAMmtlZWmZmZDzMyMMDAAgBAMzMNbLLzAAsZmxsNjxMzCAAAAAWMzMzAAAzYMDGmZbGAzMwYMMMDDA",
                                     sampleSize = 50,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
@@ -29742,7 +29854,7 @@ ZoidsToolsTalentGrimoire.data = {
                                 ["2v2"] = {
                                     title = "Murlok 2v2",
                                     modeLabel = "2v2",
-                                    importString = "C8DAAAAAAAAAAAAAAAAAAAAAAMstMzyMzMb2MzIzDwMAAAGAwMz0stsMDAwmZGz2MGzMLAAAAAYxMzMDAAMjxMYYmtZAMzAjZGGmhBA",
+                                    importString = "C8DAAAAAAAAAAAAAAAAAAAAAAMstMzyMzMbYmRmhZAAAMAgZmpZbZZGAgNzMmtZMmZWAAAAAwiZmZGAAYGjZwwMbzAYmBGzMMMDDA",
                                     sampleSize = 50,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
@@ -29760,7 +29872,7 @@ ZoidsToolsTalentGrimoire.data = {
                                 blitz = {
                                     title = "Murlok Battleground Blitz",
                                     modeLabel = "Battleground Blitz",
-                                    importString = "C8DAAAAAAAAAAAAAAAAAAAAAAMmtlZWmZmZDzMyMMDAAgBAMzMNbLLzAAsZmxsNjxMzCAAAAAWMzMzAAAzYMDGmZbGAzMwYMMMDDA",
+                                    importString = "C8DAAAAAAAAAAAAAAAAAAAAAAMmtlZWmZmZzmZGZeAmBAAwAAmZmmtllZAA2MzY2mxYmZBAAAAALmZmZAAgZMmBDzsNDgZGYMGGmhBA",
                                     sampleSize = 50,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
@@ -29769,8 +29881,8 @@ ZoidsToolsTalentGrimoire.data = {
                                 rbg = {
                                     title = "Murlok Rated Battlegrounds",
                                     modeLabel = "Rated Battlegrounds",
-                                    importString = "C8DAAAAAAAAAAAAAAAAAAAAAAMmtlZWmZmZDzMy8AMDAAgBAMzMNbLLzAAsZmxsNjxMzCAAAAAWMzMzAAAzYMDGmZbGAzMwYmhhZYA",
-                                    sampleSize = 5,
+                                    importString = "C8DAAAAAAAAAAAAAAAAAAAAAAMmtlZWmZmZDzMyMMDAAgBAMzMNbLLzAAsZmZmtZMmZWAAAAAwiZmZGAAYGjZwwMbzAYmBGjBMDDA",
+                                    sampleSize = 10,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
                                     heroTree = "Sunfury",
@@ -30177,7 +30289,7 @@ ZoidsToolsTalentGrimoire.data = {
                                 solo = {
                                     title = "Murlok Solo Shuffle",
                                     modeLabel = "Solo Shuffle",
-                                    importString = "CAEAAAAAAAAAAAAAAAAAAAAAAMmtlZWmZmZbYmJmhZmZmZmFzMDzYGAAAYmZmllZm2AAgFAAAwGAbLjZmBsMjxMjNAAAmZBYGGDwgBA",
+                                    importString = "CAEAAAAAAAAAAAAAAAAAAAAAAMmtlZWmZmZbYmJmhZmZmZmFzMzYGzAAAAzMzssMz0GAAsAAAA2AYbZMzMgFjxMjNAAAmZBYGGDwgBA",
                                     sampleSize = 50,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
@@ -30186,8 +30298,8 @@ ZoidsToolsTalentGrimoire.data = {
                                 ["2v2"] = {
                                     title = "Murlok 2v2",
                                     modeLabel = "2v2",
-                                    importString = "CAEAAAAAAAAAAAAAAAAAAAAAAMmtlZWmZmZDzMxMMzMzMzsYmZGzYGAAAYmZmllZm2AAgFAAAwGAbLjZmZgFjxMjNAAAmZBYGGDwgBA",
-                                    sampleSize = 30,
+                                    importString = "CAEAAAAAAAAAAAAAAAAAAAAAAMmtlZWmZmZDzMxMMzMzMzsYmZGzYGAAAYmZmllZm2AAgFAAAwGAbLjZmBsYMmZsBAAwMLAzwYGwgBA",
+                                    sampleSize = 29,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
                                     heroTree = "Spellslinger",
@@ -30195,8 +30307,8 @@ ZoidsToolsTalentGrimoire.data = {
                                 ["3v3"] = {
                                     title = "Murlok 3v3",
                                     modeLabel = "3v3",
-                                    importString = "CAEAAAAAAAAAAAAAAAAAAAAAAMmtlZWmZmZbYmJmhZmZmZmFzMzYGzAAAAzMzssMz0GAAsAAAA2AYbZMzMgl5BMmZsBAAwMLAzwYAGMA",
-                                    sampleSize = 46,
+                                    importString = "CAEAAAAAAAAAAAAAAAAAAAAAAMmtlZWmZmZDzMxMMzMzMzsYmZGzYGAAAYmZmllZm2AAgFAAAwGAbLjZmBsMPgxMjNAAAmZBYGGzAGMA",
+                                    sampleSize = 50,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
                                     heroTree = "Spellslinger",
@@ -30213,7 +30325,7 @@ ZoidsToolsTalentGrimoire.data = {
                                 rbg = {
                                     title = "Murlok Rated Battlegrounds",
                                     modeLabel = "Rated Battlegrounds",
-                                    importString = "CAEAAAAAAAAAAAAAAAAAAAAAAMmtlZWmZegZb28AzEzDMmZmZmZWMzMzMjZAAAgZmZWWmZaDAAWAAAAbAstNmZmB2mxYmZbDAAgZ2AmhxAAXAA",
+                                    importString = "CAEAAAAAAAAAAAAAAAAAAAAAAMmtlZWmZegZb28AzEzDMmZmZmZWMzMzMjZAAAgZmZWWmZaDAAWAAAAbAstNmZmBWmHwYmxGAAAzsAMDjBMDuAA",
                                     sampleSize = 2,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
@@ -30227,8 +30339,10 @@ ZoidsToolsTalentGrimoire.data = {
                 },
             },
         },
-    },
-    MONK = {
+    }
+    end,
+    MONK = function()
+        return {
         brewmaster = {
             mythicplus = {
                 ["all-dungeons"] = {
@@ -31010,7 +31124,7 @@ ZoidsToolsTalentGrimoire.data = {
                                 solo = {
                                     title = "Murlok Solo Shuffle",
                                     modeLabel = "Solo Shuffle",
-                                    importString = "C4QAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgxMzyMLjZzixMDGLbLzgNzsZbmxGGNjZADmFY2mZmZY2mFwsNTAAAAgZZab2mZZ2AAAAYwYmZAgBYBDA",
+                                    importString = "C4QAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgxMzyMLjZzixMDGLbLzgNzsZbmxGzoZMDYwsYY2mZmZY2mFwsNTAAAAgZZab2mZZ2AAAAYwYmZAAAwAA",
                                     sampleSize = 50,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
@@ -31019,7 +31133,7 @@ ZoidsToolsTalentGrimoire.data = {
                                 ["2v2"] = {
                                     title = "Murlok 2v2",
                                     modeLabel = "2v2",
-                                    importString = "C4QAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgxMzyMLjZzixMDGLbLzgNzsZbmxGzoZMDYwsYY2mZmZY2mFwsNTAAAAgZZab2mZZ2AAAAYwYmZAAAwAA",
+                                    importString = "C4QAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgxMzyMLjZzixMDGLbLzgNzsZbmxGzoZMDYwwwsNzMzwsNLgZbmAAAAAzy02sNzysBAAAwgxMzAADAMAA",
                                     sampleSize = 50,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
@@ -31037,7 +31151,7 @@ ZoidsToolsTalentGrimoire.data = {
                                 blitz = {
                                     title = "Murlok Battleground Blitz",
                                     modeLabel = "Battleground Blitz",
-                                    importString = "C4QAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgxMzyMLjZzixMDGLbLzgNzsZbmxCzoZMDYwwwsNzMzwsNLgZbmAAAAAzy0ysNzysBAAAwgxMzAADAMAA",
+                                    importString = "C4QAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgxMzyMLjZzixMDGLbLzgNzsZbmxCzoZMDYwwwsNzMzwsNLgZbmAAAAAzy02sNzysBAAAwgxMzAADAMAA",
                                     sampleSize = 50,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
@@ -31046,8 +31160,8 @@ ZoidsToolsTalentGrimoire.data = {
                                 rbg = {
                                     title = "Murlok Rated Battlegrounds",
                                     modeLabel = "Rated Battlegrounds",
-                                    importString = "C4QAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgxMzyMLjZzixMDGLbLzgNzsZbmxCGNjZADGmxsNzMzwsNLgZbmAAAAAzy02sNzysBAAAwgxMzAADAMAA",
-                                    sampleSize = 9,
+                                    importString = "C4QAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgxMzyMLjZzixMDGLbLzgNzsZbmxCzoZMDYwwMmtZmZGmtZBMbzEAAAAYWm2mtZWmNAAAAgxMzAADAMAA",
+                                    sampleSize = 15,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
                                     heroTree = "Master of Harmony",
@@ -31459,7 +31573,7 @@ ZoidsToolsTalentGrimoire.data = {
                                 solo = {
                                     title = "Murlok Solo Shuffle",
                                     modeLabel = "Solo Shuffle",
-                                    importString = "C0QAAAAAAAAAAAAAAAAAAAAAAYmZMgZYbmZ2mBAAAAAAAAAAAYZYEmZ2GGwwMmZmZYWmFGmlZCAYzMLzMMzMzAAYDAmtZpZmZWAGGYmBAWGADYA",
+                                    importString = "C0QAAAAAAAAAAAAAAAAAAAAAAYmZMgZYbmZ2mBAAAAAAAAAAAYZYEmZ2GGAmxMjZGzyswwsMTAAbmZZmhZmZGAAbAwsNLNzMzCwwAzMAwyYADYA",
                                     sampleSize = 50,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
@@ -31468,7 +31582,7 @@ ZoidsToolsTalentGrimoire.data = {
                                 ["2v2"] = {
                                     title = "Murlok 2v2",
                                     modeLabel = "2v2",
-                                    importString = "C0QAAAAAAAAAAAAAAAAAAAAAAYmZMYMDbzMz2MAAAAAAAAAAAALDjwMzGGwwMmZmZYWmFGmlZCAYzMLzMMzMzAAYDAmtZpZmZWAGGYmBAWGDYAfA",
+                                    importString = "C0QAAAAAAAAAAAAAAAAAAAAAAYmZMYMDbzMz2MAAAAAAAAAAAALDjwMz2wAGmxMzMDzyswwsMTAAbmZZmhZmZGAAbAwsNLNzMzCwwAzMAwyAYAfA",
                                     sampleSize = 50,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
@@ -31477,7 +31591,7 @@ ZoidsToolsTalentGrimoire.data = {
                                 ["3v3"] = {
                                     title = "Murlok 3v3",
                                     modeLabel = "3v3",
-                                    importString = "C0QAAAAAAAAAAAAAAAAAAAAAAYmZMgZYbmZ2mBAAAAAAAAAAAYZYEmZ2GGwwMmZMDzyswwsMTAAbmZZmhZmZGAAbAwsNLNzMzCwwAzMAwyYADYA",
+                                    importString = "C0QAAAAAAAAAAAAAAAAAAAAAAYmZMYMDbzMz2MAAAAAAAAAAAALDjwMz2wAwMmZMzYWmFGmlZCAYzMLzMMzMzAAYDAmtZpZmZWAGGYmBAWGDYAfA",
                                     sampleSize = 50,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
@@ -31486,7 +31600,7 @@ ZoidsToolsTalentGrimoire.data = {
                                 blitz = {
                                     title = "Murlok Battleground Blitz",
                                     modeLabel = "Battleground Blitz",
-                                    importString = "C0QAAAAAAAAAAAAAAAAAAAAAAYmZMgZYbmZ2mBAAAAAAAAAAAYZYEmZ2wAGmxMzMDzyswwsMTAAbmZZmhZmZGAAbAwsNLNzMzCwwAzMAwyYADYA",
+                                    importString = "C0QAAAAAAAAAAAAAAAAAAAAAA8AzMjBMDbzMz2MAAAAAAAAAAAALDjwMz2wAGmxMzMDzyswwsMTAAbmZZmhxMzAAYDAmtZpZmZWAGGYmBAWGADYA",
                                     sampleSize = 50,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
@@ -31495,8 +31609,8 @@ ZoidsToolsTalentGrimoire.data = {
                                 rbg = {
                                     title = "Murlok Rated Battlegrounds",
                                     modeLabel = "Rated Battlegrounds",
-                                    importString = "C0QAAAAAAAAAAAAAAAAAAAAAAMzMjBjBbzMz2MAAAAAAAAAAAALDjGmZ2wAGGmZmZYWmFGmlZCAYzMLzMmZmZGAAbAwsNLNzMzCwwAzMAMWGAD4BA",
-                                    sampleSize = 3,
+                                    importString = "C0QAAAAAAAAAAAAAAAAAAAAAAMzYMgBbzMz2MAAAAAAAAAAAALDjwMzGGwwMmZmZYWmFGmlZCAYzMLzMMzMzAAYDAmtZpZmZWAGGYmBAWGDYAD",
+                                    sampleSize = 4,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
                                     heroTree = "Shado-Pan",
@@ -31509,8 +31623,10 @@ ZoidsToolsTalentGrimoire.data = {
                 },
             },
         },
-    },
-    PALADIN = {
+    }
+    end,
+    PALADIN = function()
+        return {
         holy = {
             mythicplus = {
                 ["all-dungeons"] = {
@@ -31877,7 +31993,7 @@ ZoidsToolsTalentGrimoire.data = {
                                 solo = {
                                     title = "Murlok Solo Shuffle",
                                     modeLabel = "Solo Shuffle",
-                                    importString = "CEEAAAAAAAAAAAAAAAAAAAAAAAAAALAwMAADWGGMzyMzsMjZMsN2mZWMTTMLzwMDDbZAYAYDsZ2MzAAAAzMLbL2mZYjNwYzMMzYGMAmZAwgRDA",
+                                    importString = "CEEAAAAAAAAAAAAAAAAAAAAAAAAAALAwMAADWGGjZWmZmFjZMsN2mZWMTTMLzwMDDbZAYAYDsZ2MzAAAAzMLbL2mZYjNeAGbmhZGzgBwMDAGQDA",
                                     sampleSize = 50,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
@@ -31886,7 +32002,7 @@ ZoidsToolsTalentGrimoire.data = {
                                 ["2v2"] = {
                                     title = "Murlok 2v2",
                                     modeLabel = "2v2",
-                                    importString = "CEEAAAAAAAAAAAAAAAAAAAAAAAAAALAwMAADWGGMzyMzsMDjhtx2MziZaiZZGmZYYLDADAbgNzmZGAAAYmZZbx2MDbsxDwYzMMzYGmBwMDAGQDA",
+                                    importString = "CEEAAAAAAAAAAAAAAAAAAAAAAAAAALAwMAADWGGMzyMzsMDjhtx2MziZaiZZGmZYYLDADAbgNzmZGAAAYmZZbx2MDbsxwYzMMzwwMAmZAwAaA",
                                     sampleSize = 50,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
@@ -31895,7 +32011,7 @@ ZoidsToolsTalentGrimoire.data = {
                                 ["3v3"] = {
                                     title = "Murlok 3v3",
                                     modeLabel = "3v3",
-                                    importString = "CEEAAAAAAAAAAAAAAAAAAAAAAAAAALAwMAADWGGMzyMzsMDjhtx2MziZaiZZGmZYYLDADAbgNzmZGAAAYmZZbx2MDbsBGbmhZGzwMAmZAwgRDA",
+                                    importString = "CEEAAAAAAAAAAAAAAAAAAAAAAAAAALAwMAADWGGjZWmZsMDjhtx2MziZaiZZGmZYYLDADAbgNzmZGAAAYmZZbx2MDbsxDwYzMMzYGmBwMDAGQDA",
                                     sampleSize = 50,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
@@ -31904,17 +32020,17 @@ ZoidsToolsTalentGrimoire.data = {
                                 blitz = {
                                     title = "Murlok Battleground Blitz",
                                     modeLabel = "Battleground Blitz",
-                                    importString = "CEEAAAAAAAAAAAAAAAAAAAAAAAAAALAwMAADWGGjZWmZsMDjhlx2MziZaiZZGmZYYLDADAbgNzmZGAAAYmZZbx2MDbsBGbmhZGzwMAmZAwgRDA",
+                                    importString = "CEEAAAAAAAAAAAAAAAAAAAAAAAAAALAwMAADWGGjZWmZsMDjhlxmZWMTTMLzwMDDbZAYAYDsZ2mZmZZ2mZmtGAAAgF2AjNzwMjZYGAAzMYwwA",
                                     sampleSize = 50,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
-                                    heroTree = "Lightsmith",
+                                    heroTree = "Herald of the Sun",
                                 },
                                 rbg = {
                                     title = "Murlok Rated Battlegrounds",
                                     modeLabel = "Rated Battlegrounds",
-                                    importString = "CEEAAAAAAAAAAAAAAAAAAAAAAAAAALAwMAADWGmZMzyMjlZYMsM2mZWMTTMLzwMDDbZAYAYDsZ2mZmZZWmZmlGAAAgF2AjNzwMjZwAAYmBDG+AA",
-                                    sampleSize = 3,
+                                    importString = "CEEAAAAAAAAAAAAAAAAAAAAAAAAAALAwAAYwywMjZWmZmFDjhlx2MziZaiZZGmZGDbZAYAYDsZ2mZmZZWmZmlGAAAgFAGbeghZGzgBAwMDGjhB",
+                                    sampleSize = 6,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
                                     heroTree = "Herald of the Sun",
@@ -32702,7 +32818,7 @@ ZoidsToolsTalentGrimoire.data = {
                                 blitz = {
                                     title = "Murlok Battleground Blitz",
                                     modeLabel = "Battleground Blitz",
-                                    importString = "CYEAAAAAAAAAAAAAAAAAAAAAAAAAAAANLbzMzywMjBAAAAAYmysMDzM2G2GmZbGjxMDzYhtBgZZWmZmlGAAAYBwAYmxMmBmxwGwMzwYYwA",
+                                    importString = "CYEAAAAAAAAAAAAAAAAAAAAAAAAAAAANLbzMzywMjBAAAAAYmysMDzM2G2GmZbGjxMDzYhtBgZZWmZmtGAAAYBwAYMmxMDmxwGwMzwYYwA",
                                     sampleSize = 50,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
@@ -32711,8 +32827,8 @@ ZoidsToolsTalentGrimoire.data = {
                                 rbg = {
                                     title = "Murlok Rated Battlegrounds",
                                     modeLabel = "Rated Battlegrounds",
-                                    importString = "CYEAAAAAAAAAAAAAAAAAAAAAAAAAAAANLbzMzyYmZAAAAAAYmysMDzM2G2GMbzYMmZYGLsNAMLz2Mzs1AAAALAGAjxMmZwMGzGwMzwYYwA",
-                                    sampleSize = 11,
+                                    importString = "CYEAAAAAAAAAAAAAAAAAAAAAAAAAAAANLbzMzyYmZMAAAAAAzUmlZYmx2w2wMbzYMmZYGLsNAMLz2Mzs0AAAALAGAjxMmZwMGAMzMMGGMA",
+                                    sampleSize = 24,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
                                     heroTree = "Herald of the Sun",
@@ -32725,8 +32841,10 @@ ZoidsToolsTalentGrimoire.data = {
                 },
             },
         },
-    },
-    PRIEST = {
+    }
+    end,
+    PRIEST = function()
+        return {
         discipline = {
             mythicplus = {
                 ["all-dungeons"] = {
@@ -33128,7 +33246,7 @@ ZoidsToolsTalentGrimoire.data = {
                                 ["2v2"] = {
                                     title = "Murlok 2v2",
                                     modeLabel = "2v2",
-                                    importString = "CAQAAAAAAAAAAAAAAAAAAAAAAADsMGWmZMPwMDmZbGzMzYMzAAAAAAAAAAYmZWmBzMGLzYmhlFTzEDwMbYIMmlBYMYBAAGzwYwAYmZGwA",
+                                    importString = "CAQAAAAAAAAAAAAAAAAAAAAAAADsMGWmZMzMwMbzYmZGjZGAAAAAAAAAAzMzyMYmxYZGzMssYamYAmZDDhxsMAjBLAAwYGGDGAzMzAG",
                                     sampleSize = 50,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
@@ -33146,7 +33264,7 @@ ZoidsToolsTalentGrimoire.data = {
                                 blitz = {
                                     title = "Murlok Battleground Blitz",
                                     modeLabel = "Battleground Blitz",
-                                    importString = "CAQAAAAAAAAAAAAAAAAAAAAAAADsMzwyMjZmBMbzYmZGjZGAAAAAAAAAAzMzyMYMzYZGzMssYamYAmZDDhxsMAjBLAAwYGGDGAzMzAG",
+                                    importString = "CAQAAAAAAAAAAAAAAAAAAAAAAADsMGWmZMzMDMbzYmZGjZGAAAAAAAAAAzMzyMYMzYZGzMssYamYAmZDDhxsMAjBLAAwYGGDGAzMzAG",
                                     sampleSize = 50,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
@@ -33155,8 +33273,8 @@ ZoidsToolsTalentGrimoire.data = {
                                 rbg = {
                                     title = "Murlok Rated Battlegrounds",
                                     modeLabel = "Rated Battlegrounds",
-                                    importString = "CAQAAAAAAAAAAAAAAAAAAAAAAADsMzwyMjZmBMbzYmZGjZGAAAAAAAAAAzMzyMYMzYZGzMssYamYAmZDDhxsMAjBLAAwYGGDGAzMzAG",
-                                    sampleSize = 23,
+                                    importString = "CAQAAAAAAAAAAAAAAAAAAAAAAADsMzDwyMjZmZgZbGzMzYMzAAAAAAAAAAYmZWmBjZGLzYmhlFTzEDwMbYIMmlBYMYBAAGzwYwAYmZGwA",
+                                    sampleSize = 50,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
                                     heroTree = "Oracle",
@@ -33554,7 +33672,7 @@ ZoidsToolsTalentGrimoire.data = {
                                 solo = {
                                     title = "Murlok Solo Shuffle",
                                     modeLabel = "Solo Shuffle",
-                                    importString = "CEQAAAAAAAAAAAAAAAAAAAAAAADAAAAAAwMzMmlZmxMzYYGMbzMzMAAAAmZmlBGjxyMzMDLLGzUAMzGGCjZbAGDsYMAwMmhxgBwMzMwA",
+                                    importString = "CEQAAAAAAAAAAAAAAAAAAAAAAADAAAAAAwMzMmlZmxMzYYGMbzMzMAAAAmZmlZwYMWmxMDLLGzUAMzGGCjZZAGDsYMAwMmhxgBwMzMwA",
                                     sampleSize = 50,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
@@ -33572,7 +33690,7 @@ ZoidsToolsTalentGrimoire.data = {
                                 ["3v3"] = {
                                     title = "Murlok 3v3",
                                     modeLabel = "3v3",
-                                    importString = "CEQAAAAAAAAAAAAAAAAAAAAAAADAAAAAAwYmxsMzMzMzYYGMbzMzMAAAAmZmlBGjxyMzMDLLGzUAMzGGCjZbAGDswMAwMmhxgBwMzMwA",
+                                    importString = "CEQAAAAAAAAAAAAAAAAAAAAAAADAAAAAAwYmxsMzMzMzYYGMbzMzMAAAAmZmFYGjxyMzMDLLGzUAMzGGCjZbAGDsYmBAmxMMGMAmZmB+AA",
                                     sampleSize = 50,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
@@ -33581,7 +33699,7 @@ ZoidsToolsTalentGrimoire.data = {
                                 blitz = {
                                     title = "Murlok Battleground Blitz",
                                     modeLabel = "Battleground Blitz",
-                                    importString = "CEQAAAAAAAAAAAAAAAAAAAAAAADAAAAAAwYmxsMzMzMzYYGMbzMzMAAAAmZmlZwMjxyMmZYZxYmCgZ2wQYMbDwYgFmBAmhhxgBwMzMwA",
+                                    importString = "CEQAAAAAAAAAAAAAAAAAAAAAAADAAAAAAwYmxsMzMzMzYYGmZbmxMAAAAmZmlZwMjxyMmZYZxYmCgZ2wQYMbDwYgFzMAwMMMGMAmZmB+AA",
                                     sampleSize = 50,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
@@ -33590,8 +33708,8 @@ ZoidsToolsTalentGrimoire.data = {
                                 rbg = {
                                     title = "Murlok Rated Battlegrounds",
                                     modeLabel = "Rated Battlegrounds",
-                                    importString = "CEQAAAAAAAAAAAAAAAAAAAAAAADAAAAAAwYmxsMzMzMzYYGmZbmxMAAAAmZmlZwYmxyMmZYZxYmCgZ2wQYMbDwYgFmBAmhhxgBwMzMwA",
-                                    sampleSize = 48,
+                                    importString = "CEQAAAAAAAAAAAAAAAAAAAAAAADAAAAAAwYmxsMzMzMzYYGmZbmxMAAAAmZmlZwYmxyMmZYZxYmCgZ2wQYMbDwYgFzMAwMMMGMAmZmB+AA",
+                                    sampleSize = 50,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
                                     heroTree = "Oracle",
@@ -34003,7 +34121,7 @@ ZoidsToolsTalentGrimoire.data = {
                                 solo = {
                                     title = "Murlok Solo Shuffle",
                                     modeLabel = "Solo Shuffle",
-                                    importString = "CIQAAAAAAAAAAAAAAAAAAAAAAAjBAAAAAAAAAAAAMLzMmZZmxMz2MzYMz2MzYmZGLMZYZx0AMzMDAEgZb2WAzGDwYmBjZGjZZMDmZwMYA",
+                                    importString = "CIQAAAAAAAAAAAAAAAAAAAAAAAjBAAAAAAAAAAAAMLzMmZZmxMz2MzYMz2MzYmZGLMZYZx0AMzMDAEgZb2WAzGDwYmBjZGjZZmBmZwMYA",
                                     sampleSize = 50,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
@@ -34039,8 +34157,8 @@ ZoidsToolsTalentGrimoire.data = {
                                 rbg = {
                                     title = "Murlok Rated Battlegrounds",
                                     modeLabel = "Rated Battlegrounds",
-                                    importString = "CIQAAAAAAAAAAAAAAAAAAAAAAMMDPAAAAAAAAAAAAAMLmxMLzMmZ2mZGjZ2MzYmZGLIDLLmGDMDwMLmhZzAQGjFAMmZwYmZGzCzstNAzgB",
-                                    sampleSize = 6,
+                                    importString = "CIQAAAAAAAAAAAAAAAAAAAAAAADzAAAAAAAAAAAAgZxMmZZmxMz2MzYMz2MzYmZGLMZYZx0AMDwMLmhZzAQGjFAMmZwYmxYWYmtlBYGMA",
+                                    sampleSize = 11,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
                                     heroTree = "Archon",
@@ -34053,8 +34171,10 @@ ZoidsToolsTalentGrimoire.data = {
                 },
             },
         },
-    },
-    ROGUE = {
+    }
+    end,
+    ROGUE = function()
+        return {
         assassination = {
             mythicplus = {
                 ["all-dungeons"] = {
@@ -34087,14 +34207,14 @@ ZoidsToolsTalentGrimoire.data = {
                                 ["mythic-talents-fatebound"] = {
                                     title = "Mythic+ Talents - Fatebound",
                                     modeLabel = "Mythic+ Talents - Fatebound",
-                                    importString = "CMQAAAAAAAAAAAAAAAAAAAAAAYmlZmFDAAAAAAzygtZAAAAAAttNzMzMzMGLzMzsNzyMzwMmZMmxMjxAYgFYGjGzCIbDYDLAmZmZ8BA",
+                                    importString = "CMQAAAAAAAAAAAAAAAAAAAAAAYmlZmFDAAAAAAzygtZAAAAAAttNzMzMzMGLzMzsNzyMz8AmxMjxMmZMGADsAzY0YWAZbAbGAMzMDfA",
                                     difficulty = "Mythic+",
                                     source = "Wowhead",
                                 },
                                 ["mythic-talents-deathstalker"] = {
                                     title = "Mythic+ Talents - Deathstalker",
                                     modeLabel = "Mythic+ Talents - Deathstalker",
-                                    importString = "CMQAAAAAAAAAAAAAAAAAAAAAAYmlZmFDAAAAAAzygtZAAAAAAttNzMzMzMGLzMzsNzyMzwMmZMmxMjxAsZWGYALBLDTghFsYmBYmxHA",
+                                    importString = "CMQAAAAAAAAAAAAAAAAAAAAAAYmlZmFDAAAAAAzygtZAAAAAAttNzMzMzMGLzMzsNzyMz8AmxMjxMmZMGgNzyADYJYZYCMsYwMDgZ8BA",
                                     difficulty = "Mythic+",
                                     source = "Wowhead",
                                 },
@@ -34392,14 +34512,14 @@ ZoidsToolsTalentGrimoire.data = {
                                 ["raid-talents-fatebound"] = {
                                     title = "Raid Talents - Fatebound",
                                     modeLabel = "Raid Talents - Fatebound",
-                                    importString = "CMQAAAAAAAAAAAAAAAAAAAAAAYmlxsNDAAAAAAzygtZAAAAAAttNzMzMzMGLzMzsNzyMzMjZMjxYmxwAYgFYGjGzGIbDYDAMzMzYA",
+                                    importString = "CMQAAAAAAAAAAAAAAAAAAAAAAYmlxsNDGAAAAAYWGsNDAAAAAottZmZmZmxYZmZmtZWmZmZMjZMGzMGGADsAzY0Y2AZbAbGAMzMYA",
                                     difficulty = "Raid",
                                     source = "Wowhead",
                                 },
                                 ["raid-talents-deathstalker"] = {
                                     title = "Raid Talents - Deathstalker",
                                     modeLabel = "Raid Talents - Deathstalker",
-                                    importString = "CMQAAAAAAAAAAAAAAAAAAAAAAYmlxsNDAAAAAAzygtZAAAAAAttNzMzMzMGLzMzsNzyMzMjZMjxYmxwAsZWGYALBLDTghFwMDwMjB",
+                                    importString = "CMQAAAAAAAAAAAAAAAAAAAAAAYmlxsNDGAAAAAYWGsNDAAAAAottZmZmZmxYZmZmtZWmZmZMjZMGzMGGgNzyADYJYZYCMsYwMDwgB",
                                     difficulty = "Raid",
                                     source = "Wowhead",
                                 },
@@ -34451,7 +34571,7 @@ ZoidsToolsTalentGrimoire.data = {
                                 ["2v2"] = {
                                     title = "Murlok 2v2",
                                     modeLabel = "2v2",
-                                    importString = "CMQAAAAAAAAAAAAAAAAAAAAAAYmlxsZGAAAAAAz2MmtZAAAAAAtsMmBzMGbzMzsNzyMzYmZmZwMmxMGGYgFYGjGzCgtBsNDbAzMDGA",
+                                    importString = "CMQAAAAAAAAAAAAAAAAAAAAAAYmlxsZGAAAAAAz2MmtZAAAAAAtsMMDzMGbzMzsNzyMzYmZmZwMmxMGGYgFYGjGzCgtBsNDbAzMDGA",
                                     sampleSize = 50,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
@@ -34460,7 +34580,7 @@ ZoidsToolsTalentGrimoire.data = {
                                 ["3v3"] = {
                                     title = "Murlok 3v3",
                                     modeLabel = "3v3",
-                                    importString = "CMQAAAAAAAAAAAAAAAAAAAAAAYmlxsZGAAAAAAz2MmtZAAAAAAtsMmBzMGbzMzsNzyMzYmZmZwMmxMGGYgFYGjGzCgtBsNDbAzMDGA",
+                                    importString = "CMQAAAAAAAAAAAAAAAAAAAAAAYmlxsZGAAAAAAz2MmtZAAAAAAtsMMDzMGbzMzsNzyMzYmZmZwMmxMGGYgFYGjGzCgtBsNDbAzMDGA",
                                     sampleSize = 50,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
@@ -34469,7 +34589,7 @@ ZoidsToolsTalentGrimoire.data = {
                                 blitz = {
                                     title = "Murlok Battleground Blitz",
                                     modeLabel = "Battleground Blitz",
-                                    importString = "CMQAAAAAAAAAAAAAAAAAAAAAAYmlxsZGAAAAAAz2MmtZAAAAAAtsMMYmxYbmZmtZWmZYmZmZwMmZmxwADsAzY0YWAsNgtZYDYmZGGA",
+                                    importString = "CMQAAAAAAAAAAAAAAAAAAAAAAYmlxsZGAAAAAAz2MmtZAAAAAAtsMMDzMGbzMzsNzyMjHYmZmZwMmxMGGYgFYGjGzCgtBsNDbAzMDGA",
                                     sampleSize = 50,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
@@ -34478,8 +34598,8 @@ ZoidsToolsTalentGrimoire.data = {
                                 rbg = {
                                     title = "Murlok Rated Battlegrounds",
                                     modeLabel = "Rated Battlegrounds",
-                                    importString = "CMQAAAAAAAAAAAAAAAAAAAAAAYmlxsZGAAAAAAz2MmtZAAAAAAtsMMDzMGbzMzsNzyMDzMzMDmxMzMGGYgFYGjGzCgtBsNDbAzMDGA",
-                                    sampleSize = 25,
+                                    importString = "CMQAAAAAAAAAAAAAAAAAAAAAAYmlxsZGAAAAAAz2MmtZAAAAAAtsMMDzMGbzMzsNzyMzYmZmZwMmxMGGYgFYGjGzCgtBsNDbAzMDGA",
+                                    sampleSize = 37,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
                                     heroTree = "Fatebound",
@@ -34886,8 +35006,8 @@ ZoidsToolsTalentGrimoire.data = {
                                 ["2v2"] = {
                                     title = "Murlok 2v2",
                                     modeLabel = "2v2",
-                                    importString = "CQQAAAAAAAAAAAAAAAAAAAAAAAgZAzYGmZbmZmZGjZZzYmZbabGz2MAAAAAALLjZwMjZ2MzMGAAAAzwAwYWMMwAzGL0CbmBYmBzgB",
-                                    sampleSize = 17,
+                                    importString = "CQQAAAAAAAAAAAAAAAAAAAAAAAgZAGzwMbzMzMzYMLbmZmZbabGz2MAAAAAALLjZwMjZ2MzMGAAAAzwAwYWMMwAzGL0CbmBYmBzgB",
+                                    sampleSize = 19,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
                                     heroTree = "Trickster",
@@ -34895,8 +35015,8 @@ ZoidsToolsTalentGrimoire.data = {
                                 ["3v3"] = {
                                     title = "Murlok 3v3",
                                     modeLabel = "3v3",
-                                    importString = "CQQAAAAAAAAAAAAAAAAAAAAAAAgZAGzwMbzMzMzYMLbmZmZbabGz2MAAAAAALLjZwMjZ2MzMGAAAAzwAwYWMMwAzGL0CbmBYmBzgB",
-                                    sampleSize = 13,
+                                    importString = "CQQAAAAAAAAAAAAAAAAAAAAAAAgZAGzwMbzMzMzYMLbmZmZbabGz2MAAAAAALLzMDmZMzmZmxAAAAYGGAGzihBGY2YhWYzMAzMYgB",
+                                    sampleSize = 14,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
                                     heroTree = "Trickster",
@@ -34904,7 +35024,7 @@ ZoidsToolsTalentGrimoire.data = {
                                 blitz = {
                                     title = "Murlok Battleground Blitz",
                                     modeLabel = "Battleground Blitz",
-                                    importString = "CQQAAAAAAAAAAAAAAAAAAAAAAAgZAGzwMbzMzMzYMLbmZmZbabGz2MAAAAAALLzMDmZMzmZmxAAAAYGGYgNYGjGzGgtBWMDAmZGYA",
+                                    importString = "CQQAAAAAAAAAAAAAAAAAAAAAAAgZAGzwMbzMzMzYMLLmZmZbabGz2MAAAAAALLzMDmZMzmZmxAAAAYGADsBzY0Y2AsNwiZAwMzMYA",
                                     sampleSize = 50,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
@@ -34913,8 +35033,8 @@ ZoidsToolsTalentGrimoire.data = {
                                 rbg = {
                                     title = "Murlok Rated Battlegrounds",
                                     modeLabel = "Rated Battlegrounds",
-                                    importString = "CQQAAAAAAAAAAAAAAAAAAAAAAAgZMjxYGmZbmZmZGPgZZxDMzMbTbzYWmBAAAAAYZZmZAjZ2MzMGAAAAzYADsBzY0Y2AsNwiZAwMzMYA",
-                                    sampleSize = 1,
+                                    importString = "CQQAAAAAAAAAAAAAAAAAAAAAAAgZ8AjZmZGmZbmZmZeg5BmZZxDMPwMbTLzDYWmBAAAAAMLLzMDmHYmZ2MPwMbDAAAgZMgB2gZMaMbA2GYhBAzMzgHA",
+                                    sampleSize = 2,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
                                     heroTree = "Fatebound",
@@ -35335,7 +35455,7 @@ ZoidsToolsTalentGrimoire.data = {
                                 ["2v2"] = {
                                     title = "Murlok 2v2",
                                     modeLabel = "2v2",
-                                    importString = "CUQAAAAAAAAAAAAAAAAAAAAAAAgZ2mBAAAAAmlZmZZiZZbmxMjZgZmZmlxsNjZmllhBzMGwMGAAAAGmhNzyADYBsNMBmFmZYmBYmZA",
+                                    importString = "CUQAAAAAAAAAAAAAAAAAAAAAAAgZ2mBAAAAAmtZmZZiZZbmxMjZgZmZmlxsNjZmllhBzMGwMGAAAAGmhNzyADYBsNMBmFmZYmBYmZA",
                                     sampleSize = 50,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
@@ -35353,7 +35473,7 @@ ZoidsToolsTalentGrimoire.data = {
                                 blitz = {
                                     title = "Murlok Battleground Blitz",
                                     modeLabel = "Battleground Blitz",
-                                    importString = "CUQAAAAAAAAAAAAAAAAAAAAAAAgZ2mBAAAAAmtZmZZiZZbmxMjZgZmZmlxsNjZmllhBzMGwMGAAAAzgBwYWMMwAzGL0iNmZAzMYmZA",
+                                    importString = "CUQAAAAAAAAAAAAAAAAAAAAAAAgZ2mBAAAAAmtZmZZiZZbmxMjZgZmZmlxsNmZmllhBzMGwMGAAAAzgBwYWMMwAzGL0iNmZAzMYmZA",
                                     sampleSize = 50,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
@@ -35362,11 +35482,11 @@ ZoidsToolsTalentGrimoire.data = {
                                 rbg = {
                                     title = "Murlok Rated Battlegrounds",
                                     modeLabel = "Rated Battlegrounds",
-                                    importString = "CUQAAAAAAAAAAAAAAAAAAAAAAAgZ2mBAAAAAmtZmZZiZZbmxMjZgZmZmlxsNjZmllhBzMGwMGAAAAzgBwYWMMwAzGL0iNmZAzMYmZA",
-                                    sampleSize = 16,
+                                    importString = "CUQAAAAAAAAAAAAAAAAAAAAAAAgZ2mBAAAAAmtZmZZiZZbmxMjZgZmZmlxsNjZmllhBzMGwMGAAAAzghNzyADYBsNMBmFmZYmBYmZA",
+                                    sampleSize = 26,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
-                                    heroTree = "Trickster",
+                                    heroTree = "Deathstalker",
                                 },
                             },
                             label = "Murlok.io (Reconstructed)",
@@ -35376,8 +35496,10 @@ ZoidsToolsTalentGrimoire.data = {
                 },
             },
         },
-    },
-    SHAMAN = {
+    }
+    end,
+    SHAMAN = function()
+        return {
         elemental = {
             mythicplus = {
                 ["all-dungeons"] = {
@@ -35766,7 +35888,7 @@ ZoidsToolsTalentGrimoire.data = {
                                     title = "Murlok 2v2",
                                     modeLabel = "2v2",
                                     importString = "CYQAAAAAAAAAAAAAAAAAAAAAAAAAAAzMLbzMGjZZZhxMMDAAAAsYmNYADY2YCMLAwsNmZMz2ipFmZMWMmZMzsNbmZ5BGMzsMAwMDAmZMMjB",
-                                    sampleSize = 23,
+                                    sampleSize = 31,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
                                     heroTree = "Farseer",
@@ -35774,7 +35896,7 @@ ZoidsToolsTalentGrimoire.data = {
                                 ["3v3"] = {
                                     title = "Murlok 3v3",
                                     modeLabel = "3v3",
-                                    importString = "CYQAAAAAAAAAAAAAAAAAAAAAAAAAAAzMLbzMGjZZZhxMMDAAAAsYmNYADY2YCMLAwsNmZMz2iplxMjxixMjZmtZjZ5BGMzsMAwMDAmZMMjB",
+                                    importString = "CYQAAAAAAAAAAAAAAAAAAAAAAAAAAAzMLbzMGjZZZhxMMDAAAAsYmNYADY2YCMLAwsNmZMz2ipFmZMWMmZMzsNbmZ5BGMzsMAwMDAmZMMjB",
                                     sampleSize = 50,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
@@ -35792,8 +35914,8 @@ ZoidsToolsTalentGrimoire.data = {
                                 rbg = {
                                     title = "Murlok Rated Battlegrounds",
                                     modeLabel = "Rated Battlegrounds",
-                                    importString = "CYQAAAAAAAAAAAAAAAAAAAAAAAAAAAzMLbzMGjZZZhxMMDAAAAsYmNYADY2YCMLAwsNzMjZ2WMtwMjxixMjZmNbMLPwgZmlBAmZMAmZMMjB",
-                                    sampleSize = 6,
+                                    importString = "CYQAAAAAAAAAAAAAAAAAAAAAAAAAAAzMLbzMGjZZZhxMMDAAAAsYmNYADY2YCMLAwsNzMjZ2WMtwMjxixMjZmNbjZ5BGMzsMAwMDAmZMMjB",
+                                    sampleSize = 9,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
                                     heroTree = "Farseer",
@@ -36209,8 +36331,8 @@ ZoidsToolsTalentGrimoire.data = {
                                 ["2v2"] = {
                                     title = "Murlok 2v2",
                                     modeLabel = "2v2",
-                                    importString = "CcQAAAAAAAAAAAAAAAAAAAAAAMzMDMzMzMzMMzMDAAAAAAAAwGgNzYYDWgZYoBLAMbDGjllZsMmZ2YxMzMMz2YGAgZYmZGzMBmZwgxA",
-                                    sampleSize = 24,
+                                    importString = "CcQAAAAAAAAAAAAAAAAAAAAAAMzMDMzMzMzMMzMDAAAAAAAAwGgNzYYDWgZYoBLAMbDGjtlZswMz2YxMzMMz2YGAgZYmZGzMBmZwgxA",
+                                    sampleSize = 23,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
                                     heroTree = "Stormbringer",
@@ -36218,7 +36340,7 @@ ZoidsToolsTalentGrimoire.data = {
                                 ["3v3"] = {
                                     title = "Murlok 3v3",
                                     modeLabel = "3v3",
-                                    importString = "CcQAAAAAAAAAAAAAAAAAAAAAAMzMDMzMzMzMMzMDAAAAAAAAwGgNzYYDWgZYoBLAMbDGzstMjFGz2YxMzMMz2YGAgZYmZGzMBmZwgxA",
+                                    importString = "CcQAAAAAAAAAAAAAAAAAAAAAAMzMDMzMzMzMMzMDAAAAAAAAwGgNzYYDWgZYoBLAMbDGzstMjFmZ2YxMzMMz2YGAgZYmZGzMBmZwgxA",
                                     sampleSize = 50,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
@@ -36236,8 +36358,8 @@ ZoidsToolsTalentGrimoire.data = {
                                 rbg = {
                                     title = "Murlok Rated Battlegrounds",
                                     modeLabel = "Rated Battlegrounds",
-                                    importString = "CcQAAAAAAAAAAAAAAAAAAAAAAMzMzgZmZmZmhZmZAAAAAAAAA2AsZGDLwCMDDNYBgZZGzYmllZswMDWmxMzYmNAAYGGzMmRzCmZwgxA",
-                                    sampleSize = 1,
+                                    importString = "CcQAAAAAAAAAAAAAAAAAAAAAAMzMDMzMzMzMMzMDAAAAAAAAwGgNzYYDWgZYoBLAMbzwYstMjFmZ2YxMzMMz2YGAgZYmZGzMBmZwgxA",
+                                    sampleSize = 5,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
                                     heroTree = "Stormbringer",
@@ -36618,6 +36740,23 @@ ZoidsToolsTalentGrimoire.data = {
                 },
             },
             pvp = {
+                ["icy-veins"] = {
+                    providers = {
+                        icyveins = {
+                            builds = {
+                                totemic = {
+                                    modeLabel = "Totemic",
+                                    title = "Totemic",
+                                    importString = "CgQAAAAAAAAAAAAAAAAAAAAAAAAAAgBAAAAzMmltlxMzMzMzMzMjhFYDmxiGbDgZgN8AzgZbMGNLLzMLjZgFjZGzMbzmBAAAmZwMDAjBD",
+                                    difficulty = "PvP",
+                                    source = "Icy Veins",
+                                },
+                            },
+                            label = "Icy Veins",
+                        },
+                    },
+                    label = "Icy Veins",
+                },
                 murlok = {
                     providers = {
                         murlok = {
@@ -36625,7 +36764,7 @@ ZoidsToolsTalentGrimoire.data = {
                                 solo = {
                                     title = "Murlok Solo Shuffle",
                                     modeLabel = "Solo Shuffle",
-                                    importString = "CgQAAAAAAAAAAAAAAAAAAAAAAAAAAgBAAAAzMGbLzYmZmZmZmZGjFzsBDYAzCTgxCmZwsNGjmlFzsMzYwixMjZmtZzAAAAzMAYmhxgB",
+                                    importString = "CgQAAAAAAAAAAAAAAAAAAAAAAAAAAgBAAAAzMGbLzYmZmZmZmZGjFzsADYAzCTgxCmZwsNGjmlFzsYGDWMmZegZmtZzAAAAzMAYmhxgB",
                                     sampleSize = 50,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
@@ -36634,7 +36773,7 @@ ZoidsToolsTalentGrimoire.data = {
                                 ["2v2"] = {
                                     title = "Murlok 2v2",
                                     modeLabel = "2v2",
-                                    importString = "CgQAAAAAAAAAAAAAAAAAAAAAAAAAAgBAAAAzMGbLzwMzMzMzMzYsYmFYADYWYCMWwMDmtxY0ssYmlZGDWMmZMzsNbGAAAYmBAzMMzgB",
+                                    importString = "CgQAAAAAAAAAAAAAAAAAAAAAAAAAAgBAAAAzMGbLzwMzMzMzMzYsYmFYADY2YCMWwMDmtxY0ssMzsYGDWMmZMzsNbGAAAYmBAzMMzgB",
                                     sampleSize = 50,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
@@ -36643,7 +36782,7 @@ ZoidsToolsTalentGrimoire.data = {
                                 ["3v3"] = {
                                     title = "Murlok 3v3",
                                     modeLabel = "3v3",
-                                    importString = "CgQAAAAAAAAAAAAAAAAAAAAAAAAAAgBAAAAzMzYbZGmZmZmZmZGjFzsADYAzGTgxCmZwsNGjmlFzsMzYwixMjZmtZzAAAAzMAYmhxgB",
+                                    importString = "CgQAAAAAAAAAAAAAAAAAAAAAAAAAAgBAAAAzMGbLzwMzMzMzMzYsYmFYADYWYCMWwMDmtxY0ssMzsYGDWMmZMzsNbGAAAYmBAzMMzgB",
                                     sampleSize = 50,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
@@ -36661,7 +36800,7 @@ ZoidsToolsTalentGrimoire.data = {
                                 rbg = {
                                     title = "Murlok Rated Battlegrounds",
                                     modeLabel = "Rated Battlegrounds",
-                                    importString = "CgQAAAAAAAAAAAAAAAAAAAAAAAAAAgBAAAAzMGbLzYmZmZmZmZGjFzsADYAzGTgxCmZwsMGjmlFzsMzYwixMjZmtZzAAAAzMAYmhxgB",
+                                    importString = "CgQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYmxYbZGzMzMzMzMzYsYmFYADY2YCMWwMDmlxY0stYmlZGDWMmZMzsNbGAAAMzMAYmhxgB",
                                     sampleSize = 5,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
@@ -36675,8 +36814,10 @@ ZoidsToolsTalentGrimoire.data = {
                 },
             },
         },
-    },
-    WARLOCK = {
+    }
+    end,
+    WARLOCK = function()
+        return {
         affliction = {
             mythicplus = {
                 ["all-dungeons"] = {
@@ -36709,14 +36850,14 @@ ZoidsToolsTalentGrimoire.data = {
                                 ["aoe-mythic-soul-harvester-talents"] = {
                                     title = "AoE/Mythic+ Soul Harvester Talents",
                                     modeLabel = "AoE/Mythic+ Soul Harvester Talents",
-                                    importString = "CkQAAAAAAAAAAAAAAAAAAAAAAwMjZGNLmxyMzYWGAAwMzsMLmZ2GDAMWWGYADYG2CMsNAAAMDAAgZmxMDz2YMjZmZmhhZmZGAwAG",
+                                    importString = "CkQAAAAAAAAAAAAAAAAAAAAAAwMjZGNLmxyMzYWGAAwMzsMLzMzyYAgx2yADYAzwWghtBAAgZAAAMzMmZY2YYMzMzMMMzMzAAmBG",
                                     difficulty = "Mythic+",
                                     source = "Icy Veins",
                                 },
                                 ["aoe-mythic-hellcaller-talents"] = {
                                     title = "AoE/Mythic+ Hellcaller Talents",
                                     modeLabel = "AoE/Mythic+ Hellcaller Talents",
-                                    importString = "CkQAAAAAAAAAAAAAAAAAAAAAAwMjZGNLmxmZGzyAAAmZmlZzMz2YAALwAziRjZAMbglBAAgZAAgZGMmZGz2YMjZmZmhhZmZGAwAG",
+                                    importString = "CkQAAAAAAAAAAAAAAAAAAAAAAwMjZGNLmxmZGzyAAAmxsMLzMzyYAALwAziRjZAMbglBAAgBAAMzgxMzY2YYmZMzMmhZmZGAwMwA",
                                     difficulty = "Mythic+",
                                     source = "Icy Veins",
                                 },
@@ -37057,7 +37198,7 @@ ZoidsToolsTalentGrimoire.data = {
                                 ["2v2"] = {
                                     title = "Murlok 2v2",
                                     modeLabel = "2v2",
-                                    importString = "CkQAAAAAAAAAAAAAAAAAAAAAAsMGPwMjmtZGLMzMLDAAwMziNzMLmBAGLLDMgBMDbBG2GAAAmBAAwMzMzYmxMzwMmZmZGMjZAAGwA",
+                                    importString = "CkQAAAAAAAAAAAAAAAAAAAAAAsMGmZ0sNzYhZmZZAAAmZWsZmZxMAwYZZgBMgZYLww2AAAwMAAAmZmZmZmxMzwMmZmZGMjZAAGwA",
                                     sampleSize = 50,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
@@ -37075,7 +37216,7 @@ ZoidsToolsTalentGrimoire.data = {
                                 blitz = {
                                     title = "Murlok Battleground Blitz",
                                     modeLabel = "Battleground Blitz",
-                                    importString = "CkQAAAAAAAAAAAAAAAAAAAAAAsMGmZ0sZGLzMzMLDAAwMziNzMLmBAGLLDMgBMDbBG2GAAAmBAAwMzMzYmxMzwMmZmZGMjZAAGwA",
+                                    importString = "CkQAAAAAAAAAAAAAAAAAAAAAAsMGPwMjmtZGLMzMLDAAwMziNzMLmBAGLLDMgBMDbBG2GAAAmBAAwMzMzYmxMzwMmZmZGMjZAAGwA",
                                     sampleSize = 50,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
@@ -37084,11 +37225,11 @@ ZoidsToolsTalentGrimoire.data = {
                                 rbg = {
                                     title = "Murlok Rated Battlegrounds",
                                     modeLabel = "Rated Battlegrounds",
-                                    importString = "CkQAAAAAAAAAAAAAAAAAAAAAAsMGzMjmNzYhZmZZAAAmZ2sZmZxMAwYZZgBMgZYLww2AAAwMAAAmZmZGzMmZGmxMzMzgZMDAwAG",
-                                    sampleSize = 16,
+                                    importString = "CkQAAAAAAAAAAAAAAAAAAAAAAsMGzM0sZGLzMzMLDAAwMzmtZmZxMAgFYgZxoxMAmNwyAAAwMAAwMDmZGjxMDmxMzMzgZMDAwAG",
+                                    sampleSize = 18,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
-                                    heroTree = "Soul Harvester",
+                                    heroTree = "Hellcaller",
                                 },
                             },
                             label = "Murlok.io (Reconstructed)",
@@ -37466,7 +37607,7 @@ ZoidsToolsTalentGrimoire.data = {
                                 solo = {
                                     title = "Murlok Solo Shuffle",
                                     modeLabel = "Solo Shuffle",
-                                    importString = "CoQAAAAAAAAAAAAAAAAAAAAAAsMGmZ0sNzYhZmZZAAAAAAAGLLDMgBMDbBGbmZM2mlZmZYAAzYmZGgZmZmZmZAAAGzYGjZYZGDYA",
+                                    importString = "CoQAAAAAAAAAAAAAAAAAAAAAAsMGPwMjmtZGLMzMLDAAAAAAwYZZgBMgZYLwYzMjxysMzMDDAYGzMzAMzMzMzYAAAGzYGjZYZGDYA",
                                     sampleSize = 50,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
@@ -37475,8 +37616,8 @@ ZoidsToolsTalentGrimoire.data = {
                                 ["2v2"] = {
                                     title = "Murlok 2v2",
                                     modeLabel = "2v2",
-                                    importString = "CoQAAAAAAAAAAAAAAAAAAAAAAsMGPwMjmtZGLMzMLDAAAAAAwYZZgBMgZYLwYzMjx2sMzMDDAYGzMzAMzMzMzYAAAGzYGjZYZGDYA",
-                                    sampleSize = 23,
+                                    importString = "CoQAAAAAAAAAAAAAAAAAAAAAAsMGmZ0sNzYhZmZZAAAAAAAGLLDMgBMDbBGbmZM2mlZmZYAAzYmZGgZmZmZmZAAAGzYGjZYZGDYA",
+                                    sampleSize = 38,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
                                     heroTree = "Soul Harvester",
@@ -37484,8 +37625,8 @@ ZoidsToolsTalentGrimoire.data = {
                                 ["3v3"] = {
                                     title = "Murlok 3v3",
                                     modeLabel = "3v3",
-                                    importString = "CoQAAAAAAAAAAAAAAAAAAAAAAsMGPwMjmtZGLMzMLDAAAAAAwYZZgBMgZYLwYzMjx2sMzMjZAAzYmZGgZmZmZGDAAwYGzYMDLzAYA",
-                                    sampleSize = 26,
+                                    importString = "CoQAAAAAAAAAAAAAAAAAAAAAAsMGmZ0sNzYhZmZZAAAAAAAGLLDMgBMDbBGbmZMWmlZmZYAAzYmZGgZmZmZmZAAAGzYGjZYZGDYA",
+                                    sampleSize = 46,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
                                     heroTree = "Soul Harvester",
@@ -37493,7 +37634,7 @@ ZoidsToolsTalentGrimoire.data = {
                                 blitz = {
                                     title = "Murlok Battleground Blitz",
                                     modeLabel = "Battleground Blitz",
-                                    importString = "CoQAAAAAAAAAAAAAAAAAAAAAAsMGzMjGzMWYmZWGAAAAAAgxyyADYAzwWgxmxYsNmZmhBAMzMzMDwMzMzMjBAAYMjZMmhlZMgB",
+                                    importString = "CoQAAAAAAAAAAAAAAAAAAAAAAsMGzMjmtZGLMzMLDAAAAAAwYZZgBMgZYLwYzMjx2sMzMDDAYGzMzAMzMzMGDAAwYGzYMDLzYAD",
                                     sampleSize = 50,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
@@ -37903,7 +38044,7 @@ ZoidsToolsTalentGrimoire.data = {
                                 solo = {
                                     title = "Murlok Solo Shuffle",
                                     modeLabel = "Solo Shuffle",
-                                    importString = "CsQAAAAAAAAAAAAAAAAAAAAAAsMGPwMjmtZGLMzMLzCzYWmxstYGAAMzMmZmNLwAziRjZAMbYjBAAGgxGAwMDmZmZMAAAMjZAAYeghB",
+                                    importString = "CsQAAAAAAAAAAAAAAAAAAAAAAsMGPwMjmtZGLMzMLDmxsMjZbxMAAYmZMzMbWgBmFjGzAY2wGDAAMAjNAgZGMzMzYAAAYGzAAwMDD",
                                     sampleSize = 50,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
@@ -37912,8 +38053,8 @@ ZoidsToolsTalentGrimoire.data = {
                                 ["2v2"] = {
                                     title = "Murlok 2v2",
                                     modeLabel = "2v2",
-                                    importString = "CsQAAAAAAAAAAAAAAAAAAAAAAsMGPwMjmtZGLMzMLzCzYWmxstYGAAMzMmZmNLwAziRjZAMbYjBAAGgxGAwMDmZmZMAAAMjZAAYeghB",
-                                    sampleSize = 46,
+                                    importString = "CsQAAAAAAAAAAAAAAAAAAAAAAsMGPwMjmtZGLMzMLDmxsMjZbxMAAYmZMzMbWgBmFjGzAY2wGDAAMAjNAgZGMzMzYAAAYGzAAwMDD",
+                                    sampleSize = 50,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
                                     heroTree = "Hellcaller",
@@ -37921,7 +38062,7 @@ ZoidsToolsTalentGrimoire.data = {
                                 ["3v3"] = {
                                     title = "Murlok 3v3",
                                     modeLabel = "3v3",
-                                    importString = "CsQAAAAAAAAAAAAAAAAAAAAAAsMGPwMjmtZGLMzMLDmxsMjZbxMAAYmZMzMb2gBmFjGzAY2wGDAAMAzsBAMzgZmZGDAAAzYGAAmHYYA",
+                                    importString = "CsQAAAAAAAAAAAAAAAAAAAAAAsMGPwMjmtZGLMzMLDmxsMjZbxMAAYmZMzMb2gBmFjGzAY2wGDAAMAjNAgZGMzMzYAAAYGzAAwMDD",
                                     sampleSize = 50,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
@@ -37939,8 +38080,8 @@ ZoidsToolsTalentGrimoire.data = {
                                 rbg = {
                                     title = "Murlok Rated Battlegrounds",
                                     modeLabel = "Rated Battlegrounds",
-                                    importString = "CsQAAAAAAAAAAAAAAAAAAAAAAsMGzMjmFzYhZmZZWYGzyMmlFzAAgZmxMzsZBGYWMaMDgZDbMAAwAMzGAwMDmZmZMAAAMjZAAYMM",
-                                    sampleSize = 6,
+                                    importString = "CsQAAAAAAAAAAAAAAAAAAAAAAsMGmZ0sYGbzMzMLzCGz2MmlFzAAgZmxMzsZBGYWMaMDgZDbMAAwAMzGAwMDmZGzMAAAMjZAAYeghB",
+                                    sampleSize = 11,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
                                     heroTree = "Hellcaller",
@@ -37953,8 +38094,10 @@ ZoidsToolsTalentGrimoire.data = {
                 },
             },
         },
-    },
-    WARRIOR = {
+    }
+    end,
+    WARRIOR = function()
+        return {
         arms = {
             mythicplus = {
                 ["all-dungeons"] = {
@@ -38379,7 +38522,7 @@ ZoidsToolsTalentGrimoire.data = {
                                 ["3v3"] = {
                                     title = "Murlok 3v3",
                                     modeLabel = "3v3",
-                                    importString = "CcEAAAAAAAAAAAAAAAAAAAAAAAzMzsMzMmZAAAAMMNMGzYhZmZGzYmZAAAAAMWmZgJMW2GYDMgZYCMD2AmxiZZGsMz2AMzAwMDDA",
+                                    importString = "CcEAAAAAAAAAAAAAAAAAAAAAAAzMzsMzMmZAAAAMMNMzYGLMzMzwYmZAAAAAMWmZgJMW2GYDMgZYCMD2AmxiZZGsMz2AMzAwMDDA",
                                     sampleSize = 50,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
@@ -38388,7 +38531,7 @@ ZoidsToolsTalentGrimoire.data = {
                                 blitz = {
                                     title = "Murlok Battleground Blitz",
                                     modeLabel = "Battleground Blitz",
-                                    importString = "CcEAAAAAAAAAAAAAAAAAAAAAAAzMzsMzwMDAAAghphZGzYhZmZGGzMDAAAAgxyMDMZxYZbgNwAmhJwMYDYGLmlZGWmZbAmZAYmhBA",
+                                    importString = "CcEAAAAAAAAAAAAAAAAAAAAAAAzMzsMzMmZAAAAMMNMzYGLMzMzwYmZAAAAAMWmZgJMW2GYDMgZYCMD2AmxiZZGsMz2AMzAwMDDA",
                                     sampleSize = 50,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
@@ -38398,7 +38541,7 @@ ZoidsToolsTalentGrimoire.data = {
                                     title = "Murlok Rated Battlegrounds",
                                     modeLabel = "Rated Battlegrounds",
                                     importString = "CcEAAAAAAAAAAAAAAAAAAAAAAAzMzsMzMmZAAAAMMNMzYGLMzMzwYmZAAAAAMWmZgJMW2GYDMgZYCMD2AmxiZZGsMz2AMzAwMDDA",
-                                    sampleSize = 20,
+                                    sampleSize = 29,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
                                     heroTree = "Slayer",
@@ -38791,7 +38934,7 @@ ZoidsToolsTalentGrimoire.data = {
                                 solo = {
                                     title = "Murlok Solo Shuffle",
                                     modeLabel = "Solo Shuffle",
-                                    importString = "CgEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgGDzMjZWYmZGjxMzMzYmZmlhxMzMLmZmBAACDsBLLGNmBwshZsAYmFjFAYmBgxYYMDjB",
+                                    importString = "CgEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgGDzMzMzCzMzYwMzMzYmZmlhxMzMLmZmBAACDsBLLGNmBwshZsAYmFjFAYmBgxYYMDjB",
                                     sampleSize = 50,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
@@ -38800,7 +38943,7 @@ ZoidsToolsTalentGrimoire.data = {
                                 ["2v2"] = {
                                     title = "Murlok 2v2",
                                     modeLabel = "2v2",
-                                    importString = "CgEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgGDzMjZWYmZmZwMzMzYmZmlhxMzMLmZmBAACDsBLLGNmBwshZsAYmFjFAYmBgxYYMDjB",
+                                    importString = "CgEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgGDzMzMzCzMzYMmZmZGzMzsMMmZmZxMzMAAQYgNYZxoxMAmNMsAYmFjFAYmBgxYYMDjB",
                                     sampleSize = 50,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
@@ -38809,7 +38952,7 @@ ZoidsToolsTalentGrimoire.data = {
                                 ["3v3"] = {
                                     title = "Murlok 3v3",
                                     modeLabel = "3v3",
-                                    importString = "CgEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgGDzMjZWYmZGjxMzMzYmZmlhxMzMLmZmBAACDsBLLGNmBwshZsAYmFjFAYmBgxYYMDjB",
+                                    importString = "CgEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgGDjZmZWYmZGjxMzMzYmZmlhxMzMLmZmBAACDsBLLGNmBwshZsAYmFjFAYmBgxYYMDjB",
                                     sampleSize = 50,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
@@ -38818,7 +38961,7 @@ ZoidsToolsTalentGrimoire.data = {
                                 blitz = {
                                     title = "Murlok Battleground Blitz",
                                     modeLabel = "Battleground Blitz",
-                                    importString = "CgEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgGDzMzMzCzMzYwMzMzYmZmlZMmZmZxDMzMAAQYgNYZxoxMAmNMjFAzsYsAAzMAwYGjZYM",
+                                    importString = "CgEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgGDzMzMzCzMzYwMzMzYmZmlZMmZmZxMzMAAQYgNYZxoxMAmNMjFAzsYsAAzMAMYYMDjB",
                                     sampleSize = 50,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
@@ -38827,8 +38970,8 @@ ZoidsToolsTalentGrimoire.data = {
                                 rbg = {
                                     title = "Murlok Rated Battlegrounds",
                                     modeLabel = "Rated Battlegrounds",
-                                    importString = "CgEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgGDzMjZWYmZGjxMzMzYmZmlZMmZmZxDMzMAAQYgNYZxoxMAmNMjFAzsYsAAzMAwsMjxgxA",
-                                    sampleSize = 10,
+                                    importString = "CgEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgGDzMjZWYmZGjxMzMzMzMzsMjxMzMLMzMAAQYgNYZxoxMAmNMjFAzsYsAAzMAwsMjxgxA",
+                                    sampleSize = 11,
                                     difficulty = "PvP",
                                     source = "Murlok.io (Reconstructed)",
                                     heroTree = "Mountain Thane",
@@ -39195,5 +39338,6 @@ ZoidsToolsTalentGrimoire.data = {
                 },
             },
         },
-    },
+    }
+    end,
 }

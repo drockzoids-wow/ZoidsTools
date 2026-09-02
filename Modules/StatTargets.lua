@@ -1603,6 +1603,7 @@ local function QueueRefresh(delay)
     pendingRefresh = true
 
     local function Run()
+        if ns.RecordDiagnosticActivity then ns:RecordDiagnosticActivity("StatTargets.RefreshQueue") end
         pendingRefresh = false
 
         HideAllRows()

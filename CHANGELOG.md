@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+- Unified the BiS tooltip context with the Items page's saved Raid/Mythic+ selection, normalized invalid legacy values to Mythic+, and added the active tooltip selection to Generated Data Status for verification.
+- Removed the GearInsight footer from item tooltips and moved its source/update information into the Items page's Generated Data Status section.
+- Fixed a character-overlay item-data feedback loop that could rebuild every equipped slot more than one hundred times per second, generate thousands of redundant item-data callbacks, and produce large sawtooth memory swings. Loaded item callbacks and bounded retries now handle delayed gem and enchant data without globally refreshing on every item result.
+- Fixed Activity Recorder startup inheriting Blizzard chat-command security state by deferring diagnostic slash actions and removing dynamic Blizzard event registration.
+- Added an opt-in, bounded Activity Recorder to Core > Interface and `/zt diag`. It samples ZoidsTools and total Lua memory every five seconds, correlates the largest increases with measured addon refreshes, counts frame hitches, and opens a copyable report when stopped. Recording has no timer or event overhead while disabled and never forces garbage collection.
+- Reduced addon memory by generating Talent Grimoire and GearInsight BiS data as per-class loaders, constructing only the logged-in character's class data, and releasing every other loader after login. The modern settings window now creates each page only when it is first visited instead of allocating all settings controls at once.
+- Added compact source lines to BiS tooltip rankings, including the dungeon for Mythic+ drops and the raid, boss number, and encounter for raid drops when GearInsight provides them.
+- Tightened the Items page's General and Style card padding so the Style section remains fully inside the settings viewport after adding BiS controls.
+- Added offline top-three BiS recommendations to equippable item tooltips, with independent Raid and Mythic+ rankings for the player's current specialization. GearInsight data is generated only by the local `UpdateAll.cmd` workflow; the addon never contacts websites in game.
+- Added gem and enchant overlays to Blizzard's Inspect frame, with inspect-ready and item-data refresh handling shared with the character frame.
 - Added the current weekly Mythic+ affix icons and Blizzard-matched hover tooltips to the Instance Lockouts header, positioned immediately left of the color-coded rating.
 - Matched Instance Lockouts' Mythic+ rating color and tooltip to Blizzard's Mythic+ Dungeons page, and added a Great Vault button with Blizzard's live reward-progress tooltip.
 - Fixed Custom Damage Meter's Current Segment view matching Overall after a dungeon. Outside combat, Current now uses Blizzard's newest discrete combat-session ID while Overall continues using the aggregate session; source drilldowns follow the same selection.

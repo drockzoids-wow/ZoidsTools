@@ -734,6 +734,7 @@ function ns:InitializeQuestItemButton()
         proximityUpdateElapsed = proximityUpdateElapsed + elapsed
         if proximityUpdateElapsed >= PROXIMITY_UPDATE_INTERVAL then
             proximityUpdateElapsed = 0
+            if ns.RecordDiagnosticActivity then ns:RecordDiagnosticActivity("QuestItemButton.ProximityPoll") end
             ScheduleRefresh(0)
         end
     end)

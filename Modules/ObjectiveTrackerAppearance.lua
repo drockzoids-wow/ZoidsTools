@@ -562,6 +562,7 @@ local function RefreshMouseoverTicker()
     local shouldRun = db and db.enabled
     if shouldRun and not mouseoverTicker and C_Timer and C_Timer.NewTicker then
         mouseoverTicker = C_Timer.NewTicker(0.20, function()
+            if ns.RecordDiagnosticActivity then ns:RecordDiagnosticActivity("ObjectiveTracker.MouseoverPoll") end
             local frame = FindTracker()
             local settings = GetSettings()
             if not frame or not settings or not settings.enabled then return end

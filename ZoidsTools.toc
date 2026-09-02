@@ -47,8 +47,10 @@ Modules\Coordinates.lua
 Modules\ItemOverlays.lua
 Modules\ProfessionHelper.lua
 Data\StatGoals.lua
+Data\BiS.lua
 Data\TalentGrimoire.lua
 Data\QuestItems.lua
+Modules\BiSTooltips.lua
 Modules\StatTargets.lua
 Modules\TalentGrimoire.lua
 Modules\BlizzardDamageMeterProfiles.lua

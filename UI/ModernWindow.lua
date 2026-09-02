@@ -21,7 +21,7 @@ local pages = {
     tooltips = { key = "tooltips", label = "Tooltips", icon = "T", page = "tooltips", sectionKey = "core", description = "Class-colored player names, Mythic+ rating, and equipped item level." },
     windows = { key = "windows", label = "Windows", icon = "W", page = "windows", sectionKey = "core", description = "Move and scale Blizzard windows and default bag frames." },
     chat = { key = "chat", label = "Chat", icon = "H", page = "chat", sectionKey = "chat", description = "Chat copy, saved history, input styling, scrolling, and message awareness." },
-    items = { key = "items", label = "Items", icon = "I", page = "items", sectionKey = "character", description = "Item level, gems, enchants, bind text, and stat goal overlays." },
+    items = { key = "items", label = "Items", icon = "I", page = "items", sectionKey = "character", description = "Item level, gems, enchants, bind text, stat goals, and offline BiS rankings." },
     professions = { key = "professions", label = "Tools", icon = "P", page = "professions", sectionKey = "profession_area", description = "Molinari-style disenchant, mill, prospect, and lockbox helpers." },
     talents = { key = "talents", label = "Talents", icon = "B", page = "builds", sectionKey = "character", description = "Talent recommendations, source selection, and application helpers." },
     meters = { key = "meters", label = "Meters", icon = "M", page = "meters", sectionKey = "combat_area", description = "Custom damage meters and Blizzard meter profile tools." },
@@ -1405,6 +1405,48 @@ local function CreateInterfacePage(parent)
     )
     PlaceBelow(safeDungeonQueue, safeQueue)
 
+    local diagnosticsCard = CreateSectionCard(page, "Activity Recorder", cardW, 132)
+    diagnosticsCard:SetPoint("TOPLEFT", queueCard, "BOTTOMLEFT", 0, -10)
+
+    local diagnosticsStatus = diagnosticsCard:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    diagnosticsStatus:SetPoint("TOPLEFT", diagnosticsCard, "TOPLEFT", 18, -42)
+    diagnosticsStatus:SetPoint("RIGHT", diagnosticsCard, "RIGHT", -18, 0)
+    diagnosticsStatus:SetJustifyH("LEFT")
+    diagnosticsStatus:SetTextColor(0.76, 0.77, 0.78)
+
+    local toggleDiagnostics = CreateButton(diagnosticsCard, "Start", 96, 27)
+    toggleDiagnostics:SetPoint("TOPLEFT", diagnosticsStatus, "BOTTOMLEFT", 0, -12)
+    toggleDiagnostics:SetScript("OnClick", function()
+        if ns.IsDiagnosticsActive and ns:IsDiagnosticsActive() then
+            if ns.StopDiagnostics then ns:StopDiagnostics() end
+        elseif ns.StartDiagnostics then
+            ns:StartDiagnostics()
+        end
+        if page.Refresh then page:Refresh() end
+    end)
+
+    local copyDiagnostics = CreateButton(diagnosticsCard, "Copy Report", 112, 27)
+    copyDiagnostics:SetPoint("LEFT", toggleDiagnostics, "RIGHT", 8, 0)
+    copyDiagnostics:SetScript("OnClick", function()
+        if ns.ShowDiagnosticsReport then ns:ShowDiagnosticsReport() end
+    end)
+
+    local resetDiagnostics = CreateButton(diagnosticsCard, "Clear", 86, 27)
+    resetDiagnostics:SetPoint("LEFT", copyDiagnostics, "RIGHT", 8, 0)
+    resetDiagnostics:SetScript("OnClick", function()
+        if ns.ResetDiagnostics then ns:ResetDiagnostics() end
+        if page.Refresh then page:Refresh() end
+    end)
+
+    if ns.UI and ns.UI.RegisterSearchControl then
+        ns.UI.RegisterSearchControl(
+            diagnosticsCard,
+            toggleDiagnostics,
+            "Activity and memory recorder",
+            "Temporarily records bounded memory samples, measured ZoidsTools subsystem calls, recurring refreshes, and frame hitches until stopped."
+        )
+    end
+
     local qualityCard = CreateSectionCard(page, "Quality of Life", cardW, 224)
     qualityCard:SetPoint("TOPLEFT", page, "TOPLEFT", 0, 0)
 
@@ -1564,6 +1606,13 @@ local function CreateInterfacePage(parent)
         safeDungeonQueue:Refresh()
         mailRolodex:Refresh()
         rememberMailRecipient:Refresh()
+
+        local diagnosticsActive = ns.IsDiagnosticsActive and ns:IsDiagnosticsActive()
+        diagnosticsStatus:SetText(ns.GetDiagnosticsStatusText and ns:GetDiagnosticsStatusText() or "Ready | recorder is off")
+        toggleDiagnostics:SetText(diagnosticsActive and "Stop" or "Start")
+        if ns.UI and ns.UI.SetControlEnabled then
+            ns.UI.SetControlEnabled(copyDiagnostics, ns.HasDiagnosticReport and ns:HasDiagnosticReport())
+        end
 
         if ns.UI and ns.UI.SetControlEnabled then
             local talkingHeadActive = subtleTalkingHead:GetChecked() == true
@@ -2529,7 +2578,7 @@ local function CreateItemsPage(parent)
         }
     end
 
-    local general = CreateSectionCard(page, "General", cardW, 170)
+    local general = CreateSectionCard(page, "General", cardW, 240)
     general:SetPoint("TOPLEFT", page, "TOPLEFT", leftX, 0)
 
     local enabled = UI.CreateCheckbox(
@@ -2572,6 +2621,41 @@ local function CreateItemsPage(parent)
     )
     statTargetContext:SetPoint("TOPLEFT", enabled, "BOTTOMLEFT", 0, -16)
 
+    local bisEnabled = UI.CreateCheckbox(
+        general,
+        "Show BiS rankings in item tooltips",
+        "Adds the current spec's top-three offline GearInsight recommendations to equippable item tooltips.",
+        function() return ns.GetBiSTooltipsEnabled and ns:GetBiSTooltipsEnabled() end,
+        function(value)
+            if ns.SetBiSTooltipsEnabled then
+                ns:SetBiSTooltipsEnabled(value)
+            end
+
+            if page.Refresh then
+                page:Refresh()
+            end
+        end
+    )
+    bisEnabled:SetPoint("TOPLEFT", statTargetContext, "BOTTOMLEFT", 0, -16)
+
+    local bisContext = UI.CreateDropdown(
+        general,
+        "BiS content",
+        "Chooses whether item tooltips show Raid or Mythic+ top-three gear rankings.",
+        {
+            { value = "raid", text = "Raid" },
+            { value = "mythicplus", text = "Mythic+" },
+        },
+        function() return ns.GetBiSContext and ns:GetBiSContext() or "mythicplus" end,
+        function(value)
+            if ns.SetBiSContext then
+                ns:SetBiSContext(value)
+            end
+        end,
+        dropdownWidth
+    )
+    bisContext:SetPoint("TOPLEFT", bisEnabled, "BOTTOMLEFT", 0, -16)
+
     local display = CreateSectionCard(page, "Display", cardW, 170)
     display:SetPoint("TOPLEFT", page, "TOPLEFT", rightX, 0)
 
@@ -2607,7 +2691,7 @@ local function CreateItemsPage(parent)
     )
     bagBankOptions:SetPoint("TOPLEFT", characterOptions, "BOTTOMLEFT", 0, -16)
 
-    local style = CreateSectionCard(page, "Style", cardW, 190)
+    local style = CreateSectionCard(page, "Style", cardW, 164)
     style:SetPoint("TOPLEFT", general, "BOTTOMLEFT", 0, -14)
 
     local fontSize = UI.CreateSlider(
@@ -2641,7 +2725,7 @@ local function CreateItemsPage(parent)
         end
     end)
 
-    local statusCard = CreateSectionCard(page, "Stat Goal Status", cardW, 190)
+    local statusCard = CreateSectionCard(page, "Generated Data Status", cardW, 240)
     statusCard:SetPoint("TOPLEFT", display, "BOTTOMLEFT", 0, -14)
 
     local status = statusCard:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
@@ -2655,6 +2739,8 @@ local function CreateItemsPage(parent)
         characterOptions:Refresh()
         bagBankOptions:Refresh()
         statTargetContext:Refresh()
+        bisEnabled:Refresh()
+        bisContext:Refresh()
         fontSize:Refresh()
         qualityColor:Refresh()
 
@@ -2663,16 +2749,21 @@ local function CreateItemsPage(parent)
             UI.SetControlEnabled(characterOptions, active)
             UI.SetControlEnabled(bagBankOptions, active)
             UI.SetControlEnabled(statTargetContext, active)
+            UI.SetControlEnabled(bisEnabled, active)
+            UI.SetControlEnabled(bisContext, active and bisEnabled:GetChecked() == true)
             UI.SetControlEnabled(fontSize, active)
             UI.SetControlEnabled(qualityColor, active)
             UI.SetControlEnabled(refreshButton, active)
         end
 
+        local statusLines = {}
         if ns.GetStatTargetStatusText then
-            status:SetText(ns:GetStatTargetStatusText())
-        else
-            status:SetText("")
+            statusLines[#statusLines + 1] = ns:GetStatTargetStatusText()
         end
+        if ns.GetBiSDataStatusText then
+            statusLines[#statusLines + 1] = ns:GetBiSDataStatusText()
+        end
+        status:SetText(table.concat(statusLines, "\n\n"))
     end
 
     page:SetScript("OnShow", function(self) self:Refresh() end)
@@ -4681,6 +4772,56 @@ local function CreateModernSearch(frame)
     frame.searchResults = results
 end
 
+local modernPageCreators = {
+    warband = CreateWarbandPage,
+    professionweekly = CreateProfessionWeeklyPage,
+    minimap = CreateMinimapPage,
+    general = CreateInterfacePage,
+    tooltips = CreateTooltipsPage,
+    windows = CreateWindowsPage,
+    chat = CreateChatPage,
+    items = CreateItemsPage,
+    professions = CreateProfessionsPage,
+    talents = CreateTalentsPage,
+    meters = CreateMetersPage,
+    combat = CreateCombatPage,
+    unitframes = CreateUnitFramesPage,
+    macros = CreateMacrosPage,
+    mounts = CreateMountsPage,
+    loot = CreateLootPage,
+    quests = CreateQuestsPage,
+    tracker = CreateTrackerPage,
+    dialogs = CreateDialogsPage,
+}
+
+local function EnsureModernPage(frame, pageKey)
+    if not frame or not pageKey or pageKey == "overview" then
+        return frame and frame.overview or nil
+    end
+
+    frame.modernPages = frame.modernPages or {}
+    if frame.modernPages[pageKey] then
+        return frame.modernPages[pageKey]
+    end
+
+    local creator = modernPageCreators[pageKey]
+    if type(creator) ~= "function" then
+        return nil
+    end
+
+    if ns.RecordDiagnosticActivity then
+        ns:RecordDiagnosticActivity("Settings.CreatePage." .. tostring(pageKey))
+    end
+    local page = CreateModernPage(frame.pageHost, pageKey, creator)
+    frame.modernPages[pageKey] = page
+
+    local searchEntry = frame.modernPageSearchEntries and frame.modernPageSearchEntries[pageKey]
+    if searchEntry and page then
+        searchEntry.control = page
+    end
+    return page
+end
+
 
 local function CreateModernWindow()
     if UI2.frame then
@@ -4809,27 +4950,8 @@ local function CreateModernWindow()
     frame.overview = CreateFrame("Frame", nil, frame.pageHost)
     frame.overview:SetAllPoints()
     frame.overview.ZTPageKey = "overview"
-    frame.modernPages = {
-        warband = CreateModernPage(frame.pageHost, "warband", CreateWarbandPage),
-        professionweekly = CreateModernPage(frame.pageHost, "professionweekly", CreateProfessionWeeklyPage),
-        minimap = CreateModernPage(frame.pageHost, "minimap", CreateMinimapPage),
-        general = CreateModernPage(frame.pageHost, "general", CreateInterfacePage),
-        tooltips = CreateModernPage(frame.pageHost, "tooltips", CreateTooltipsPage),
-        windows = CreateModernPage(frame.pageHost, "windows", CreateWindowsPage),
-        chat = CreateModernPage(frame.pageHost, "chat", CreateChatPage),
-        items = CreateModernPage(frame.pageHost, "items", CreateItemsPage),
-        professions = CreateModernPage(frame.pageHost, "professions", CreateProfessionsPage),
-        talents = CreateModernPage(frame.pageHost, "talents", CreateTalentsPage),
-        meters = CreateModernPage(frame.pageHost, "meters", CreateMetersPage),
-        combat = CreateModernPage(frame.pageHost, "combat", CreateCombatPage),
-        unitframes = CreateModernPage(frame.pageHost, "unitframes", CreateUnitFramesPage),
-        macros = CreateModernPage(frame.pageHost, "macros", CreateMacrosPage),
-        mounts = CreateModernPage(frame.pageHost, "mounts", CreateMountsPage),
-        loot = CreateModernPage(frame.pageHost, "loot", CreateLootPage),
-        quests = CreateModernPage(frame.pageHost, "quests", CreateQuestsPage),
-        tracker = CreateModernPage(frame.pageHost, "tracker", CreateTrackerPage),
-        dialogs = CreateModernPage(frame.pageHost, "dialogs", CreateDialogsPage),
-    }
+    frame.modernPages = {}
+    frame.modernPageSearchEntries = {}
 
     if ns.UI and ns.UI.SearchEntries then
         ns.UI.SearchEntries[#ns.UI.SearchEntries + 1] = {
@@ -4840,17 +4962,19 @@ local function CreateModernWindow()
             ZTModernSearch = true,
             _modernPageKey = "overview",
         }
-        for key, page in pairs(frame.modernPages) do
+        for key in pairs(modernPageCreators) do
             local info = pageByKey[key]
             if info then
-                ns.UI.SearchEntries[#ns.UI.SearchEntries + 1] = {
+                local entry = {
                     pageKey = key,
-                    control = page,
+                    control = frame.overview,
                     label = info.label,
                     tooltip = info.description or "",
                     ZTModernSearch = true,
                     _modernPageKey = key,
                 }
+                ns.UI.SearchEntries[#ns.UI.SearchEntries + 1] = entry
+                frame.modernPageSearchEntries[key] = entry
             end
         end
     end
@@ -4948,6 +5072,14 @@ function ShowPage(pageKey)
     info = info or pageByKey.overview
     local section = sectionByKey[info.sectionKey or info.key] or sectionByKey.overview
     local r, g, b = GetClassColor()
+
+    if ns.RecordDiagnosticActivity then
+        ns:RecordDiagnosticActivity("Settings.ShowPage." .. tostring(info.key))
+    end
+
+    if info.key ~= "overview" then
+        EnsureModernPage(frame, info.key)
+    end
 
     frame.pageKey = info.key
     frame.pageTitle:SetText(info.label)

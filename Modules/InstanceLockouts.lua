@@ -1514,6 +1514,7 @@ local function ScheduleRefresh(delay)
 
     updateQueued = true
     local function Run()
+        if ns.RecordDiagnosticActivity then ns:RecordDiagnosticActivity("InstanceLockouts.RefreshQueue") end
         updateQueued = false
         RefreshLockouts()
     end

@@ -219,8 +219,9 @@ local function GetClassColor()
         end
     end
 
+    local customClassColors = rawget(_G, "CUSTOM_CLASS_COLORS")
     local color = classFile
-        and ((CUSTOM_CLASS_COLORS and CUSTOM_CLASS_COLORS[classFile]) or (RAID_CLASS_COLORS and RAID_CLASS_COLORS[classFile]))
+        and ((customClassColors and customClassColors[classFile]) or (RAID_CLASS_COLORS and RAID_CLASS_COLORS[classFile]))
 
     if color then
         return color.r or 1, color.g or 0.82, color.b or 0
@@ -463,8 +464,6 @@ end
 local function OpenCalendarFromClock()
     if C_AddOns and C_AddOns.LoadAddOn and C_AddOns.IsAddOnLoaded and not C_AddOns.IsAddOnLoaded("Blizzard_Calendar") then
         pcall(C_AddOns.LoadAddOn, "Blizzard_Calendar")
-    elseif LoadAddOn and (not IsAddOnLoaded or not IsAddOnLoaded("Blizzard_Calendar")) then
-        pcall(LoadAddOn, "Blizzard_Calendar")
     end
 
     if Calendar_Toggle then
@@ -1443,6 +1442,7 @@ local function EnsureCollectorFrames()
         collectorPanel:Hide()
 
         collectorContent = CreateFrame("Frame", nil, collectorPanel)
+        ---@cast collectorPanel Frame
         collectorContent:SetAllPoints(collectorPanel)
         collectorContent:EnableMouse(false)
 

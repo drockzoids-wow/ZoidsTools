@@ -197,7 +197,7 @@ local function ApplyPvPSafeQueue()
             local whichOK, which = pcall(function() return popup.which end)
             if whichOK and which == PVP_READY_POPUP then
                 local button = GetStaticPopupButton(popup, 2)
-                if CanAccessFrame(button) and not (InCombatLockdown and InCombatLockdown()) then
+                if button and CanAccessFrame(button) and not (InCombatLockdown and InCombatLockdown()) then
                     if hideLeaveQueue then
                         pcall(button.Hide, button)
                     else

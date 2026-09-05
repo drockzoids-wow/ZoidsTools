@@ -354,7 +354,7 @@ local function EnsureDB()
 end
 
 local function GetRoot()
-    return _G.ZoidsToolsTalentGrimoire
+    return ns.TalentGrimoireData
 end
 
 local function PruneTalentGrimoireToPlayerClass()
@@ -2805,7 +2805,7 @@ local function RequestSpecializationSwitch(specIndex, specName)
         return true
     end
 
-    local setter = C_SpecializationInfo and C_SpecializationInfo.SetSpecialization or SetSpecialization
+    local setter = C_SpecializationInfo and C_SpecializationInfo.SetSpecialization
 
     if not specIndex or type(setter) ~= "function" then
         return nil, "The game does not currently provide a specialization switch for " .. specName .. "."
@@ -3539,13 +3539,6 @@ end
 local function GetRotationSpellTexture(spellId)
     if C_Spell and C_Spell.GetSpellTexture then
         local ok, texture = pcall(C_Spell.GetSpellTexture, spellId)
-        if ok and texture then
-            return texture
-        end
-    end
-
-    if GetSpellTexture then
-        local ok, texture = pcall(GetSpellTexture, spellId)
         if ok and texture then
             return texture
         end

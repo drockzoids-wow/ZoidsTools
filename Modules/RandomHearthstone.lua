@@ -65,7 +65,7 @@ local function IsOwned(entry)
         if C_Item and C_Item.GetItemCount then
             return (C_Item.GetItemCount(entry.id) or 0) > 0
         end
-        return GetItemCount and (GetItemCount(entry.id) or 0) > 0
+        return false
     end
     if not PlayerHasToy or not PlayerHasToy(entry.id) then return false end
     if entry.races then
@@ -83,7 +83,7 @@ local function GetDisplayName(entry)
     if entry.item and C_Item and C_Item.GetItemNameByID then
         return C_Item.GetItemNameByID(entry.id) or entry.name
     elseif C_ToyBox and C_ToyBox.GetToyInfo then
-        local name = C_ToyBox.GetToyInfo(entry.id)
+        local _, name = C_ToyBox.GetToyInfo(entry.id)
         return type(name) == "string" and name or entry.name
     end
     return entry.name
@@ -262,6 +262,10 @@ local function RefreshSelector()
     end
     table.sort(owned, function(a, b) return GetDisplayName(a) < GetDisplayName(b) end)
     local db = EnsureDB()
+    if not db then
+        return
+    end
+
     for index, entry in ipairs(owned) do
         local rowEntry = entry
         local row = CreateFrame("CheckButton", nil, frame.content, "ChatConfigCheckButtonTemplate")
@@ -343,7 +347,9 @@ function ns:InitializeRandomHearthstone()
         -- Only a real interrupted Hearthstone cast should rotate the generated
         -- macro. Ordinary failed presses (cooldown, movement, spam) must not
         -- rewrite an action while the player is actively pressing it.
-        if event == "UNIT_SPELLCAST_INTERRUPTED" and arg1 == "player" then
+        if event == "UNIT_SPELLCAST_INTERRUPTED"
+            and not (issecretvalue and (issecretvalue(arg1) or issecretvalue(spellID)))
+            and arg1 == "player" then
             local isHearthstone = false
             for _, entry in ipairs(HEARTHSTONES) do
                 if entry.spell == spellID then

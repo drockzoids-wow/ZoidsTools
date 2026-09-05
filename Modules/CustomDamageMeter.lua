@@ -40,7 +40,7 @@ local METER_CATEGORIES = {
         },
     },
     {
-        label = HEALING or "Healing",
+        label = rawget(_G, "HEALING") or "Healing",
         types = {
             { key = "HealingDone", enum = "HealingDone", global = "DAMAGE_METER_TYPE_HEALING_DONE", label = "Healing Done" },
             { key = "Hps", enum = "Hps", global = "DAMAGE_METER_TYPE_HPS", label = "HPS" },
@@ -48,7 +48,7 @@ local METER_CATEGORIES = {
         },
     },
     {
-        label = ACTIONS or "Actions",
+        label = rawget(_G, "ACTIONS") or "Actions",
         types = {
             { key = "Interrupts", enum = "Interrupts", global = "DAMAGE_METER_TYPE_INTERRUPTS", label = "Interrupts" },
             { key = "Dispels", enum = "Dispels", global = "DAMAGE_METER_TYPE_DISPELS", label = "Dispels" },
@@ -718,7 +718,8 @@ local function OpenSessionMenu(owner, frame)
         if sessionID then
             local rawName = availableSession.name
             local sessionName = not IsSecret(rawName) and type(rawName) == "string" and rawName ~= "" and rawName or nil
-            sessionName = sessionName or ((DAMAGE_METER_COMBAT_NUMBER and DAMAGE_METER_COMBAT_NUMBER:format(sessionID)) or ("Combat " .. sessionID))
+            local combatNumberFormat = rawget(_G, "DAMAGE_METER_COMBAT_NUMBER")
+            sessionName = sessionName or ((combatNumberFormat and combatNumberFormat:format(sessionID)) or ("Combat " .. sessionID))
             local duration = FormatSessionDuration(availableSession.durationSeconds)
             entries[#entries + 1] = {
                 label = duration and string.format("%s [%s]", sessionName, duration) or sessionName,
@@ -1479,7 +1480,11 @@ local function GetSourceDetails(frame, source)
         if sessionID then
             return C_DamageMeter.GetCombatSessionSourceFromID(sessionID, meterType, guid, creatureID)
         end
-        return C_DamageMeter.GetCombatSessionSourceFromType(sessionType, meterType, guid, creatureID)
+        if sessionType ~= nil then
+            return C_DamageMeter.GetCombatSessionSourceFromType(sessionType, meterType, guid, creatureID)
+        end
+
+        return nil
     end
 
     local details = Query(sourceGUID, sourceCreatureID)

@@ -471,8 +471,9 @@ local function GetClassColor(unit)
         end
     end
 
+    local customClassColors = rawget(_G, "CUSTOM_CLASS_COLORS")
     color = classFile
-        and ((CUSTOM_CLASS_COLORS and CUSTOM_CLASS_COLORS[classFile]) or (RAID_CLASS_COLORS and RAID_CLASS_COLORS[classFile]))
+        and ((customClassColors and customClassColors[classFile]) or (RAID_CLASS_COLORS and RAID_CLASS_COLORS[classFile]))
     r, g, b = ReadColor(color)
 
     if r and g and b then
@@ -1229,7 +1230,7 @@ end
 local function ChildNameMatches(child, patterns, auraType, unit)
     local name = child and child.GetName and child:GetName()
     local lowerName = not IsSecretValue(name) and type(name) == "string" and string.lower(name) or nil
-    local kind = GetAuraKindFromFields(child, unit)
+    local kind = GetAuraKindFromFields(child)
 
     if not LooksLikeAuraButton(child) then
         return false
@@ -1371,6 +1372,11 @@ local function ApplyManagedAuraVisibility(key)
         return false
     end
 
+    local hasOverrides = HasAuraVisibilityOverridesFor(key)
+    if not hasOverrides and not originalManagedAuraLimits[owner] then
+        return true
+    end
+
     if InCombatLockdown and InCombatLockdown() then
         pendingProtectedRefresh = true
         return true
@@ -1399,6 +1405,9 @@ local function ApplyManagedAuraVisibility(key)
     if not managedAuraHooks[owner] and type(hooksecurefunc) == "function" then
         managedAuraHooks[owner] = true
         hooksecurefunc(owner, "ConfigureAuraContainer", function()
+            -- Blizzard has applied its latest limits. Capture those on the next
+            -- override instead of restoring an obsolete configuration later.
+            originalManagedAuraLimits[owner] = nil
             if HasAuraVisibilityOverridesFor(key) and C_Timer and C_Timer.After then
                 C_Timer.After(0, function()
                     ApplyManagedAuraVisibility(key)
@@ -1438,6 +1447,8 @@ local function ApplyManagedAuraVisibility(key)
 
     if not buffsSet or not debuffsSet then
         pendingProtectedRefresh = true
+    elseif not hasOverrides then
+        originalManagedAuraLimits[owner] = nil
     end
 
     return true
@@ -1822,7 +1833,7 @@ function ns:InitializeUnitFrames()
         hooksecurefunc("UnitFrameHealthBar_Update", ScheduleHealthBars)
     end
 
-    if type(TargetFrame_UpdateAuras) == "function" then
+    if type(rawget(_G, "TargetFrame_UpdateAuras")) == "function" then
         hooksecurefunc("TargetFrame_UpdateAuras", function()
             if HasAuraVisibilityOverrides() then
                 ScheduleAuraVisibility(0.08)

@@ -193,8 +193,6 @@ end
 local function EnsureMountJournalLoaded()
     if C_AddOns and C_AddOns.LoadAddOn then
         pcall(C_AddOns.LoadAddOn, "Blizzard_Collections")
-    elseif LoadAddOn then
-        pcall(LoadAddOn, "Blizzard_Collections")
     end
 end
 
@@ -327,16 +325,14 @@ local function GetSpellName(spellID)
         return info and info.name
     end
 
-    return GetSpellInfo and GetSpellInfo(spellID)
+    return nil
 end
 
 local function IsSpellKnownByPlayer(spellID)
-    if C_SpellBook and C_SpellBook.IsSpellKnown then
+    if C_SpellBook and C_SpellBook.IsSpellKnownOrInSpellBook then
+        return C_SpellBook.IsSpellKnownOrInSpellBook(spellID)
+    elseif C_SpellBook and C_SpellBook.IsSpellKnown then
         return C_SpellBook.IsSpellKnown(spellID)
-    elseif IsPlayerSpell then
-        return IsPlayerSpell(spellID)
-    elseif IsSpellKnown then
-        return IsSpellKnown(spellID)
     end
 
     return GetSpellName(spellID) ~= nil
@@ -353,8 +349,6 @@ local function SpellUsable(spellID)
 
     if C_Spell and C_Spell.IsSpellUsable then
         usable, noMana = C_Spell.IsSpellUsable(spellID)
-    elseif IsUsableSpell then
-        usable, noMana = IsUsableSpell(spellName)
     else
         usable = true
     end
@@ -398,16 +392,10 @@ local function NormalizeFactionToken(value)
             return "Alliance"
         end
     elseif type(value) == "number" then
-        if LE_MOUNT_FACTION_HORDE ~= nil and value == LE_MOUNT_FACTION_HORDE then
-            return "Horde"
-        elseif LE_MOUNT_FACTION_ALLIANCE ~= nil and value == LE_MOUNT_FACTION_ALLIANCE then
-            return "Alliance"
-        end
-
-        if Enum and Enum.PlayerFaction then
-            if Enum.PlayerFaction.Horde ~= nil and value == Enum.PlayerFaction.Horde then
+        if Enum and Enum.PvPFaction then
+            if Enum.PvPFaction.Horde ~= nil and value == Enum.PvPFaction.Horde then
                 return "Horde"
-            elseif Enum.PlayerFaction.Alliance ~= nil and value == Enum.PlayerFaction.Alliance then
+            elseif Enum.PvPFaction.Alliance ~= nil and value == Enum.PvPFaction.Alliance then
                 return "Alliance"
             end
         end
@@ -894,7 +882,7 @@ local function GetBreathTimerState()
         return nil, nil, nil
     end
 
-    for index = 1, MIRRORTIMER_NUMTIMERS or 3 do
+    for index = 1, 3 do
         local timer, value, maxValue, scale = GetMirrorTimerInfo(index)
 
         if timer == "BREATH" then
@@ -1049,6 +1037,10 @@ end
 
 local function GetMountUsage(mountID)
     local db = EnsureDB()
+    if not db then
+        return 0
+    end
+
     db.mountUsage = db.mountUsage or {}
 
     return db.mountUsage[mountID] or db.mountUsage[tostring(mountID)] or 0
@@ -1272,7 +1264,8 @@ local function FindUsableMountByName(wantedName)
         local details = GetMountDetails(mountID)
         local name = details and details.name
 
-        if name
+        if details
+            and name
             and details.isCollected
             and IsMountAllowedForCharacter(details)
             and (IsMountUsable(details) or IsRecentlyOutOfCombat())
@@ -1317,7 +1310,7 @@ local function GetRideAlongMountCandidates()
         local details = GetMountDetails(mountID)
         local name = details and details.name
 
-        if name and details.isCollected and IsMountUsable(details) and IsMountAllowedForCharacter(details) and IsRideAlongMountAllowed(name) then
+        if details and name and details.isCollected and IsMountUsable(details) and IsMountAllowedForCharacter(details) and IsRideAlongMountAllowed(name) then
             candidates[#candidates + 1] = details.mountID
         end
     end
@@ -1481,7 +1474,7 @@ end
 BuildRandomMountPools = ns:WrapDiagnosticFunction("Mounts.BuildPools", BuildRandomMountPools)
 
 local function GetPreferredRandomPool(pools)
-    local db = EnsureDB()
+    local db = EnsureDB() or {}
 
     if pools.isFlyableWater and pools.canFly and #pools.surfaceFlying > 0 then
         return pools.surfaceFlying, "Flying"
@@ -1926,7 +1919,7 @@ function ns:GetCollectedMountSearch(query, limit)
         local details = GetMountDetails(mountID)
         local name = details and details.name
 
-        if name and details.isCollected and IsMountAllowedForCharacter(details) and string.find(NormalizeMountName(name), query, 1, true) then
+        if details and name and details.isCollected and IsMountAllowedForCharacter(details) and string.find(NormalizeMountName(name), query, 1, true) then
             mounts[#mounts + 1] = {
                 id = details.mountID,
                 name = name,
@@ -1961,7 +1954,7 @@ function ns:GetMountServiceOptions(serviceType)
         local details = GetMountDetails(mountID)
         local name = details and details.name
 
-        if name and details.isCollected and IsMountAllowedForCharacter(details) then
+        if details and name and details.isCollected and IsMountAllowedForCharacter(details) then
             local normalized = NormalizeMountName(name)
             local matchesService = false
 

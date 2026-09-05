@@ -17,6 +17,10 @@ local damageMeterHooksInstalled = false
 local applyingProfileDepth = 0
 local hookedDamageMeterFrames = {}
 
+local function GetBlizzardDamageMeter()
+    return rawget(_G, "DamageMeter")
+end
+
 local TYPE_LABELS = {
     DamageDone = "Damage Done",
     Dps = "DPS",
@@ -151,7 +155,7 @@ local function BumpAutoApplyGeneration()
 end
 
 local function TryLoadBlizzardDamageMeter()
-    return DamageMeter ~= nil
+    return GetBlizzardDamageMeter() ~= nil
 end
 
 local function IsBlizzardDamageMeterAvailable()
@@ -234,14 +238,15 @@ local function GetDamageMeterWindow(index)
         return nil
     end
 
-    local window = DamageMeter and DamageMeter.GetSessionWindow and SafeCall(DamageMeter.GetSessionWindow, DamageMeter, index)
+    local damageMeter = GetBlizzardDamageMeter()
+    local window = damageMeter and damageMeter.GetSessionWindow and SafeCall(damageMeter.GetSessionWindow, damageMeter, index)
     if window then return window end
 
     window = _G["DamageMeterSessionWindow" .. tostring(index)]
     if window then return window end
 
     for _, collectionName in ipairs({ "sessionWindows", "SessionWindows", "windows", "Windows" }) do
-        local collection = DamageMeter and DamageMeter[collectionName]
+        local collection = damageMeter and damageMeter[collectionName]
         if type(collection) == "table" and collection[index] then
             return collection[index]
         end
@@ -252,7 +257,7 @@ end
 
 local function GetFrameForWindow(index, window)
     if index == 1 then
-        return DamageMeter
+        return GetBlizzardDamageMeter()
     end
 
     return window
@@ -519,7 +524,8 @@ local function QueueDamageMeterProfileAutoApply()
 end
 
 local function IsEditModeActive()
-    if DamageMeter and DamageMeter.IsEditing and SafeCall(DamageMeter.IsEditing, DamageMeter) == true then
+    local damageMeter = GetBlizzardDamageMeter()
+    if damageMeter and damageMeter.IsEditing and SafeCall(damageMeter.IsEditing, damageMeter) == true then
         return true
     end
 
@@ -563,10 +569,11 @@ local function InstallDamageMeterHooks()
         QueueDamageMeterProfileAutoApply()
     end
 
-    InstallDamageMeterFrameHooks(DamageMeter)
-    SafeCall(hooksecurefunc, DamageMeter, "SetupSessionWindow", QueueAfterBlizzardLayout)
-    SafeCall(hooksecurefunc, DamageMeter, "RefreshLayout", QueueAfterBlizzardLayout)
-    SafeCall(hooksecurefunc, DamageMeter, "UpdateShownState", QueueAfterBlizzardLayout)
+    local damageMeter = GetBlizzardDamageMeter()
+    InstallDamageMeterFrameHooks(damageMeter)
+    SafeCall(hooksecurefunc, damageMeter, "SetupSessionWindow", QueueAfterBlizzardLayout)
+    SafeCall(hooksecurefunc, damageMeter, "RefreshLayout", QueueAfterBlizzardLayout)
+    SafeCall(hooksecurefunc, damageMeter, "UpdateShownState", QueueAfterBlizzardLayout)
 
     damageMeterHooksInstalled = true
 end
@@ -774,8 +781,9 @@ function ns:SetBlizzardDamageMeterEnabled(value)
     local ok, result = pcall(setter, "damageMeterEnabled", enabled and "1" or "0")
     if not ok or result == false then return false end
 
-    if DamageMeter and DamageMeter.UpdateShownState then
-        SafeCall(DamageMeter.UpdateShownState, DamageMeter)
+    local damageMeter = GetBlizzardDamageMeter()
+    if damageMeter and damageMeter.UpdateShownState then
+        SafeCall(damageMeter.UpdateShownState, damageMeter)
     end
 
     if enabled and ns.GetCustomDamageMeterEnabled and ns:GetCustomDamageMeterEnabled() and ns.SetCustomDamageMeterEnabled then
@@ -849,6 +857,10 @@ function ns:ApplyDamageMeterProfile(key, silent, options)
 
     if not ProfileHasSavedLayout(profile) then
         return false, "This profile does not have a saved layout yet."
+    end
+
+    if type(profile) ~= "table" then
+        return false, "The selected damage meter profile is invalid."
     end
 
     applyingProfileDepth = applyingProfileDepth + 1

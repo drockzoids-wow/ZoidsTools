@@ -121,6 +121,7 @@ local function CreateSubtitleFrame()
     end)
 
     frame.moveOverlay = CreateFrame("Frame", nil, frame, "BackdropTemplate")
+    ---@cast frame Frame
     frame.moveOverlay:SetAllPoints(frame)
     frame.moveOverlay:EnableMouse(true)
     frame.moveOverlay:RegisterForDrag("LeftButton")
@@ -194,6 +195,7 @@ local function ShowLine(name, text, duration)
     if type(text) ~= "string" or text == "" then return end
     local db = EnsureDB()
     local frame = CreateSubtitleFrame()
+    ---@cast frame Frame
     ApplyAppearance()
     lineToken = lineToken + 1
     local token = lineToken

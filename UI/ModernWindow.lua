@@ -447,7 +447,7 @@ local function FormatWarbandBest(level)
 end
 
 local function GetWarbandClassColor(classFile)
-    local colors = CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS
+    local colors = rawget(_G, "CUSTOM_CLASS_COLORS") or RAID_CLASS_COLORS
     local color = colors and classFile and colors[classFile]
     if color then
         return color.r or 1, color.g or 1, color.b or 1
@@ -539,7 +539,7 @@ local function ShowWarbandCharacterTooltip(row)
         end
     end
     GameTooltip:AddLine(" ")
-    GameTooltip:AddDoubleLine("Last updated", updatedText, 0.55, 0.55, 0.58, 0.75, 0.75, 0.78)
+    GameTooltip:AddDoubleLine("Last updated", tostring(updatedText or "Unknown"), 0.55, 0.55, 0.58, 0.75, 0.75, 0.78)
     GameTooltip:Show()
 end
 
@@ -2303,7 +2303,6 @@ local function CreateMountsPage(parent)
         if UI.SetControlEnabled then
             local active = enabled:GetChecked() == true
             UI.SetControlEnabled(resetRotation, active)
-            UI.SetControlEnabled(openLegacy, true)
             UI.SetControlEnabled(recentAvoid, active)
             UI.SetControlEnabled(preferGround, active)
             UI.SetControlEnabled(surfaceWater, active)
@@ -2532,7 +2531,6 @@ local function CreateWindowsPage(parent)
             UI.SetControlEnabled(refreshButton, active)
             UI.SetControlEnabled(resetButton, active)
             UI.SetControlEnabled(resetScalesButton, active)
-            UI.SetControlEnabled(openLegacy, true)
         end
 
         local windowCount, bagCount, scaleCount = 0, 0, 0
@@ -2887,7 +2885,6 @@ local function CreateProfessionsPage(parent)
             UI.SetControlEnabled(mill, active)
             UI.SetControlEnabled(prospect, active)
             UI.SetControlEnabled(open, active)
-            UI.SetControlEnabled(openLegacy, true)
         end
 
         if ns.GetProfessionHelperStatusText then
@@ -3008,7 +3005,6 @@ local function CreateTalentsPage(parent)
             UI.SetControlEnabled(targetButton, active)
             UI.SetControlEnabled(modeButton, active)
             UI.SetControlEnabled(refreshButton, active)
-            UI.SetControlEnabled(openLegacy, true)
         end
 
         if ns.GetTalentGrimoireStatusText then

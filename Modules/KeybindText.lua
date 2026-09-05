@@ -409,19 +409,19 @@ end
 local function IsActionButtonOutOfRange(button)
     local action = GetActionSlot(button)
 
-    if not action or not HasAction or not HasAction(action) then
+    if not action or not C_ActionBar or not C_ActionBar.HasAction or not C_ActionBar.HasAction(action) then
         return false
     end
 
-    if ActionHasRange and not ActionHasRange(action) then
+    if C_ActionBar.HasRangeRequirements and not C_ActionBar.HasRangeRequirements(action) then
         return false
     end
 
-    if not IsActionInRange then
+    if not C_ActionBar.IsActionInRange then
         return false
     end
 
-    local inRange = IsActionInRange(action)
+    local inRange = C_ActionBar.IsActionInRange(action)
 
     return IsOutOfRangeValue(inRange)
 end
@@ -673,7 +673,7 @@ local function InstallHooks()
     hooksInstalled = true
 
     if type(hooksecurefunc) == "function" then
-        if type(ActionButton_UpdateHotkeys) == "function" then
+        if type(rawget(_G, "ActionButton_UpdateHotkeys")) == "function" then
             hooksecurefunc("ActionButton_UpdateHotkeys", function(button)
                 if IsCombatLocked() then
                     return
@@ -683,7 +683,7 @@ local function InstallHooks()
             end)
         end
 
-        if type(ActionButton_Update) == "function" then
+        if type(rawget(_G, "ActionButton_Update")) == "function" then
             hooksecurefunc("ActionButton_Update", function(button)
                 if not IsCombatLocked() then
                     ApplyHotkey(button, true)

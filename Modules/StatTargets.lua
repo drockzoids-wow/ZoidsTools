@@ -274,7 +274,7 @@ local function GetClassAndSpec()
     local _, classToken = UnitClass("player")
     local specIndex = GetSpecialization and GetSpecialization()
     local specKey = classToken and specIndex and SPEC_KEYS[classToken] and SPEC_KEYS[classToken][specIndex]
-    local root = _G.ZoidsToolsStatTargets
+    local root = ns.StatGoalsData and ns.StatGoalsData.data
 
     if classToken and specIndex and GetSpecializationInfo and root and root[classToken] then
         local _, specName = GetSpecializationInfo(specIndex)
@@ -297,7 +297,7 @@ local function GetSnapshot()
 
     local context = GetContextLabel()
     local roots = {
-        _G.ZoidsToolsStatTargets,
+        ns.StatGoalsData and ns.StatGoalsData.data,
     }
 
     for _, root in ipairs(roots) do
@@ -1401,6 +1401,10 @@ local function RefreshStatPanel()
         if panel then panel:Hide() end
         if sourceDropdown then sourceDropdown:Hide() end
         if toggle then toggle:Hide() end
+        return
+    end
+
+    if not toggle then
         return
     end
 

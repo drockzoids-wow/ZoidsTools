@@ -229,7 +229,7 @@ local function IsSpellKnown(spellID)
         end
     end
 
-    return IsPlayerSpell and IsPlayerSpell(spellID)
+    return false
 end
 
 local function GetSpellName(spellID)
@@ -237,7 +237,7 @@ local function GetSpellName(spellID)
         return C_Spell.GetSpellName(spellID)
     end
 
-    return GetSpellInfo and GetSpellInfo(spellID)
+    return nil
 end
 
 local function GetItemName(itemID)
@@ -253,7 +253,8 @@ local function GetStackCount(location)
 end
 
 local function IsKeyUsable(itemID)
-    if not C_TooltipInfo or not C_TooltipInfo.GetItemByID or not Enum or not Enum.TooltipDataLineType then
+    if not C_TooltipInfo or not C_TooltipInfo.GetItemByID or not Enum
+        or not Enum.TooltipDataLineType or not Enum.TooltipDataUsageRequirementType then
         return true
     end
 
@@ -263,10 +264,11 @@ local function IsKeyUsable(itemID)
         return true
     end
 
-    for index = 3, #data.lines do
+    for index = 1, #data.lines do
         local line = data.lines[index]
 
-        if line and line.type == Enum.TooltipDataLineType.RestrictedSkill then
+        if line and line.type == Enum.TooltipDataLineType.UsageRequirement
+            and line.requirementType == Enum.TooltipDataUsageRequirementType.Skill then
             return line.leftColor and line.leftColor:IsRGBEqualTo(CreateColor(1, 1, 1))
         end
     end
@@ -816,12 +818,6 @@ local function GetHoveredBagSlot()
                     candidates[#candidates + 1] = value
                 end
             end
-        end
-    elseif type(GetMouseFocus) == "function" then
-        local ok, focus = pcall(GetMouseFocus)
-
-        if ok then
-            candidates[1] = focus
         end
     end
 

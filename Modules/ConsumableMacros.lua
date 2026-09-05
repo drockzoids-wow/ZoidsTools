@@ -100,8 +100,6 @@ end
 local function GetContainerNumSlotsSafe(bag)
     if C_Container and C_Container.GetContainerNumSlots then
         return C_Container.GetContainerNumSlots(bag) or 0
-    elseif GetContainerNumSlots then
-        return GetContainerNumSlots(bag) or 0
     end
 
     return 0
@@ -110,8 +108,6 @@ end
 local function GetContainerItemIDSafe(bag, slot)
     if C_Container and C_Container.GetContainerItemID then
         return C_Container.GetContainerItemID(bag, slot)
-    elseif GetContainerItemID then
-        return GetContainerItemID(bag, slot)
     end
 end
 
@@ -120,10 +116,6 @@ local function GetContainerItemCountSafe(bag, slot)
         local info = C_Container.GetContainerItemInfo(bag, slot)
 
         return info and info.stackCount or 0
-    elseif GetContainerItemInfo then
-        local _, count = GetContainerItemInfo(bag, slot)
-
-        return count or 0
     end
 
     return 0
@@ -136,12 +128,6 @@ local function GetItemCountSafe(itemID)
 
     if C_Item and C_Item.GetItemCount then
         local ok, count = pcall(C_Item.GetItemCount, itemID, false, false)
-
-        if ok then
-            return count or 0
-        end
-    elseif GetItemCount then
-        local ok, count = pcall(GetItemCount, itemID, false, false)
 
         if ok then
             return count or 0
@@ -173,6 +159,7 @@ local function BuildBagSignature()
     return table.concat(parts, "|")
 end
 
+---@type GameTooltip?
 local tooltipScanner
 
 local function ReadTooltipViaScanner(bag, slot)
@@ -182,6 +169,7 @@ local function ReadTooltipViaScanner(bag, slot)
 
     if not tooltipScanner then
         tooltipScanner = CreateFrame("GameTooltip", "ZoidsToolsConsumableScannerTooltip", UIParent, "GameTooltipTemplate")
+        ---@cast tooltipScanner GameTooltip
         tooltipScanner:SetOwner(UIParent, "ANCHOR_NONE")
     end
 
@@ -447,16 +435,12 @@ end
 local function GetItemInfoSafe(itemID)
     if C_Item and C_Item.GetItemInfo then
         return C_Item.GetItemInfo(itemID)
-    elseif GetItemInfo then
-        return GetItemInfo(itemID)
     end
 end
 
 local function GetItemInfoInstantSafe(itemID)
     if C_Item and C_Item.GetItemInfoInstant then
         return C_Item.GetItemInfoInstant(itemID)
-    elseif GetItemInfoInstant then
-        return GetItemInfoInstant(itemID)
     end
 end
 
@@ -620,8 +604,6 @@ local function GetRecuperateName()
         if info and info.name then
             return info.name
         end
-    elseif GetSpellInfo then
-        return GetSpellInfo(RECUPERATE_SPELL_ID)
     end
 
     return "Recuperate"

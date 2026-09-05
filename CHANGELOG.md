@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Vendor known-item highlighting now shades collected pets green once at least one copy is owned, and refreshes when the pet journal updates.
+- Guarded hearthstone and Mythic+ invite spell-event handlers against restricted values in WoW 12.1.
+- Fixed target/focus aura visibility overrides restoring obsolete Blizzard limits, and stopped writing aura limits when no override is active.
+- Updated profession lockbox-key checks to the current skill-requirement tooltip format and mount faction checks to the documented PvPFaction enum.
+- Fixed the Hearthstone selector using English fallback names instead of localized toy names.
 - Unified the BiS tooltip context with the Items page's saved Raid/Mythic+ selection, normalized invalid legacy values to Mythic+, and added the active tooltip selection to Generated Data Status for verification.
 - Removed the GearInsight footer from item tooltips and moved its source/update information into the Items page's Generated Data Status section.
 - Fixed a character-overlay item-data feedback loop that could rebuild every equipped slot more than one hundred times per second, generate thousands of redundant item-data callbacks, and produce large sawtooth memory swings. Loaded item callbacks and bounded retries now handle delayed gem and enchant data without globally refreshing on every item result.

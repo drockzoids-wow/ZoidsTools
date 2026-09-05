@@ -336,7 +336,7 @@ local function AnnounceMissingBuff(buffName)
         return
     end
 
-    local sender = C_ChatInfo and C_ChatInfo.SendChatMessage or SendChatMessage
+    local sender = C_ChatInfo and C_ChatInfo.SendChatMessage
     if type(sender) ~= "function" then
         return
     end
@@ -363,14 +363,6 @@ local function GetSpellName(spellID, fallbackName)
         end
     end
 
-    if GetSpellInfo then
-        local name = GetSpellInfo(spellID)
-
-        if name then
-            return name
-        end
-    end
-
     return fallbackName
 end
 
@@ -391,14 +383,6 @@ local function GetSpellIcon(spellID)
         end
     end
 
-    if GetSpellTexture then
-        local icon = GetSpellTexture(spellID)
-
-        if icon then
-            return icon
-        end
-    end
-
     return MISSING_ICON_FALLBACK
 end
 
@@ -407,11 +391,10 @@ local function PlayerCanCastBuff(spellID)
         return false
     end
 
-    if IsPlayerSpell and SafeAPICall(IsPlayerSpell, spellID) == true then
-        return true
-    end
-
-    if IsSpellKnown and SafeAPICall(IsSpellKnown, spellID) == true then
+    if C_SpellBook
+        and C_SpellBook.IsSpellKnownOrInSpellBook
+        and SafeAPICall(C_SpellBook.IsSpellKnownOrInSpellBook, spellID) == true
+    then
         return true
     end
 

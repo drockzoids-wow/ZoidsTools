@@ -4,6 +4,7 @@ local frame
 local initialized = false
 local sellQueue
 local sellQueueIndex = 1
+---@type GameTooltip?
 local knownTooltip
 local knownMerchantTouched = false
 local IsMerchantOpen
@@ -71,6 +72,7 @@ local function EnsureKnownTooltip()
     end
 
     knownTooltip = CreateFrame("GameTooltip", "ZoidsToolsKnownMerchantTooltip", UIParent, "GameTooltipTemplate")
+    ---@cast knownTooltip GameTooltip
     knownTooltip:SetOwner(UIParent, "ANCHOR_NONE")
 
     return knownTooltip
@@ -92,7 +94,7 @@ local function TooltipLineHasKnownText(text)
 end
 
 local function TooltipLineHasOwnedHousingText(text)
-    local ownedFormat = HOUSING_DECOR_OWNED_COUNT_FORMAT
+    local ownedFormat = rawget(_G, "HOUSING_DECOR_OWNED_COUNT_FORMAT")
 
     if not text or not ownedFormat then
         return false
@@ -148,13 +150,42 @@ local function TooltipDataHasKnownLine(data, isHousingItem)
     return false
 end
 
+local function IsCollectedPetItem(itemID)
+    if type(itemID) ~= "number" or not C_PetJournal
+        or type(C_PetJournal.GetPetInfoByItemID) ~= "function"
+        or type(C_PetJournal.GetNumCollectedInfo) ~= "function" then
+        return false
+    end
+
+    -- Pet tooltips say "Collected (1/3)" rather than "Already Known".
+    -- Query the species directly so one owned copy is enough in any locale.
+    local ok, speciesID = pcall(function()
+        return select(13, C_PetJournal.GetPetInfoByItemID(itemID))
+    end)
+    if not ok or (issecretvalue and issecretvalue(speciesID))
+        or type(speciesID) ~= "number" or speciesID <= 0 then
+        return false
+    end
+
+    local countOK, count = pcall(C_PetJournal.GetNumCollectedInfo, speciesID)
+    return countOK and not (issecretvalue and issecretvalue(count))
+        and type(count) == "number" and count > 0
+end
+
 local function TooltipHasKnownLine(merchantIndex)
     if not merchantIndex or merchantIndex <= 0 then
         return false
     end
 
     local itemLink = GetMerchantItemLink and GetMerchantItemLink(merchantIndex) or nil
-    local itemClassID = itemLink and C_Item and C_Item.GetItemInfoInstant and select(6, C_Item.GetItemInfoInstant(itemLink)) or nil
+    local itemID, itemClassID
+    if itemLink and C_Item and C_Item.GetItemInfoInstant then
+        local _
+        itemID, _, _, _, _, itemClassID = C_Item.GetItemInfoInstant(itemLink)
+    end
+    if IsCollectedPetItem(itemID) then
+        return true
+    end
     local isHousingItem = itemClassID == ITEM_CLASS_HOUSING
 
     if C_TooltipInfo then
@@ -344,8 +375,8 @@ end
 local function FormatMoney(amount)
     amount = tonumber(amount) or 0
 
-    if GetCoinTextureString then
-        return GetCoinTextureString(amount)
+    if C_CurrencyInfo and C_CurrencyInfo.GetCoinTextureString then
+        return C_CurrencyInfo.GetCoinTextureString(amount)
     end
 
     return tostring(amount) .. " copper"
@@ -369,8 +400,6 @@ end
 local function GetContainerNumSlotsSafe(bag)
     if C_Container and C_Container.GetContainerNumSlots then
         return C_Container.GetContainerNumSlots(bag) or 0
-    elseif GetContainerNumSlots then
-        return GetContainerNumSlots(bag) or 0
     end
 
     return 0
@@ -379,8 +408,6 @@ end
 local function GetContainerItemLinkSafe(bag, slot)
     if C_Container and C_Container.GetContainerItemLink then
         return C_Container.GetContainerItemLink(bag, slot)
-    elseif GetContainerItemLink then
-        return GetContainerItemLink(bag, slot)
     end
 end
 
@@ -391,18 +418,12 @@ local function GetContainerItemInfoSafe(bag, slot)
         if info then
             return info.quality, info.isLocked, info.hasNoValue, info.hyperlink or GetContainerItemLinkSafe(bag, slot), info.isBound
         end
-    elseif GetContainerItemInfo then
-        local _, _, locked, quality, _, _, link, _, noValue, _, isBound = GetContainerItemInfo(bag, slot)
-
-        return quality, locked, noValue, link, isBound
     end
 end
 
 local function UseContainerItemSafe(bag, slot)
     if C_Container and C_Container.UseContainerItem then
         return pcall(C_Container.UseContainerItem, bag, slot)
-    elseif UseContainerItem then
-        return pcall(UseContainerItem, bag, slot)
     end
 
     return false
@@ -415,12 +436,6 @@ local function GetItemBindType(link)
 
     if C_Item and C_Item.GetItemInfo then
         local info = { C_Item.GetItemInfo(link) }
-
-        if info[14] then
-            return info[14]
-        end
-    elseif GetItemInfo then
-        local info = { GetItemInfo(link) }
 
         if info[14] then
             return info[14]
@@ -443,8 +458,6 @@ local function IsEquippableItemLink(link)
 
     if C_Item and C_Item.GetItemInfoInstant then
         equipLocation = select(4, C_Item.GetItemInfoInstant(link))
-    elseif GetItemInfoInstant then
-        equipLocation = select(4, GetItemInfoInstant(link))
     end
 
     return type(equipLocation) == "string" and equipLocation ~= ""
@@ -708,13 +721,14 @@ function ns:InitializeVendorAutomation()
     frame:RegisterEvent("MERCHANT_SHOW")
     frame:RegisterEvent("MERCHANT_UPDATE")
     frame:RegisterEvent("MERCHANT_CLOSED")
+    frame:RegisterEvent("PET_JOURNAL_LIST_UPDATE")
     frame:SetScript("OnEvent", function(_, event)
         if event == "MERCHANT_CLOSED" then
             HideKnownMerchantOverlays()
             return
         end
 
-        if event == "MERCHANT_UPDATE" then
+        if event == "MERCHANT_UPDATE" or event == "PET_JOURNAL_LIST_UPDATE" then
             QueueKnownMerchantOverlayRefresh()
             QueueKnownMerchantOverlayRefresh(0.3)
             return

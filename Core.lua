@@ -5,8 +5,6 @@ ns.title = "ZoidsTools"
 local metadataVersion
 if C_AddOns and C_AddOns.GetAddOnMetadata then
     metadataVersion = C_AddOns.GetAddOnMetadata(ADDON_NAME, "Version")
-elseif GetAddOnMetadata then
-    metadataVersion = GetAddOnMetadata(ADDON_NAME, "Version")
 end
 ns.version = metadataVersion and not metadataVersion:find("@", 1, true) and metadataVersion or "Development"
 local CURRENT_MIGRATION_VERSION = 5

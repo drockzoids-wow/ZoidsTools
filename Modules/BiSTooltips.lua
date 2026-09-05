@@ -98,7 +98,7 @@ local function GetClassAndSpec()
         specName = localizedName
 
         local normalized = NormalizeSpecName(localizedName)
-        local root = _G.ZoidsToolsBiS
+        local root = ns.BiSData
         if root and root.data and root.data[classToken] and root.data[classToken][normalized] then
             specKey = normalized
         end
@@ -108,7 +108,7 @@ local function GetClassAndSpec()
 end
 
 local function RetainPlayerClassData()
-    local root = _G.ZoidsToolsBiS
+    local root = ns.BiSData
     if type(root) ~= "table" or type(root.data) ~= "table" or type(UnitClass) ~= "function" then
         return
     end
@@ -150,7 +150,7 @@ local function GetItemEquipLocation(itemLink)
         return nil
     end
 
-    local getter = C_Item and C_Item.GetItemInfoInstant or GetItemInfoInstant
+    local getter = C_Item and C_Item.GetItemInfoInstant
     if type(getter) ~= "function" then
         return nil
     end
@@ -172,7 +172,7 @@ local function GetRecommendations(itemLink)
         return nil
     end
 
-    local root = _G.ZoidsToolsBiS
+    local root = ns.BiSData
     if type(root) ~= "table" or type(root.data) ~= "table" then
         return nil
     end
@@ -277,7 +277,7 @@ function ns:SetBiSContext(value)
 end
 
 function ns:GetBiSDataStatusText()
-    local root = _G.ZoidsToolsBiS
+    local root = ns.BiSData
     if type(root) ~= "table" or type(root.data) ~= "table" or not next(root.data) then
         return "BiS rankings: no generated data yet.\nRun UpdateAll.cmd, then reload WoW."
     end

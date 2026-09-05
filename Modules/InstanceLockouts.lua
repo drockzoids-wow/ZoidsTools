@@ -1195,6 +1195,10 @@ local function SortSeasonalDungeons(list)
         return list
     end
 
+    if not db then
+        return list
+    end
+
     local sorted = {}
     for index, info in ipairs(list or {}) do
         sorted[index] = info

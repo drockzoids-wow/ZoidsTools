@@ -1185,20 +1185,8 @@ local function RegisterUIPanelWindows()
         MakeMovable(_G[name])
     end
 
-    if PlayerSpellsFrame then
-        MakeMovable(PlayerSpellsFrame)
-    end
-
-    if ClassTalentFrame then
-        MakeMovable(ClassTalentFrame)
-    end
-
-    if PlayerTalentFrame then
-        MakeMovable(PlayerTalentFrame)
-    end
-
-    if SpellBookFrame then
-        MakeMovable(SpellBookFrame)
+    for _, name in ipairs({ "PlayerSpellsFrame", "ClassTalentFrame", "PlayerTalentFrame", "SpellBookFrame" }) do
+        MakeMovable(rawget(_G, name))
     end
 
     RefreshWorldMapMovement()

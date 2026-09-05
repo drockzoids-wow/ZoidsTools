@@ -436,8 +436,8 @@ local function UpdateCooldown()
     local candidate = button.candidate
     local questLogIndex = candidate.questLogIndex
     local start, duration, enabled
-    if candidate.inventoryItem and C_Container and C_Container.GetItemCooldown then
-        start, duration, enabled = C_Container.GetItemCooldown(candidate.bag, candidate.slot)
+    if candidate.inventoryItem and C_Container and C_Container.GetContainerItemCooldown then
+        start, duration, enabled = C_Container.GetContainerItemCooldown(candidate.bag, candidate.slot)
     else
         start, duration, enabled = GetQuestLogSpecialItemCooldown(questLogIndex)
     end

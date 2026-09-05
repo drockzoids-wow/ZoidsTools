@@ -331,7 +331,10 @@ function ns:ReportChatDiagnostics()
         ReadBooleanMethod(container, "IsMouseEnabled"),
         ReadBooleanMethod(container, "IsMouseClickEnabled"),
         ReadBooleanMethod(container, "DoesHyperlinkPropagateToParent"),
-        ChatFrameMixin and type(ChatFrameMixin.OnHyperlinkClick) == "function" and "present" or "missing"
+        type(rawget(_G, "ChatFrameMixin")) == "table"
+            and type(rawget(_G, "ChatFrameMixin").OnHyperlinkClick) == "function"
+            and "present"
+            or "missing"
     ))
 
     self:Print("Chat diagnostics are read-only; ZoidsTools does not hook Blizzard's normal chat hyperlink scripts.")
@@ -463,7 +466,7 @@ local function RestoreFrameAppearance(frame)
 
     local background = GetChatBackground(frame)
     local alpha = background and originalBackgroundAlphas[background]
-    if frame.ZTChatBackgroundApplied and alpha ~= nil and background.SetAlpha then
+    if frame.ZTChatBackgroundApplied and background and alpha ~= nil and background.SetAlpha then
         background:SetAlpha(alpha)
     end
     frame.ZTChatBackgroundApplied = nil
@@ -1268,8 +1271,9 @@ local function GetPlayerClassColor()
         if color and color.GetRGB then return color:GetRGB() end
     end
 
+    local customClassColors = rawget(_G, "CUSTOM_CLASS_COLORS")
     local color = classFile
-        and ((CUSTOM_CLASS_COLORS and CUSTOM_CLASS_COLORS[classFile])
+        and ((customClassColors and customClassColors[classFile])
             or (RAID_CLASS_COLORS and RAID_CLASS_COLORS[classFile]))
     if color then return color.r or 1, color.g or 0.82, color.b or 0 end
     return 1, 0.82, 0

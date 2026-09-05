@@ -54,11 +54,9 @@ end
 
 local function SpellIsKnown(spellID)
     if not spellID then return false end
-    if C_SpellBook and C_SpellBook.IsSpellKnown then
-        return C_SpellBook.IsSpellKnown(spellID)
+    if C_SpellBook and C_SpellBook.IsSpellKnownOrInSpellBook then
+        return C_SpellBook.IsSpellKnownOrInSpellBook(spellID)
     end
-    if IsPlayerSpell then return IsPlayerSpell(spellID) end
-    if IsSpellKnown then return IsSpellKnown(spellID) end
     return false
 end
 
@@ -66,8 +64,7 @@ local function ReadSpellInfo(spellID)
     if C_Spell and C_Spell.GetSpellInfo then
         return C_Spell.GetSpellInfo(spellID)
     end
-    local name, _, icon = _G.GetSpellInfo and _G.GetSpellInfo(spellID)
-    return name and { name = name, iconID = icon } or nil
+    return nil
 end
 
 local function FindPortalSpell(activityName)
@@ -291,8 +288,8 @@ function ns:InitializeMythicInviteBanner()
         elseif event == "PLAYER_REGEN_ENABLED" and pendingPortalSpell then
             ConfigurePortalButton(pendingPortalSpell)
         elseif event == "UNIT_SPELLCAST_SUCCEEDED" then
-            local unit = searchResultID
-            local spellID = oldStatus
+            local unit = SafeValue(searchResultID)
+            local spellID = SafeValue(oldStatus)
 
             if unit == "player" and lastInvite and spellID == lastInvite.spellID and banner then
                 banner:Hide()

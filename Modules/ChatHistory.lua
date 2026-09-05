@@ -16,7 +16,10 @@ local function GetDB()
 end
 
 local function CharacterKey()
-    local name, realm = UnitFullName and UnitFullName("player")
+    local name, realm
+    if UnitFullName then
+        name, realm = UnitFullName("player")
+    end
     name = name or (UnitName and UnitName("player")) or "Unknown"
     realm = realm or (GetRealmName and GetRealmName()) or "Unknown"
     return name .. "-" .. realm

@@ -250,17 +250,11 @@ local function SetQualityColor(fontString, itemLink, fallbackR, fallbackG, fallb
                 quality = select(3, SafeCall(C_Item.GetItemInfo, itemLink))
             end
 
-            if not quality and GetItemInfo then
-                quality = select(3, SafeCall(GetItemInfo, itemLink))
-            end
-
             if quality then
                 local r, g, b
 
                 if C_Item and C_Item.GetItemQualityColor then
                     r, g, b = C_Item.GetItemQualityColor(quality)
-                elseif GetItemQualityColor then
-                    r, g, b = GetItemQualityColor(quality)
                 end
 
                 if r and g and b then
@@ -288,8 +282,6 @@ end
 local function GetItemInfoInstantEquipLoc(itemLink)
     if C_Item and C_Item.GetItemInfoInstant then
         return select(4, SafeCall(C_Item.GetItemInfoInstant, itemLink))
-    elseif GetItemInfoInstant then
-        return select(4, SafeCall(GetItemInfoInstant, itemLink))
     end
 
     return nil
@@ -302,8 +294,6 @@ local function FetchContainerItemLink(bag, slot)
 
     if C_Container and C_Container.GetContainerItemLink then
         return SafeCall(C_Container.GetContainerItemLink, bag, slot)
-    elseif _G.GetContainerItemLink then
-        return SafeCall(_G.GetContainerItemLink, bag, slot)
     end
 
     return nil
@@ -339,14 +329,6 @@ local function GetBagItemLevel(bag, slot, itemLink)
 
     if not itemLevel and C_Item and C_Item.GetDetailedItemLevelInfo then
         itemLevel = SafeCall(C_Item.GetDetailedItemLevelInfo, itemLink)
-    end
-
-    if not itemLevel and GetDetailedItemLevelInfo then
-        itemLevel = SafeCall(GetDetailedItemLevelInfo, itemLink)
-    end
-
-    if not itemLevel and GetItemInfo then
-        itemLevel = select(4, SafeCall(GetItemInfo, itemLink))
     end
 
     return itemLevel
@@ -471,8 +453,8 @@ local function GetGemIcon(gemLink)
         return SafeCall(C_Item.GetItemIconByID, gemLink)
     end
 
-    if GetItemInfo then
-        return select(10, SafeCall(GetItemInfo, gemLink))
+    if C_Item and C_Item.GetItemInfo then
+        return select(10, SafeCall(C_Item.GetItemInfo, gemLink))
     end
 
     return nil
@@ -743,7 +725,9 @@ local function UpdateCharacterSlot(slotInfo, unit, isInspect)
 
         if db.character.itemLevel then
             local itemLevel = isInspect and nil or GetEquipmentItemLevel(slotInfo.slot, itemObject)
-            itemLevel = itemLevel or (GetDetailedItemLevelInfo and SafeCall(GetDetailedItemLevelInfo, itemLink))
+            itemLevel = itemLevel or (C_Item
+                and C_Item.GetDetailedItemLevelInfo
+                and SafeCall(C_Item.GetDetailedItemLevelInfo, itemLink))
 
             if itemLevel and itemLevel > 0 then
                 button.ZTItemLevelText:SetText(math.floor(itemLevel + 0.5))
@@ -883,8 +867,8 @@ local function GetButtonBagSlot(button, bankFrame)
         slot = button.slotID or button.SlotID or button.slot or button.Slot
     end
 
-    if bankFrame and bag == nil and BANK_CONTAINER then
-        bag = BANK_CONTAINER
+    if bankFrame and bag == nil then
+        bag = -1
     end
 
     return bag, slot
@@ -899,7 +883,9 @@ local function MapBindText(text)
         return "SB"
     elseif TextMatches(text, ITEM_ACCOUNTBOUND) or TextMatches(text, ITEM_BIND_TO_BNETACCOUNT) then
         return "WB"
-    elseif TextMatches(text, ITEM_ACCOUNTBOUND_UNTIL_EQUIP) or TextMatches(text, ITEM_BIND_TO_ACCOUNT_UNTIL_EQUIP) or TextMatches(text, ITEM_BIND_TO_BNETACCOUNT_UNTIL_EQUIP) then
+    elseif TextMatches(text, ITEM_ACCOUNTBOUND_UNTIL_EQUIP)
+        or TextMatches(text, ITEM_BIND_TO_ACCOUNT_UNTIL_EQUIP)
+        or TextMatches(text, rawget(_G, "ITEM_BIND_TO_BNETACCOUNT_UNTIL_EQUIP")) then
         return "WuE"
     end
 
@@ -1171,7 +1157,7 @@ local function RefreshBankFrames(forceClear)
         RefreshContainerFrame(_G.BankPanel, "bank")
     end
 
-    local bankSlots = NUM_BANKGENERIC_SLOTS or 28
+    local bankSlots = 28
 
     for index = 1, bankSlots do
         local button = _G["BankFrameItem" .. index]

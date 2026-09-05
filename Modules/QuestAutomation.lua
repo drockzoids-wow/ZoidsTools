@@ -118,14 +118,6 @@ local function IsRepeatableQuest(questID, frequency)
         return true
     end
 
-    if type(GetQuestFrequency) == "function" then
-        local questFrequency = SafeCall(GetQuestFrequency)
-
-        if tonumber(questFrequency or 0) and tonumber(questFrequency or 0) > 0 then
-            return true
-        end
-    end
-
     if questID and C_QuestInfoSystem and type(C_QuestInfoSystem.GetQuestClassification) == "function" then
         local classification = SafeCall(C_QuestInfoSystem.GetQuestClassification, questID)
 
@@ -139,17 +131,8 @@ local function IsRepeatableQuest(questID, frequency)
 end
 
 local function IsDailyQuest(frequency)
-    local dailyFrequency = LE_QUEST_FREQUENCY_DAILY or 1
-
-    if Enum and Enum.QuestFrequency and Enum.QuestFrequency.Daily then
-        dailyFrequency = Enum.QuestFrequency.Daily
-    end
-
+    local dailyFrequency = Enum and Enum.QuestFrequency and Enum.QuestFrequency.Daily or 1
     local questFrequency = tonumber(frequency)
-
-    if not questFrequency and type(GetQuestFrequency) == "function" then
-        questFrequency = tonumber(SafeCall(GetQuestFrequency))
-    end
 
     return questFrequency == tonumber(dailyFrequency)
 end

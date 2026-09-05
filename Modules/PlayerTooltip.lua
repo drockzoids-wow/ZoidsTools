@@ -82,7 +82,8 @@ local function GetUnitClassColor(unit)
         return nil
     end
 
-    local color = (CUSTOM_CLASS_COLORS and CUSTOM_CLASS_COLORS[classFile])
+    local customClassColors = rawget(_G, "CUSTOM_CLASS_COLORS")
+    local color = (customClassColors and customClassColors[classFile])
         or (RAID_CLASS_COLORS and RAID_CLASS_COLORS[classFile])
 
     if not color then

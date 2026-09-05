@@ -104,8 +104,9 @@ local function GetClassColor()
         end
     end
 
+    local customClassColors = rawget(_G, "CUSTOM_CLASS_COLORS")
     local color = classFile
-        and ((CUSTOM_CLASS_COLORS and CUSTOM_CLASS_COLORS[classFile]) or (RAID_CLASS_COLORS and RAID_CLASS_COLORS[classFile]))
+        and ((customClassColors and customClassColors[classFile]) or (RAID_CLASS_COLORS and RAID_CLASS_COLORS[classFile]))
 
     if color then
         return color.r or 1, color.g or 0.82, color.b or 0

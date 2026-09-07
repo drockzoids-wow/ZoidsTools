@@ -1043,7 +1043,6 @@ local function EnsureStatToggleButton()
     local button = CreateFrame("Button", "ZoidsToolsStatGoalsToggle", characterFrame, "BackdropTemplate")
     button:SetSize(50, 22)
     button:SetPoint("BOTTOMRIGHT", characterFrame, "BOTTOMRIGHT", -10, 10)
-    button:SetFrameLevel((characterFrame:GetFrameLevel() or 1) + 14)
     button:RegisterForClicks("LeftButtonUp")
     button:SetBackdrop({
         bgFile = "Interface\\Buttons\\WHITE8x8",
@@ -1091,10 +1090,10 @@ local function EnsureStatPanel()
         return nil
     end
 
-    local panel = CreateFrame("Frame", "ZoidsToolsStatGoalsPanel", UIParent, "BackdropTemplate")
+    -- Inherit the Character window's strata and stacking order so the entire
+    -- panel, including its controls, stays behind windows covering Character.
+    local panel = CreateFrame("Frame", "ZoidsToolsStatGoalsPanel", characterFrame, "BackdropTemplate")
     panel:SetSize(276, 190)
-    panel:SetFrameStrata(characterFrame:GetFrameStrata() or "HIGH")
-    panel:SetFrameLevel((characterFrame:GetFrameLevel() or 1) + 12)
     panel:SetClampedToScreen(true)
     panel:SetBackdrop({
         bgFile = "Interface\\Buttons\\WHITE8x8",
@@ -1284,8 +1283,6 @@ local function EnsureCharacterSourceDropdown()
     local control = CreateFrame("Frame", nil, parent)
     control:SetSize(112, 22)
     AnchorCharacterSourceDropdown(control, parent)
-    control:SetFrameStrata("HIGH")
-    control:SetFrameLevel((parent:GetFrameLevel() or 1) + 20)
 
     control.label = control:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     control.label:SetPoint("RIGHT", control, "RIGHT", -64, 0)
@@ -1316,8 +1313,6 @@ local function EnsureCharacterSourceDropdown()
 
     control.menu = CreateFrame("Frame", nil, control, "BackdropTemplate")
     control.menu:SetSize(58, (#SOURCE_OPTIONS * 20) + 8)
-    control.menu:SetFrameStrata("DIALOG")
-    control.menu:SetToplevel(true)
     control.menu:SetBackdrop({
         bgFile = "Interface\\Buttons\\WHITE8x8",
         edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",

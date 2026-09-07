@@ -274,6 +274,47 @@ local function IsQuestNearby(candidate)
         and candidate.distanceSq <= NEARBY_QUEST_DISTANCE_SQ
 end
 
+local function ItemHasLocationWarning(candidate)
+    if not C_TooltipInfo then
+        return false
+    end
+
+    local getter, firstArg, secondArg
+    if candidate.inventoryItem then
+        getter = C_TooltipInfo.GetBagItem
+        firstArg, secondArg = candidate.bag, candidate.slot
+    else
+        getter = C_TooltipInfo.GetQuestLogSpecialItem
+        firstArg = candidate.questLogIndex
+    end
+    if type(getter) ~= "function" then
+        return false
+    end
+
+    -- Read fresh tooltip data: bag contents can stay unchanged while the
+    -- item's required location becomes unavailable (including across phases).
+    local ok, data = pcall(getter, firstArg, secondArg)
+    if not ok or IsSecretValue(data) or type(data) ~= "table"
+        or IsSecretValue(data.lines) or type(data.lines) ~= "table" then
+        return false
+    end
+
+    for _, line in ipairs(data.lines) do
+        if not IsSecretValue(line) and type(line) == "table" then
+            for _, field in ipairs({ "leftText", "rightText" }) do
+                local text = line[field]
+                if not IsSecretValue(text) and type(text) == "string" then
+                    text = text:gsub("|c%x%x%x%x%x%x%x%x", ""):gsub("|r", "")
+                    if text:find("Not close enough to the required location.", 1, true) then
+                        return true
+                    end
+                end
+            end
+        end
+    end
+    return false
+end
+
 local function GetQuestCandidate(candidate, bagItemIndex)
     if not candidate then
         return nil
@@ -301,6 +342,9 @@ local function GetQuestCandidate(candidate, bagItemIndex)
     candidate.bag = bag
     candidate.slot = slot
     candidate.inventoryItem = inventoryItem
+    if ItemHasLocationWarning(candidate) then
+        return nil
+    end
     return candidate
 end
 
@@ -408,6 +452,9 @@ local function FindBestQuestItem()
         best.slot = entry.slot
         best.inventoryItem = true
         best.inferredInventoryItem = true
+        if ItemHasLocationWarning(best) then
+            best = nil
+        end
     end
 
     return best
@@ -620,6 +667,12 @@ local function CreateButton()
 
     button:SetScript("OnLeave", function()
         GameTooltip:Hide()
+    end)
+
+    button:SetScript("OnHide", function(self)
+        if GameTooltip:IsOwned(self) then
+            GameTooltip:Hide()
+        end
     end)
 
     button:SetScript("PostClick", function()

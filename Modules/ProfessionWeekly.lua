@@ -5,7 +5,7 @@ local DEFAULT_POINT = "CENTER"
 local DEFAULT_RELATIVE_POINT = "CENTER"
 local DEFAULT_X = 330
 local DEFAULT_Y = 40
-local TRACKER_WIDTH = 340
+local TRACKER_WIDTH = 340 -- Initial size; refreshed to fit the visible content.
 
 local tracker
 local eventFrame
@@ -763,6 +763,18 @@ local function UpdateTrackerHeaderControls()
     end
 end
 
+local function UpdateTrackerWidth(lineCount)
+    -- Match the header anchors, with a small gap between the title and hint.
+    local width = 12 + tracker.title:GetStringWidth() + 16
+        + tracker.hint:GetStringWidth() + 5 + tracker.lockButton:GetWidth()
+        + 4 + tracker.minimizeButton:GetWidth() + 8
+    for index = 1, lineCount do
+        -- Include the 12-pixel left inset and matching right padding.
+        width = math.max(width, tracker.lines[index].text:GetStringWidth() + 24)
+    end
+    tracker:SetWidth(math.ceil(width))
+end
+
 local function ApplyTrackerMouseBehavior()
     local db = EnsureDB()
     if not db or not tracker then return end
@@ -815,7 +827,6 @@ local function GetOrCreateTrackerLine(index)
 
     line.text = line:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
     line.text:SetPoint("LEFT", line, "LEFT", 2, 0)
-    line.text:SetPoint("RIGHT", line, "RIGHT", -2, 0)
     line.text:SetJustifyH("LEFT")
     line.text:SetWordWrap(false)
 
@@ -880,6 +891,7 @@ local function UpdateTracker()
         end
         tracker:SetHeight(36)
         UpdateTrackerHeaderControls()
+        UpdateTrackerWidth(0)
         tracker:Show()
         return
     end
@@ -977,6 +989,7 @@ local function UpdateTracker()
 
     tracker:SetHeight(math.max(50, 39 + (#lines * 17)))
     UpdateTrackerHeaderControls()
+    UpdateTrackerWidth(#lines)
     tracker:Show()
 end
 

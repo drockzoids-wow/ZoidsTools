@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Fixed offline Warband item counts being erased by an inventory scan during logout, when Blizzard can already return empty bags and equipment. Scanning now pauses while leaving the world and stops at logout, preserving the last recorded contents.
+- Added Warband > Item Search (`/zt inventory`) with item-name/ID search, expansion filters, per-location counts, and removal of offline character snapshots. Compact Inventory tooltips show a total, one row per character with Bags/Bank/Equipped counts, and a shared Warband bank row. Timestamp recording and display have been removed. Tooltip display can be disabled independently; unavailable banks preserve their last readable snapshot.
+- Added expansion dropdowns to default bags, character bank, and Warband bank, with nonmatching item dimming that combines with text search, plus an expansion label and logo above item BiS tooltips.
+- Fixed Stat Goals controls showing through overlapping windows by making the panel and dropdown inherit the Character window's layering.
 - Vendor known-item highlighting now shades collected pets green once at least one copy is owned, and refreshes when the pet journal updates.
 - Guarded hearthstone and Mythic+ invite spell-event handlers against restricted values in WoW 12.1.
 - Fixed target/focus aura visibility overrides restoring obsolete Blizzard limits, and stopped writing aura limits when no override is active.

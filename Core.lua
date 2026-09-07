@@ -506,6 +506,7 @@ local function PrintHelp()
     ns:Print("/zt2 also opens ZoidsTools.")
     ns:Print("/zt windows on/off toggles movable Blizzard windows.")
     ns:Print("/zt warband opens the Warband Weekly dashboard.")
+    ns:Print("/zt inventory opens Warband item search and tooltip options.")
     ns:Print("/zt goals opens Weekly Goals and profession progress options.")
     ns:Print("/zt tooltips opens player tooltip options.")
     ns:Print("/zt chat opens chat enhancement options.")
@@ -574,6 +575,8 @@ local function HandleSlash(input)
         ns:OpenConfig("windows")
     elseif input == "warband" or input == "weekly" or input == "dashboard" then
         ns:OpenConfig("warband")
+    elseif input == "inventory" or input == "itemsearch" then
+        ns:OpenConfig("inventory")
     elseif input == "tooltips" or input == "tooltip" then
         ns:OpenConfig("tooltips")
     elseif input == "chat" or input == "chat settings" then
@@ -931,6 +934,8 @@ local moduleInitializers = {
     "InitializePerformanceWidget",
     "InitializeCoordinates",
     "InitializeItemOverlays",
+    "InitializeItemExpansions",
+    "InitializeWarbandItems",
     "InitializeBiSTooltips",
     "InitializeStatTargets",
     "InitializeTalentGrimoire",

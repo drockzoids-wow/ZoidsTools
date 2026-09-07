@@ -221,12 +221,16 @@ local function ApplyBiSTooltip(tooltip)
         return
     end
 
+    tooltip.ZoidsToolsBiSApplied = true
+    if ns.AddItemExpansionTooltip then
+        ns:AddItemExpansionTooltip(tooltip, itemLink)
+    end
+
     local recommendations, context, specName = GetRecommendations(itemLink)
     if type(recommendations) ~= "table" then
         return
     end
 
-    tooltip.ZoidsToolsBiSApplied = true
     tooltip:AddLine(" ")
     tooltip:AddLine(
         string.format("ZoidsTools BiS - %s - %s", tostring(specName or "Current Spec"), context == "raid" and "Raid" or "Mythic+"),

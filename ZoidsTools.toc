@@ -45,6 +45,8 @@ Modules\FlyoutDirection.lua
 Modules\PerformanceWidget.lua
 Modules\Coordinates.lua
 Modules\ItemOverlays.lua
+Modules\ItemExpansions.lua
+Modules\WarbandItems.lua
 Modules\ProfessionHelper.lua
 Data\StatGoals.lua
 Data\BiS.lua
@@ -62,5 +64,6 @@ Modules\MinimapTools.lua
 Modules\PlayerTooltip.lua
 UI\Theme.lua
 UI\Controls.lua
+UI\WarbandItems.lua
 UI\ModernWindow.lua
 UI\Minimap.lua

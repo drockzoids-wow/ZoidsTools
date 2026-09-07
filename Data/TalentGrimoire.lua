@@ -5,7 +5,7 @@
 local _, ns = ...
 ns.TalentGrimoireData = ns.TalentGrimoireData or {}
 ns.TalentGrimoireData.schemaVersion = 3
-ns.TalentGrimoireData.generatedAt = "2026-09-04 16:45:31 -05:00"
+ns.TalentGrimoireData.generatedAt = "2026-09-07 09:46:13 -05:00"
 ns.TalentGrimoireData.source = "Archon + Icy Veins + Wowhead + Murlok.io"
 ns.TalentGrimoireData.providers = {
     archon = {
@@ -931,8 +931,8 @@ ns.TalentGrimoireData.rotationLoaders = {
                     heroTree = "Rider of the Apocalypse",
                     scenario = "raid",
                     scenarioLabel = "Raid",
-                    recommended = false,
-                    selected = false,
+                    recommended = true,
+                    selected = true,
                     stateTokens = {
                         "preset-1",
                         "talent-4",
@@ -962,8 +962,8 @@ ns.TalentGrimoireData.rotationLoaders = {
                     heroTree = "San'layn",
                     scenario = "raid",
                     scenarioLabel = "Raid",
-                    recommended = true,
-                    selected = true,
+                    recommended = false,
+                    selected = false,
                     stateTokens = {
                         "preset-2",
                         "talent-4",
@@ -987,7 +987,6 @@ ns.TalentGrimoireData.rotationLoaders = {
                         "talent-8",
                         "talent-10",
                         "talent-9",
-                        "talent-6",
                     },
                 },
             },
@@ -1060,17 +1059,17 @@ ns.TalentGrimoireData.rotationLoaders = {
                             spellId = 1247378,
                         },
                         {
-                            name = "Putrefy",
-                            text = "Use Putrefy.",
-                            spellId = 1247378,
+                            name = "Death Coil",
+                            text = "Use Death Coil.",
+                            spellId = 47541,
                             conditions = {
                                 "talent-4:on",
                             },
                         },
                         {
-                            name = "Death Coil",
-                            text = "Use Death Coil.",
-                            spellId = 47541,
+                            name = "Putrefy",
+                            text = "Use Putrefy.",
+                            spellId = 1247378,
                             conditions = {
                                 "talent-4:on",
                             },
@@ -1254,17 +1253,17 @@ ns.TalentGrimoireData.rotationLoaders = {
                             spellId = 1247378,
                         },
                         {
-                            name = "Putrefy",
-                            text = "Use Putrefy.",
-                            spellId = 1247378,
+                            name = "Epidemic",
+                            text = "Use Epidemic.",
+                            spellId = 207317,
                             conditions = {
                                 "talent-4:on",
                             },
                         },
                         {
-                            name = "Epidemic",
-                            text = "Use Epidemic.",
-                            spellId = 207317,
+                            name = "Putrefy",
+                            text = "Use Putrefy.",
+                            spellId = 1247378,
                             conditions = {
                                 "talent-4:on",
                             },
@@ -7488,29 +7487,6 @@ ns.TalentGrimoireData.rotationLoaders = {
                             },
                         },
                         {
-                            name = "Use your Potion, on-use Trinket, Racials, etc.",
-                            text = "Use your Potion, on-use Trinket, Racials, etc.",
-                            conditions = {
-                                "preset-2:on",
-                            },
-                        },
-                        {
-                            name = "Barbed Shot",
-                            text = "Barbed Shot",
-                            spellId = 217200,
-                            conditions = {
-                                "preset-2:on",
-                            },
-                        },
-                        {
-                            name = "Bestial Wrath",
-                            text = "Bestial Wrath",
-                            spellId = 19574,
-                            conditions = {
-                                "preset-2:on",
-                            },
-                        },
-                        {
                             name = "Barbed Shot",
                             text = "Barbed Shot",
                             spellId = 217200,
@@ -7543,9 +7519,89 @@ ns.TalentGrimoireData.rotationLoaders = {
                             },
                         },
                         {
+                            name = "Bestial Wrath",
+                            text = "Bestial Wrath",
+                            spellId = 19574,
+                            conditions = {
+                                "preset-2:on",
+                            },
+                        },
+                        {
+                            name = "Wild Thrash",
+                            text = "Wild Thrash",
+                            spellId = 1264359,
+                            conditions = {
+                                "preset-2:on",
+                                "talent-3:on",
+                            },
+                        },
+                        {
+                            name = "Continue with the priority list as described below.",
+                            text = "Continue with the priority list as described below.",
+                            conditions = {
+                                "preset-2:on",
+                            },
+                        },
+                        {
                             name = "Barbed Shot",
                             text = "Barbed Shot",
                             spellId = 217200,
+                            conditions = {
+                                "preset-2:on",
+                            },
+                        },
+                        {
+                            name = "Barbed Shot",
+                            text = "Barbed Shot",
+                            spellId = 217200,
+                            conditions = {
+                                "preset-2:on",
+                            },
+                        },
+                        {
+                            name = "Use your Potion, on-use Trinket, Racials, etc.",
+                            text = "Use your Potion, on-use Trinket, Racials, etc.",
+                            conditions = {
+                                "preset-2:on",
+                            },
+                        },
+                        {
+                            name = "Wild Thrash",
+                            text = "Wild Thrash",
+                            spellId = 1264359,
+                            conditions = {
+                                "preset-2:on",
+                                "talent-3:on",
+                            },
+                        },
+                        {
+                            name = "Bestial Wrath",
+                            text = "Bestial Wrath",
+                            spellId = 19574,
+                            conditions = {
+                                "preset-2:on",
+                            },
+                        },
+                        {
+                            name = "Kill Command",
+                            text = "Kill Command",
+                            spellId = 34026,
+                            conditions = {
+                                "preset-2:on",
+                            },
+                        },
+                        {
+                            name = "Cobra Shot",
+                            text = "Cobra Shot",
+                            spellId = 193455,
+                            conditions = {
+                                "preset-2:on",
+                            },
+                        },
+                        {
+                            name = "Kill Command",
+                            text = "Kill Command",
+                            spellId = 34026,
                             conditions = {
                                 "preset-2:on",
                             },
@@ -22854,7 +22910,7 @@ ns.TalentGrimoireData.dataLoaders = {
                                 ["mythic-talent-builds-san-layn"] = {
                                     title = "Mythic+ Talent Builds - San'layn",
                                     modeLabel = "Mythic+ Talent Builds - San'layn",
-                                    importString = "CwPAAAAAAAAAAAAAAAAAAAAAAAwMjZMDDz2MzMTzmZmZMjBAAAAAAAg5BGDDAWmhZ2MzYMjBGYGbassAYZiNMgZAMzMzMmBzMYGjB",
+                                    importString = "CwPAAAAAAAAAAAAAAAAAAAAAAAYmhZMGDz2MzMTzyMzYMjBAAAAAAAgZGDDAWmxMzmZGzMjBGYGbassAYbiNMgZAYMzMmBzMYMjB",
                                     difficulty = "Mythic+",
                                     source = "Wowhead",
                                 },
@@ -23126,7 +23182,14 @@ ns.TalentGrimoireData.dataLoaders = {
                                 ["raid-talents"] = {
                                     title = "Raid Talents",
                                     modeLabel = "Raid Talents",
-                                    importString = "CwPAAAAAAAAAAAAAAAAAAAAAAAwMjZMzYY2mZmZa2MzMjZAAAAAAAAg5BGGDAWmhZ2MzYmZMwAzYRjlFAbD2AwMAmZmZGzgZGMjxA",
+                                    importString = "CwPAAAAAAAAAAAAAAAAAAAAAAAwMjZMzYY2mZmZa2MzMjZAAAAAAAAgZGGDAWmxMz2MzYmZAbmFDDMwsxQjFAMDAjZmxMAzMzYMA",
+                                    difficulty = "Raid",
+                                    source = "Icy Veins",
+                                },
+                                ["raid-talents-2"] = {
+                                    title = "Raid Talents",
+                                    modeLabel = "Raid Talents",
+                                    importString = "CwPAAAAAAAAAAAAAAAAAAAAAAAwMjZMzYY2mZmZa2MzMjZAAAAAAAAgZGGDAWmxMz2MzYmZMwAzYRjlFAbD2AwMAMmZGzgZGMjxA",
                                     difficulty = "Raid",
                                     source = "Icy Veins",
                                 },
@@ -23137,10 +23200,10 @@ ns.TalentGrimoireData.dataLoaders = {
                                     difficulty = "Raid",
                                     source = "Icy Veins",
                                 },
-                                ["raid-talents-2"] = {
-                                    title = "Raid Talents",
-                                    modeLabel = "Raid Talents",
-                                    importString = "CwPAAAAAAAAAAAAAAAAAAAAAAAwMjZMzYY2mZmZa2MzMjZAAAAAAAAgZGGDAWmxMz2MzYmZAbmFDDMwsxQjFAMDAjZmxMAzMzYMA",
+                                ["san-layn-pet-build"] = {
+                                    title = "San'layn Pet Build",
+                                    modeLabel = "San'layn Pet Build",
+                                    importString = "CwPAAAAAAAAAAAAAAAAAAAAAAAYmhZMzMDz2MzMTzmZGjZAAAAAAAAgZGzYAwyMmZ2MzYMjBGYGbassAYbwGGwMAMmZGzgZGMjxA",
                                     difficulty = "Raid",
                                     source = "Icy Veins",
                                 },
@@ -23159,7 +23222,7 @@ ns.TalentGrimoireData.dataLoaders = {
                                 ["raid-talent-builds-san-layn"] = {
                                     title = "Raid Talent Builds - San'layn",
                                     modeLabel = "Raid Talent Builds - San'layn",
-                                    importString = "CwPAAAAAAAAAAAAAAAAAAAAAAAwMjZMDDz2MzMTjZmxYGDAAAAAAAAzDMMGAsMDzsZmxMzYgBmxiGLbA2mYDAzAYmZmZMDmZwMzYA",
+                                    importString = "CwPAAAAAAAAAAAAAAAAAAAAAAAwMjZMDDz2MzMTjZmxYGDAAAAAAAAzMMGAsMjZmtZmxMzYgBmxiGLbA2mYDAzAwYmZMDmZwMzYA",
                                     difficulty = "Raid",
                                     source = "Wowhead",
                                 },
@@ -27996,7 +28059,7 @@ ns.TalentGrimoireData.dataLoaders = {
                                 ["raid-talents-raid-cleave"] = {
                                     title = "Raid Talents - Raid Cleave",
                                     modeLabel = "Raid Talents - Raid Cleave",
-                                    importString = "C0PAAAAAAAAAAAAAAAAAAAAAAAMmxwCsAzwQDbAAYGPwMzsMzwMzMjZGMzYmhZGzYGmZGzYGM0MAAAAAAAAYmZmBYmNCDzCYbAYA",
+                                    importString = "C0PAAAAAAAAAAAAAAAAAAAAAAAMmxwCsAzwQDbAAYGPwMzsMzwMzMjZGMzYmhZGzYGbzMjZMDGaGAAAAAAAAMzYGgZ2IMMLgtBgB",
                                     difficulty = "Raid",
                                     source = "Wowhead",
                                 },
@@ -36436,7 +36499,7 @@ ns.TalentGrimoireData.dataLoaders = {
                                 ["mythic-talents-totemic"] = {
                                     title = "Mythic+ Talents - Totemic",
                                     modeLabel = "Mythic+ Talents - Totemic",
-                                    importString = "CgQAAAAAAAAAAAAAAAAAAAAAAAAAAgBAAAAzMzsstMzMzMjZGjZgFYDmxiGbDIzAbMzMY2mZMa2WmZ2MjZhFjZGDLzyAAAAzMDmZAgBzA",
+                                    importString = "CgQAAAAAAAAAAAAAAAAAAAAAAAAAAgBAAAAzMzsstMzMzMjZGjZgFYDmxmGbDIzAbMzMY2mZMa2WmZ2MjZhFjZGDLzyAAAAzMDmZAgBzA",
                                     difficulty = "Mythic+",
                                     source = "Wowhead",
                                 },
@@ -36734,7 +36797,7 @@ ns.TalentGrimoireData.dataLoaders = {
                                 ["raid-talents-totemic"] = {
                                     title = "Raid Talents - Totemic",
                                     modeLabel = "Raid Talents - Totemic",
-                                    importString = "CgQAAAAAAAAAAAAAAAAAAAAAAAAAAgBAAAAzMzsssNjZGjZGzMDjFYDmxiGbDIzAbmhZw2YMTz2yMzmZMLsYegZGzwsMAAAwMzgZGAYwM",
+                                    importString = "CgQAAAAAAAAAAAAAAAAAAAAAAAAAAgBAAAAzMzsssNjZGjZGzMDjFYDmxmGbDIzAbmhZw2YMTz2yMzmZMLsYegZGzwsMAAAwMzgZGAYwM",
                                     difficulty = "Raid",
                                     source = "Wowhead",
                                 },
@@ -38493,7 +38556,7 @@ ns.TalentGrimoireData.dataLoaders = {
                                 slayer = {
                                     modeLabel = "Slayer",
                                     title = "Slayer",
-                                    importString = "CcEAAAAAAAAAAAAAAAAAAAAAAgZmZmFz8AzMzAAAAMMNMGGLmZmZGzYmZAAAAAMWMDMZxYZbgNwAmhJwMYDYGLmlZGMz2AMzAwMDDA",
+                                    importString = "CcEAAAAAAAAAAAAAAAAAAAAAAgZmZmFzYmZGAAAghphZGGLMzMzYGzMDAAAAgxyMDMhxy2AbgBMDTgZwGwMWMLzglZ2GgZGAmZYA",
                                     difficulty = "PvP",
                                     source = "Icy Veins",
                                 },
@@ -38930,7 +38993,14 @@ ns.TalentGrimoireData.dataLoaders = {
                                 ["mountain-thane"] = {
                                     modeLabel = "Mountain Thane",
                                     title = "Mountain Thane",
-                                    importString = "CgEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgGDzMjxCzMzYMmZGzYmZmlZmxYmZZMzMAAQYgNYZxoxMAmNMjFAzswsAAzMAGGzMDDjB",
+                                    importString = "CgEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgGDzMjZWYmZGjxMzMzYmZmlhxMzMLmZmBAACDsBLLGNmBwshZsAYmFjFAYmBgxYYMDjB",
+                                    difficulty = "PvP",
+                                    source = "Icy Veins",
+                                },
+                                slayer = {
+                                    modeLabel = "Slayer",
+                                    title = "Slayer",
+                                    importString = "CgEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgGDzMMzCzMzMzMmZmZGzMzsMMmZmZxMzMAAQMW2GYDMgZYCMDbAmZxYBAAmZYMGGzwYA",
                                     difficulty = "PvP",
                                     source = "Icy Veins",
                                 },

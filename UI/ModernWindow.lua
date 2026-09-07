@@ -13,6 +13,7 @@ local TOP_HEIGHT = 86
 local ROW_HEIGHT = 44
 
 local pages = {
+    inventory = { key = "inventory", label = "Item Search", icon = "I", page = "inventory", sectionKey = "warband", description = "Search saved item counts and locations across character bags, equipment, banks, and the Warband bank." },
     overview = { key = "overview", label = "Overview", icon = "ZT", page = nil, sectionKey = "overview", description = "Status, quick actions, and common ZoidsTools areas." },
     warband = { key = "warband", label = "Warband Weekly", icon = "WB", page = "warband", sectionKey = "warband", description = "Account-wide Mythic+, Great Vault, keystone, and current-expansion lockout snapshots." },
     professionweekly = { key = "professionweekly", label = "Weekly Goals", icon = "WK", page = "professionweekly", sectionKey = "profession_area", description = "Popular weekly goals, Great Vault progress, and Midnight profession Knowledge." },
@@ -37,7 +38,7 @@ local pages = {
 
 local sections = {
     { key = "overview", label = "Overview", icon = "ZT", iconTexture = "Interface\\Icons\\INV_Misc_Map_01", defaultPageKey = "overview", tabs = { pages.overview } },
-    { key = "warband", label = "Warband", icon = "WB", iconTexture = "Interface\\Icons\\INV_Misc_GroupLooking", defaultPageKey = "warband", tabs = { pages.warband } },
+    { key = "warband", label = "Warband", icon = "WB", iconTexture = "Interface\\Icons\\INV_Misc_GroupLooking", defaultPageKey = "warband", tabs = { pages.warband, pages.inventory } },
     { key = "profession_area", label = "Weekly", icon = "WK", iconTexture = "Interface\\Icons\\INV_Misc_Note_06", defaultPageKey = "professionweekly", tabs = { pages.professionweekly, pages.professions } },
     { key = "core", label = "Core", icon = "UI", iconTexture = "Interface\\Icons\\INV_Misc_Gear_01", defaultPageKey = "minimap", tabs = { pages.minimap, pages.general, pages.tooltips, pages.windows } },
     { key = "character", label = "Character", icon = "CHAR", iconTexture = "Interface\\Icons\\INV_Misc_GroupLooking", defaultPageKey = "items", tabs = { pages.items, pages.talents } },
@@ -4769,6 +4770,7 @@ local function CreateModernSearch(frame)
 end
 
 local modernPageCreators = {
+    inventory = function(parent) return ns:CreateWarbandItemsPage(parent) end,
     warband = CreateWarbandPage,
     professionweekly = CreateProfessionWeeklyPage,
     minimap = CreateMinimapPage,

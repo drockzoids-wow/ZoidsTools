@@ -5,7 +5,7 @@
 local _, ns = ...
 ns.TalentGrimoireData = ns.TalentGrimoireData or {}
 ns.TalentGrimoireData.schemaVersion = 3
-ns.TalentGrimoireData.generatedAt = "2026-09-07 09:46:13 -05:00"
+ns.TalentGrimoireData.generatedAt = "2026-09-08 10:14:32 -05:00"
 ns.TalentGrimoireData.source = "Archon + Icy Veins + Wowhead + Murlok.io"
 ns.TalentGrimoireData.providers = {
     archon = {
@@ -14945,7 +14945,7 @@ ns.TalentGrimoireData.rotationLoaders = {
                         {
                             name = "Voidform",
                             text = "Cast Voidform.",
-                            spellId = 228264,
+                            spellId = 228260,
                             conditions = {
                                 "talent-2:on",
                             },
@@ -15035,7 +15035,7 @@ ns.TalentGrimoireData.rotationLoaders = {
                         {
                             name = "Voidform",
                             text = "Cast Voidform.",
-                            spellId = 228264,
+                            spellId = 228260,
                             conditions = {
                                 "talent-2:on",
                             },
@@ -15228,7 +15228,7 @@ ns.TalentGrimoireData.rotationLoaders = {
                         {
                             name = "Voidform",
                             text = "Cast Voidform.",
-                            spellId = 228264,
+                            spellId = 228260,
                             conditions = {
                                 "talent-2:on",
                             },
@@ -15314,7 +15314,7 @@ ns.TalentGrimoireData.rotationLoaders = {
                         {
                             name = "Voidform",
                             text = "Cast Voidform.",
-                            spellId = 228264,
+                            spellId = 228260,
                             conditions = {
                                 "talent-2:on",
                             },
@@ -25971,7 +25971,7 @@ ns.TalentGrimoireData.dataLoaders = {
                                 ["mythic-talent-builds-wildstalker-mythic"] = {
                                     title = "Mythic+ Talent Builds - Wildstalker Mythic+",
                                     modeLabel = "Mythic+ Talent Builds - Wildstalker Mythic+",
-                                    importString = "CkGAAAAAAAAAAAAAAAAAAAAAAMMmZZMjZmxsNMMmlZsZbGAAAAAAAAAAsMoZzw0MjZwsYmZmZZGGDAAAAAAAGAACAAYWmZrZbmFbMmZgZ2ANDAwMDADA",
+                                    importString = "CkGAAAAAAAAAAAAAAAAAAAAAAMMmZZMjZmxsNMMmlZsZbGAAAAAAAAAAsMoZzw0MjZwsYmZmZZGGDAAAAAAAGAACAAYWmZrZbmFbMmZgZWANDAwMDADA",
                                     difficulty = "Mythic+",
                                     source = "Wowhead",
                                 },

@@ -2,7 +2,7 @@
 -- Source: GearInsight rankings aggregated from WarcraftLogs. Re-run the updater instead of editing this file.
 local _, ns = ...
 ns.BiSData = {
-    generatedAt = "2026-09-07 10:00:22 -05:00",
+    generatedAt = "2026-09-08 10:27:47 -05:00",
     source = "GearInsight",
     sourceUrl = "https://gearinsight.app/wow/en",
     data = {},
@@ -100,7 +100,7 @@ ns.BiSData = {
                     },
                     [3] = {
                         { 271472, "Baleful Grave-Knight's Gibbets", "Tier Set token" },
-                        { 271444, "Item #271444", "World Drop" },
+                        { 271444, "Pauldrons of the Forgotten Sacrifice", "World Drop" },
                         { 239037, "C'thraxxi Binders Pauldrons", "Mythic+ Dungeon - Temple of Sethraliss" },
                     },
                     [5] = {
@@ -190,7 +190,7 @@ ns.BiSData = {
                     [6] = {
                         { 268259, "Girdle of Toxic Regret", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
                         { 159418, "Girdle of Pestilent Purification", "Mythic+ Dungeon - Kings' Rest" },
-                        { 271471, "Item #271471", "Raid drop - The Venomous Abyss" },
+                        { 271471, "Baleful Grave-Knight's Girdle", "Tier Set token" },
                     },
                     [7] = {
                         { 271473, "Baleful Grave-Knight's Greaves", "Tier Set token" },
@@ -261,7 +261,7 @@ ns.BiSData = {
                     },
                     [3] = {
                         { 271472, "Baleful Grave-Knight's Gibbets", "Tier Set token" },
-                        { 271444, "Item #271444", "World Drop" },
+                        { 271444, "Pauldrons of the Forgotten Sacrifice", "World Drop" },
                         { 251138, "Cinderfury Shoulderguards", "Mythic+ Dungeon - Murder Row" },
                     },
                     [5] = {
@@ -317,7 +317,7 @@ ns.BiSData = {
                     [15] = {
                         { 251132, "Speakeasy Shroud", "Mythic+ Dungeon - Murder Row" },
                         { 251190, "Bloodthorn Burnous", "Mythic+ Dungeon - The Blinding Vale" },
-                        { 271469, "Item #271469", "World Drop" },
+                        { 271469, "Baleful Grave-Knight's Greatcloak", "World Drop" },
                     },
                     [16] = {
                         { 237839, "Spellbreaker's Blade", "Crafted" },
@@ -411,7 +411,7 @@ ns.BiSData = {
                 mythicplus = {
                     [1] = {
                         { 271474, "Baleful Grave-Knight's Casque", "Tier Set token" },
-                        { 244746, "Item #244746", "Drop" },
+                        { 244746, "Aetherlume Sun Guard", "Drop" },
                         { 251126, "Greathelm of Temptation", "Mythic+ Dungeon - Murder Row" },
                     },
                     [2] = {
@@ -773,7 +773,7 @@ ns.BiSData = {
                     [8] = {
                         { 159327, "Sand-Shined Snakeskin Sandals", "Mythic+ Dungeon - Temple of Sethraliss" },
                         { 244569, "Silvermoon Agent's Sneakers", "Crafted" },
-                        { 271539, "Item #271539", "World Drop" },
+                        { 271539, "Abyssal Doomhound's Footpads", "World Drop" },
                     },
                     [9] = {
                         { 244576, "Silvermoon Agent's Deflectors", "Crafted" },
@@ -1643,7 +1643,7 @@ ns.BiSData = {
                     [1] = {
                         { 271501, "Calamitous Echo's Magmashapers", "Tier Set token" },
                         { 239035, "Sethraliss' Fanged Helm", "Mythic+ Dungeon - Temple of Sethraliss" },
-                        { 271441, "Item #271441", "Raid drop - The Venomous Abyss" },
+                        { 271441, "Crushing Coiler Coif", "Raid drop - The Venomous Abyss" },
                     },
                     [2] = {
                         { 268265, "Aqirbane Reliquary", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
@@ -2225,7 +2225,7 @@ ns.BiSData = {
                     [2] = {
                         { 268265, "Aqirbane Reliquary", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                         { 251234, "Graft of the Domanaar", "Mythic+ Dungeon - Voidscar Arena" },
-                        { 272228, "Item #272228", "World Drop" },
+                        { 272228, "Whispering Periapt", "World Drop" },
                     },
                     [3] = {
                         { 271490, "Jaws of the Skulking Viper", "Tier Set token" },
@@ -2250,11 +2250,11 @@ ns.BiSData = {
                     [8] = {
                         { 159388, "Sabatons of Coruscating Energy", "Mythic+ Dungeon - Temple of Sethraliss" },
                         { 271494, "Skulking Viper's Tracks", "Tier Set token" },
-                        { 271440, "Item #271440", "World Drop" },
+                        { 271440, "Greaves of the Noxious Depths", "World Drop" },
                     },
                     [9] = {
                         { 244584, "Farstrider's Plated Bracers", "Crafted" },
-                        { 244568, "Item #244568", "World Drop" },
+                        { 244568, "Thalassian Competitor's Chain Cuffs", "World Drop" },
                         { 273775, "Hydra Scale Wristguards", "Mythic+ Dungeon - Altar of Fangs" },
                     },
                     [10] = {
@@ -2771,7 +2771,7 @@ ns.BiSData = {
                     [15] = {
                         { 193763, "Fireproof Drape", "Mythic+ Dungeon - Ruby Life Pools" },
                         { 268248, "Amani Summoning Shawl", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
-                        { 271559, "Item #271559", "World Drop" },
+                        { 271559, "Spellcloak of the Primal Leywarden", "World Drop" },
                     },
                     [16] = {
                         { 245770, "Aln'hara Cane", "Crafted" },
@@ -3693,7 +3693,7 @@ ns.BiSData = {
                     },
                     [3] = {
                         { 271463, "Pauldrons of the Consecrated Flame", "Tier Set token" },
-                        { 271444, "Item #271444", "World Drop" },
+                        { 271444, "Pauldrons of the Forgotten Sacrifice", "World Drop" },
                         { 251138, "Cinderfury Shoulderguards", "Mythic+ Dungeon - Murder Row" },
                     },
                     [5] = {
@@ -4041,7 +4041,7 @@ ns.BiSData = {
                     [8] = {
                         { 268260, "Scaled Fiend's Warboots", "Raid drop - The Venomous Abyss - Boss 4 - Vashnik the Malignant" },
                         { 268245, "Entombed Cultist's Sabatons", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
-                        { 271467, "Item #271467", "World Drop" },
+                        { 271467, "Greatboots of the Consecrated Flame", "World Drop" },
                     },
                     [9] = {
                         { 237834, "Spellbreaker's Bracers", "Crafted" },
@@ -5208,7 +5208,7 @@ ns.BiSData = {
                     },
                     [8] = {
                         { 268258, "Boots of the Reckless Wayfarer", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
-                        { 271440, "Item #271440", "World Drop" },
+                        { 271440, "Greaves of the Noxious Depths", "World Drop" },
                         { 244577, "Farstrider's Razor Talons", "Crafted" },
                     },
                     [9] = {
@@ -5345,7 +5345,7 @@ ns.BiSData = {
                     [1] = {
                         { 271483, "Serpent Crown of the Ophidian Oracle", "Tier Set token" },
                         { 244579, "Farstrider's Unwavering Visage", "Crafted" },
-                        { 271441, "Item #271441", "Drop" },
+                        { 271441, "Crushing Coiler Coif", "Drop" },
                     },
                     [2] = {
                         { 268265, "Aqirbane Reliquary", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
@@ -5540,7 +5540,7 @@ ns.BiSData = {
                     },
                     [8] = {
                         { 251125, "Felsoaked Soles", "Mythic+ Dungeon - Murder Row" },
-                        { 271440, "Item #271440", "World Drop" },
+                        { 271440, "Greaves of the Noxious Depths", "World Drop" },
                         { 244577, "Farstrider's Razor Talons", "Crafted" },
                     },
                     [9] = {
@@ -5745,7 +5745,7 @@ ns.BiSData = {
                     },
                     [15] = {
                         { 193763, "Fireproof Drape", "Mythic+ Dungeon - Ruby Life Pools" },
-                        { 275525, "Item #275525", "World Drop" },
+                        { 275525, "Preyhunter's Polished Cloak", "World Drop" },
                         { 268248, "Amani Summoning Shawl", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
                     },
                     [16] = {
@@ -6348,7 +6348,7 @@ ns.BiSData = {
                     [3] = {
                         { 271454, "Raging Pauldrons of the Jade Warlord", "Tier Set token" },
                         { 251138, "Cinderfury Shoulderguards", "Mythic+ Dungeon - Murder Row" },
-                        { 271444, "Item #271444", "Drop" },
+                        { 271444, "Pauldrons of the Forgotten Sacrifice", "Drop" },
                     },
                     [5] = {
                         { 271459, "Cuirass of the Jade Warlord", "Tier Set token" },
@@ -6534,7 +6534,7 @@ ns.BiSData = {
                     [8] = {
                         { 237828, "Spellbreaker's March", "Crafted" },
                         { 273777, "Poison-Proof Stompers", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 171512, "Item #171512", "World Drop" },
+                        { 171512, "Iron-Spring Jumpers", "World Drop" },
                     },
                     [9] = {
                         { 237834, "Spellbreaker's Bracers", "Crafted" },

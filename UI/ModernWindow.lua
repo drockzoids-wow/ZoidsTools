@@ -5134,6 +5134,21 @@ function ShowPage(pageKey)
     end
 end
 
+-- Module callbacks still use the shared UI namespace. Refresh only an existing
+-- visible page so background updates do not construct the settings window.
+function UI2.RefreshVisiblePage()
+    local frame = UI2.frame
+    if not frame or not frame:IsShown() then return end
+    local page = frame.modernPages and frame.modernPages[frame.pageKey]
+    if page and page.Refresh then
+        page:Refresh()
+    elseif frame.pageKey == "overview" then
+        for _, tile in ipairs(frame.statusTiles or {}) do tile:Refresh() end
+    end
+end
+
+ns.UI.RefreshVisiblePage = UI2.RefreshVisiblePage
+
 function UI2.Show(pageKey)
     local frame = CreateModernWindow()
     frame:Raise()

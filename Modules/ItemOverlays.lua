@@ -20,6 +20,7 @@ local pendingCombatBankRefresh = false
 local pendingCombatBagForceClear = false
 local pendingCombatBankForceClear = false
 local QueueCharacterDataRetry
+local QueueCharacterRefresh
 local qualityColorCache = {}
 local qualityColorCacheCount = 0
 
@@ -444,6 +445,30 @@ local function GetGemLink(itemLink, index)
     return gemLink
 end
 
+local function GetGemID(itemLink, index)
+    local id = C_Item and SafeCall(C_Item.GetItemGemID, itemLink, index)
+    if not (issecretvalue and issecretvalue(id)) and type(id) == "number" and id > 0 then
+        return id
+    end
+end
+
+local function RequestGemRefresh(button, itemLink, gemID, slot, unit)
+    if not gemID or not Item or not Item.CreateFromItemID then return end
+    button.ZTGemLoadRequests = button.ZTGemLoadRequests or {}
+    local requests = button.ZTGemLoadRequests
+    if requests[gemID] then return end
+    local item = SafeCall(Item.CreateFromItemID, Item, gemID)
+    if not item or type(item.ContinueOnItemLoad) ~= "function" then return end
+    -- A cached item can call back synchronously. Mark it before registering so
+    -- incomplete socket metadata cannot create a request/refresh feedback loop.
+    requests[gemID] = true
+    item:ContinueOnItemLoad(function()
+        if button.ZTGemLoadRequests ~= requests or button.ZTItemOverlayLink ~= itemLink then return end
+        if GetInventoryItemLink and GetInventoryItemLink(unit, slot) ~= itemLink then return end
+        QueueCharacterRefresh()
+    end)
+end
+
 local function GetGemIcon(gemLink)
     if not gemLink then
         return nil
@@ -583,6 +608,9 @@ local function ClearCharacterButton(button)
         return
     end
 
+    button.ZTItemOverlayLink = nil
+    button.ZTGemLoadRequests = nil
+
     if button.ZTItemLevelText then
         button.ZTItemLevelText:SetText("")
         button.ZTItemLevelText:Hide()
@@ -600,7 +628,7 @@ local function ClearCharacterButton(button)
     HideGemFrames(button)
 end
 
-local function UpdateCharacterGems(button, itemLink, slot, side)
+local function UpdateCharacterGems(button, itemLink, slot, side, unit)
     local db = EnsureDB()
 
     if not db or not db.enabled or not db.character.gems then
@@ -609,8 +637,15 @@ local function UpdateCharacterGems(button, itemLink, slot, side)
     end
 
     local socketCount, statsReady = CountSockets(itemLink)
+    local gemIDs = {}
+    -- Equipped gem IDs are available independently of the gem's cached name
+    -- and the parent item's socket stats. Do not mistake missing stats for no gems.
+    for index = 1, 4 do
+        gemIDs[index] = GetGemID(itemLink, index)
+        if gemIDs[index] then socketCount = math.max(socketCount, index) end
+    end
 
-    if not statsReady then
+    if not statsReady and socketCount == 0 then
         HideGemFrames(button)
         return false
     end
@@ -623,11 +658,19 @@ local function UpdateCharacterGems(button, itemLink, slot, side)
 
     EnsureGemFrames(button, displayCount)
     PositionGemFrames(button, displayCount, side)
+    local ready = statsReady
 
     for index, frame in ipairs(button.ZTGemFrames) do
         if index <= displayCount then
             local gemLink = index <= socketCount and GetGemLink(itemLink, index) or nil
+            local gemID = gemIDs[index]
+            local fullGemLink = gemLink
+            if not gemLink and gemID then gemLink = "item:" .. gemID end
             local icon = GetGemIcon(gemLink)
+            if gemID and (not fullGemLink or not icon) then
+                ready = false
+                RequestGemRefresh(button, itemLink, gemID, slot, unit or "player")
+            end
 
             frame.ZTGemLink = gemLink
             frame.ZTEmptySocket = not gemLink
@@ -647,7 +690,7 @@ local function UpdateCharacterGems(button, itemLink, slot, side)
         end
     end
 
-    return true
+    return ready
 end
 
 local function UpdateCharacterEnchant(button, itemLink, slot, side, showMissing)
@@ -712,6 +755,7 @@ local function UpdateCharacterSlot(slotInfo, unit, isInspect)
         return
     end
 
+    if button.ZTItemOverlayLink ~= itemLink then button.ZTGemLoadRequests = nil end
     button.ZTItemOverlayLink = itemLink
 
     local function ApplyLoadedItem(itemObject)
@@ -743,7 +787,7 @@ local function UpdateCharacterSlot(slotInfo, unit, isInspect)
         end
 
         UpdateCharacterEnchant(button, itemLink, slotInfo.slot, slotInfo.side, not isInspect)
-        local gemsReady = UpdateCharacterGems(button, itemLink, slotInfo.slot, slotInfo.side)
+        local gemsReady = UpdateCharacterGems(button, itemLink, slotInfo.slot, slotInfo.side, unit)
 
         if not gemsReady then
             QueueCharacterDataRetry()
@@ -1170,7 +1214,7 @@ end
 
 RefreshBankFrames = ns:WrapDiagnosticFunction("ItemOverlays.Bank", RefreshBankFrames)
 
-local function QueueCharacterRefresh(delay, force)
+QueueCharacterRefresh = function(delay, force)
     if type(delay) ~= "number" then
         delay = CHARACTER_REFRESH_DELAY
     end
@@ -1195,6 +1239,12 @@ local function QueueCharacterRefresh(delay, force)
 
         pendingCharacterRefresh = false
         pendingCharacterForceRefresh = false
+
+        if IsCombatLocked() then
+            pendingCombatCharacterRefresh = true
+            pendingCombatCharacterForceRefresh = pendingCombatCharacterForceRefresh or shouldForce
+            return
+        end
 
         if shouldForce or IsCharacterFrameVisible() then
             RefreshCharacterSlots()

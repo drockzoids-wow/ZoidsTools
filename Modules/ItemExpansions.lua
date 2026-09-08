@@ -3,6 +3,7 @@ local _, ns = ...
 local selections = { bags = -1, bank = -1, warbandBank = -1 }
 local hookedFrames, dropdowns, pendingItems = {}, {}, {}
 local queued, initialized = false, false
+local inventoryRefreshPending = false
 local Refresh
 local names = {
     [0] = "Classic", "The Burning Crusade", "Wrath of the Lich King", "Cataclysm",
@@ -59,6 +60,10 @@ local function QueueRefresh()
     C_Timer.After(0.05, function()
         queued = false
         Refresh()
+        if inventoryRefreshPending then
+            inventoryRefreshPending = false
+            if ns.UI2 and ns.UI2.RefreshWarbandItems then ns.UI2.RefreshWarbandItems() end
+        end
     end)
 end
 
@@ -194,6 +199,7 @@ function ns:InitializeItemExpansions()
             if pendingItems[itemID] ~= true then return end
             -- Keep the request marker even on failure: don't retry forever.
             pendingItems[itemID] = "complete"
+            inventoryRefreshPending = true
         end
         QueueRefresh()
     end)

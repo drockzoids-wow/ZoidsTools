@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Fixed equipped gems missing on the first character-sheet opening when socket or gem metadata is uncached. Known gem IDs now preserve occupied sockets, and individual gem-load callbacks refresh the open sheet after data arrives, with bounded requests and combat deferral.
+- Restored module-driven refreshes of the visible settings page after the modern-window migration, including meter, talent, macro, and window-reset updates, without constructing unopened pages.
+- Fixed expansion-filtered Warband item searches staying empty after requested item metadata finishes loading. Relevant item completions now refresh the visible search with the existing bounded refresh queue.
 - Fixed offline Warband item counts being erased by an inventory scan during logout, when Blizzard can already return empty bags and equipment. Scanning now pauses while leaving the world and stops at logout, preserving the last recorded contents.
 - Added Warband > Item Search (`/zt inventory`) with item-name/ID search, expansion filters, per-location counts, and removal of offline character snapshots. Compact Inventory tooltips show a total, one row per character with Bags/Bank/Equipped counts, and a shared Warband bank row. Timestamp recording and display have been removed. Tooltip display can be disabled independently; unavailable banks preserve their last readable snapshot.
 - Added expansion dropdowns to default bags, character bank, and Warband bank, with nonmatching item dimming that combines with text search, plus an expansion label and logo above item BiS tooltips.

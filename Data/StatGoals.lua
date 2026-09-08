@@ -4,7 +4,7 @@
 
 local _, ns = ...
 ns.StatGoalsData = ns.StatGoalsData or {}
-ns.StatGoalsData.generatedAt = "2026-09-07 09:59:36 -05:00"
+ns.StatGoalsData.generatedAt = "2026-09-08 10:27:08 -05:00"
 ns.StatGoalsData.data = {
     ["DEATHKNIGHT"] = {
         ["blood"] = {

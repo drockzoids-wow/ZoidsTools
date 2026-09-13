@@ -2,7 +2,7 @@
 -- Source: GearInsight rankings aggregated from WarcraftLogs. Re-run the updater instead of editing this file.
 local _, ns = ...
 ns.BiSData = {
-    generatedAt = "2026-09-08 10:27:47 -05:00",
+    generatedAt = "2026-09-13 11:55:54 -05:00",
     source = "GearInsight",
     sourceUrl = "https://gearinsight.app/wow/en",
     data = {},
@@ -61,17 +61,7 @@ ns.BiSData = {
                         { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
                         { 240949, "Masterwork Sin'dorei Band", "Crafted" },
                     },
-                    [12] = {
-                        { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
-                        { 240949, "Masterwork Sin'dorei Band", "Crafted" },
-                    },
                     [13] = {
-                        { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 270173, "Zul'jin's Guillotine Technique", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
-                        { 250245, "Tumor of the Swarm", "Mythic+ Dungeon - Voidscar Arena" },
-                    },
-                    [14] = {
                         { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                         { 270173, "Zul'jin's Guillotine Technique", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
                         { 250245, "Tumor of the Swarm", "Mythic+ Dungeon - Voidscar Arena" },
@@ -138,17 +128,7 @@ ns.BiSData = {
                         { 159459, "Ritual Binder's Ring", "Mythic+ Dungeon - Kings' Rest" },
                         { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
                     },
-                    [12] = {
-                        { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 159459, "Ritual Binder's Ring", "Mythic+ Dungeon - Kings' Rest" },
-                        { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
-                    },
                     [13] = {
-                        { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 270165, "Keeper's Seething Core", "Raid drop - The Venomous Abyss - Boss 2 - Entombed Sentinels" },
-                        { 270164, "Gebbo's Bottomless Bag", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
-                    },
-                    [14] = {
                         { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                         { 270165, "Keeper's Seething Core", "Raid drop - The Venomous Abyss - Boss 2 - Entombed Sentinels" },
                         { 270164, "Gebbo's Bottomless Bag", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
@@ -217,17 +197,7 @@ ns.BiSData = {
                         { 251513, "Loa Worshiper's Band", "Crafted" },
                         { 158366, "Charged Sandstone Band", "Mythic+ Dungeon - Temple of Sethraliss" },
                     },
-                    [12] = {
-                        { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
-                        { 251513, "Loa Worshiper's Band", "Crafted" },
-                        { 158366, "Charged Sandstone Band", "Mythic+ Dungeon - Temple of Sethraliss" },
-                    },
                     [13] = {
-                        { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 270173, "Zul'jin's Guillotine Technique", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
-                        { 270165, "Keeper's Seething Core", "Raid drop - The Venomous Abyss - Boss 2 - Entombed Sentinels" },
-                    },
-                    [14] = {
                         { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                         { 270173, "Zul'jin's Guillotine Technique", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
                         { 270165, "Keeper's Seething Core", "Raid drop - The Venomous Abyss - Boss 2 - Entombed Sentinels" },
@@ -299,17 +269,7 @@ ns.BiSData = {
                         { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
                         { 251513, "Loa Worshiper's Band", "Crafted" },
                     },
-                    [12] = {
-                        { 158366, "Charged Sandstone Band", "Mythic+ Dungeon - Temple of Sethraliss" },
-                        { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
-                        { 251513, "Loa Worshiper's Band", "Crafted" },
-                    },
                     [13] = {
-                        { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 249343, "Gaze of the Alnseer", "Raid drop" },
-                        { 249344, "Light Company Guidon", "Raid drop" },
-                    },
-                    [14] = {
                         { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                         { 249343, "Gaze of the Alnseer", "Raid drop" },
                         { 249344, "Light Company Guidon", "Raid drop" },
@@ -382,17 +342,7 @@ ns.BiSData = {
                         { 158366, "Charged Sandstone Band", "Mythic+ Dungeon - Temple of Sethraliss" },
                         { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
                     },
-                    [12] = {
-                        { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
-                        { 158366, "Charged Sandstone Band", "Mythic+ Dungeon - Temple of Sethraliss" },
-                        { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
-                    },
                     [13] = {
-                        { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 270173, "Zul'jin's Guillotine Technique", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
-                        { 270165, "Keeper's Seething Core", "Raid drop - The Venomous Abyss - Boss 2 - Entombed Sentinels" },
-                    },
-                    [14] = {
                         { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                         { 270173, "Zul'jin's Guillotine Technique", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
                         { 270165, "Keeper's Seething Core", "Raid drop - The Venomous Abyss - Boss 2 - Entombed Sentinels" },
@@ -459,17 +409,7 @@ ns.BiSData = {
                         { 158366, "Charged Sandstone Band", "Mythic+ Dungeon - Temple of Sethraliss" },
                         { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
                     },
-                    [12] = {
-                        { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
-                        { 158366, "Charged Sandstone Band", "Mythic+ Dungeon - Temple of Sethraliss" },
-                        { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
-                    },
                     [13] = {
-                        { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 249344, "Light Company Guidon", "Raid drop" },
-                        { 249343, "Gaze of the Alnseer", "Raid drop" },
-                    },
-                    [14] = {
                         { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                         { 249344, "Light Company Guidon", "Raid drop" },
                         { 249343, "Gaze of the Alnseer", "Raid drop" },
@@ -542,17 +482,7 @@ ns.BiSData = {
                         { 158366, "Charged Sandstone Band", "Mythic+ Dungeon - Temple of Sethraliss" },
                         { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
                     },
-                    [12] = {
-                        { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
-                        { 158366, "Charged Sandstone Band", "Mythic+ Dungeon - Temple of Sethraliss" },
-                        { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
-                    },
                     [13] = {
-                        { 250215, "Freightrunner's Flask", "Mythic+ Dungeon - Murder Row" },
-                        { 270164, "Gebbo's Bottomless Bag", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
-                        { 270167, "Wavecaller's Seastone", "Raid drop" },
-                    },
-                    [14] = {
                         { 250215, "Freightrunner's Flask", "Mythic+ Dungeon - Murder Row" },
                         { 270164, "Gebbo's Bottomless Bag", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
                         { 270167, "Wavecaller's Seastone", "Raid drop" },
@@ -624,17 +554,7 @@ ns.BiSData = {
                         { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
                         { 158366, "Charged Sandstone Band", "Mythic+ Dungeon - Temple of Sethraliss" },
                     },
-                    [12] = {
-                        { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
-                        { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
-                        { 158366, "Charged Sandstone Band", "Mythic+ Dungeon - Temple of Sethraliss" },
-                    },
                     [13] = {
-                        { 250215, "Freightrunner's Flask", "Mythic+ Dungeon - Murder Row" },
-                        { 270164, "Gebbo's Bottomless Bag", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
-                        { 270167, "Wavecaller's Seastone", "Raid drop" },
-                    },
-                    [14] = {
                         { 250215, "Freightrunner's Flask", "Mythic+ Dungeon - Murder Row" },
                         { 270164, "Gebbo's Bottomless Bag", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
                         { 270167, "Wavecaller's Seastone", "Raid drop" },
@@ -708,17 +628,7 @@ ns.BiSData = {
                         { 158366, "Charged Sandstone Band", "Mythic+ Dungeon - Temple of Sethraliss" },
                         { 268249, "Vile Alchemist's Band", "Raid drop - The Venomous Abyss - Boss 4 - Vashnik the Malignant" },
                     },
-                    [12] = {
-                        { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
-                        { 158366, "Charged Sandstone Band", "Mythic+ Dungeon - Temple of Sethraliss" },
-                        { 268249, "Vile Alchemist's Band", "Raid drop - The Venomous Abyss - Boss 4 - Vashnik the Malignant" },
-                    },
                     [13] = {
-                        { 270173, "Zul'jin's Guillotine Technique", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
-                        { 270168, "Font of Venomous Rage", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                    },
-                    [14] = {
                         { 270173, "Zul'jin's Guillotine Technique", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
                         { 270168, "Font of Venomous Rage", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                         { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
@@ -790,17 +700,7 @@ ns.BiSData = {
                         { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
                         { 268249, "Vile Alchemist's Band", "Raid drop - The Venomous Abyss - Boss 4 - Vashnik the Malignant" },
                     },
-                    [12] = {
-                        { 158366, "Charged Sandstone Band", "Mythic+ Dungeon - Temple of Sethraliss" },
-                        { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
-                        { 268249, "Vile Alchemist's Band", "Raid drop - The Venomous Abyss - Boss 4 - Vashnik the Malignant" },
-                    },
                     [13] = {
-                        { 270173, "Zul'jin's Guillotine Technique", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
-                        { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 270168, "Font of Venomous Rage", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                    },
-                    [14] = {
                         { 270173, "Zul'jin's Guillotine Technique", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
                         { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                         { 270168, "Font of Venomous Rage", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
@@ -874,17 +774,7 @@ ns.BiSData = {
                         { 159459, "Ritual Binder's Ring", "Mythic+ Dungeon - Kings' Rest" },
                         { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
                     },
-                    [12] = {
-                        { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 159459, "Ritual Binder's Ring", "Mythic+ Dungeon - Kings' Rest" },
-                        { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
-                    },
                     [13] = {
-                        { 250245, "Tumor of the Swarm", "Mythic+ Dungeon - Voidscar Arena" },
-                        { 270173, "Zul'jin's Guillotine Technique", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
-                        { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                    },
-                    [14] = {
                         { 250245, "Tumor of the Swarm", "Mythic+ Dungeon - Voidscar Arena" },
                         { 270173, "Zul'jin's Guillotine Technique", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
                         { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
@@ -956,17 +846,7 @@ ns.BiSData = {
                         { 159459, "Ritual Binder's Ring", "Mythic+ Dungeon - Kings' Rest" },
                         { 251148, "Pilfered Precious Band", "Mythic+ Dungeon - Den of Nalorakk" },
                     },
-                    [12] = {
-                        { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 159459, "Ritual Binder's Ring", "Mythic+ Dungeon - Kings' Rest" },
-                        { 251148, "Pilfered Precious Band", "Mythic+ Dungeon - Den of Nalorakk" },
-                    },
                     [13] = {
-                        { 250228, "Resonant Bellowstone", "Mythic+ Dungeon - Murder Row" },
-                        { 270165, "Keeper's Seething Core", "Raid drop - The Venomous Abyss - Boss 2 - Entombed Sentinels" },
-                        { 270173, "Zul'jin's Guillotine Technique", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
-                    },
-                    [14] = {
                         { 250228, "Resonant Bellowstone", "Mythic+ Dungeon - Murder Row" },
                         { 270165, "Keeper's Seething Core", "Raid drop - The Venomous Abyss - Boss 2 - Entombed Sentinels" },
                         { 270173, "Zul'jin's Guillotine Technique", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
@@ -1044,17 +924,7 @@ ns.BiSData = {
                         { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
                         { 158366, "Charged Sandstone Band", "Mythic+ Dungeon - Temple of Sethraliss" },
                     },
-                    [12] = {
-                        { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
-                        { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
-                        { 158366, "Charged Sandstone Band", "Mythic+ Dungeon - Temple of Sethraliss" },
-                    },
                     [13] = {
-                        { 273796, "Vile Vial of Volatile Venom", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 270164, "Gebbo's Bottomless Bag", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
-                        { 270167, "Wavecaller's Seastone", "Raid drop" },
-                    },
-                    [14] = {
                         { 273796, "Vile Vial of Volatile Venom", "Mythic+ Dungeon - Altar of Fangs" },
                         { 270164, "Gebbo's Bottomless Bag", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
                         { 270167, "Wavecaller's Seastone", "Raid drop" },
@@ -1066,7 +936,6 @@ ns.BiSData = {
                     },
                     [16] = {
                         { 271092, "Jan'thrazet, the Soul Fang", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 245770, "Aln'hara Cane", "Crafted" },
                         { 237838, "Magister's Ritual Knife", "Crafted" },
                     },
                     [17] = {
@@ -1125,17 +994,7 @@ ns.BiSData = {
                         { 158366, "Charged Sandstone Band", "Mythic+ Dungeon - Temple of Sethraliss" },
                         { 268249, "Vile Alchemist's Band", "Raid drop - The Venomous Abyss - Boss 4 - Vashnik the Malignant" },
                     },
-                    [12] = {
-                        { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
-                        { 158366, "Charged Sandstone Band", "Mythic+ Dungeon - Temple of Sethraliss" },
-                        { 268249, "Vile Alchemist's Band", "Raid drop - The Venomous Abyss - Boss 4 - Vashnik the Malignant" },
-                    },
                     [13] = {
-                        { 273796, "Vile Vial of Volatile Venom", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 270164, "Gebbo's Bottomless Bag", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
-                        { 270167, "Wavecaller's Seastone", "Raid drop" },
-                    },
-                    [14] = {
                         { 273796, "Vile Vial of Volatile Venom", "Mythic+ Dungeon - Altar of Fangs" },
                         { 270164, "Gebbo's Bottomless Bag", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
                         { 270167, "Wavecaller's Seastone", "Raid drop" },
@@ -1146,7 +1005,6 @@ ns.BiSData = {
                         { 193763, "Fireproof Drape", "Mythic+ Dungeon - Ruby Life Pools" },
                     },
                     [16] = {
-                        { 245770, "Aln'hara Cane", "Crafted" },
                         { 271092, "Jan'thrazet, the Soul Fang", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                         { 273778, "Polished Lightwood Channeler", "Mythic+ Dungeon - Altar of Fangs" },
                     },
@@ -1209,17 +1067,7 @@ ns.BiSData = {
                         { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
                         { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
                     },
-                    [12] = {
-                        { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
-                        { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
-                        { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
-                    },
                     [13] = {
-                        { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 270173, "Zul'jin's Guillotine Technique", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
-                        { 273796, "Vile Vial of Volatile Venom", "Mythic+ Dungeon - Altar of Fangs" },
-                    },
-                    [14] = {
                         { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                         { 270173, "Zul'jin's Guillotine Technique", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
                         { 273796, "Vile Vial of Volatile Venom", "Mythic+ Dungeon - Altar of Fangs" },
@@ -1286,17 +1134,7 @@ ns.BiSData = {
                         { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
                         { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
                     },
-                    [12] = {
-                        { 158366, "Charged Sandstone Band", "Mythic+ Dungeon - Temple of Sethraliss" },
-                        { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
-                        { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
-                    },
                     [13] = {
-                        { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 270173, "Zul'jin's Guillotine Technique", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
-                        { 270165, "Keeper's Seething Core", "Raid drop - The Venomous Abyss - Boss 2 - Entombed Sentinels" },
-                    },
-                    [14] = {
                         { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                         { 270173, "Zul'jin's Guillotine Technique", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
                         { 270165, "Keeper's Seething Core", "Raid drop - The Venomous Abyss - Boss 2 - Entombed Sentinels" },
@@ -1365,17 +1203,7 @@ ns.BiSData = {
                         { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
                         { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
                     },
-                    [12] = {
-                        { 159459, "Ritual Binder's Ring", "Mythic+ Dungeon - Kings' Rest" },
-                        { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
-                    },
                     [13] = {
-                        { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 273796, "Vile Vial of Volatile Venom", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 270173, "Zul'jin's Guillotine Technique", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
-                    },
-                    [14] = {
                         { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                         { 273796, "Vile Vial of Volatile Venom", "Mythic+ Dungeon - Altar of Fangs" },
                         { 270173, "Zul'jin's Guillotine Technique", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
@@ -1442,17 +1270,7 @@ ns.BiSData = {
                         { 159459, "Ritual Binder's Ring", "Mythic+ Dungeon - Kings' Rest" },
                         { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
                     },
-                    [12] = {
-                        { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 159459, "Ritual Binder's Ring", "Mythic+ Dungeon - Kings' Rest" },
-                        { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
-                    },
                     [13] = {
-                        { 250245, "Tumor of the Swarm", "Mythic+ Dungeon - Voidscar Arena" },
-                        { 270165, "Keeper's Seething Core", "Raid drop - The Venomous Abyss - Boss 2 - Entombed Sentinels" },
-                        { 250228, "Resonant Bellowstone", "Mythic+ Dungeon - Murder Row" },
-                    },
-                    [14] = {
                         { 250245, "Tumor of the Swarm", "Mythic+ Dungeon - Voidscar Arena" },
                         { 270165, "Keeper's Seething Core", "Raid drop - The Venomous Abyss - Boss 2 - Entombed Sentinels" },
                         { 250228, "Resonant Bellowstone", "Mythic+ Dungeon - Murder Row" },
@@ -1520,17 +1338,7 @@ ns.BiSData = {
                         { 279010, "Ula'tek's Bind", "Raid drop - The Venomous Abyss" },
                         { 272147, "Colubrine Band", "Raid drop - The Venomous Abyss" },
                     },
-                    [12] = {
-                        { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
-                        { 279010, "Ula'tek's Bind", "Raid drop - The Venomous Abyss" },
-                        { 272147, "Colubrine Band", "Raid drop - The Venomous Abyss" },
-                    },
                     [13] = {
-                        { 270167, "Wavecaller's Seastone", "Raid drop" },
-                        { 270162, "Soulcoiler Ritual Vessel", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
-                        { 270169, "Hex Lord's Dooming Idol", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
-                    },
-                    [14] = {
                         { 270167, "Wavecaller's Seastone", "Raid drop" },
                         { 270162, "Soulcoiler Ritual Vessel", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
                         { 270169, "Hex Lord's Dooming Idol", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
@@ -1541,7 +1349,6 @@ ns.BiSData = {
                         { 193763, "Fireproof Drape", "Mythic+ Dungeon - Ruby Life Pools" },
                     },
                     [16] = {
-                        { 245770, "Aln'hara Cane", "Crafted" },
                         { 271092, "Jan'thrazet, the Soul Fang", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                         { 273778, "Polished Lightwood Channeler", "Mythic+ Dungeon - Altar of Fangs" },
                     },
@@ -1602,17 +1409,7 @@ ns.BiSData = {
                         { 159459, "Ritual Binder's Ring", "Mythic+ Dungeon - Kings' Rest" },
                         { 279010, "Ula'tek's Bind", "World Drop" },
                     },
-                    [12] = {
-                        { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
-                        { 159459, "Ritual Binder's Ring", "Mythic+ Dungeon - Kings' Rest" },
-                        { 279010, "Ula'tek's Bind", "World Drop" },
-                    },
                     [13] = {
-                        { 250214, "Lightspire Core", "Mythic+ Dungeon - The Blinding Vale" },
-                        { 270162, "Soulcoiler Ritual Vessel", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
-                        { 270167, "Wavecaller's Seastone", "Raid drop" },
-                    },
-                    [14] = {
                         { 250214, "Lightspire Core", "Mythic+ Dungeon - The Blinding Vale" },
                         { 270162, "Soulcoiler Ritual Vessel", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
                         { 270167, "Wavecaller's Seastone", "Raid drop" },
@@ -1623,9 +1420,7 @@ ns.BiSData = {
                         { 272230, "Pledgebearer's Pall", "World Drop" },
                     },
                     [16] = {
-                        { 245770, "Aln'hara Cane", "Crafted" },
                         { 271092, "Jan'thrazet, the Soul Fang", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 159636, "Staff of the Lightning Serpent", "Mythic+ Dungeon - Temple of Sethraliss" },
                     },
                     [17] = {
                         { 245769, "Aln'hara Lantern", "Crafted" },
@@ -1690,17 +1485,7 @@ ns.BiSData = {
                         { 158366, "Charged Sandstone Band", "Mythic+ Dungeon - Temple of Sethraliss" },
                         { 268249, "Vile Alchemist's Band", "Raid drop - The Venomous Abyss - Boss 4 - Vashnik the Malignant" },
                     },
-                    [12] = {
-                        { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
-                        { 158366, "Charged Sandstone Band", "Mythic+ Dungeon - Temple of Sethraliss" },
-                        { 268249, "Vile Alchemist's Band", "Raid drop - The Venomous Abyss - Boss 4 - Vashnik the Malignant" },
-                    },
                     [13] = {
-                        { 250224, "Mindpiercer's Sigil", "Mythic+ Dungeon - Voidscar Arena" },
-                        { 270161, "Fang of Umbral Malignance", "Raid drop - The Venomous Abyss - Boss 4 - Vashnik the Malignant" },
-                        { 270168, "Font of Venomous Rage", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                    },
-                    [14] = {
                         { 250224, "Mindpiercer's Sigil", "Mythic+ Dungeon - Voidscar Arena" },
                         { 270161, "Fang of Umbral Malignance", "Raid drop - The Venomous Abyss - Boss 4 - Vashnik the Malignant" },
                         { 270168, "Font of Venomous Rage", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
@@ -1711,7 +1496,6 @@ ns.BiSData = {
                         { 193763, "Fireproof Drape", "Mythic+ Dungeon - Ruby Life Pools" },
                     },
                     [16] = {
-                        { 245770, "Aln'hara Cane", "Crafted" },
                         { 271092, "Jan'thrazet, the Soul Fang", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                         { 273778, "Polished Lightwood Channeler", "Mythic+ Dungeon - Altar of Fangs" },
                     },
@@ -1772,17 +1556,7 @@ ns.BiSData = {
                         { 158366, "Charged Sandstone Band", "Mythic+ Dungeon - Temple of Sethraliss" },
                         { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
                     },
-                    [12] = {
-                        { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
-                        { 158366, "Charged Sandstone Band", "Mythic+ Dungeon - Temple of Sethraliss" },
-                        { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
-                    },
                     [13] = {
-                        { 250224, "Mindpiercer's Sigil", "Mythic+ Dungeon - Voidscar Arena" },
-                        { 270161, "Fang of Umbral Malignance", "Raid drop - The Venomous Abyss - Boss 4 - Vashnik the Malignant" },
-                        { 249346, "Vaelgor's Final Stare", "Raid drop" },
-                    },
-                    [14] = {
                         { 250224, "Mindpiercer's Sigil", "Mythic+ Dungeon - Voidscar Arena" },
                         { 270161, "Fang of Umbral Malignance", "Raid drop - The Venomous Abyss - Boss 4 - Vashnik the Malignant" },
                         { 249346, "Vaelgor's Final Stare", "Raid drop" },
@@ -1856,17 +1630,7 @@ ns.BiSData = {
                         { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
                         { 158366, "Charged Sandstone Band", "Mythic+ Dungeon - Temple of Sethraliss" },
                     },
-                    [12] = {
-                        { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
-                        { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 158366, "Charged Sandstone Band", "Mythic+ Dungeon - Temple of Sethraliss" },
-                    },
                     [13] = {
-                        { 273796, "Vile Vial of Volatile Venom", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 270164, "Gebbo's Bottomless Bag", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
-                        { 270167, "Wavecaller's Seastone", "Raid drop" },
-                    },
-                    [14] = {
                         { 273796, "Vile Vial of Volatile Venom", "Mythic+ Dungeon - Altar of Fangs" },
                         { 270164, "Gebbo's Bottomless Bag", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
                         { 270167, "Wavecaller's Seastone", "Raid drop" },
@@ -1878,7 +1642,6 @@ ns.BiSData = {
                     },
                     [16] = {
                         { 271092, "Jan'thrazet, the Soul Fang", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 245770, "Aln'hara Cane", "Crafted" },
                         { 273778, "Polished Lightwood Channeler", "Mythic+ Dungeon - Altar of Fangs" },
                     },
                     [17] = {
@@ -1938,17 +1701,7 @@ ns.BiSData = {
                         { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
                         { 158366, "Charged Sandstone Band", "Mythic+ Dungeon - Temple of Sethraliss" },
                     },
-                    [12] = {
-                        { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
-                        { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 158366, "Charged Sandstone Band", "Mythic+ Dungeon - Temple of Sethraliss" },
-                    },
                     [13] = {
-                        { 273796, "Vile Vial of Volatile Venom", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 270164, "Gebbo's Bottomless Bag", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
-                        { 270167, "Wavecaller's Seastone", "Raid drop" },
-                    },
-                    [14] = {
                         { 273796, "Vile Vial of Volatile Venom", "Mythic+ Dungeon - Altar of Fangs" },
                         { 270164, "Gebbo's Bottomless Bag", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
                         { 270167, "Wavecaller's Seastone", "Raid drop" },
@@ -1959,7 +1712,6 @@ ns.BiSData = {
                         { 193763, "Fireproof Drape", "Mythic+ Dungeon - Ruby Life Pools" },
                     },
                     [16] = {
-                        { 245770, "Aln'hara Cane", "Crafted" },
                         { 271092, "Jan'thrazet, the Soul Fang", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                         { 273778, "Polished Lightwood Channeler", "Mythic+ Dungeon - Altar of Fangs" },
                     },
@@ -2020,17 +1772,7 @@ ns.BiSData = {
                         { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
                         { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
                     },
-                    [12] = {
-                        { 158366, "Charged Sandstone Band", "Mythic+ Dungeon - Temple of Sethraliss" },
-                        { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
-                        { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
-                    },
                     [13] = {
-                        { 270162, "Soulcoiler Ritual Vessel", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
-                        { 270164, "Gebbo's Bottomless Bag", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
-                        { 250214, "Lightspire Core", "Mythic+ Dungeon - The Blinding Vale" },
-                    },
-                    [14] = {
                         { 270162, "Soulcoiler Ritual Vessel", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
                         { 270164, "Gebbo's Bottomless Bag", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
                         { 250214, "Lightspire Core", "Mythic+ Dungeon - The Blinding Vale" },
@@ -2041,7 +1783,6 @@ ns.BiSData = {
                         { 193763, "Fireproof Drape", "Mythic+ Dungeon - Ruby Life Pools" },
                     },
                     [16] = {
-                        { 245770, "Aln'hara Cane", "Crafted" },
                         { 271092, "Jan'thrazet, the Soul Fang", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                         { 268210, "Malevolent Spiritcudgel", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
                     },
@@ -2102,17 +1843,7 @@ ns.BiSData = {
                         { 159459, "Ritual Binder's Ring", "Mythic+ Dungeon - Kings' Rest" },
                         { 251148, "Pilfered Precious Band", "Mythic+ Dungeon - Den of Nalorakk" },
                     },
-                    [12] = {
-                        { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 159459, "Ritual Binder's Ring", "Mythic+ Dungeon - Kings' Rest" },
-                        { 251148, "Pilfered Precious Band", "Mythic+ Dungeon - Den of Nalorakk" },
-                    },
                     [13] = {
-                        { 270162, "Soulcoiler Ritual Vessel", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
-                        { 270164, "Gebbo's Bottomless Bag", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
-                        { 250214, "Lightspire Core", "Mythic+ Dungeon - The Blinding Vale" },
-                    },
-                    [14] = {
                         { 270162, "Soulcoiler Ritual Vessel", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
                         { 270164, "Gebbo's Bottomless Bag", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
                         { 250214, "Lightspire Core", "Mythic+ Dungeon - The Blinding Vale" },
@@ -2123,7 +1854,6 @@ ns.BiSData = {
                         { 251190, "Bloodthorn Burnous", "Mythic+ Dungeon - The Blinding Vale" },
                     },
                     [16] = {
-                        { 245770, "Aln'hara Cane", "Crafted" },
                         { 271092, "Jan'thrazet, the Soul Fang", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                         { 268203, "Hexing Spiritrender", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
                     },
@@ -2190,17 +1920,7 @@ ns.BiSData = {
                         { 158366, "Charged Sandstone Band", "Mythic+ Dungeon - Temple of Sethraliss" },
                         { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
                     },
-                    [12] = {
-                        { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
-                        { 158366, "Charged Sandstone Band", "Mythic+ Dungeon - Temple of Sethraliss" },
-                        { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
-                    },
                     [13] = {
-                        { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 270165, "Keeper's Seething Core", "Raid drop - The Venomous Abyss - Boss 2 - Entombed Sentinels" },
-                        { 270173, "Zul'jin's Guillotine Technique", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
-                    },
-                    [14] = {
                         { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                         { 270165, "Keeper's Seething Core", "Raid drop - The Venomous Abyss - Boss 2 - Entombed Sentinels" },
                         { 270173, "Zul'jin's Guillotine Technique", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
@@ -2267,17 +1987,7 @@ ns.BiSData = {
                         { 158366, "Charged Sandstone Band", "Mythic+ Dungeon - Temple of Sethraliss" },
                         { 251194, "Lightwarden's Bind", "Mythic+ Dungeon - The Blinding Vale" },
                     },
-                    [12] = {
-                        { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
-                        { 158366, "Charged Sandstone Band", "Mythic+ Dungeon - Temple of Sethraliss" },
-                        { 251194, "Lightwarden's Bind", "Mythic+ Dungeon - The Blinding Vale" },
-                    },
                     [13] = {
-                        { 270164, "Gebbo's Bottomless Bag", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
-                        { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 273796, "Vile Vial of Volatile Venom", "Mythic+ Dungeon - Altar of Fangs" },
-                    },
-                    [14] = {
                         { 270164, "Gebbo's Bottomless Bag", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
                         { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                         { 273796, "Vile Vial of Volatile Venom", "Mythic+ Dungeon - Altar of Fangs" },
@@ -2346,17 +2056,7 @@ ns.BiSData = {
                         { 158366, "Charged Sandstone Band", "Mythic+ Dungeon - Temple of Sethraliss" },
                         { 268249, "Vile Alchemist's Band", "Raid drop - The Venomous Abyss - Boss 4 - Vashnik the Malignant" },
                     },
-                    [12] = {
-                        { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
-                        { 158366, "Charged Sandstone Band", "Mythic+ Dungeon - Temple of Sethraliss" },
-                        { 268249, "Vile Alchemist's Band", "Raid drop - The Venomous Abyss - Boss 4 - Vashnik the Malignant" },
-                    },
                     [13] = {
-                        { 270168, "Font of Venomous Rage", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 270173, "Zul'jin's Guillotine Technique", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
-                    },
-                    [14] = {
                         { 270168, "Font of Venomous Rage", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                         { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                         { 270173, "Zul'jin's Guillotine Technique", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
@@ -2423,17 +2123,7 @@ ns.BiSData = {
                         { 158366, "Charged Sandstone Band", "Mythic+ Dungeon - Temple of Sethraliss" },
                         { 251148, "Pilfered Precious Band", "Mythic+ Dungeon - Den of Nalorakk" },
                     },
-                    [12] = {
-                        { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
-                        { 158366, "Charged Sandstone Band", "Mythic+ Dungeon - Temple of Sethraliss" },
-                        { 251148, "Pilfered Precious Band", "Mythic+ Dungeon - Den of Nalorakk" },
-                    },
                     [13] = {
-                        { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 270168, "Font of Venomous Rage", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 249806, "Radiant Plume", "Raid drop" },
-                    },
-                    [14] = {
                         { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                         { 270168, "Font of Venomous Rage", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                         { 249806, "Radiant Plume", "Raid drop" },
@@ -2502,17 +2192,7 @@ ns.BiSData = {
                         { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
                         { 158366, "Charged Sandstone Band", "Mythic+ Dungeon - Temple of Sethraliss" },
                     },
-                    [12] = {
-                        { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
-                        { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
-                        { 158366, "Charged Sandstone Band", "Mythic+ Dungeon - Temple of Sethraliss" },
-                    },
                     [13] = {
-                        { 270165, "Keeper's Seething Core", "Raid drop - The Venomous Abyss - Boss 2 - Entombed Sentinels" },
-                        { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 250215, "Freightrunner's Flask", "Mythic+ Dungeon - Murder Row" },
-                    },
-                    [14] = {
                         { 270165, "Keeper's Seething Core", "Raid drop - The Venomous Abyss - Boss 2 - Entombed Sentinels" },
                         { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                         { 250215, "Freightrunner's Flask", "Mythic+ Dungeon - Murder Row" },
@@ -2526,11 +2206,6 @@ ns.BiSData = {
                         { 268215, "Abyssal Broodfiend's Bardiche", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                         { 268213, "Maze-roa, Warlord's Fury", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
                         { 237847, "Blood Knight's Impetus", "Crafted" },
-                    },
-                    [17] = {
-                        { 275070, "Sharpened Lightwood Slasher", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 251224, "Hulking Handaxe", "Mythic+ Dungeon - Voidscar Arena" },
-                        { 268264, "Ravenous Feaster's Fang", "Raid drop - The Venomous Abyss - Boss 6 - The Twin Fangs" },
                     },
                 },
                 mythicplus = {
@@ -2584,17 +2259,7 @@ ns.BiSData = {
                         { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
                         { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
                     },
-                    [12] = {
-                        { 158366, "Charged Sandstone Band", "Mythic+ Dungeon - Temple of Sethraliss" },
-                        { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
-                        { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
-                    },
                     [13] = {
-                        { 250214, "Lightspire Core", "Mythic+ Dungeon - The Blinding Vale" },
-                        { 250215, "Freightrunner's Flask", "Mythic+ Dungeon - Murder Row" },
-                        { 270173, "Zul'jin's Guillotine Technique", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
-                    },
-                    [14] = {
                         { 250214, "Lightspire Core", "Mythic+ Dungeon - The Blinding Vale" },
                         { 250215, "Freightrunner's Flask", "Mythic+ Dungeon - Murder Row" },
                         { 270173, "Zul'jin's Guillotine Technique", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
@@ -2608,10 +2273,6 @@ ns.BiSData = {
                         { 268215, "Abyssal Broodfiend's Bardiche", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                         { 268199, "Tidepiercer's Bubble Popper", "Raid drop" },
                         { 268213, "Maze-roa, Warlord's Fury", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
-                    },
-                    [17] = {
-                        { 275070, "Sharpened Lightwood Slasher", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 251224, "Hulking Handaxe", "Mythic+ Dungeon - Voidscar Arena" },
                     },
                 },
             },
@@ -2671,17 +2332,7 @@ ns.BiSData = {
                         { 159459, "Ritual Binder's Ring", "Mythic+ Dungeon - Kings' Rest" },
                         { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
                     },
-                    [12] = {
-                        { 251148, "Pilfered Precious Band", "Mythic+ Dungeon - Den of Nalorakk" },
-                        { 159459, "Ritual Binder's Ring", "Mythic+ Dungeon - Kings' Rest" },
-                        { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
-                    },
                     [13] = {
-                        { 250215, "Freightrunner's Flask", "Mythic+ Dungeon - Murder Row" },
-                        { 270164, "Gebbo's Bottomless Bag", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
-                        { 270167, "Wavecaller's Seastone", "Raid drop" },
-                    },
-                    [14] = {
                         { 250215, "Freightrunner's Flask", "Mythic+ Dungeon - Murder Row" },
                         { 270164, "Gebbo's Bottomless Bag", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
                         { 270167, "Wavecaller's Seastone", "Raid drop" },
@@ -2692,7 +2343,6 @@ ns.BiSData = {
                         { 159288, "Cloak of the Restless Tribes", "Mythic+ Dungeon - Kings' Rest" },
                     },
                     [16] = {
-                        { 245770, "Aln'hara Cane", "Crafted" },
                         { 273778, "Polished Lightwood Channeler", "Mythic+ Dungeon - Altar of Fangs" },
                         { 271092, "Jan'thrazet, the Soul Fang", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                     },
@@ -2753,17 +2403,7 @@ ns.BiSData = {
                         { 159459, "Ritual Binder's Ring", "Mythic+ Dungeon - Kings' Rest" },
                         { 268266, "Alluring Bubbleband", "Raid drop" },
                     },
-                    [12] = {
-                        { 251148, "Pilfered Precious Band", "Mythic+ Dungeon - Den of Nalorakk" },
-                        { 159459, "Ritual Binder's Ring", "Mythic+ Dungeon - Kings' Rest" },
-                        { 268266, "Alluring Bubbleband", "Raid drop" },
-                    },
                     [13] = {
-                        { 250215, "Freightrunner's Flask", "Mythic+ Dungeon - Murder Row" },
-                        { 270164, "Gebbo's Bottomless Bag", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
-                        { 270167, "Wavecaller's Seastone", "Raid drop" },
-                    },
-                    [14] = {
                         { 250215, "Freightrunner's Flask", "Mythic+ Dungeon - Murder Row" },
                         { 270164, "Gebbo's Bottomless Bag", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
                         { 270167, "Wavecaller's Seastone", "Raid drop" },
@@ -2774,9 +2414,7 @@ ns.BiSData = {
                         { 271559, "Spellcloak of the Primal Leywarden", "World Drop" },
                     },
                     [16] = {
-                        { 245770, "Aln'hara Cane", "Crafted" },
                         { 271092, "Jan'thrazet, the Soul Fang", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 268205, "Venomancer's Winged Channeler", "Raid drop - The Venomous Abyss - Boss 4 - Vashnik the Malignant" },
                     },
                     [17] = {
                         { 245769, "Aln'hara Lantern", "Crafted" },
@@ -2834,17 +2472,7 @@ ns.BiSData = {
                         { 159459, "Ritual Binder's Ring", "Mythic+ Dungeon - Kings' Rest" },
                         { 268266, "Alluring Bubbleband", "Raid drop" },
                     },
-                    [12] = {
-                        { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
-                        { 159459, "Ritual Binder's Ring", "Mythic+ Dungeon - Kings' Rest" },
-                        { 268266, "Alluring Bubbleband", "Raid drop" },
-                    },
                     [13] = {
-                        { 273796, "Vile Vial of Volatile Venom", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 270164, "Gebbo's Bottomless Bag", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
-                        { 270168, "Font of Venomous Rage", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                    },
-                    [14] = {
                         { 273796, "Vile Vial of Volatile Venom", "Mythic+ Dungeon - Altar of Fangs" },
                         { 270164, "Gebbo's Bottomless Bag", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
                         { 270168, "Font of Venomous Rage", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
@@ -2855,7 +2483,6 @@ ns.BiSData = {
                         { 268253, "Silken Voodoo Drape", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
                     },
                     [16] = {
-                        { 245770, "Aln'hara Cane", "Crafted" },
                         { 268203, "Hexing Spiritrender", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
                         { 273778, "Polished Lightwood Channeler", "Mythic+ Dungeon - Altar of Fangs" },
                     },
@@ -2914,17 +2541,7 @@ ns.BiSData = {
                         { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
                         { 268266, "Alluring Bubbleband", "Raid drop" },
                     },
-                    [12] = {
-                        { 159459, "Ritual Binder's Ring", "Mythic+ Dungeon - Kings' Rest" },
-                        { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
-                        { 268266, "Alluring Bubbleband", "Raid drop" },
-                    },
                     [13] = {
-                        { 273796, "Vile Vial of Volatile Venom", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 250144, "Emberwing Feather", "World Drop" },
-                        { 270167, "Wavecaller's Seastone", "Raid drop" },
-                    },
-                    [14] = {
                         { 273796, "Vile Vial of Volatile Venom", "Mythic+ Dungeon - Altar of Fangs" },
                         { 250144, "Emberwing Feather", "World Drop" },
                         { 270167, "Wavecaller's Seastone", "Raid drop" },
@@ -2935,7 +2552,6 @@ ns.BiSData = {
                         { 239656, "Adherent's Silken Shroud", "Crafted" },
                     },
                     [16] = {
-                        { 245770, "Aln'hara Cane", "Crafted" },
                         { 273778, "Polished Lightwood Channeler", "Mythic+ Dungeon - Altar of Fangs" },
                         { 159137, "Gilded Serpent's Tooth", "Mythic+ Dungeon - Kings' Rest" },
                     },
@@ -2998,17 +2614,7 @@ ns.BiSData = {
                         { 158366, "Charged Sandstone Band", "Mythic+ Dungeon - Temple of Sethraliss" },
                         { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
                     },
-                    [12] = {
-                        { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
-                        { 158366, "Charged Sandstone Band", "Mythic+ Dungeon - Temple of Sethraliss" },
-                        { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
-                    },
                     [13] = {
-                        { 250215, "Freightrunner's Flask", "Mythic+ Dungeon - Murder Row" },
-                        { 270164, "Gebbo's Bottomless Bag", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
-                        { 250224, "Mindpiercer's Sigil", "Mythic+ Dungeon - Voidscar Arena" },
-                    },
-                    [14] = {
                         { 250215, "Freightrunner's Flask", "Mythic+ Dungeon - Murder Row" },
                         { 270164, "Gebbo's Bottomless Bag", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
                         { 250224, "Mindpiercer's Sigil", "Mythic+ Dungeon - Voidscar Arena" },
@@ -3019,7 +2625,6 @@ ns.BiSData = {
                         { 251190, "Bloodthorn Burnous", "Mythic+ Dungeon - The Blinding Vale" },
                     },
                     [16] = {
-                        { 245770, "Aln'hara Cane", "Crafted" },
                         { 271092, "Jan'thrazet, the Soul Fang", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                         { 273778, "Polished Lightwood Channeler", "Mythic+ Dungeon - Altar of Fangs" },
                     },
@@ -3080,17 +2685,7 @@ ns.BiSData = {
                         { 158366, "Charged Sandstone Band", "Mythic+ Dungeon - Temple of Sethraliss" },
                         { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
                     },
-                    [12] = {
-                        { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
-                        { 158366, "Charged Sandstone Band", "Mythic+ Dungeon - Temple of Sethraliss" },
-                        { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
-                    },
                     [13] = {
-                        { 250215, "Freightrunner's Flask", "Mythic+ Dungeon - Murder Row" },
-                        { 270164, "Gebbo's Bottomless Bag", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
-                        { 250224, "Mindpiercer's Sigil", "Mythic+ Dungeon - Voidscar Arena" },
-                    },
-                    [14] = {
                         { 250215, "Freightrunner's Flask", "Mythic+ Dungeon - Murder Row" },
                         { 270164, "Gebbo's Bottomless Bag", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
                         { 250224, "Mindpiercer's Sigil", "Mythic+ Dungeon - Voidscar Arena" },
@@ -3101,7 +2696,6 @@ ns.BiSData = {
                         { 251190, "Bloodthorn Burnous", "Mythic+ Dungeon - The Blinding Vale" },
                     },
                     [16] = {
-                        { 245770, "Aln'hara Cane", "Crafted" },
                         { 273778, "Polished Lightwood Channeler", "Mythic+ Dungeon - Altar of Fangs" },
                         { 237843, "Magister's Mana Sword", "Crafted" },
                     },
@@ -3168,17 +2762,7 @@ ns.BiSData = {
                         { 251148, "Pilfered Precious Band", "Mythic+ Dungeon - Den of Nalorakk" },
                         { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
                     },
-                    [12] = {
-                        { 251513, "Loa Worshiper's Band", "Crafted" },
-                        { 251148, "Pilfered Precious Band", "Mythic+ Dungeon - Den of Nalorakk" },
-                        { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
-                    },
                     [13] = {
-                        { 250245, "Tumor of the Swarm", "Mythic+ Dungeon - Voidscar Arena" },
-                        { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 270168, "Font of Venomous Rage", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                    },
-                    [14] = {
                         { 250245, "Tumor of the Swarm", "Mythic+ Dungeon - Voidscar Arena" },
                         { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                         { 270168, "Font of Venomous Rage", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
@@ -3192,11 +2776,6 @@ ns.BiSData = {
                         { 268215, "Abyssal Broodfiend's Bardiche", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                         { 245771, "Aln'hara Pikestaff", "Crafted" },
                         { 268199, "Tidepiercer's Bubble Popper", "Raid drop" },
-                    },
-                    [17] = {
-                        { 270930, "Tomb-Creeper's Claw", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
-                        { 268206, "Slithering Savage's Gavel", "Raid drop - The Venomous Abyss - Boss 5 - Sszorak" },
-                        { 237850, "Farstrider's Chopper", "Crafted" },
                     },
                 },
                 mythicplus = {
@@ -3249,17 +2828,7 @@ ns.BiSData = {
                         { 251148, "Pilfered Precious Band", "Mythic+ Dungeon - Den of Nalorakk" },
                         { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
                     },
-                    [12] = {
-                        { 251513, "Loa Worshiper's Band", "Crafted" },
-                        { 251148, "Pilfered Precious Band", "Mythic+ Dungeon - Den of Nalorakk" },
-                        { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
-                    },
                     [13] = {
-                        { 250245, "Tumor of the Swarm", "Mythic+ Dungeon - Voidscar Arena" },
-                        { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 250215, "Freightrunner's Flask", "Mythic+ Dungeon - Murder Row" },
-                    },
-                    [14] = {
                         { 250245, "Tumor of the Swarm", "Mythic+ Dungeon - Voidscar Arena" },
                         { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                         { 250215, "Freightrunner's Flask", "Mythic+ Dungeon - Murder Row" },
@@ -3326,17 +2895,7 @@ ns.BiSData = {
                         { 159459, "Ritual Binder's Ring", "Mythic+ Dungeon - Kings' Rest" },
                         { 268266, "Alluring Bubbleband", "Raid drop" },
                     },
-                    [12] = {
-                        { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 159459, "Ritual Binder's Ring", "Mythic+ Dungeon - Kings' Rest" },
-                        { 268266, "Alluring Bubbleband", "Raid drop" },
-                    },
                     [13] = {
-                        { 270162, "Soulcoiler Ritual Vessel", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
-                        { 270167, "Wavecaller's Seastone", "Raid drop" },
-                        { 248583, "Drum of Renewed Bonds", "Raid drop - The Venomous Abyss" },
-                    },
-                    [14] = {
                         { 270162, "Soulcoiler Ritual Vessel", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
                         { 270167, "Wavecaller's Seastone", "Raid drop" },
                         { 248583, "Drum of Renewed Bonds", "Raid drop - The Venomous Abyss" },
@@ -3349,12 +2908,6 @@ ns.BiSData = {
                     [16] = {
                         { 245770, "Aln'hara Cane", "Crafted" },
                         { 268205, "Venomancer's Winged Channeler", "Raid drop - The Venomous Abyss - Boss 4 - Vashnik the Malignant" },
-                        { 237843, "Magister's Mana Sword", "Crafted" },
-                    },
-                    [17] = {
-                        { 268197, "Spine of the Hissing Abyss", "Raid drop - The Venomous Abyss - Boss 2 - Entombed Sentinels" },
-                        { 245769, "Aln'hara Lantern", "Crafted" },
-                        { 271681, "Perennial Frostbound Charm", "Mythic+ Dungeon - Den of Nalorakk" },
                     },
                 },
                 mythicplus = {
@@ -3408,17 +2961,7 @@ ns.BiSData = {
                         { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
                         { 159459, "Ritual Binder's Ring", "Mythic+ Dungeon - Kings' Rest" },
                     },
-                    [12] = {
-                        { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
-                        { 159459, "Ritual Binder's Ring", "Mythic+ Dungeon - Kings' Rest" },
-                    },
                     [13] = {
-                        { 249808, "Litany of Lightblind Wrath", "Raid drop" },
-                        { 270162, "Soulcoiler Ritual Vessel", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
-                        { 270167, "Wavecaller's Seastone", "Raid drop" },
-                    },
-                    [14] = {
                         { 249808, "Litany of Lightblind Wrath", "Raid drop" },
                         { 270162, "Soulcoiler Ritual Vessel", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
                         { 270167, "Wavecaller's Seastone", "Raid drop" },
@@ -3487,17 +3030,7 @@ ns.BiSData = {
                         { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
                         { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
                     },
-                    [12] = {
-                        { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
-                        { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
-                        { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
-                    },
                     [13] = {
-                        { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 270173, "Zul'jin's Guillotine Technique", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
-                        { 250215, "Freightrunner's Flask", "Mythic+ Dungeon - Murder Row" },
-                    },
-                    [14] = {
                         { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                         { 270173, "Zul'jin's Guillotine Technique", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
                         { 250215, "Freightrunner's Flask", "Mythic+ Dungeon - Murder Row" },
@@ -3511,11 +3044,6 @@ ns.BiSData = {
                         { 268215, "Abyssal Broodfiend's Bardiche", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                         { 245771, "Aln'hara Pikestaff", "Crafted" },
                         { 237847, "Blood Knight's Impetus", "Crafted" },
-                    },
-                    [17] = {
-                        { 237839, "Spellbreaker's Blade", "Crafted" },
-                        { 268206, "Slithering Savage's Gavel", "Raid drop - The Venomous Abyss - Boss 5 - Sszorak" },
-                        { 193767, "Havoc Crusher", "Mythic+ Dungeon - Ruby Life Pools" },
                     },
                 },
                 mythicplus = {
@@ -3569,17 +3097,7 @@ ns.BiSData = {
                         { 158366, "Charged Sandstone Band", "Mythic+ Dungeon - Temple of Sethraliss" },
                         { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
                     },
-                    [12] = {
-                        { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
-                        { 158366, "Charged Sandstone Band", "Mythic+ Dungeon - Temple of Sethraliss" },
-                        { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
-                    },
                     [13] = {
-                        { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 250228, "Resonant Bellowstone", "Mythic+ Dungeon - Murder Row" },
-                        { 270173, "Zul'jin's Guillotine Technique", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
-                    },
-                    [14] = {
                         { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                         { 250228, "Resonant Bellowstone", "Mythic+ Dungeon - Murder Row" },
                         { 270173, "Zul'jin's Guillotine Technique", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
@@ -3649,17 +3167,7 @@ ns.BiSData = {
                         { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
                         { 158366, "Charged Sandstone Band", "Mythic+ Dungeon - Temple of Sethraliss" },
                     },
-                    [12] = {
-                        { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
-                        { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
-                        { 158366, "Charged Sandstone Band", "Mythic+ Dungeon - Temple of Sethraliss" },
-                    },
                     [13] = {
-                        { 270162, "Soulcoiler Ritual Vessel", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
-                        { 270164, "Gebbo's Bottomless Bag", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
-                        { 250214, "Lightspire Core", "Mythic+ Dungeon - The Blinding Vale" },
-                    },
-                    [14] = {
                         { 270162, "Soulcoiler Ritual Vessel", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
                         { 270164, "Gebbo's Bottomless Bag", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
                         { 250214, "Lightspire Core", "Mythic+ Dungeon - The Blinding Vale" },
@@ -3672,7 +3180,6 @@ ns.BiSData = {
                     [16] = {
                         { 237843, "Magister's Mana Sword", "Crafted" },
                         { 268210, "Malevolent Spiritcudgel", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
-                        { 237849, "Magister's Valediction", "Crafted" },
                     },
                     [17] = {
                         { 237831, "Spellbreaker's Rebuke", "Crafted" },
@@ -3731,17 +3238,7 @@ ns.BiSData = {
                         { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
                         { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
                     },
-                    [12] = {
-                        { 159459, "Ritual Binder's Ring", "Mythic+ Dungeon - Kings' Rest" },
-                        { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
-                    },
                     [13] = {
-                        { 270162, "Soulcoiler Ritual Vessel", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
-                        { 270164, "Gebbo's Bottomless Bag", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
-                        { 270167, "Wavecaller's Seastone", "Raid drop" },
-                    },
-                    [14] = {
                         { 270162, "Soulcoiler Ritual Vessel", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
                         { 270164, "Gebbo's Bottomless Bag", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
                         { 270167, "Wavecaller's Seastone", "Raid drop" },
@@ -3815,17 +3312,7 @@ ns.BiSData = {
                         { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
                         { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
                     },
-                    [12] = {
-                        { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
-                        { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
-                    },
                     [13] = {
-                        { 250245, "Tumor of the Swarm", "Mythic+ Dungeon - Voidscar Arena" },
-                        { 270173, "Zul'jin's Guillotine Technique", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
-                        { 273796, "Vile Vial of Volatile Venom", "Mythic+ Dungeon - Altar of Fangs" },
-                    },
-                    [14] = {
                         { 250245, "Tumor of the Swarm", "Mythic+ Dungeon - Voidscar Arena" },
                         { 270173, "Zul'jin's Guillotine Technique", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
                         { 273796, "Vile Vial of Volatile Venom", "Mythic+ Dungeon - Altar of Fangs" },
@@ -3897,17 +3384,7 @@ ns.BiSData = {
                         { 251148, "Pilfered Precious Band", "Mythic+ Dungeon - Den of Nalorakk" },
                         { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
                     },
-                    [12] = {
-                        { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 251148, "Pilfered Precious Band", "Mythic+ Dungeon - Den of Nalorakk" },
-                        { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
-                    },
                     [13] = {
-                        { 273796, "Vile Vial of Volatile Venom", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 250228, "Resonant Bellowstone", "Mythic+ Dungeon - Murder Row" },
-                        { 250245, "Tumor of the Swarm", "Mythic+ Dungeon - Voidscar Arena" },
-                    },
-                    [14] = {
                         { 273796, "Vile Vial of Volatile Venom", "Mythic+ Dungeon - Altar of Fangs" },
                         { 250228, "Resonant Bellowstone", "Mythic+ Dungeon - Murder Row" },
                         { 250245, "Tumor of the Swarm", "Mythic+ Dungeon - Voidscar Arena" },
@@ -3981,17 +3458,7 @@ ns.BiSData = {
                         { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
                         { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
                     },
-                    [12] = {
-                        { 251513, "Loa Worshiper's Band", "Crafted" },
-                        { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
-                        { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
-                    },
                     [13] = {
-                        { 270173, "Zul'jin's Guillotine Technique", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
-                        { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 273796, "Vile Vial of Volatile Venom", "Mythic+ Dungeon - Altar of Fangs" },
-                    },
-                    [14] = {
                         { 270173, "Zul'jin's Guillotine Technique", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
                         { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                         { 273796, "Vile Vial of Volatile Venom", "Mythic+ Dungeon - Altar of Fangs" },
@@ -4058,17 +3525,7 @@ ns.BiSData = {
                         { 251513, "Loa Worshiper's Band", "Crafted" },
                         { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
                     },
-                    [12] = {
-                        { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
-                        { 251513, "Loa Worshiper's Band", "Crafted" },
-                        { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
-                    },
                     [13] = {
-                        { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 270173, "Zul'jin's Guillotine Technique", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
-                        { 270602, "Venomous Gladiator's Badge of Ferocity", "World Drop" },
-                    },
-                    [14] = {
                         { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                         { 270173, "Zul'jin's Guillotine Technique", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
                         { 270602, "Venomous Gladiator's Badge of Ferocity", "World Drop" },
@@ -4141,17 +3598,7 @@ ns.BiSData = {
                         { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
                         { 159459, "Ritual Binder's Ring", "Mythic+ Dungeon - Kings' Rest" },
                     },
-                    [12] = {
-                        { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
-                        { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 159459, "Ritual Binder's Ring", "Mythic+ Dungeon - Kings' Rest" },
-                    },
                     [13] = {
-                        { 270169, "Hex Lord's Dooming Idol", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
-                        { 270167, "Wavecaller's Seastone", "Raid drop" },
-                        { 270162, "Soulcoiler Ritual Vessel", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
-                    },
-                    [14] = {
                         { 270169, "Hex Lord's Dooming Idol", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
                         { 270167, "Wavecaller's Seastone", "Raid drop" },
                         { 270162, "Soulcoiler Ritual Vessel", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
@@ -4223,17 +3670,7 @@ ns.BiSData = {
                         { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
                         { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
                     },
-                    [12] = {
-                        { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
-                        { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
-                    },
                     [13] = {
-                        { 270162, "Soulcoiler Ritual Vessel", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
-                        { 250214, "Lightspire Core", "Mythic+ Dungeon - The Blinding Vale" },
-                        { 270167, "Wavecaller's Seastone", "Raid drop" },
-                    },
-                    [14] = {
                         { 270162, "Soulcoiler Ritual Vessel", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
                         { 250214, "Lightspire Core", "Mythic+ Dungeon - The Blinding Vale" },
                         { 270167, "Wavecaller's Seastone", "Raid drop" },
@@ -4244,7 +3681,6 @@ ns.BiSData = {
                         { 193763, "Fireproof Drape", "Mythic+ Dungeon - Ruby Life Pools" },
                     },
                     [16] = {
-                        { 245770, "Aln'hara Cane", "Crafted" },
                         { 271092, "Jan'thrazet, the Soul Fang", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                         { 273778, "Polished Lightwood Channeler", "Mythic+ Dungeon - Altar of Fangs" },
                     },
@@ -4307,17 +3743,7 @@ ns.BiSData = {
                         { 158366, "Charged Sandstone Band", "Mythic+ Dungeon - Temple of Sethraliss" },
                         { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
                     },
-                    [12] = {
-                        { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
-                        { 158366, "Charged Sandstone Band", "Mythic+ Dungeon - Temple of Sethraliss" },
-                        { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
-                    },
                     [13] = {
-                        { 270162, "Soulcoiler Ritual Vessel", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
-                        { 270164, "Gebbo's Bottomless Bag", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
-                        { 270167, "Wavecaller's Seastone", "Raid drop" },
-                    },
-                    [14] = {
                         { 270162, "Soulcoiler Ritual Vessel", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
                         { 270164, "Gebbo's Bottomless Bag", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
                         { 270167, "Wavecaller's Seastone", "Raid drop" },
@@ -4328,7 +3754,6 @@ ns.BiSData = {
                         { 193763, "Fireproof Drape", "Mythic+ Dungeon - Ruby Life Pools" },
                     },
                     [16] = {
-                        { 245770, "Aln'hara Cane", "Crafted" },
                         { 271092, "Jan'thrazet, the Soul Fang", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                         { 237838, "Magister's Ritual Knife", "Crafted" },
                     },
@@ -4389,17 +3814,7 @@ ns.BiSData = {
                         { 158366, "Charged Sandstone Band", "Mythic+ Dungeon - Temple of Sethraliss" },
                         { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
                     },
-                    [12] = {
-                        { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 158366, "Charged Sandstone Band", "Mythic+ Dungeon - Temple of Sethraliss" },
-                        { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
-                    },
                     [13] = {
-                        { 270162, "Soulcoiler Ritual Vessel", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
-                        { 270164, "Gebbo's Bottomless Bag", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
-                        { 270167, "Wavecaller's Seastone", "Raid drop" },
-                    },
-                    [14] = {
                         { 270162, "Soulcoiler Ritual Vessel", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
                         { 270164, "Gebbo's Bottomless Bag", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
                         { 270167, "Wavecaller's Seastone", "Raid drop" },
@@ -4410,7 +3825,6 @@ ns.BiSData = {
                         { 159288, "Cloak of the Restless Tribes", "Mythic+ Dungeon - Kings' Rest" },
                     },
                     [16] = {
-                        { 245770, "Aln'hara Cane", "Crafted" },
                         { 271092, "Jan'thrazet, the Soul Fang", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                         { 273778, "Polished Lightwood Channeler", "Mythic+ Dungeon - Altar of Fangs" },
                     },
@@ -4473,17 +3887,7 @@ ns.BiSData = {
                         { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
                         { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
                     },
-                    [12] = {
-                        { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
-                        { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
-                        { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
-                    },
                     [13] = {
-                        { 250215, "Freightrunner's Flask", "Mythic+ Dungeon - Murder Row" },
-                        { 270167, "Wavecaller's Seastone", "Raid drop" },
-                        { 273796, "Vile Vial of Volatile Venom", "Mythic+ Dungeon - Altar of Fangs" },
-                    },
-                    [14] = {
                         { 250215, "Freightrunner's Flask", "Mythic+ Dungeon - Murder Row" },
                         { 270167, "Wavecaller's Seastone", "Raid drop" },
                         { 273796, "Vile Vial of Volatile Venom", "Mythic+ Dungeon - Altar of Fangs" },
@@ -4494,7 +3898,6 @@ ns.BiSData = {
                         { 193763, "Fireproof Drape", "Mythic+ Dungeon - Ruby Life Pools" },
                     },
                     [16] = {
-                        { 245770, "Aln'hara Cane", "Crafted" },
                         { 271092, "Jan'thrazet, the Soul Fang", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                         { 273778, "Polished Lightwood Channeler", "Mythic+ Dungeon - Altar of Fangs" },
                     },
@@ -4555,17 +3958,7 @@ ns.BiSData = {
                         { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
                         { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
                     },
-                    [12] = {
-                        { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
-                        { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
-                        { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
-                    },
                     [13] = {
-                        { 250215, "Freightrunner's Flask", "Mythic+ Dungeon - Murder Row" },
-                        { 273796, "Vile Vial of Volatile Venom", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 270164, "Gebbo's Bottomless Bag", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
-                    },
-                    [14] = {
                         { 250215, "Freightrunner's Flask", "Mythic+ Dungeon - Murder Row" },
                         { 273796, "Vile Vial of Volatile Venom", "Mythic+ Dungeon - Altar of Fangs" },
                         { 270164, "Gebbo's Bottomless Bag", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
@@ -4576,7 +3969,6 @@ ns.BiSData = {
                         { 193763, "Fireproof Drape", "Mythic+ Dungeon - Ruby Life Pools" },
                     },
                     [16] = {
-                        { 245770, "Aln'hara Cane", "Crafted" },
                         { 273778, "Polished Lightwood Channeler", "Mythic+ Dungeon - Altar of Fangs" },
                         { 271092, "Jan'thrazet, the Soul Fang", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                     },
@@ -4643,17 +4035,7 @@ ns.BiSData = {
                         { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
                         { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
                     },
-                    [12] = {
-                        { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
-                        { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
-                    },
                     [13] = {
-                        { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 270168, "Font of Venomous Rage", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 270165, "Keeper's Seething Core", "Raid drop - The Venomous Abyss - Boss 2 - Entombed Sentinels" },
-                    },
-                    [14] = {
                         { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                         { 270168, "Font of Venomous Rage", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                         { 270165, "Keeper's Seething Core", "Raid drop - The Venomous Abyss - Boss 2 - Entombed Sentinels" },
@@ -4725,17 +4107,7 @@ ns.BiSData = {
                         { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
                         { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
                     },
-                    [12] = {
-                        { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
-                        { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
-                    },
                     [13] = {
-                        { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 270165, "Keeper's Seething Core", "Raid drop - The Venomous Abyss - Boss 2 - Entombed Sentinels" },
-                        { 270168, "Font of Venomous Rage", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                    },
-                    [14] = {
                         { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                         { 270165, "Keeper's Seething Core", "Raid drop - The Venomous Abyss - Boss 2 - Entombed Sentinels" },
                         { 270168, "Font of Venomous Rage", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
@@ -4809,17 +4181,7 @@ ns.BiSData = {
                         { 251148, "Pilfered Precious Band", "Mythic+ Dungeon - Den of Nalorakk" },
                         { 159459, "Ritual Binder's Ring", "Mythic+ Dungeon - Kings' Rest" },
                     },
-                    [12] = {
-                        { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 251148, "Pilfered Precious Band", "Mythic+ Dungeon - Den of Nalorakk" },
-                        { 159459, "Ritual Binder's Ring", "Mythic+ Dungeon - Kings' Rest" },
-                    },
                     [13] = {
-                        { 270173, "Zul'jin's Guillotine Technique", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
-                        { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 159617, "Lustrous Golden Plumage", "Mythic+ Dungeon - Kings' Rest" },
-                    },
-                    [14] = {
                         { 270173, "Zul'jin's Guillotine Technique", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
                         { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                         { 159617, "Lustrous Golden Plumage", "Mythic+ Dungeon - Kings' Rest" },
@@ -4891,17 +4253,7 @@ ns.BiSData = {
                         { 251148, "Pilfered Precious Band", "Mythic+ Dungeon - Den of Nalorakk" },
                         { 159459, "Ritual Binder's Ring", "Mythic+ Dungeon - Kings' Rest" },
                     },
-                    [12] = {
-                        { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 251148, "Pilfered Precious Band", "Mythic+ Dungeon - Den of Nalorakk" },
-                        { 159459, "Ritual Binder's Ring", "Mythic+ Dungeon - Kings' Rest" },
-                    },
                     [13] = {
-                        { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 270173, "Zul'jin's Guillotine Technique", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
-                        { 250215, "Freightrunner's Flask", "Mythic+ Dungeon - Murder Row" },
-                    },
-                    [14] = {
                         { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                         { 270173, "Zul'jin's Guillotine Technique", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
                         { 250215, "Freightrunner's Flask", "Mythic+ Dungeon - Murder Row" },
@@ -4975,17 +4327,7 @@ ns.BiSData = {
                         { 251194, "Lightwarden's Bind", "Mythic+ Dungeon - The Blinding Vale" },
                         { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
                     },
-                    [12] = {
-                        { 162544, "Jade Ophidian Band", "Mythic+ Dungeon - Temple of Sethraliss" },
-                        { 251194, "Lightwarden's Bind", "Mythic+ Dungeon - The Blinding Vale" },
-                        { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
-                    },
                     [13] = {
-                        { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 270173, "Zul'jin's Guillotine Technique", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
-                        { 270165, "Keeper's Seething Core", "Raid drop - The Venomous Abyss - Boss 2 - Entombed Sentinels" },
-                    },
-                    [14] = {
                         { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                         { 270173, "Zul'jin's Guillotine Technique", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
                         { 270165, "Keeper's Seething Core", "Raid drop - The Venomous Abyss - Boss 2 - Entombed Sentinels" },
@@ -5057,17 +4399,7 @@ ns.BiSData = {
                         { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
                         { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
                     },
-                    [12] = {
-                        { 251194, "Lightwarden's Bind", "Mythic+ Dungeon - The Blinding Vale" },
-                        { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
-                        { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
-                    },
                     [13] = {
-                        { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 270165, "Keeper's Seething Core", "Raid drop - The Venomous Abyss - Boss 2 - Entombed Sentinels" },
-                        { 270164, "Gebbo's Bottomless Bag", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
-                    },
-                    [14] = {
                         { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                         { 270165, "Keeper's Seething Core", "Raid drop - The Venomous Abyss - Boss 2 - Entombed Sentinels" },
                         { 270164, "Gebbo's Bottomless Bag", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
@@ -5144,17 +4476,7 @@ ns.BiSData = {
                         { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
                         { 158366, "Charged Sandstone Band", "Mythic+ Dungeon - Temple of Sethraliss" },
                     },
-                    [12] = {
-                        { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
-                        { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 158366, "Charged Sandstone Band", "Mythic+ Dungeon - Temple of Sethraliss" },
-                    },
                     [13] = {
-                        { 273796, "Vile Vial of Volatile Venom", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 270164, "Gebbo's Bottomless Bag", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
-                        { 270167, "Wavecaller's Seastone", "Raid drop" },
-                    },
-                    [14] = {
                         { 273796, "Vile Vial of Volatile Venom", "Mythic+ Dungeon - Altar of Fangs" },
                         { 270164, "Gebbo's Bottomless Bag", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
                         { 270167, "Wavecaller's Seastone", "Raid drop" },
@@ -5165,7 +4487,6 @@ ns.BiSData = {
                         { 251190, "Bloodthorn Burnous", "Mythic+ Dungeon - The Blinding Vale" },
                     },
                     [16] = {
-                        { 245770, "Aln'hara Cane", "Crafted" },
                         { 271092, "Jan'thrazet, the Soul Fang", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                         { 273778, "Polished Lightwood Channeler", "Mythic+ Dungeon - Altar of Fangs" },
                     },
@@ -5226,17 +4547,7 @@ ns.BiSData = {
                         { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
                         { 158366, "Charged Sandstone Band", "Mythic+ Dungeon - Temple of Sethraliss" },
                     },
-                    [12] = {
-                        { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
-                        { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 158366, "Charged Sandstone Band", "Mythic+ Dungeon - Temple of Sethraliss" },
-                    },
                     [13] = {
-                        { 273796, "Vile Vial of Volatile Venom", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 270164, "Gebbo's Bottomless Bag", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
-                        { 250214, "Lightspire Core", "Mythic+ Dungeon - The Blinding Vale" },
-                    },
-                    [14] = {
                         { 273796, "Vile Vial of Volatile Venom", "Mythic+ Dungeon - Altar of Fangs" },
                         { 270164, "Gebbo's Bottomless Bag", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
                         { 250214, "Lightspire Core", "Mythic+ Dungeon - The Blinding Vale" },
@@ -5248,13 +4559,6 @@ ns.BiSData = {
                     },
                     [16] = {
                         { 245770, "Aln'hara Cane", "Crafted" },
-                        { 271092, "Jan'thrazet, the Soul Fang", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 268210, "Malevolent Spiritcudgel", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
-                    },
-                    [17] = {
-                        { 268262, "Bubblefin Splash Guard", "Raid drop" },
-                        { 237831, "Spellbreaker's Rebuke", "Crafted" },
-                        { 245769, "Aln'hara Lantern", "Crafted" },
                     },
                 },
             },
@@ -5310,17 +4614,7 @@ ns.BiSData = {
                         { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
                         { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
                     },
-                    [12] = {
-                        { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
-                        { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
-                    },
                     [13] = {
-                        { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 273796, "Vile Vial of Volatile Venom", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 270173, "Zul'jin's Guillotine Technique", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
-                    },
-                    [14] = {
                         { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                         { 273796, "Vile Vial of Volatile Venom", "Mythic+ Dungeon - Altar of Fangs" },
                         { 270173, "Zul'jin's Guillotine Technique", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
@@ -5392,17 +4686,7 @@ ns.BiSData = {
                         { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
                         { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
                     },
-                    [12] = {
-                        { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
-                        { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
-                    },
                     [13] = {
-                        { 273796, "Vile Vial of Volatile Venom", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 270173, "Zul'jin's Guillotine Technique", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
-                        { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                    },
-                    [14] = {
                         { 273796, "Vile Vial of Volatile Venom", "Mythic+ Dungeon - Altar of Fangs" },
                         { 270173, "Zul'jin's Guillotine Technique", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
                         { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
@@ -5476,17 +4760,7 @@ ns.BiSData = {
                         { 251148, "Pilfered Precious Band", "Mythic+ Dungeon - Den of Nalorakk" },
                         { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
                     },
-                    [12] = {
-                        { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 251148, "Pilfered Precious Band", "Mythic+ Dungeon - Den of Nalorakk" },
-                        { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
-                    },
                     [13] = {
-                        { 270162, "Soulcoiler Ritual Vessel", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
-                        { 270164, "Gebbo's Bottomless Bag", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
-                        { 250215, "Freightrunner's Flask", "Mythic+ Dungeon - Murder Row" },
-                    },
-                    [14] = {
                         { 270162, "Soulcoiler Ritual Vessel", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
                         { 270164, "Gebbo's Bottomless Bag", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
                         { 250215, "Freightrunner's Flask", "Mythic+ Dungeon - Murder Row" },
@@ -5558,17 +4832,7 @@ ns.BiSData = {
                         { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
                         { 159459, "Ritual Binder's Ring", "Mythic+ Dungeon - Kings' Rest" },
                     },
-                    [12] = {
-                        { 251148, "Pilfered Precious Band", "Mythic+ Dungeon - Den of Nalorakk" },
-                        { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 159459, "Ritual Binder's Ring", "Mythic+ Dungeon - Kings' Rest" },
-                    },
                     [13] = {
-                        { 270162, "Soulcoiler Ritual Vessel", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
-                        { 250255, "Unstable Felheart Crystal", "Mythic+ Dungeon - Murder Row" },
-                        { 248583, "Drum of Renewed Bonds", "World Drop" },
-                    },
-                    [14] = {
                         { 270162, "Soulcoiler Ritual Vessel", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
                         { 250255, "Unstable Felheart Crystal", "Mythic+ Dungeon - Murder Row" },
                         { 248583, "Drum of Renewed Bonds", "World Drop" },
@@ -5581,7 +4845,6 @@ ns.BiSData = {
                     [16] = {
                         { 271092, "Jan'thrazet, the Soul Fang", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                         { 251225, "Fang of Contagion", "Mythic+ Dungeon - Voidscar Arena" },
-                        { 245770, "Aln'hara Cane", "Crafted" },
                     },
                     [17] = {
                         { 237831, "Spellbreaker's Rebuke", "Crafted" },
@@ -5646,17 +4909,7 @@ ns.BiSData = {
                         { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
                         { 268252, "Apex Brute's Claw Ring", "Raid drop - The Venomous Abyss - Boss 5 - Sszorak" },
                     },
-                    [12] = {
-                        { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
-                        { 268252, "Apex Brute's Claw Ring", "Raid drop - The Venomous Abyss - Boss 5 - Sszorak" },
-                    },
                     [13] = {
-                        { 273796, "Vile Vial of Volatile Venom", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 270164, "Gebbo's Bottomless Bag", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
-                        { 250224, "Mindpiercer's Sigil", "Mythic+ Dungeon - Voidscar Arena" },
-                    },
-                    [14] = {
                         { 273796, "Vile Vial of Volatile Venom", "Mythic+ Dungeon - Altar of Fangs" },
                         { 270164, "Gebbo's Bottomless Bag", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
                         { 250224, "Mindpiercer's Sigil", "Mythic+ Dungeon - Voidscar Arena" },
@@ -5667,7 +4920,6 @@ ns.BiSData = {
                         { 251190, "Bloodthorn Burnous", "Mythic+ Dungeon - The Blinding Vale" },
                     },
                     [16] = {
-                        { 245770, "Aln'hara Cane", "Crafted" },
                         { 271092, "Jan'thrazet, the Soul Fang", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                         { 273778, "Polished Lightwood Channeler", "Mythic+ Dungeon - Altar of Fangs" },
                     },
@@ -5728,17 +4980,7 @@ ns.BiSData = {
                         { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
                         { 268266, "Alluring Bubbleband", "Raid drop" },
                     },
-                    [12] = {
-                        { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
-                        { 268266, "Alluring Bubbleband", "Raid drop" },
-                    },
                     [13] = {
-                        { 273796, "Vile Vial of Volatile Venom", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 250224, "Mindpiercer's Sigil", "Mythic+ Dungeon - Voidscar Arena" },
-                        { 270164, "Gebbo's Bottomless Bag", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
-                    },
-                    [14] = {
                         { 273796, "Vile Vial of Volatile Venom", "Mythic+ Dungeon - Altar of Fangs" },
                         { 250224, "Mindpiercer's Sigil", "Mythic+ Dungeon - Voidscar Arena" },
                         { 270164, "Gebbo's Bottomless Bag", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
@@ -5749,7 +4991,6 @@ ns.BiSData = {
                         { 268248, "Amani Summoning Shawl", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
                     },
                     [16] = {
-                        { 245770, "Aln'hara Cane", "Crafted" },
                         { 273778, "Polished Lightwood Channeler", "Mythic+ Dungeon - Altar of Fangs" },
                         { 237838, "Magister's Ritual Knife", "Crafted" },
                     },
@@ -5812,17 +5053,7 @@ ns.BiSData = {
                         { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
                         { 158366, "Charged Sandstone Band", "Mythic+ Dungeon - Temple of Sethraliss" },
                     },
-                    [12] = {
-                        { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
-                        { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 158366, "Charged Sandstone Band", "Mythic+ Dungeon - Temple of Sethraliss" },
-                    },
                     [13] = {
-                        { 273796, "Vile Vial of Volatile Venom", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 270164, "Gebbo's Bottomless Bag", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
-                        { 250215, "Freightrunner's Flask", "Mythic+ Dungeon - Murder Row" },
-                    },
-                    [14] = {
                         { 273796, "Vile Vial of Volatile Venom", "Mythic+ Dungeon - Altar of Fangs" },
                         { 270164, "Gebbo's Bottomless Bag", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
                         { 250215, "Freightrunner's Flask", "Mythic+ Dungeon - Murder Row" },
@@ -5833,7 +5064,6 @@ ns.BiSData = {
                         { 251190, "Bloodthorn Burnous", "Mythic+ Dungeon - The Blinding Vale" },
                     },
                     [16] = {
-                        { 245770, "Aln'hara Cane", "Crafted" },
                         { 271092, "Jan'thrazet, the Soul Fang", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                         { 273778, "Polished Lightwood Channeler", "Mythic+ Dungeon - Altar of Fangs" },
                     },
@@ -5894,17 +5124,7 @@ ns.BiSData = {
                         { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
                         { 158366, "Charged Sandstone Band", "Mythic+ Dungeon - Temple of Sethraliss" },
                     },
-                    [12] = {
-                        { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
-                        { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 158366, "Charged Sandstone Band", "Mythic+ Dungeon - Temple of Sethraliss" },
-                    },
                     [13] = {
-                        { 273796, "Vile Vial of Volatile Venom", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 270164, "Gebbo's Bottomless Bag", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
-                        { 250215, "Freightrunner's Flask", "Mythic+ Dungeon - Murder Row" },
-                    },
-                    [14] = {
                         { 273796, "Vile Vial of Volatile Venom", "Mythic+ Dungeon - Altar of Fangs" },
                         { 270164, "Gebbo's Bottomless Bag", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
                         { 250215, "Freightrunner's Flask", "Mythic+ Dungeon - Murder Row" },
@@ -5915,7 +5135,6 @@ ns.BiSData = {
                         { 251132, "Speakeasy Shroud", "Mythic+ Dungeon - Murder Row" },
                     },
                     [16] = {
-                        { 245770, "Aln'hara Cane", "Crafted" },
                         { 268203, "Hexing Spiritrender", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
                         { 273778, "Polished Lightwood Channeler", "Mythic+ Dungeon - Altar of Fangs" },
                     },
@@ -5977,17 +5196,7 @@ ns.BiSData = {
                         { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
                         { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
                     },
-                    [12] = {
-                        { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
-                        { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
-                    },
                     [13] = {
-                        { 250215, "Freightrunner's Flask", "Mythic+ Dungeon - Murder Row" },
-                        { 270164, "Gebbo's Bottomless Bag", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
-                        { 270167, "Wavecaller's Seastone", "Raid drop" },
-                    },
-                    [14] = {
                         { 250215, "Freightrunner's Flask", "Mythic+ Dungeon - Murder Row" },
                         { 270164, "Gebbo's Bottomless Bag", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
                         { 270167, "Wavecaller's Seastone", "Raid drop" },
@@ -5998,7 +5207,6 @@ ns.BiSData = {
                         { 193763, "Fireproof Drape", "Mythic+ Dungeon - Ruby Life Pools" },
                     },
                     [16] = {
-                        { 245770, "Aln'hara Cane", "Crafted" },
                         { 273778, "Polished Lightwood Channeler", "Mythic+ Dungeon - Altar of Fangs" },
                         { 271092, "Jan'thrazet, the Soul Fang", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                     },
@@ -6059,17 +5267,7 @@ ns.BiSData = {
                         { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
                         { 158366, "Charged Sandstone Band", "Mythic+ Dungeon - Temple of Sethraliss" },
                     },
-                    [12] = {
-                        { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
-                        { 158366, "Charged Sandstone Band", "Mythic+ Dungeon - Temple of Sethraliss" },
-                    },
                     [13] = {
-                        { 250215, "Freightrunner's Flask", "Mythic+ Dungeon - Murder Row" },
-                        { 270164, "Gebbo's Bottomless Bag", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
-                        { 250224, "Mindpiercer's Sigil", "Mythic+ Dungeon - Voidscar Arena" },
-                    },
-                    [14] = {
                         { 250215, "Freightrunner's Flask", "Mythic+ Dungeon - Murder Row" },
                         { 270164, "Gebbo's Bottomless Bag", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
                         { 250224, "Mindpiercer's Sigil", "Mythic+ Dungeon - Voidscar Arena" },
@@ -6080,9 +5278,7 @@ ns.BiSData = {
                         { 193763, "Fireproof Drape", "Mythic+ Dungeon - Ruby Life Pools" },
                     },
                     [16] = {
-                        { 245770, "Aln'hara Cane", "Crafted" },
                         { 273778, "Polished Lightwood Channeler", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 251123, "Nibbles' Training Rod", "Mythic+ Dungeon - Murder Row" },
                     },
                     [17] = {
                         { 245769, "Aln'hara Lantern", "Crafted" },
@@ -6147,17 +5343,7 @@ ns.BiSData = {
                         { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
                         { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
                     },
-                    [12] = {
-                        { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
-                        { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
-                    },
                     [13] = {
-                        { 270173, "Zul'jin's Guillotine Technique", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
-                        { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 270165, "Keeper's Seething Core", "Raid drop - The Venomous Abyss - Boss 2 - Entombed Sentinels" },
-                    },
-                    [14] = {
                         { 270173, "Zul'jin's Guillotine Technique", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
                         { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                         { 270165, "Keeper's Seething Core", "Raid drop - The Venomous Abyss - Boss 2 - Entombed Sentinels" },
@@ -6224,17 +5410,7 @@ ns.BiSData = {
                         { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
                         { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
                     },
-                    [12] = {
-                        { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
-                        { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
-                    },
                     [13] = {
-                        { 270165, "Keeper's Seething Core", "Raid drop - The Venomous Abyss - Boss 2 - Entombed Sentinels" },
-                        { 270164, "Gebbo's Bottomless Bag", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
-                        { 270173, "Zul'jin's Guillotine Technique", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
-                    },
-                    [14] = {
                         { 270165, "Keeper's Seething Core", "Raid drop - The Venomous Abyss - Boss 2 - Entombed Sentinels" },
                         { 270164, "Gebbo's Bottomless Bag", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
                         { 270173, "Zul'jin's Guillotine Technique", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
@@ -6303,17 +5479,7 @@ ns.BiSData = {
                         { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
                         { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
                     },
-                    [12] = {
-                        { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
-                        { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
-                    },
                     [13] = {
-                        { 270173, "Zul'jin's Guillotine Technique", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
-                        { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 270165, "Keeper's Seething Core", "Raid drop - The Venomous Abyss - Boss 2 - Entombed Sentinels" },
-                    },
-                    [14] = {
                         { 270173, "Zul'jin's Guillotine Technique", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
                         { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                         { 270165, "Keeper's Seething Core", "Raid drop - The Venomous Abyss - Boss 2 - Entombed Sentinels" },
@@ -6327,11 +5493,6 @@ ns.BiSData = {
                         { 237846, "Blood Knight's Warblade", "Crafted" },
                         { 268213, "Maze-roa, Warlord's Fury", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
                         { 251134, "Xathuux's Cleave", "Mythic+ Dungeon - Murder Row" },
-                    },
-                    [17] = {
-                        { 268214, "Malignant Toothed Edge", "Raid drop - The Venomous Abyss - Boss 4 - Vashnik the Malignant" },
-                        { 237846, "Blood Knight's Warblade", "Crafted" },
-                        { 193755, "Backdraft Cleaver", "Mythic+ Dungeon - Ruby Life Pools" },
                     },
                 },
                 mythicplus = {
@@ -6385,17 +5546,7 @@ ns.BiSData = {
                         { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
                         { 251194, "Lightwarden's Bind", "Mythic+ Dungeon - The Blinding Vale" },
                     },
-                    [12] = {
-                        { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
-                        { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 251194, "Lightwarden's Bind", "Mythic+ Dungeon - The Blinding Vale" },
-                    },
                     [13] = {
-                        { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 270165, "Keeper's Seething Core", "Raid drop - The Venomous Abyss - Boss 2 - Entombed Sentinels" },
-                        { 270173, "Zul'jin's Guillotine Technique", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
-                    },
-                    [14] = {
                         { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                         { 270165, "Keeper's Seething Core", "Raid drop - The Venomous Abyss - Boss 2 - Entombed Sentinels" },
                         { 270173, "Zul'jin's Guillotine Technique", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
@@ -6409,11 +5560,6 @@ ns.BiSData = {
                         { 268213, "Maze-roa, Warlord's Fury", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
                         { 237846, "Blood Knight's Warblade", "Crafted" },
                         { 273782, "Vile Writhefang Glaive", "Mythic+ Dungeon - Altar of Fangs" },
-                    },
-                    [17] = {
-                        { 268214, "Malignant Toothed Edge", "Raid drop - The Venomous Abyss - Boss 4 - Vashnik the Malignant" },
-                        { 237846, "Blood Knight's Warblade", "Crafted" },
-                        { 268213, "Maze-roa, Warlord's Fury", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
                     },
                 },
             },
@@ -6469,17 +5615,7 @@ ns.BiSData = {
                         { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
                         { 159459, "Ritual Binder's Ring", "Mythic+ Dungeon - Kings' Rest" },
                     },
-                    [12] = {
-                        { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
-                        { 159459, "Ritual Binder's Ring", "Mythic+ Dungeon - Kings' Rest" },
-                    },
                     [13] = {
-                        { 270173, "Zul'jin's Guillotine Technique", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
-                        { 250245, "Tumor of the Swarm", "Mythic+ Dungeon - Voidscar Arena" },
-                        { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                    },
-                    [14] = {
                         { 270173, "Zul'jin's Guillotine Technique", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
                         { 250245, "Tumor of the Swarm", "Mythic+ Dungeon - Voidscar Arena" },
                         { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
@@ -6551,17 +5687,7 @@ ns.BiSData = {
                         { 159459, "Ritual Binder's Ring", "Mythic+ Dungeon - Kings' Rest" },
                         { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
                     },
-                    [12] = {
-                        { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 159459, "Ritual Binder's Ring", "Mythic+ Dungeon - Kings' Rest" },
-                        { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
-                    },
                     [13] = {
-                        { 250245, "Tumor of the Swarm", "Mythic+ Dungeon - Voidscar Arena" },
-                        { 273796, "Vile Vial of Volatile Venom", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 250228, "Resonant Bellowstone", "Mythic+ Dungeon - Murder Row" },
-                    },
-                    [14] = {
                         { 250245, "Tumor of the Swarm", "Mythic+ Dungeon - Voidscar Arena" },
                         { 273796, "Vile Vial of Volatile Venom", "Mythic+ Dungeon - Altar of Fangs" },
                         { 250228, "Resonant Bellowstone", "Mythic+ Dungeon - Murder Row" },

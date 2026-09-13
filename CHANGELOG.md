@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Removed the visible delay when collapsing or expanding the quest tracker by synchronizing background visibility each frame, without queuing a layout refresh.
+- Fixed the quest tracker's built-in background remaining visible when minimized to only the restore button. Its previous opacity returns when expanded or when the option is disabled.
 - Fixed equipped gems missing on the first character-sheet opening when socket or gem metadata is uncached. Known gem IDs now preserve occupied sockets, and individual gem-load callbacks refresh the open sheet after data arrives, with bounded requests and combat deferral.
 - Restored module-driven refreshes of the visible settings page after the modern-window migration, including meter, talent, macro, and window-reset updates, without constructing unopened pages.
 - Fixed expansion-filtered Warband item searches staying empty after requested item metadata finishes loading. Relevant item completions now refresh the visible search with the existing bounded refresh queue.

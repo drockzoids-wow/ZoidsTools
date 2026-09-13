@@ -37,7 +37,7 @@ local fontRefreshRequested = true
 local deferredForCombat = false
 local applyingLayout = false
 local initialized = false
-local mouseoverTicker
+local appearanceWatcher
 local appearanceWasEnabled = false
 local preAppearanceWidth
 local preAppearanceScale
@@ -47,6 +47,7 @@ local originalNineSliceTopLeft
 local originalNineSliceTopRight
 local originalHeaderBackgroundAlpha
 local originalHeaderTextAlpha
+local minimizedBackdropAlpha
 local knownCollapsed
 local lastHeaderControlsAlpha
 local originalSelectionPoints
@@ -505,7 +506,7 @@ end
 
 local function ShouldShowOnlyMinimizeButton(db, frame)
     local collapsed = knownCollapsed
-    if collapsed == nil and frame and frame.IsCollapsed then
+    if frame and frame.IsCollapsed then
         collapsed = frame:IsCollapsed() and true or false
     end
     return db
@@ -529,6 +530,20 @@ local function ApplyMinimizedHeaderStyle(db, frame)
     end
 
     local minimizeOnly = ShouldShowOnlyMinimizeButton(db, frame)
+    -- Blizzard keeps its NineSlice visible when all modules collapse. Hide it
+    -- cosmetically as well as our independent skin, without triggering layout.
+    local backdrop = frame.NineSlice
+    if backdrop and backdrop.GetAlpha and backdrop.SetAlpha then
+        if minimizeOnly then
+            if minimizedBackdropAlpha == nil then
+                minimizedBackdropAlpha = backdrop:GetAlpha()
+            end
+            backdrop:SetAlpha(0)
+        elseif minimizedBackdropAlpha ~= nil then
+            backdrop:SetAlpha(minimizedBackdropAlpha)
+            minimizedBackdropAlpha = nil
+        end
+    end
     if background and background.SetAlpha then
         background:SetAlpha(minimizeOnly and 0 or (originalHeaderBackgroundAlpha or 1))
     end
@@ -555,41 +570,45 @@ local function UpdateMouseoverControls()
     end
 end
 
-local function RefreshMouseoverTicker()
+local function RefreshAppearanceWatcher()
     local db = GetSettings()
-    -- Polling one tracker state five times per second avoids hooking Blizzard's
-    -- protected collapse and module methods. Those hooks can contaminate the
-    -- quest-supertracking path even when the hook only schedules cosmetic work.
-    local shouldRun = db and db.enabled
-    if shouldRun and not mouseoverTicker and C_Timer and C_Timer.NewTicker then
-        mouseoverTicker = C_Timer.NewTicker(0.20, function()
-            if ns.RecordDiagnosticActivity then ns:RecordDiagnosticActivity("ObjectiveTracker.MouseoverPoll") end
+    if db and db.enabled then
+        if not appearanceWatcher then
+            -- Observe from our own frame instead of hooking Blizzard's protected
+            -- collapse methods. Only state changes write cosmetic properties.
+            appearanceWatcher = CreateFrame("Frame")
+        end
+        local mouseoverElapsed = 0
+        appearanceWatcher:SetScript("OnUpdate", function(_, elapsed)
             local frame = FindTracker()
-            local settings = GetSettings()
+            local settings = ns.db and ns.db.quests and ns.db.quests.trackerAppearance
             if not frame or not settings or not settings.enabled then return end
 
             if frame.IsCollapsed then
                 local collapsed = frame:IsCollapsed() and true or false
                 if collapsed ~= knownCollapsed then
                     knownCollapsed = collapsed
-                    ScheduleRefresh(0, false)
-                    return
+                    ApplyMinimizedHeaderStyle(settings, frame)
+                    UpdateMouseoverControls()
                 end
             end
 
             if skin then
                 local minimizeOnly = ShouldShowOnlyMinimizeButton(settings, frame)
-                skin:SetShown(
-                    frame:IsShown()
+                local shown = frame:IsShown()
                     and not minimizeOnly
                     and (settings.backgroundOpacity > 0 or settings.borderEnabled)
-                )
+                if skin:IsShown() ~= shown then skin:SetShown(shown) end
             end
-            UpdateMouseoverControls()
+            mouseoverElapsed = mouseoverElapsed + elapsed
+            if mouseoverElapsed >= 0.20 then
+                mouseoverElapsed = 0
+                if ns.RecordDiagnosticActivity then ns:RecordDiagnosticActivity("ObjectiveTracker.MouseoverPoll") end
+                UpdateMouseoverControls()
+            end
         end)
-    elseif not shouldRun and mouseoverTicker then
-        mouseoverTicker:Cancel()
-        mouseoverTicker = nil
+    elseif appearanceWatcher then
+        appearanceWatcher:SetScript("OnUpdate", nil)
     end
 end
 
@@ -634,7 +653,7 @@ local function ApplyAppearance()
     applyingLayout = false
 
     UpdateMouseoverControls()
-    RefreshMouseoverTicker()
+    RefreshAppearanceWatcher()
 end
 
 ApplyAppearance = ns:WrapDiagnosticFunction("ObjectiveTracker.Refresh", ApplyAppearance)

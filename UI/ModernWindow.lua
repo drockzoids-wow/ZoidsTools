@@ -2655,7 +2655,7 @@ local function CreateItemsPage(parent)
     )
     bisContext:SetPoint("TOPLEFT", bisEnabled, "BOTTOMLEFT", 0, -16)
 
-    local display = CreateSectionCard(page, "Display", cardW, 170)
+    local display = CreateSectionCard(page, "Display", cardW, 210)
     display:SetPoint("TOPLEFT", page, "TOPLEFT", rightX, 0)
 
     local characterOptions = UI.CreateMultiSelectDropdown(
@@ -2689,6 +2689,15 @@ local function CreateItemsPage(parent)
         dropdownWidth
     )
     bagBankOptions:SetPoint("TOPLEFT", characterOptions, "BOTTOMLEFT", 0, -16)
+
+    local upgradePath = UI.CreateCheckbox(
+        display,
+        "Show upgrade path with item level",
+        "Adds the upgrade path's initial to item levels, such as 295-C for Champion, on equipped, inspected, bag, and bank items.",
+        function() return ns.GetItemOverlayUpgradePath and ns:GetItemOverlayUpgradePath() end,
+        function(value) if ns.SetItemOverlayUpgradePath then ns:SetItemOverlayUpgradePath(value) end end
+    )
+    upgradePath:SetPoint("TOPLEFT", bagBankOptions, "BOTTOMLEFT", 0, -16)
 
     local style = CreateSectionCard(page, "Style", cardW, 164)
     style:SetPoint("TOPLEFT", general, "BOTTOMLEFT", 0, -14)
@@ -2737,6 +2746,7 @@ local function CreateItemsPage(parent)
         enabled:Refresh()
         characterOptions:Refresh()
         bagBankOptions:Refresh()
+        upgradePath:Refresh()
         statTargetContext:Refresh()
         bisEnabled:Refresh()
         bisContext:Refresh()
@@ -2747,6 +2757,7 @@ local function CreateItemsPage(parent)
         if UI.SetControlEnabled then
             UI.SetControlEnabled(characterOptions, active)
             UI.SetControlEnabled(bagBankOptions, active)
+            UI.SetControlEnabled(upgradePath, active)
             UI.SetControlEnabled(statTargetContext, active)
             UI.SetControlEnabled(bisEnabled, active)
             UI.SetControlEnabled(bisContext, active and bisEnabled:GetChecked() == true)
@@ -4930,6 +4941,7 @@ local function CreateModernWindow()
         local previous
         for index, tabInfo in ipairs(section.tabs or {}) do
             local width = tabInfo.label == "Weekly Goals" and 142 or (tabInfo.label == "Unit Frames" and 128 or 118)
+            if tabInfo.key == "warband" then width = 160 end
             local button = CreateButton(frame.subnav, tabInfo.label, width, 27)
             if index == 1 then
                 button:SetPoint("TOPLEFT", frame.subnav, "TOPLEFT", 0, 0)

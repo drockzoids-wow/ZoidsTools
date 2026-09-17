@@ -272,6 +272,7 @@ local defaults = {
         enabled = true,
         fontSize = 12,
         useQualityColor = true,
+        showUpgradePath = true,
         statTargetContext = "mythicplus",
         bisEnabled = true,
         bisContext = "mythicplus",
@@ -530,7 +531,7 @@ local function PrintHelp()
     ns:Print("/zt talentdiag start/report/stop/reset diagnoses talent application failures.")
     ns:Print("/zt talentpaneldiag reports and repairs the talent helper panel.")
     ns:Print("/zt chatdiag reports Blizzard chat-link interaction state.")
-    ns:Print("/zt invitebanner previews the Mythic+ invitation banner.")
+    ns:Print("/zt invitebanner cycles season portal previews; add list or a dungeon number.")
     ns:Print("/zt items opens item overlay options.")
     ns:Print("/zt iteminfo on/off toggles item overlays.")
     ns:Print("/zt talents opens talent build options.")
@@ -877,9 +878,10 @@ local function HandleSlash(input)
         if ns.ReportChatDiagnostics then
             ns:ReportChatDiagnostics()
         end
-    elseif input == "invitebanner" or input == "invite banner" or input == "mythicinvite" then
+    elseif input == "invitebanner" or input:match("^invitebanner%s+") or input == "invite banner" or input == "mythicinvite" then
         if ns.PreviewMythicInviteBanner then
-            ns:PreviewMythicInviteBanner()
+            local selection = input:match("^invitebanner%s+(.+)$")
+            RunDiagnosticSlashAction(function() ns:PreviewMythicInviteBanner(selection) end)
         end
     elseif input == "help" then
         PrintHelp()
@@ -911,6 +913,7 @@ local moduleInitializers = {
     "InitializeMovableWindows",
     "InitializeFastLoot",
     "InitializeVendorAutomation",
+    "InitializeVendorReputation",
     "InitializeCombatSettings",
     "InitializeCinematicSkip",
     "InitializeAutoConfirm",

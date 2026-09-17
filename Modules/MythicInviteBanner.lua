@@ -31,6 +31,7 @@ local eventFrame
 local banner
 local pendingPortalSpell
 local lastInvite
+local previewIndex = 0
 
 local function EnsureDB()
     if not ns.db then return nil end
@@ -213,9 +214,9 @@ local function ConfigurePortalButton(spellID)
     button:Show()
 end
 
-local function ShowInvite(dungeonName, spellID)
+local function ShowInvite(dungeonName, spellID, preview)
     local db = EnsureDB()
-    if not db or db.enabled ~= true then return end
+    if not db or (not preview and db.enabled ~= true) then return end
 
     local frame = CreateBanner()
     lastInvite = { dungeonName = dungeonName or DEFAULT_DUNGEON, spellID = spellID }
@@ -257,20 +258,59 @@ function ns:SetMythicInviteBannerEnabled(value)
     if not db.enabled and banner then banner:Hide() end
 end
 
-function ns:PreviewMythicInviteBanner()
+function ns:PreviewMythicInviteBanner(selection)
+    local entries = {}
     if C_ChallengeMode and C_ChallengeMode.GetMapTable and C_ChallengeMode.GetMapUIInfo then
         for _, mapID in ipairs(C_ChallengeMode.GetMapTable() or {}) do
-            local spellID = PORTAL_SPELLS[mapID]
-            if spellID and SpellIsKnown(spellID) then
-                local mapName = C_ChallengeMode.GetMapUIInfo(mapID)
-                if type(mapName) == "string" then
-                    ShowInvite(mapName, spellID)
-                    return
-                end
-            end
+            local mapName = C_ChallengeMode.GetMapUIInfo(mapID)
+            entries[#entries + 1] = {
+                mapID = mapID,
+                name = type(mapName) == "string" and mapName or ("Dungeon " .. mapID),
+                spellID = PORTAL_SPELLS[mapID],
+            }
         end
     end
-    ShowInvite("Algeth'ar Academy", nil)
+    table.sort(entries, function(a, b) return a.mapID < b.mapID end)
+    if #entries == 0 then
+        self:Print("Season dungeon data is not available yet. Open Mythic+ Dungeons, then try /zt invitebanner again.")
+        return
+    end
+
+    local function DescribeEntry(index)
+        local entry = entries[index]
+        local status = not entry.spellID and "MISSING PORTAL MAPPING"
+            or (SpellIsKnown(entry.spellID) and "learned" or "not learned")
+        return string.format("%d/%d: %s - %s (map %d, spell %s)",
+            index, #entries, entry.name, status, entry.mapID, tostring(entry.spellID or "none"))
+    end
+
+    if selection == "list" then
+        for index = 1, #entries do self:Print(DescribeEntry(index)) end
+        self:Print("Use /zt invitebanner <number> to test one, or /zt invitebanner to cycle through them.")
+        return
+    end
+
+    local index
+    if not selection or selection == "" or selection == "next" then
+        index = previewIndex % #entries + 1
+    else
+        index = tonumber(selection)
+        if not index or index % 1 ~= 0 or index < 1 or index > #entries then
+            self:Print("Use /zt invitebanner list, /zt invitebanner next, or /zt invitebanner <number>.")
+            return
+        end
+    end
+    if InCombatLockdown and InCombatLockdown() then
+        self:Print("Leave combat before testing a dungeon portal.")
+        return
+    end
+    previewIndex = index
+    local entry = entries[index]
+    ShowInvite(entry.name, entry.spellID, true)
+    if not entry.spellID then
+        banner.unavailable:SetText("Dungeon portal mapping missing")
+    end
+    self:Print("Portal test " .. DescribeEntry(index))
 end
 
 function ns:InitializeMythicInviteBanner()

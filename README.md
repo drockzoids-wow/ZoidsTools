@@ -27,6 +27,7 @@ A personal World of Warcraft Retail quality-of-life addon by Drockzoids.
 - `/zt` opens the ZoidsTools window.
 - `/zt warband`, `/zt goals`, `/zt tooltips`, `/zt windows`, `/zt chat`, `/zt items`, `/zt professions`, `/zt talents`, `/zt meters`, `/zt combat`, `/zt unitframes`, `/zt macros`, `/zt mounts`, `/zt loot`, or `/zt quests` opens that page.
 - `/zt chatcopy` opens a searchable copy window for the active chat tab.
+- `/zt invitebanner` opens the real Mythic+ portal button and cycles through the current season's dungeons. `/zt invitebanner list` lists their portal status and numbers; `/zt invitebanner <number>` selects one. Test outside combat; previews work even if automatic invitation banners are disabled. Clicking the button casts the actual teleport and uses its normal cooldown.
 - `/zt windows on/off` toggles movable Blizzard windows.
 - `/zt bags on/off` toggles default bag movement.
 - `/zt talents on/off` toggles the Blizzard talent-frame controls.

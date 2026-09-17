@@ -22,6 +22,7 @@ Modules\ChatProfiles.lua
 Modules\MovableWindows.lua
 Modules\FastLoot.lua
 Modules\VendorAutomation.lua
+Modules\VendorReputation.lua
 Modules\Combat.lua
 Modules\CinematicSkip.lua
 Modules\AutoConfirm.lua

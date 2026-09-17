@@ -27,6 +27,7 @@ local qualityColorCacheCount = 0
 local tableUnpack = unpack or table.unpack
 local DEFAULT_FONT_SIZE = 12
 local QUALITY_COLOR_CACHE_MAX = 250
+local SOULBOUND_COLOR = { 0.7, 0.9, 1 }
 local CHARACTER_GEM_SIZE = 13
 local CHARACTER_GEM_SPACING = 1
 local CHARACTER_REFRESH_DELAY = 0.05
@@ -139,6 +140,10 @@ local function EnsureDB()
         db.useQualityColor = true
     end
 
+    if db.showUpgradePath == nil then
+        db.showUpgradePath = true
+    end
+
     db.character = db.character or {}
 
     if db.character.itemLevel == nil then
@@ -231,6 +236,73 @@ end
 
 local function TextMatches(text, constant)
     return constant and CleanTooltipText(text) == CleanTooltipText(constant)
+end
+
+local function FormatItemLevel(itemLevel, itemLink)
+    local label = tostring(math.floor(itemLevel + 0.5))
+    local db = EnsureDB()
+    if not db or not db.showUpgradePath then
+        return label
+    end
+
+    local upgradeInfo = itemLink and C_Item and SafeCall(C_Item.GetItemUpgradeInfo, itemLink)
+
+    if issecretvalue and issecretvalue(upgradeInfo) then
+        return label
+    end
+
+    local track = type(upgradeInfo) == "table" and upgradeInfo.trackString or nil
+    if (issecretvalue and issecretvalue(track)) or type(track) ~= "string" then
+        return label
+    end
+
+    -- Use the localized path's initial, preserving a complete UTF-8 character.
+    -- Read the item's path directly: overlapping item levels cannot identify it.
+    local initial = CleanTooltipText(track):match("^[%z\1-\127\194-\244][\128-\191]*")
+    if initial then
+        return label, "-" .. string.upper(initial)
+    end
+
+    return label
+end
+
+local function EnsureUpgradePathText(button, sizeOffset)
+    if not button.ZTUpgradePathText then
+        button.ZTUpgradePathText = button:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+        button.ZTUpgradePathText:SetJustifyH("LEFT")
+        button.ZTUpgradePathText:Hide()
+    end
+
+    StyleFont(button.ZTUpgradePathText, sizeOffset - 2)
+    button.ZTUpgradePathText:SetTextColor(tableUnpack(SOULBOUND_COLOR))
+end
+
+local function SetItemLevelText(button, levelText, itemLevel, itemLink, inset)
+    local label, suffix = FormatItemLevel(itemLevel, itemLink)
+    local pathText = button.ZTUpgradePathText
+    levelText:SetText(label)
+    pathText:SetText(suffix or "")
+    local pathWidth = suffix and pathText:GetStringWidth() or 0
+    levelText:ClearAllPoints()
+    levelText:SetPoint("TOPRIGHT", button, "TOPRIGHT", -inset - pathWidth, -inset)
+    pathText:ClearAllPoints()
+    pathText:SetPoint("BOTTOMLEFT", levelText, "BOTTOMRIGHT", 0, 0)
+    if suffix then
+        pathText:Show()
+    else
+        pathText:Hide()
+    end
+end
+
+local function ClearItemLevelText(button, levelText)
+    if levelText then
+        levelText:SetText("")
+        levelText:Hide()
+    end
+    if button.ZTUpgradePathText then
+        button.ZTUpgradePathText:SetText("")
+        button.ZTUpgradePathText:Hide()
+    end
 end
 
 local function SetQualityColor(fontString, itemLink, fallbackR, fallbackG, fallbackB)
@@ -510,6 +582,7 @@ local function EnsureCharacterOverlays(button)
     button.ZTEnchantWarning:SetSize((width or 36) + 18, (height or 36) + 18)
 
     StyleFont(button.ZTItemLevelText, 0)
+    EnsureUpgradePathText(button, 0)
     StyleFont(button.ZTEnchantText, -2)
 end
 
@@ -611,10 +684,7 @@ local function ClearCharacterButton(button)
     button.ZTItemOverlayLink = nil
     button.ZTGemLoadRequests = nil
 
-    if button.ZTItemLevelText then
-        button.ZTItemLevelText:SetText("")
-        button.ZTItemLevelText:Hide()
-    end
+    ClearItemLevelText(button, button.ZTItemLevelText)
 
     if button.ZTEnchantText then
         button.ZTEnchantText:SetText("")
@@ -774,16 +844,14 @@ local function UpdateCharacterSlot(slotInfo, unit, isInspect)
                 and SafeCall(C_Item.GetDetailedItemLevelInfo, itemLink))
 
             if itemLevel and itemLevel > 0 then
-                button.ZTItemLevelText:SetText(math.floor(itemLevel + 0.5))
+                SetItemLevelText(button, button.ZTItemLevelText, itemLevel, itemLink, 1)
                 SetQualityColor(button.ZTItemLevelText, itemLink, 1, 0.82, 0)
                 button.ZTItemLevelText:Show()
             else
-                button.ZTItemLevelText:SetText("")
-                button.ZTItemLevelText:Hide()
+                ClearItemLevelText(button, button.ZTItemLevelText)
             end
         else
-            button.ZTItemLevelText:SetText("")
-            button.ZTItemLevelText:Hide()
+            ClearItemLevelText(button, button.ZTItemLevelText)
         end
 
         UpdateCharacterEnchant(button, itemLink, slotInfo.slot, slotInfo.side, not isInspect)
@@ -863,6 +931,7 @@ local function EnsureBagOverlays(button)
     end
 
     StyleFont(button.ZTBagItemLevelText, -1)
+    EnsureUpgradePathText(button, -1)
     StyleFont(button.ZTBagBindText, -3)
 end
 
@@ -875,10 +944,7 @@ local function ClearBagButton(button)
     button.ZTBagCacheKey = nil
     button.ZTBagCacheReady = nil
 
-    if button.ZTBagItemLevelText then
-        button.ZTBagItemLevelText:SetText("")
-        button.ZTBagItemLevelText:Hide()
-    end
+    ClearItemLevelText(button, button.ZTBagItemLevelText)
 
     if button.ZTBagBindText then
         button.ZTBagBindText:SetText("")
@@ -966,7 +1032,7 @@ local function SetBindColor(fontString, bindLabel)
     elseif bindLabel == "BoP" then
         fontString:SetTextColor(0.85, 0.85, 0.85)
     else
-        fontString:SetTextColor(0.7, 0.9, 1)
+        fontString:SetTextColor(tableUnpack(SOULBOUND_COLOR))
     end
 end
 
@@ -1056,13 +1122,14 @@ local function UpdateBagButton(button, kind, frame)
         tostring(section.bindType == true),
         tostring(db.fontSize or DEFAULT_FONT_SIZE),
         tostring(db.useQualityColor == true),
+        tostring(db.showUpgradePath == true),
     }, "|")
 
     if button.ZTBagCacheKey == cacheKey and button.ZTBagCacheReady == true then
         return
     end
 
-    if IsCombatLocked() and (not button.ZTBagItemLevelText or not button.ZTBagBindText) then
+    if IsCombatLocked() and (not button.ZTBagItemLevelText or not button.ZTBagBindText or not button.ZTUpgradePathText) then
         pendingCombatBagRefresh = true
         pendingCombatBagForceClear = true
         return
@@ -1081,17 +1148,15 @@ local function UpdateBagButton(button, kind, frame)
         local itemLevel = GetBagItemLevel(bag, slot, itemLink)
 
         if itemLevel and itemLevel > 0 then
-            button.ZTBagItemLevelText:SetText(math.floor(itemLevel + 0.5))
+            SetItemLevelText(button, button.ZTBagItemLevelText, itemLevel, itemLink, 2)
             SetQualityColor(button.ZTBagItemLevelText, itemLink, 1, 0.82, 0)
             button.ZTBagItemLevelText:Show()
         else
-            button.ZTBagItemLevelText:SetText("")
-            button.ZTBagItemLevelText:Hide()
+            ClearItemLevelText(button, button.ZTBagItemLevelText)
             cacheReady = false
         end
     else
-        button.ZTBagItemLevelText:SetText("")
-        button.ZTBagItemLevelText:Hide()
+        ClearItemLevelText(button, button.ZTBagItemLevelText)
     end
 
     if section.bindType then
@@ -1598,6 +1663,21 @@ function ns:GetItemOverlayQualityColor()
     local db = EnsureDB()
 
     return db and db.useQualityColor == true
+end
+
+function ns:SetItemOverlayUpgradePath(value)
+    local db = EnsureDB()
+    if not db then
+        return
+    end
+
+    db.showUpgradePath = value == true
+    ns:RefreshItemOverlays()
+end
+
+function ns:GetItemOverlayUpgradePath()
+    local db = EnsureDB()
+    return db and db.showUpgradePath == true
 end
 
 function ns:RefreshItemOverlays()

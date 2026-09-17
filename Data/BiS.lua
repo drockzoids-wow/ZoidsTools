@@ -2,7 +2,7 @@
 -- Source: GearInsight rankings aggregated from WarcraftLogs. Re-run the updater instead of editing this file.
 local _, ns = ...
 ns.BiSData = {
-    generatedAt = "2026-09-13 11:55:54 -05:00",
+    generatedAt = "2026-09-16 21:13:11 -05:00",
     source = "GearInsight",
     sourceUrl = "https://gearinsight.app/wow/en",
     data = {},
@@ -14,7 +14,7 @@ ns.BiSData = {
                     [1] = {
                         { 271474, "Baleful Grave-Knight's Casque", "Tier Set token" },
                         { 268229, "Skullguard of the Risen Sacrifice", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
-                        { 237832, "Spellbreaker's Cover", "Crafted" },
+                        { 251229, "Visor of the Predator", "Mythic+ Dungeon - Voidscar Arena" },
                     },
                     [2] = {
                         { 268265, "Aqirbane Reliquary", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
@@ -24,12 +24,12 @@ ns.BiSData = {
                     [3] = {
                         { 271472, "Baleful Grave-Knight's Gibbets", "Tier Set token" },
                         { 239037, "C'thraxxi Binders Pauldrons", "Mythic+ Dungeon - Temple of Sethraliss" },
-                        { 251138, "Cinderfury Shoulderguards", "Mythic+ Dungeon - Murder Row" },
+                        { 268226, "Swelling Sea Spaulders", "Raid drop" },
                     },
                     [5] = {
                         { 271477, "Baleful Grave-Knight's Breastplate", "Tier Set token" },
                         { 237829, "Spellbreaker's Shelter", "Crafted" },
-                        { 251193, "Taproot Ribs", "Mythic+ Dungeon - The Blinding Vale" },
+                        { 268222, "Reckless Spirit Breastplate", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
                     },
                     [6] = {
                         { 268244, "Forgotten Grotto Girdle", "Raid drop" },
@@ -39,21 +39,21 @@ ns.BiSData = {
                     [7] = {
                         { 271473, "Baleful Grave-Knight's Greaves", "Tier Set token" },
                         { 271878, "Chausses of Unbound Rancor", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 273776, "Ancient General's Obsidian Pillars", "Mythic+ Dungeon - Altar of Fangs" },
+                        { 268224, "Venom Warden's Greaves", "Raid drop - The Venomous Abyss - Boss 2 - Entombed Sentinels" },
                     },
                     [8] = {
-                        { 273777, "Poison-Proof Stompers", "Mythic+ Dungeon - Altar of Fangs" },
                         { 268245, "Entombed Cultist's Sabatons", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
+                        { 273777, "Poison-Proof Stompers", "Mythic+ Dungeon - Altar of Fangs" },
                         { 237828, "Spellbreaker's March", "Crafted" },
                     },
                     [9] = {
                         { 237834, "Spellbreaker's Bracers", "Crafted" },
-                        { 159409, "Embalmer's Steadying Bracers", "Mythic+ Dungeon - Kings' Rest" },
                         { 251133, "Overseer's Vambraces", "Mythic+ Dungeon - Murder Row" },
+                        { 159409, "Embalmer's Steadying Bracers", "Mythic+ Dungeon - Kings' Rest" },
                     },
                     [10] = {
                         { 271475, "Baleful Grave-Knight's Deathgrips", "Tier Set token" },
-                        { 268220, "Scaleplate Strangulators", "Raid drop - The Venomous Abyss - Boss 6 - The Twin Fangs" },
+                        { 251214, "Bonds of the Hash'ura", "Mythic+ Dungeon - Den of Nalorakk" },
                         { 251221, "Despondent's Gauntlets", "Mythic+ Dungeon - Voidscar Arena" },
                     },
                     [11] = {
@@ -68,8 +68,8 @@ ns.BiSData = {
                     },
                     [15] = {
                         { 193763, "Fireproof Drape", "Mythic+ Dungeon - Ruby Life Pools" },
-                        { 251132, "Speakeasy Shroud", "Mythic+ Dungeon - Murder Row" },
                         { 251190, "Bloodthorn Burnous", "Mythic+ Dungeon - The Blinding Vale" },
+                        { 251132, "Speakeasy Shroud", "Mythic+ Dungeon - Murder Row" },
                     },
                     [16] = {
                         { 237846, "Blood Knight's Warblade", "Crafted" },
@@ -85,23 +85,22 @@ ns.BiSData = {
                     },
                     [2] = {
                         { 268265, "Aqirbane Reliquary", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 273781, "Strand of Warding Fangs", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 251142, "Pendant of Malefic Fury", "Mythic+ Dungeon - Murder Row" },
+                        { 271638, "Bound Serpent's Jade Eye", "World Drop" },
+                        { 268250, "Sentinel's Vitriolic Chain", "Raid drop - The Venomous Abyss - Boss 2 - Entombed Sentinels" },
                     },
                     [3] = {
                         { 271472, "Baleful Grave-Knight's Gibbets", "Tier Set token" },
                         { 271444, "Pauldrons of the Forgotten Sacrifice", "World Drop" },
-                        { 239037, "C'thraxxi Binders Pauldrons", "Mythic+ Dungeon - Temple of Sethraliss" },
                     },
                     [5] = {
                         { 271477, "Baleful Grave-Knight's Breastplate", "Tier Set token" },
-                        { 273787, "Aged Interwoven Scaleplate", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 251151, "Sentinel Challenger's Prize", "Mythic+ Dungeon - Den of Nalorakk" },
+                        { 193753, "Breastplate of Soaring Terror", "Mythic+ Dungeon - Ruby Life Pools" },
+                        { 239036, "Desert Guardian's Breastplate", "Mythic+ Dungeon - Temple of Sethraliss" },
                     },
                     [6] = {
                         { 271445, "Fanged Brute's Greatbelt", "World Drop" },
-                        { 268244, "Forgotten Grotto Girdle", "Raid drop" },
-                        { 159418, "Girdle of Pestilent Purification", "Mythic+ Dungeon - Kings' Rest" },
+                        { 271471, "Baleful Grave-Knight's Girdle", "Tier Set token" },
+                        { 251144, "Autumn's Boon Belt", "Mythic+ Dungeon - Den of Nalorakk" },
                     },
                     [7] = {
                         { 271473, "Baleful Grave-Knight's Greaves", "Tier Set token" },
@@ -109,24 +108,24 @@ ns.BiSData = {
                         { 273776, "Ancient General's Obsidian Pillars", "Mythic+ Dungeon - Altar of Fangs" },
                     },
                     [8] = {
-                        { 268245, "Entombed Cultist's Sabatons", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
                         { 268260, "Scaled Fiend's Warboots", "Raid drop - The Venomous Abyss - Boss 4 - Vashnik the Malignant" },
                         { 273777, "Poison-Proof Stompers", "Mythic+ Dungeon - Altar of Fangs" },
+                        { 237828, "Spellbreaker's March", "Crafted" },
                     },
                     [9] = {
                         { 237834, "Spellbreaker's Bracers", "Crafted" },
                         { 159425, "Shard-Tipped Vambraces", "Mythic+ Dungeon - Temple of Sethraliss" },
-                        { 251133, "Overseer's Vambraces", "Mythic+ Dungeon - Murder Row" },
+                        { 268239, "Shellbound Bracers", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
                     },
                     [10] = {
                         { 271475, "Baleful Grave-Knight's Deathgrips", "Tier Set token" },
-                        { 251214, "Bonds of the Hash'ura", "Mythic+ Dungeon - Den of Nalorakk" },
                         { 237836, "Spellbreaker's Resolve", "Crafted" },
+                        { 251214, "Bonds of the Hash'ura", "Mythic+ Dungeon - Den of Nalorakk" },
                     },
                     [11] = {
-                        { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
                         { 159459, "Ritual Binder's Ring", "Mythic+ Dungeon - Kings' Rest" },
-                        { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
+                        { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
+                        { 268266, "Alluring Bubbleband", "Raid drop" },
                     },
                     [13] = {
                         { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
@@ -136,12 +135,12 @@ ns.BiSData = {
                     [15] = {
                         { 193763, "Fireproof Drape", "Mythic+ Dungeon - Ruby Life Pools" },
                         { 251190, "Bloodthorn Burnous", "Mythic+ Dungeon - The Blinding Vale" },
-                        { 268253, "Silken Voodoo Drape", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
+                        { 268248, "Amani Summoning Shawl", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
                     },
                     [16] = {
                         { 237846, "Blood Knight's Warblade", "Crafted" },
-                        { 237842, "Bloomforged Greataxe", "World Drop" },
                         { 268198, "Caustic Keeper-Crusher", "Raid drop - The Venomous Abyss - Boss 2 - Entombed Sentinels" },
+                        { 237842, "Bloomforged Greataxe", "World Drop" },
                     },
                 },
             },
@@ -149,8 +148,8 @@ ns.BiSData = {
                 raid = {
                     [1] = {
                         { 271474, "Baleful Grave-Knight's Casque", "Tier Set token" },
+                        { 268229, "Skullguard of the Risen Sacrifice", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
                         { 251229, "Visor of the Predator", "Mythic+ Dungeon - Voidscar Arena" },
-                        { 251126, "Greathelm of Temptation", "Mythic+ Dungeon - Murder Row" },
                     },
                     [2] = {
                         { 268265, "Aqirbane Reliquary", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
@@ -164,8 +163,8 @@ ns.BiSData = {
                     },
                     [5] = {
                         { 271477, "Baleful Grave-Knight's Breastplate", "Tier Set token" },
-                        { 268222, "Reckless Spirit Breastplate", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
                         { 193753, "Breastplate of Soaring Terror", "Mythic+ Dungeon - Ruby Life Pools" },
+                        { 251151, "Sentinel Challenger's Prize", "Mythic+ Dungeon - Den of Nalorakk" },
                     },
                     [6] = {
                         { 268259, "Girdle of Toxic Regret", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
@@ -189,8 +188,8 @@ ns.BiSData = {
                     },
                     [10] = {
                         { 271475, "Baleful Grave-Knight's Deathgrips", "Tier Set token" },
-                        { 268220, "Scaleplate Strangulators", "Raid drop - The Venomous Abyss - Boss 6 - The Twin Fangs" },
                         { 159413, "Gauntlets of the Avian Sentinel", "Mythic+ Dungeon - Kings' Rest" },
+                        { 268220, "Scaleplate Strangulators", "Raid drop - The Venomous Abyss - Boss 6 - The Twin Fangs" },
                     },
                     [11] = {
                         { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
@@ -204,8 +203,8 @@ ns.BiSData = {
                     },
                     [15] = {
                         { 251132, "Speakeasy Shroud", "Mythic+ Dungeon - Murder Row" },
+                        { 271469, "Baleful Grave-Knight's Greatcloak", "Tier Set token" },
                         { 268253, "Silken Voodoo Drape", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
-                        { 251190, "Bloodthorn Burnous", "Mythic+ Dungeon - The Blinding Vale" },
                     },
                     [16] = {
                         { 268208, "Strongblood's Ceremonial Cleaver", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
@@ -215,34 +214,34 @@ ns.BiSData = {
                     [17] = {
                         { 268202, "Jaw of the Shackled Goddess", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                         { 268208, "Strongblood's Ceremonial Cleaver", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
-                        { 251218, "Taz'Rah's Cosmic Edge", "Mythic+ Dungeon - Voidscar Arena" },
+                        { 237839, "Spellbreaker's Blade", "Crafted" },
                     },
                 },
                 mythicplus = {
                     [1] = {
                         { 271474, "Baleful Grave-Knight's Casque", "Tier Set token" },
-                        { 251126, "Greathelm of Temptation", "Mythic+ Dungeon - Murder Row" },
+                        { 268229, "Skullguard of the Risen Sacrifice", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
                         { 251229, "Visor of the Predator", "Mythic+ Dungeon - Voidscar Arena" },
                     },
                     [2] = {
-                        { 251234, "Graft of the Domanaar", "Mythic+ Dungeon - Voidscar Arena" },
                         { 268265, "Aqirbane Reliquary", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
+                        { 251234, "Graft of the Domanaar", "Mythic+ Dungeon - Voidscar Arena" },
                         { 251142, "Pendant of Malefic Fury", "Mythic+ Dungeon - Murder Row" },
                     },
                     [3] = {
                         { 271472, "Baleful Grave-Knight's Gibbets", "Tier Set token" },
                         { 271444, "Pauldrons of the Forgotten Sacrifice", "World Drop" },
-                        { 251138, "Cinderfury Shoulderguards", "Mythic+ Dungeon - Murder Row" },
+                        { 268226, "Swelling Sea Spaulders", "Raid drop" },
                     },
                     [5] = {
                         { 271477, "Baleful Grave-Knight's Breastplate", "Tier Set token" },
-                        { 251151, "Sentinel Challenger's Prize", "Mythic+ Dungeon - Den of Nalorakk" },
                         { 239036, "Desert Guardian's Breastplate", "Mythic+ Dungeon - Temple of Sethraliss" },
+                        { 268222, "Reckless Spirit Breastplate", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
                     },
                     [6] = {
-                        { 159418, "Girdle of Pestilent Purification", "Mythic+ Dungeon - Kings' Rest" },
-                        { 268259, "Girdle of Toxic Regret", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
                         { 271445, "Fanged Brute's Greatbelt", "World Drop" },
+                        { 268259, "Girdle of Toxic Regret", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
+                        { 159418, "Girdle of Pestilent Purification", "Mythic+ Dungeon - Kings' Rest" },
                     },
                     [7] = {
                         { 271473, "Baleful Grave-Knight's Greaves", "Tier Set token" },
@@ -257,7 +256,7 @@ ns.BiSData = {
                     [9] = {
                         { 237834, "Spellbreaker's Bracers", "Crafted" },
                         { 268239, "Shellbound Bracers", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
-                        { 251133, "Overseer's Vambraces", "Mythic+ Dungeon - Murder Row" },
+                        { 159409, "Embalmer's Steadying Bracers", "Mythic+ Dungeon - Kings' Rest" },
                     },
                     [10] = {
                         { 271475, "Baleful Grave-Knight's Deathgrips", "Tier Set token" },
@@ -271,23 +270,23 @@ ns.BiSData = {
                     },
                     [13] = {
                         { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 249343, "Gaze of the Alnseer", "Raid drop" },
-                        { 249344, "Light Company Guidon", "Raid drop" },
+                        { 270165, "Keeper's Seething Core", "Raid drop - The Venomous Abyss - Boss 2 - Entombed Sentinels" },
+                        { 270173, "Zul'jin's Guillotine Technique", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
                     },
                     [15] = {
                         { 251132, "Speakeasy Shroud", "Mythic+ Dungeon - Murder Row" },
+                        { 193763, "Fireproof Drape", "Mythic+ Dungeon - Ruby Life Pools" },
                         { 251190, "Bloodthorn Burnous", "Mythic+ Dungeon - The Blinding Vale" },
-                        { 271469, "Baleful Grave-Knight's Greatcloak", "World Drop" },
                     },
                     [16] = {
-                        { 237839, "Spellbreaker's Blade", "Crafted" },
                         { 268202, "Jaw of the Shackled Goddess", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 268208, "Strongblood's Ceremonial Cleaver", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
+                        { 268209, "Aman'muso, Warlord's Vengeance", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
+                        { 237839, "Spellbreaker's Blade", "Crafted" },
                     },
                     [17] = {
                         { 268202, "Jaw of the Shackled Goddess", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 237850, "Farstrider's Chopper", "Crafted" },
-                        { 158373, "Resonating Crystal Scimitar", "Mythic+ Dungeon - Temple of Sethraliss" },
+                        { 268208, "Strongblood's Ceremonial Cleaver", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
+                        { 237839, "Spellbreaker's Blade", "Crafted" },
                     },
                 },
             },
@@ -310,12 +309,13 @@ ns.BiSData = {
                     },
                     [5] = {
                         { 271477, "Baleful Grave-Knight's Breastplate", "Tier Set token" },
-                        { 268222, "Reckless Spirit Breastplate", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
                         { 239036, "Desert Guardian's Breastplate", "Mythic+ Dungeon - Temple of Sethraliss" },
+                        { 268222, "Reckless Spirit Breastplate", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
                     },
                     [6] = {
                         { 268259, "Girdle of Toxic Regret", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
                         { 159418, "Girdle of Pestilent Purification", "Mythic+ Dungeon - Kings' Rest" },
+                        { 271471, "Baleful Grave-Knight's Girdle", "Tier Set token" },
                     },
                     [7] = {
                         { 271473, "Baleful Grave-Knight's Greaves", "Tier Set token" },
@@ -324,8 +324,8 @@ ns.BiSData = {
                     },
                     [8] = {
                         { 237828, "Spellbreaker's March", "Crafted" },
-                        { 268245, "Entombed Cultist's Sabatons", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
                         { 268260, "Scaled Fiend's Warboots", "Raid drop - The Venomous Abyss - Boss 4 - Vashnik the Malignant" },
+                        { 268245, "Entombed Cultist's Sabatons", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
                     },
                     [9] = {
                         { 237834, "Spellbreaker's Bracers", "Crafted" },
@@ -350,29 +350,29 @@ ns.BiSData = {
                     [15] = {
                         { 251132, "Speakeasy Shroud", "Mythic+ Dungeon - Murder Row" },
                         { 268253, "Silken Voodoo Drape", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
-                        { 193763, "Fireproof Drape", "Mythic+ Dungeon - Ruby Life Pools" },
+                        { 271469, "Baleful Grave-Knight's Greatcloak", "Tier Set token" },
                     },
                     [16] = {
                         { 237846, "Blood Knight's Warblade", "Crafted" },
                         { 268213, "Maze-roa, Warlord's Fury", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
-                        { 251134, "Xathuux's Cleave", "Mythic+ Dungeon - Murder Row" },
+                        { 268198, "Caustic Keeper-Crusher", "Raid drop - The Venomous Abyss - Boss 2 - Entombed Sentinels" },
                     },
                 },
                 mythicplus = {
                     [1] = {
                         { 271474, "Baleful Grave-Knight's Casque", "Tier Set token" },
-                        { 244746, "Aetherlume Sun Guard", "Drop" },
                         { 251126, "Greathelm of Temptation", "Mythic+ Dungeon - Murder Row" },
+                        { 251229, "Visor of the Predator", "Mythic+ Dungeon - Voidscar Arena" },
                     },
                     [2] = {
-                        { 251234, "Graft of the Domanaar", "Mythic+ Dungeon - Voidscar Arena" },
                         { 268265, "Aqirbane Reliquary", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
+                        { 251234, "Graft of the Domanaar", "Mythic+ Dungeon - Voidscar Arena" },
                         { 251142, "Pendant of Malefic Fury", "Mythic+ Dungeon - Murder Row" },
                     },
                     [3] = {
                         { 271472, "Baleful Grave-Knight's Gibbets", "Tier Set token" },
                         { 251138, "Cinderfury Shoulderguards", "Mythic+ Dungeon - Murder Row" },
-                        { 268226, "Swelling Sea Spaulders", "Raid drop" },
+                        { 271444, "Pauldrons of the Forgotten Sacrifice", "World Drop" },
                     },
                     [5] = {
                         { 271477, "Baleful Grave-Knight's Breastplate", "Tier Set token" },
@@ -392,17 +392,17 @@ ns.BiSData = {
                     [8] = {
                         { 237828, "Spellbreaker's March", "Crafted" },
                         { 268260, "Scaled Fiend's Warboots", "Raid drop - The Venomous Abyss - Boss 4 - Vashnik the Malignant" },
-                        { 193728, "Scaleguard's Stalwart Greatboots", "Mythic+ Dungeon - Ruby Life Pools" },
+                        { 268245, "Entombed Cultist's Sabatons", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
                     },
                     [9] = {
                         { 237834, "Spellbreaker's Bracers", "Crafted" },
                         { 268239, "Shellbound Bracers", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
-                        { 159409, "Embalmer's Steadying Bracers", "Mythic+ Dungeon - Kings' Rest" },
+                        { 156301, "Bitter Cold Armguards", "World Drop" },
                     },
                     [10] = {
                         { 271475, "Baleful Grave-Knight's Deathgrips", "Tier Set token" },
-                        { 268220, "Scaleplate Strangulators", "Raid drop - The Venomous Abyss - Boss 6 - The Twin Fangs" },
-                        { 251214, "Bonds of the Hash'ura", "Mythic+ Dungeon - Den of Nalorakk" },
+                        { 237836, "Spellbreaker's Resolve", "Crafted" },
+                        { 159413, "Gauntlets of the Avian Sentinel", "Mythic+ Dungeon - Kings' Rest" },
                     },
                     [11] = {
                         { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
@@ -411,7 +411,7 @@ ns.BiSData = {
                     },
                     [13] = {
                         { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 249344, "Light Company Guidon", "Raid drop" },
+                        { 270173, "Zul'jin's Guillotine Technique", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
                         { 249343, "Gaze of the Alnseer", "Raid drop" },
                     },
                     [15] = {
@@ -422,7 +422,7 @@ ns.BiSData = {
                     [16] = {
                         { 237846, "Blood Knight's Warblade", "Crafted" },
                         { 268213, "Maze-roa, Warlord's Fury", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
-                        { 193755, "Backdraft Cleaver", "Mythic+ Dungeon - Ruby Life Pools" },
+                        { 273782, "Vile Writhefang Glaive", "Mythic+ Dungeon - Altar of Fangs" },
                     },
                 },
             },
@@ -460,7 +460,7 @@ ns.BiSData = {
                     [7] = {
                         { 271536, "Abyssal Doomhound's Legwraps", "Tier Set token" },
                         { 251130, "Breeches of Deft Deals", "Mythic+ Dungeon - Murder Row" },
-                        { 244574, "Silvermoon Agent's Leggings", "Crafted" },
+                        { 268225, "Coiled Hex Legguards", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
                     },
                     [8] = {
                         { 244569, "Silvermoon Agent's Sneakers", "Crafted" },
@@ -490,7 +490,7 @@ ns.BiSData = {
                     [15] = {
                         { 251132, "Speakeasy Shroud", "Mythic+ Dungeon - Murder Row" },
                         { 251190, "Bloodthorn Burnous", "Mythic+ Dungeon - The Blinding Vale" },
-                        { 193763, "Fireproof Drape", "Mythic+ Dungeon - Ruby Life Pools" },
+                        { 268253, "Silken Voodoo Drape", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
                     },
                     [16] = {
                         { 237840, "Spellbreaker's Warglaive", "Crafted" },
@@ -507,7 +507,7 @@ ns.BiSData = {
                     [1] = {
                         { 271537, "Abyssal Doomhound's Relentless Stare", "Tier Set token" },
                         { 271875, "Gaze of the Coiled Watcher", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 268219, "Shadow Hunter's Warmask", "Raid drop - The Venomous Abyss - Boss 2 - Entombed Sentinels" },
+                        { 250033, "Devouring Reaver's Intake", "Tier Set token" },
                     },
                     [2] = {
                         { 268265, "Aqirbane Reliquary", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
@@ -517,27 +517,27 @@ ns.BiSData = {
                     [3] = {
                         { 271535, "Abyssal Doomhound's Jaws", "Tier Set token" },
                         { 268246, "Frothing Venom Spaulders", "Raid drop - The Venomous Abyss - Boss 4 - Vashnik the Malignant" },
-                        { 251223, "Somber Spaulders", "Mythic+ Dungeon - Voidscar Arena" },
+                        { 273774, "Snakeskin Spaulders", "Mythic+ Dungeon - Altar of Fangs" },
                     },
                     [5] = {
                         { 271540, "Abyssal Doomhound's Coreguard", "Tier Set token" },
                         { 251159, "War Trial Vestments", "Mythic+ Dungeon - Den of Nalorakk" },
-                        { 239048, "Vest of Reverent Adoration", "Mythic+ Dungeon - Kings' Rest" },
+                        { 244570, "Silvermoon Agent's Coat", "Crafted" },
                     },
                     [6] = {
-                        { 159317, "Whirling Dervish Sash", "Mythic+ Dungeon - Temple of Sethraliss" },
                         { 268256, "Sash of the Forlorn Vessel", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
-                        { 271436, "Slitherscale Girdle", "World Drop" },
+                        { 159317, "Whirling Dervish Sash", "Mythic+ Dungeon - Temple of Sethraliss" },
+                        { 271534, "Abyssal Doomhound's Jeweled Cinch", "World Drop" },
                     },
                     [7] = {
                         { 271536, "Abyssal Doomhound's Legwraps", "Tier Set token" },
                         { 251130, "Breeches of Deft Deals", "Mythic+ Dungeon - Murder Row" },
-                        { 244574, "Silvermoon Agent's Leggings", "Crafted" },
+                        { 268225, "Coiled Hex Legguards", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
                     },
                     [8] = {
                         { 244569, "Silvermoon Agent's Sneakers", "Crafted" },
-                        { 159327, "Sand-Shined Snakeskin Sandals", "Mythic+ Dungeon - Temple of Sethraliss" },
                         { 251153, "Arctic Explorer's Legwraps", "Mythic+ Dungeon - Den of Nalorakk" },
+                        { 159327, "Sand-Shined Snakeskin Sandals", "Mythic+ Dungeon - Temple of Sethraliss" },
                     },
                     [9] = {
                         { 244576, "Silvermoon Agent's Deflectors", "Crafted" },
@@ -547,22 +547,22 @@ ns.BiSData = {
                     [10] = {
                         { 271538, "Abyssal Doomhound's Studded Gauntlets", "Tier Set token" },
                         { 251124, "Gauntlets of Fevered Defense", "Mythic+ Dungeon - Murder Row" },
-                        { 244575, "Silvermoon Agent's Handwraps", "Crafted" },
+                        { 268234, "Ruthless Slaughtergrips", "Raid drop - The Venomous Abyss - Boss 5 - Sszorak" },
                     },
                     [11] = {
+                        { 158366, "Charged Sandstone Band", "Mythic+ Dungeon - Temple of Sethraliss" },
                         { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
                         { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
-                        { 158366, "Charged Sandstone Band", "Mythic+ Dungeon - Temple of Sethraliss" },
                     },
                     [13] = {
-                        { 250215, "Freightrunner's Flask", "Mythic+ Dungeon - Murder Row" },
                         { 270164, "Gebbo's Bottomless Bag", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
+                        { 250215, "Freightrunner's Flask", "Mythic+ Dungeon - Murder Row" },
                         { 270167, "Wavecaller's Seastone", "Raid drop" },
                     },
                     [15] = {
                         { 251190, "Bloodthorn Burnous", "Mythic+ Dungeon - The Blinding Vale" },
-                        { 193763, "Fireproof Drape", "Mythic+ Dungeon - Ruby Life Pools" },
                         { 251132, "Speakeasy Shroud", "Mythic+ Dungeon - Murder Row" },
+                        { 193763, "Fireproof Drape", "Mythic+ Dungeon - Ruby Life Pools" },
                     },
                     [16] = {
                         { 237840, "Spellbreaker's Warglaive", "Crafted" },
@@ -570,8 +570,8 @@ ns.BiSData = {
                         { 268203, "Hexing Spiritrender", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
                     },
                     [17] = {
-                        { 273778, "Polished Lightwood Channeler", "Mythic+ Dungeon - Altar of Fangs" },
                         { 237840, "Spellbreaker's Warglaive", "Crafted" },
+                        { 273778, "Polished Lightwood Channeler", "Mythic+ Dungeon - Altar of Fangs" },
                         { 271092, "Jan'thrazet, the Soul Fang", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                     },
                 },
@@ -581,12 +581,12 @@ ns.BiSData = {
                     [1] = {
                         { 271537, "Abyssal Doomhound's Relentless Stare", "Tier Set token" },
                         { 271875, "Gaze of the Coiled Watcher", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 251140, "Vilefiend's Guise", "Mythic+ Dungeon - Murder Row" },
+                        { 271438, "Temple Delver's Mystic Helm", "Raid drop - The Venomous Abyss" },
                     },
                     [2] = {
                         { 251234, "Graft of the Domanaar", "Mythic+ Dungeon - Voidscar Arena" },
                         { 268265, "Aqirbane Reliquary", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 251142, "Pendant of Malefic Fury", "Mythic+ Dungeon - Murder Row" },
+                        { 271638, "Bound Serpent's Jade Eye", "Raid drop - The Venomous Abyss" },
                     },
                     [3] = {
                         { 271535, "Abyssal Doomhound's Jaws", "Tier Set token" },
@@ -605,8 +605,8 @@ ns.BiSData = {
                     },
                     [7] = {
                         { 271536, "Abyssal Doomhound's Legwraps", "Tier Set token" },
-                        { 244574, "Silvermoon Agent's Leggings", "Crafted" },
                         { 251130, "Breeches of Deft Deals", "Mythic+ Dungeon - Murder Row" },
+                        { 244574, "Silvermoon Agent's Leggings", "Crafted" },
                     },
                     [8] = {
                         { 159327, "Sand-Shined Snakeskin Sandals", "Mythic+ Dungeon - Temple of Sethraliss" },
@@ -620,8 +620,8 @@ ns.BiSData = {
                     },
                     [10] = {
                         { 271538, "Abyssal Doomhound's Studded Gauntlets", "Tier Set token" },
-                        { 268234, "Ruthless Slaughtergrips", "Raid drop - The Venomous Abyss - Boss 5 - Sszorak" },
                         { 159312, "Desiccator's Blessed Gloves", "Mythic+ Dungeon - Kings' Rest" },
+                        { 268234, "Ruthless Slaughtergrips", "Raid drop - The Venomous Abyss - Boss 5 - Sszorak" },
                     },
                     [11] = {
                         { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
@@ -636,28 +636,28 @@ ns.BiSData = {
                     [15] = {
                         { 251132, "Speakeasy Shroud", "Mythic+ Dungeon - Murder Row" },
                         { 268253, "Silken Voodoo Drape", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
-                        { 239656, "Adherent's Silken Shroud", "Crafted" },
+                        { 271532, "Abyssal Doomhound's Ornate Drape", "Tier Set token" },
                     },
                     [16] = {
-                        { 237840, "Spellbreaker's Warglaive", "Crafted" },
                         { 268209, "Aman'muso, Warlord's Vengeance", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
+                        { 237840, "Spellbreaker's Warglaive", "Crafted" },
                         { 268201, "Venomous Boneglaive", "Raid drop - The Venomous Abyss - Boss 5 - Sszorak" },
                     },
                     [17] = {
                         { 237840, "Spellbreaker's Warglaive", "Crafted" },
                         { 268201, "Venomous Boneglaive", "Raid drop - The Venomous Abyss - Boss 5 - Sszorak" },
-                        { 251186, "Thorntalon Edge", "Mythic+ Dungeon - The Blinding Vale" },
+                        { 251231, "Singularity Slicer", "Mythic+ Dungeon - Voidscar Arena" },
                     },
                 },
                 mythicplus = {
                     [1] = {
                         { 271537, "Abyssal Doomhound's Relentless Stare", "Tier Set token" },
+                        { 271875, "Gaze of the Coiled Watcher", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                         { 271438, "Temple Delver's Mystic Helm", "World Drop" },
-                        { 268219, "Shadow Hunter's Warmask", "Raid drop - The Venomous Abyss - Boss 2 - Entombed Sentinels" },
                     },
                     [2] = {
-                        { 251234, "Graft of the Domanaar", "Mythic+ Dungeon - Voidscar Arena" },
                         { 268265, "Aqirbane Reliquary", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
+                        { 251234, "Graft of the Domanaar", "Mythic+ Dungeon - Voidscar Arena" },
                         { 271638, "Bound Serpent's Jade Eye", "World Drop" },
                     },
                     [3] = {
@@ -667,8 +667,8 @@ ns.BiSData = {
                     },
                     [5] = {
                         { 271540, "Abyssal Doomhound's Coreguard", "Tier Set token" },
-                        { 239048, "Vest of Reverent Adoration", "Mythic+ Dungeon - Kings' Rest" },
                         { 244570, "Silvermoon Agent's Coat", "Crafted" },
+                        { 239048, "Vest of Reverent Adoration", "Mythic+ Dungeon - Kings' Rest" },
                     },
                     [6] = {
                         { 268227, "Unpossessed Skullsash", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
@@ -677,48 +677,48 @@ ns.BiSData = {
                     },
                     [7] = {
                         { 271536, "Abyssal Doomhound's Legwraps", "Tier Set token" },
+                        { 244574, "Silvermoon Agent's Leggings", "Crafted" },
                         { 251130, "Breeches of Deft Deals", "Mythic+ Dungeon - Murder Row" },
-                        { 268225, "Coiled Hex Legguards", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
                     },
                     [8] = {
                         { 159327, "Sand-Shined Snakeskin Sandals", "Mythic+ Dungeon - Temple of Sethraliss" },
                         { 244569, "Silvermoon Agent's Sneakers", "Crafted" },
-                        { 271539, "Abyssal Doomhound's Footpads", "World Drop" },
+                        { 271539, "Abyssal Doomhound's Footpads", "Tier Set token" },
                     },
                     [9] = {
                         { 244576, "Silvermoon Agent's Deflectors", "Crafted" },
                         { 251183, "Rootwarden Wraps", "Mythic+ Dungeon - The Blinding Vale" },
-                        { 271533, "Abyssal Doomhound's Wristguards", "Tier Set token" },
+                        { 268240, "Restless Spirit Shackles", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
                     },
                     [10] = {
                         { 271538, "Abyssal Doomhound's Studded Gauntlets", "Tier Set token" },
-                        { 159312, "Desiccator's Blessed Gloves", "Mythic+ Dungeon - Kings' Rest" },
                         { 193758, "Subjugator's Chilling Grips", "Mythic+ Dungeon - Ruby Life Pools" },
+                        { 251124, "Gauntlets of Fevered Defense", "Mythic+ Dungeon - Murder Row" },
                     },
                     [11] = {
-                        { 158366, "Charged Sandstone Band", "Mythic+ Dungeon - Temple of Sethraliss" },
                         { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
+                        { 158366, "Charged Sandstone Band", "Mythic+ Dungeon - Temple of Sethraliss" },
                         { 268249, "Vile Alchemist's Band", "Raid drop - The Venomous Abyss - Boss 4 - Vashnik the Malignant" },
                     },
                     [13] = {
                         { 270173, "Zul'jin's Guillotine Technique", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
-                        { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                         { 270168, "Font of Venomous Rage", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
+                        { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                     },
                     [15] = {
                         { 251132, "Speakeasy Shroud", "Mythic+ Dungeon - Murder Row" },
                         { 239656, "Adherent's Silken Shroud", "Crafted" },
-                        { 193763, "Fireproof Drape", "Mythic+ Dungeon - Ruby Life Pools" },
+                        { 271532, "Abyssal Doomhound's Ornate Drape", "World Drop" },
                     },
                     [16] = {
-                        { 237840, "Spellbreaker's Warglaive", "Crafted" },
                         { 268209, "Aman'muso, Warlord's Vengeance", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
+                        { 237840, "Spellbreaker's Warglaive", "Crafted" },
                         { 268201, "Venomous Boneglaive", "Raid drop - The Venomous Abyss - Boss 5 - Sszorak" },
                     },
                     [17] = {
                         { 237840, "Spellbreaker's Warglaive", "Crafted" },
                         { 268201, "Venomous Boneglaive", "Raid drop - The Venomous Abyss - Boss 5 - Sszorak" },
-                        { 251186, "Thorntalon Edge", "Mythic+ Dungeon - The Blinding Vale" },
+                        { 251231, "Singularity Slicer", "Mythic+ Dungeon - Voidscar Arena" },
                     },
                 },
             },
@@ -730,39 +730,39 @@ ns.BiSData = {
                         { 273791, "Spare Speaker's Hood", "Mythic+ Dungeon - Altar of Fangs" },
                     },
                     [2] = {
-                        { 251173, "Yoke of the Charging Bear", "Mythic+ Dungeon - Den of Nalorakk" },
                         { 268265, "Aqirbane Reliquary", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
+                        { 251173, "Yoke of the Charging Bear", "Mythic+ Dungeon - Den of Nalorakk" },
                         { 273781, "Strand of Warding Fangs", "Mythic+ Dungeon - Altar of Fangs" },
                     },
                     [3] = {
                         { 271535, "Abyssal Doomhound's Jaws", "Tier Set token" },
                         { 251223, "Somber Spaulders", "Mythic+ Dungeon - Voidscar Arena" },
-                        { 251146, "Scavenger's Spaulders", "Mythic+ Dungeon - Den of Nalorakk" },
+                        { 273774, "Snakeskin Spaulders", "Mythic+ Dungeon - Altar of Fangs" },
                     },
                     [5] = {
                         { 271540, "Abyssal Doomhound's Coreguard", "Tier Set token" },
-                        { 251226, "Hide of Pestilence", "Mythic+ Dungeon - Voidscar Arena" },
                         { 244570, "Silvermoon Agent's Coat", "Crafted" },
+                        { 251226, "Hide of Pestilence", "Mythic+ Dungeon - Voidscar Arena" },
                     },
                     [6] = {
                         { 159301, "Primal Dinomancer's Belt", "Mythic+ Dungeon - Kings' Rest" },
-                        { 268227, "Unpossessed Skullsash", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
                         { 268256, "Sash of the Forlorn Vessel", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
+                        { 268227, "Unpossessed Skullsash", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
                     },
                     [7] = {
                         { 271536, "Abyssal Doomhound's Legwraps", "Tier Set token" },
-                        { 251130, "Breeches of Deft Deals", "Mythic+ Dungeon - Murder Row" },
                         { 159313, "Breeches of the Sacred Hall", "Mythic+ Dungeon - Kings' Rest" },
+                        { 244574, "Silvermoon Agent's Leggings", "Crafted" },
                     },
                     [8] = {
                         { 251153, "Arctic Explorer's Legwraps", "Mythic+ Dungeon - Den of Nalorakk" },
-                        { 244569, "Silvermoon Agent's Sneakers", "Crafted" },
                         { 268247, "Breakwater Boots", "Raid drop" },
+                        { 244569, "Silvermoon Agent's Sneakers", "Crafted" },
                     },
                     [9] = {
                         { 244576, "Silvermoon Agent's Deflectors", "Crafted" },
-                        { 251135, "Fury-fletched Armlets", "Mythic+ Dungeon - Murder Row" },
                         { 268240, "Restless Spirit Shackles", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
+                        { 251135, "Fury-fletched Armlets", "Mythic+ Dungeon - Murder Row" },
                     },
                     [10] = {
                         { 271538, "Abyssal Doomhound's Studded Gauntlets", "Tier Set token" },
@@ -775,14 +775,14 @@ ns.BiSData = {
                         { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
                     },
                     [13] = {
-                        { 250245, "Tumor of the Swarm", "Mythic+ Dungeon - Voidscar Arena" },
                         { 270173, "Zul'jin's Guillotine Technique", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
                         { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
+                        { 250245, "Tumor of the Swarm", "Mythic+ Dungeon - Voidscar Arena" },
                     },
                     [15] = {
                         { 193763, "Fireproof Drape", "Mythic+ Dungeon - Ruby Life Pools" },
-                        { 251132, "Speakeasy Shroud", "Mythic+ Dungeon - Murder Row" },
                         { 268253, "Silken Voodoo Drape", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
+                        { 239656, "Adherent's Silken Shroud", "Crafted" },
                     },
                     [16] = {
                         { 237840, "Spellbreaker's Warglaive", "Crafted" },
@@ -799,17 +799,17 @@ ns.BiSData = {
                     [1] = {
                         { 271537, "Abyssal Doomhound's Relentless Stare", "Tier Set token" },
                         { 273791, "Spare Speaker's Hood", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 251140, "Vilefiend's Guise", "Mythic+ Dungeon - Murder Row" },
+                        { 271875, "Gaze of the Coiled Watcher", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                     },
                     [2] = {
                         { 251173, "Yoke of the Charging Bear", "Mythic+ Dungeon - Den of Nalorakk" },
-                        { 273781, "Strand of Warding Fangs", "Mythic+ Dungeon - Altar of Fangs" },
                         { 268265, "Aqirbane Reliquary", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
+                        { 273781, "Strand of Warding Fangs", "Mythic+ Dungeon - Altar of Fangs" },
                     },
                     [3] = {
                         { 271535, "Abyssal Doomhound's Jaws", "Tier Set token" },
                         { 251223, "Somber Spaulders", "Mythic+ Dungeon - Voidscar Arena" },
-                        { 251146, "Scavenger's Spaulders", "Mythic+ Dungeon - Den of Nalorakk" },
+                        { 272244, "Miststalker's Spaulders", "World Drop" },
                     },
                     [5] = {
                         { 271540, "Abyssal Doomhound's Coreguard", "Tier Set token" },
@@ -817,9 +817,9 @@ ns.BiSData = {
                         { 251226, "Hide of Pestilence", "Mythic+ Dungeon - Voidscar Arena" },
                     },
                     [6] = {
-                        { 244573, "Silvermoon Agent's Utility Belt", "Crafted" },
-                        { 159317, "Whirling Dervish Sash", "Mythic+ Dungeon - Temple of Sethraliss" },
                         { 159301, "Primal Dinomancer's Belt", "Mythic+ Dungeon - Kings' Rest" },
+                        { 244573, "Silvermoon Agent's Utility Belt", "Crafted" },
+                        { 271436, "Slitherscale Girdle", "World Drop" },
                     },
                     [7] = {
                         { 271536, "Abyssal Doomhound's Legwraps", "Tier Set token" },
@@ -828,42 +828,42 @@ ns.BiSData = {
                     },
                     [8] = {
                         { 251153, "Arctic Explorer's Legwraps", "Mythic+ Dungeon - Den of Nalorakk" },
-                        { 159327, "Sand-Shined Snakeskin Sandals", "Mythic+ Dungeon - Temple of Sethraliss" },
-                        { 268261, "Bespittled Slitherslippers", "Raid drop - The Venomous Abyss - Boss 6 - The Twin Fangs" },
+                        { 271539, "Abyssal Doomhound's Footpads", "Tier Set token" },
+                        { 244569, "Silvermoon Agent's Sneakers", "Crafted" },
                     },
                     [9] = {
                         { 244576, "Silvermoon Agent's Deflectors", "Crafted" },
                         { 251135, "Fury-fletched Armlets", "Mythic+ Dungeon - Murder Row" },
-                        { 268240, "Restless Spirit Shackles", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
+                        { 159300, "Kula's Butchering Wristwraps", "Mythic+ Dungeon - Kings' Rest" },
                     },
                     [10] = {
                         { 271538, "Abyssal Doomhound's Studded Gauntlets", "Tier Set token" },
                         { 244575, "Silvermoon Agent's Handwraps", "Crafted" },
-                        { 159337, "Grips of Electrified Defense", "Mythic+ Dungeon - Temple of Sethraliss" },
+                        { 251124, "Gauntlets of Fevered Defense", "Mythic+ Dungeon - Murder Row" },
                     },
                     [11] = {
-                        { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
                         { 159459, "Ritual Binder's Ring", "Mythic+ Dungeon - Kings' Rest" },
+                        { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
                         { 251148, "Pilfered Precious Band", "Mythic+ Dungeon - Den of Nalorakk" },
                     },
                     [13] = {
-                        { 250228, "Resonant Bellowstone", "Mythic+ Dungeon - Murder Row" },
-                        { 270165, "Keeper's Seething Core", "Raid drop - The Venomous Abyss - Boss 2 - Entombed Sentinels" },
                         { 270173, "Zul'jin's Guillotine Technique", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
+                        { 270165, "Keeper's Seething Core", "Raid drop - The Venomous Abyss - Boss 2 - Entombed Sentinels" },
+                        { 270164, "Gebbo's Bottomless Bag", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
                     },
                     [15] = {
                         { 193763, "Fireproof Drape", "Mythic+ Dungeon - Ruby Life Pools" },
-                        { 251190, "Bloodthorn Burnous", "Mythic+ Dungeon - The Blinding Vale" },
                         { 239656, "Adherent's Silken Shroud", "Crafted" },
+                        { 251190, "Bloodthorn Burnous", "Mythic+ Dungeon - The Blinding Vale" },
                     },
                     [16] = {
                         { 237840, "Spellbreaker's Warglaive", "Crafted" },
                         { 268209, "Aman'muso, Warlord's Vengeance", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
-                        { 237839, "Spellbreaker's Blade", "Crafted" },
+                        { 270930, "Tomb-Creeper's Claw", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
                     },
                     [17] = {
-                        { 251231, "Singularity Slicer", "Mythic+ Dungeon - Voidscar Arena" },
                         { 237840, "Spellbreaker's Warglaive", "Crafted" },
+                        { 251231, "Singularity Slicer", "Mythic+ Dungeon - Voidscar Arena" },
                         { 251143, "Grim Harvest Gloves", "Mythic+ Dungeon - Den of Nalorakk" },
                     },
                 },
@@ -877,7 +877,7 @@ ns.BiSData = {
                     [1] = {
                         { 271528, "Enigmatic Dreamwatcher's Somnolent Stare", "Tier Set token" },
                         { 271875, "Gaze of the Coiled Watcher", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 268219, "Shadow Hunter's Warmask", "Raid drop - The Venomous Abyss - Boss 2 - Entombed Sentinels" },
+                        { 239033, "Hood of the Slithering Loa", "Mythic+ Dungeon - Temple of Sethraliss" },
                     },
                     [2] = {
                         { 268265, "Aqirbane Reliquary", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
@@ -887,12 +887,12 @@ ns.BiSData = {
                     [3] = {
                         { 271526, "Enigmatic Dreamwatcher's Plumage", "Tier Set token" },
                         { 268246, "Frothing Venom Spaulders", "Raid drop - The Venomous Abyss - Boss 4 - Vashnik the Malignant" },
-                        { 251223, "Somber Spaulders", "Mythic+ Dungeon - Voidscar Arena" },
+                        { 244572, "Silvermoon Agent's Mantle", "Crafted" },
                     },
                     [5] = {
                         { 271531, "Enigmatic Dreamwatcher's Lunar Raiment", "Tier Set token" },
                         { 268235, "Vestment of the Awakening", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
-                        { 251159, "War Trial Vestments", "Mythic+ Dungeon - Den of Nalorakk" },
+                        { 244570, "Silvermoon Agent's Coat", "Crafted" },
                     },
                     [6] = {
                         { 268227, "Unpossessed Skullsash", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
@@ -902,7 +902,7 @@ ns.BiSData = {
                     [7] = {
                         { 271527, "Enigmatic Dreamwatcher's Leggings", "Tier Set token" },
                         { 244574, "Silvermoon Agent's Leggings", "Crafted" },
-                        { 268225, "Coiled Hex Legguards", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
+                        { 251130, "Breeches of Deft Deals", "Mythic+ Dungeon - Murder Row" },
                     },
                     [8] = {
                         { 159327, "Sand-Shined Snakeskin Sandals", "Mythic+ Dungeon - Temple of Sethraliss" },
@@ -921,8 +921,8 @@ ns.BiSData = {
                     },
                     [11] = {
                         { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
-                        { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
                         { 158366, "Charged Sandstone Band", "Mythic+ Dungeon - Temple of Sethraliss" },
+                        { 268249, "Vile Alchemist's Band", "Raid drop - The Venomous Abyss - Boss 4 - Vashnik the Malignant" },
                     },
                     [13] = {
                         { 273796, "Vile Vial of Volatile Venom", "Mythic+ Dungeon - Altar of Fangs" },
@@ -941,7 +941,7 @@ ns.BiSData = {
                     [17] = {
                         { 245769, "Aln'hara Lantern", "Crafted" },
                         { 268197, "Spine of the Hissing Abyss", "Raid drop - The Venomous Abyss - Boss 2 - Entombed Sentinels" },
-                        { 273779, "Nocuous Focal Fang", "Mythic+ Dungeon - Altar of Fangs" },
+                        { 268263, "Frostscale's Mystic Frond", "Raid drop" },
                     },
                 },
                 mythicplus = {
@@ -961,23 +961,23 @@ ns.BiSData = {
                     },
                     [5] = {
                         { 271531, "Enigmatic Dreamwatcher's Lunar Raiment", "Tier Set token" },
+                        { 251159, "War Trial Vestments", "Mythic+ Dungeon - Den of Nalorakk" },
                         { 268235, "Vestment of the Awakening", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
-                        { 239048, "Vest of Reverent Adoration", "Mythic+ Dungeon - Kings' Rest" },
                     },
                     [6] = {
                         { 268227, "Unpossessed Skullsash", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
-                        { 159317, "Whirling Dervish Sash", "Mythic+ Dungeon - Temple of Sethraliss" },
                         { 271436, "Slitherscale Girdle", "World Drop" },
+                        { 251235, "Gravitic Girdle", "Mythic+ Dungeon - Voidscar Arena" },
                     },
                     [7] = {
                         { 271527, "Enigmatic Dreamwatcher's Leggings", "Tier Set token" },
                         { 244574, "Silvermoon Agent's Leggings", "Crafted" },
-                        { 268225, "Coiled Hex Legguards", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
+                        { 251198, "Lightspore Leggings", "Mythic+ Dungeon - The Blinding Vale" },
                     },
                     [8] = {
-                        { 159327, "Sand-Shined Snakeskin Sandals", "Mythic+ Dungeon - Temple of Sethraliss" },
                         { 244569, "Silvermoon Agent's Sneakers", "Crafted" },
-                        { 251153, "Arctic Explorer's Legwraps", "Mythic+ Dungeon - Den of Nalorakk" },
+                        { 159327, "Sand-Shined Snakeskin Sandals", "Mythic+ Dungeon - Temple of Sethraliss" },
+                        { 268261, "Bespittled Slitherslippers", "Raid drop - The Venomous Abyss - Boss 6 - The Twin Fangs" },
                     },
                     [9] = {
                         { 244576, "Silvermoon Agent's Deflectors", "Crafted" },
@@ -991,27 +991,27 @@ ns.BiSData = {
                     },
                     [11] = {
                         { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
-                        { 158366, "Charged Sandstone Band", "Mythic+ Dungeon - Temple of Sethraliss" },
+                        { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
                         { 268249, "Vile Alchemist's Band", "Raid drop - The Venomous Abyss - Boss 4 - Vashnik the Malignant" },
                     },
                     [13] = {
-                        { 273796, "Vile Vial of Volatile Venom", "Mythic+ Dungeon - Altar of Fangs" },
                         { 270164, "Gebbo's Bottomless Bag", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
-                        { 270167, "Wavecaller's Seastone", "Raid drop" },
+                        { 273796, "Vile Vial of Volatile Venom", "Mythic+ Dungeon - Altar of Fangs" },
+                        { 250215, "Freightrunner's Flask", "Mythic+ Dungeon - Murder Row" },
                     },
                     [15] = {
-                        { 251132, "Speakeasy Shroud", "Mythic+ Dungeon - Murder Row" },
                         { 251190, "Bloodthorn Burnous", "Mythic+ Dungeon - The Blinding Vale" },
-                        { 193763, "Fireproof Drape", "Mythic+ Dungeon - Ruby Life Pools" },
+                        { 251132, "Speakeasy Shroud", "Mythic+ Dungeon - Murder Row" },
+                        { 268253, "Silken Voodoo Drape", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
                     },
                     [16] = {
                         { 271092, "Jan'thrazet, the Soul Fang", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 273778, "Polished Lightwood Channeler", "Mythic+ Dungeon - Altar of Fangs" },
+                        { 268210, "Malevolent Spiritcudgel", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
                     },
                     [17] = {
                         { 245769, "Aln'hara Lantern", "Crafted" },
-                        { 273779, "Nocuous Focal Fang", "Mythic+ Dungeon - Altar of Fangs" },
                         { 268263, "Frostscale's Mystic Frond", "Raid drop" },
+                        { 251191, "Luminescent Sprout", "Mythic+ Dungeon - The Blinding Vale" },
                     },
                 },
             },
@@ -1030,22 +1030,22 @@ ns.BiSData = {
                     [3] = {
                         { 271526, "Enigmatic Dreamwatcher's Plumage", "Tier Set token" },
                         { 244572, "Silvermoon Agent's Mantle", "Crafted" },
-                        { 251146, "Scavenger's Spaulders", "Mythic+ Dungeon - Den of Nalorakk" },
+                        { 268246, "Frothing Venom Spaulders", "Raid drop - The Venomous Abyss - Boss 4 - Vashnik the Malignant" },
                     },
                     [5] = {
                         { 271531, "Enigmatic Dreamwatcher's Lunar Raiment", "Tier Set token" },
+                        { 268235, "Vestment of the Awakening", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
                         { 239048, "Vest of Reverent Adoration", "Mythic+ Dungeon - Kings' Rest" },
-                        { 251226, "Hide of Pestilence", "Mythic+ Dungeon - Voidscar Arena" },
                     },
                     [6] = {
-                        { 159317, "Whirling Dervish Sash", "Mythic+ Dungeon - Temple of Sethraliss" },
                         { 268256, "Sash of the Forlorn Vessel", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
-                        { 159301, "Primal Dinomancer's Belt", "Mythic+ Dungeon - Kings' Rest" },
+                        { 159317, "Whirling Dervish Sash", "Mythic+ Dungeon - Temple of Sethraliss" },
+                        { 268227, "Unpossessed Skullsash", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
                     },
                     [7] = {
                         { 271527, "Enigmatic Dreamwatcher's Leggings", "Tier Set token" },
                         { 244574, "Silvermoon Agent's Leggings", "Crafted" },
-                        { 251130, "Breeches of Deft Deals", "Mythic+ Dungeon - Murder Row" },
+                        { 268225, "Coiled Hex Legguards", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
                     },
                     [8] = {
                         { 244569, "Silvermoon Agent's Sneakers", "Crafted" },
@@ -1065,7 +1065,7 @@ ns.BiSData = {
                     [11] = {
                         { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
                         { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
-                        { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
+                        { 158366, "Charged Sandstone Band", "Mythic+ Dungeon - Temple of Sethraliss" },
                     },
                     [13] = {
                         { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
@@ -1073,9 +1073,9 @@ ns.BiSData = {
                         { 273796, "Vile Vial of Volatile Venom", "Mythic+ Dungeon - Altar of Fangs" },
                     },
                     [15] = {
-                        { 251132, "Speakeasy Shroud", "Mythic+ Dungeon - Murder Row" },
                         { 251190, "Bloodthorn Burnous", "Mythic+ Dungeon - The Blinding Vale" },
-                        { 239656, "Adherent's Silken Shroud", "Crafted" },
+                        { 251132, "Speakeasy Shroud", "Mythic+ Dungeon - Murder Row" },
+                        { 193763, "Fireproof Drape", "Mythic+ Dungeon - Ruby Life Pools" },
                     },
                     [16] = {
                         { 268215, "Abyssal Broodfiend's Bardiche", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
@@ -1087,11 +1087,11 @@ ns.BiSData = {
                     [1] = {
                         { 271528, "Enigmatic Dreamwatcher's Somnolent Stare", "Tier Set token" },
                         { 271875, "Gaze of the Coiled Watcher", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 273791, "Spare Speaker's Hood", "Mythic+ Dungeon - Altar of Fangs" },
+                        { 271438, "Temple Delver's Mystic Helm", "World Drop" },
                     },
                     [2] = {
-                        { 251142, "Pendant of Malefic Fury", "Mythic+ Dungeon - Murder Row" },
                         { 268265, "Aqirbane Reliquary", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
+                        { 251142, "Pendant of Malefic Fury", "Mythic+ Dungeon - Murder Row" },
                         { 251234, "Graft of the Domanaar", "Mythic+ Dungeon - Voidscar Arena" },
                     },
                     [3] = {
@@ -1102,7 +1102,7 @@ ns.BiSData = {
                     [5] = {
                         { 271531, "Enigmatic Dreamwatcher's Lunar Raiment", "Tier Set token" },
                         { 268235, "Vestment of the Awakening", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
-                        { 251159, "War Trial Vestments", "Mythic+ Dungeon - Den of Nalorakk" },
+                        { 244570, "Silvermoon Agent's Coat", "Crafted" },
                     },
                     [6] = {
                         { 159317, "Whirling Dervish Sash", "Mythic+ Dungeon - Temple of Sethraliss" },
@@ -1117,12 +1117,12 @@ ns.BiSData = {
                     [8] = {
                         { 251153, "Arctic Explorer's Legwraps", "Mythic+ Dungeon - Den of Nalorakk" },
                         { 244569, "Silvermoon Agent's Sneakers", "Crafted" },
-                        { 159327, "Sand-Shined Snakeskin Sandals", "Mythic+ Dungeon - Temple of Sethraliss" },
+                        { 268261, "Bespittled Slitherslippers", "Raid drop - The Venomous Abyss - Boss 6 - The Twin Fangs" },
                     },
                     [9] = {
                         { 244576, "Silvermoon Agent's Deflectors", "Crafted" },
-                        { 251135, "Fury-fletched Armlets", "Mythic+ Dungeon - Murder Row" },
                         { 251183, "Rootwarden Wraps", "Mythic+ Dungeon - The Blinding Vale" },
+                        { 155922, "Mechanist's Bindings", "World Drop" },
                     },
                     [10] = {
                         { 271529, "Enigmatic Dreamwatcher's Gauntlets", "Tier Set token" },
@@ -1142,12 +1142,12 @@ ns.BiSData = {
                     [15] = {
                         { 251132, "Speakeasy Shroud", "Mythic+ Dungeon - Murder Row" },
                         { 251190, "Bloodthorn Burnous", "Mythic+ Dungeon - The Blinding Vale" },
-                        { 239656, "Adherent's Silken Shroud", "Crafted" },
+                        { 268253, "Silken Voodoo Drape", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
                     },
                     [16] = {
                         { 268215, "Abyssal Broodfiend's Bardiche", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
+                        { 268199, "Tidepiercer's Bubble Popper", "Raid drop" },
                         { 251149, "Victor's Flashfrozen Blade", "Mythic+ Dungeon - Den of Nalorakk" },
-                        { 237847, "Blood Knight's Impetus", "Crafted" },
                     },
                 },
             },
@@ -1160,8 +1160,8 @@ ns.BiSData = {
                     },
                     [2] = {
                         { 268265, "Aqirbane Reliquary", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 251173, "Yoke of the Charging Bear", "Mythic+ Dungeon - Den of Nalorakk" },
                         { 268250, "Sentinel's Vitriolic Chain", "Raid drop - The Venomous Abyss - Boss 2 - Entombed Sentinels" },
+                        { 273781, "Strand of Warding Fangs", "Mythic+ Dungeon - Altar of Fangs" },
                     },
                     [3] = {
                         { 271526, "Enigmatic Dreamwatcher's Plumage", "Tier Set token" },
@@ -1176,7 +1176,7 @@ ns.BiSData = {
                     [6] = {
                         { 251235, "Gravitic Girdle", "Mythic+ Dungeon - Voidscar Arena" },
                         { 159301, "Primal Dinomancer's Belt", "Mythic+ Dungeon - Kings' Rest" },
-                        { 251189, "Rootwalker Harness", "Mythic+ Dungeon - The Blinding Vale" },
+                        { 244573, "Silvermoon Agent's Utility Belt", "Crafted" },
                     },
                     [7] = {
                         { 271527, "Enigmatic Dreamwatcher's Leggings", "Tier Set token" },
@@ -1196,16 +1196,16 @@ ns.BiSData = {
                     [10] = {
                         { 271529, "Enigmatic Dreamwatcher's Gauntlets", "Tier Set token" },
                         { 244575, "Silvermoon Agent's Handwraps", "Crafted" },
-                        { 159312, "Desiccator's Blessed Gloves", "Mythic+ Dungeon - Kings' Rest" },
+                        { 193758, "Subjugator's Chilling Grips", "Mythic+ Dungeon - Ruby Life Pools" },
                     },
                     [11] = {
-                        { 159459, "Ritual Binder's Ring", "Mythic+ Dungeon - Kings' Rest" },
                         { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
+                        { 159459, "Ritual Binder's Ring", "Mythic+ Dungeon - Kings' Rest" },
                         { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
                     },
                     [13] = {
                         { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 273796, "Vile Vial of Volatile Venom", "Mythic+ Dungeon - Altar of Fangs" },
+                        { 250245, "Tumor of the Swarm", "Mythic+ Dungeon - Voidscar Arena" },
                         { 270173, "Zul'jin's Guillotine Technique", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
                     },
                     [15] = {
@@ -1226,9 +1226,9 @@ ns.BiSData = {
                         { 273791, "Spare Speaker's Hood", "Mythic+ Dungeon - Altar of Fangs" },
                     },
                     [2] = {
-                        { 251173, "Yoke of the Charging Bear", "Mythic+ Dungeon - Den of Nalorakk" },
                         { 268265, "Aqirbane Reliquary", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                         { 273781, "Strand of Warding Fangs", "Mythic+ Dungeon - Altar of Fangs" },
+                        { 251173, "Yoke of the Charging Bear", "Mythic+ Dungeon - Den of Nalorakk" },
                     },
                     [3] = {
                         { 271526, "Enigmatic Dreamwatcher's Plumage", "Tier Set token" },
@@ -1237,12 +1237,12 @@ ns.BiSData = {
                     },
                     [5] = {
                         { 271531, "Enigmatic Dreamwatcher's Lunar Raiment", "Tier Set token" },
+                        { 251226, "Hide of Pestilence", "Mythic+ Dungeon - Voidscar Arena" },
                         { 244570, "Silvermoon Agent's Coat", "Crafted" },
-                        { 268235, "Vestment of the Awakening", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
                     },
                     [6] = {
-                        { 159301, "Primal Dinomancer's Belt", "Mythic+ Dungeon - Kings' Rest" },
                         { 251189, "Rootwalker Harness", "Mythic+ Dungeon - The Blinding Vale" },
+                        { 159301, "Primal Dinomancer's Belt", "Mythic+ Dungeon - Kings' Rest" },
                         { 271436, "Slitherscale Girdle", "World Drop" },
                     },
                     [7] = {
@@ -1253,7 +1253,7 @@ ns.BiSData = {
                     [8] = {
                         { 244569, "Silvermoon Agent's Sneakers", "Crafted" },
                         { 251153, "Arctic Explorer's Legwraps", "Mythic+ Dungeon - Den of Nalorakk" },
-                        { 159304, "Goldfeather Boots", "Mythic+ Dungeon - Kings' Rest" },
+                        { 268247, "Breakwater Boots", "Raid drop" },
                     },
                     [9] = {
                         { 244576, "Silvermoon Agent's Deflectors", "Crafted" },
@@ -1263,7 +1263,7 @@ ns.BiSData = {
                     [10] = {
                         { 271529, "Enigmatic Dreamwatcher's Gauntlets", "Tier Set token" },
                         { 159312, "Desiccator's Blessed Gloves", "Mythic+ Dungeon - Kings' Rest" },
-                        { 272241, "Miststalker's Grips", "Drop" },
+                        { 272241, "Miststalker's Grips", "World Drop" },
                     },
                     [11] = {
                         { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
@@ -1271,9 +1271,9 @@ ns.BiSData = {
                         { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
                     },
                     [13] = {
-                        { 250245, "Tumor of the Swarm", "Mythic+ Dungeon - Voidscar Arena" },
                         { 270165, "Keeper's Seething Core", "Raid drop - The Venomous Abyss - Boss 2 - Entombed Sentinels" },
-                        { 250228, "Resonant Bellowstone", "Mythic+ Dungeon - Murder Row" },
+                        { 250215, "Freightrunner's Flask", "Mythic+ Dungeon - Murder Row" },
+                        { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                     },
                     [15] = {
                         { 193763, "Fireproof Drape", "Mythic+ Dungeon - Ruby Life Pools" },
@@ -1307,21 +1307,22 @@ ns.BiSData = {
                     [5] = {
                         { 271531, "Enigmatic Dreamwatcher's Lunar Raiment", "Tier Set token" },
                         { 268235, "Vestment of the Awakening", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
-                        { 251159, "War Trial Vestments", "Mythic+ Dungeon - Den of Nalorakk" },
+                        { 272239, "Miststalker's Brigandine", "Raid drop - The Venomous Abyss" },
                     },
                     [6] = {
                         { 268256, "Sash of the Forlorn Vessel", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
                         { 159317, "Whirling Dervish Sash", "Mythic+ Dungeon - Temple of Sethraliss" },
-                        { 251235, "Gravitic Girdle", "Mythic+ Dungeon - Voidscar Arena" },
+                        { 271436, "Slitherscale Girdle", "Raid drop - The Venomous Abyss" },
                     },
                     [7] = {
                         { 271527, "Enigmatic Dreamwatcher's Leggings", "Tier Set token" },
                         { 268225, "Coiled Hex Legguards", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
+                        { 272243, "Miststalker's Cuisses", "Raid drop - The Venomous Abyss" },
                     },
                     [8] = {
                         { 268247, "Breakwater Boots", "Raid drop" },
-                        { 251153, "Arctic Explorer's Legwraps", "Mythic+ Dungeon - Den of Nalorakk" },
                         { 244569, "Silvermoon Agent's Sneakers", "Crafted" },
+                        { 251153, "Arctic Explorer's Legwraps", "Mythic+ Dungeon - Den of Nalorakk" },
                     },
                     [9] = {
                         { 244576, "Silvermoon Agent's Deflectors", "Crafted" },
@@ -1330,12 +1331,12 @@ ns.BiSData = {
                     },
                     [10] = {
                         { 271529, "Enigmatic Dreamwatcher's Gauntlets", "Tier Set token" },
-                        { 159337, "Grips of Electrified Defense", "Mythic+ Dungeon - Temple of Sethraliss" },
+                        { 272241, "Miststalker's Grips", "Raid drop - The Venomous Abyss" },
                         { 251124, "Gauntlets of Fevered Defense", "Mythic+ Dungeon - Murder Row" },
                     },
                     [11] = {
                         { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
-                        { 279010, "Ula'tek's Bind", "Raid drop - The Venomous Abyss" },
+                        { 268266, "Alluring Bubbleband", "Raid drop" },
                         { 272147, "Colubrine Band", "Raid drop - The Venomous Abyss" },
                     },
                     [13] = {
@@ -1362,70 +1363,71 @@ ns.BiSData = {
                     [1] = {
                         { 271528, "Enigmatic Dreamwatcher's Somnolent Stare", "Tier Set token" },
                         { 271875, "Gaze of the Coiled Watcher", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 271438, "Temple Delver's Mystic Helm", "Drop" },
+                        { 251140, "Vilefiend's Guise", "Mythic+ Dungeon - Murder Row" },
                     },
                     [2] = {
-                        { 251142, "Pendant of Malefic Fury", "Mythic+ Dungeon - Murder Row" },
                         { 268265, "Aqirbane Reliquary", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
+                        { 251142, "Pendant of Malefic Fury", "Mythic+ Dungeon - Murder Row" },
                         { 268251, "Amulet of the Twin Fangs", "Raid drop - The Venomous Abyss - Boss 6 - The Twin Fangs" },
                     },
                     [3] = {
-                        { 244572, "Silvermoon Agent's Mantle", "Crafted" },
                         { 271526, "Enigmatic Dreamwatcher's Plumage", "Tier Set token" },
-                        { 251223, "Somber Spaulders", "Mythic+ Dungeon - Voidscar Arena" },
+                        { 244572, "Silvermoon Agent's Mantle", "Crafted" },
+                        { 251146, "Scavenger's Spaulders", "Mythic+ Dungeon - Den of Nalorakk" },
                     },
                     [5] = {
                         { 271531, "Enigmatic Dreamwatcher's Lunar Raiment", "Tier Set token" },
-                        { 251159, "War Trial Vestments", "Mythic+ Dungeon - Den of Nalorakk" },
-                        { 251226, "Hide of Pestilence", "Mythic+ Dungeon - Voidscar Arena" },
+                        { 193764, "Invader's Firestorm Chestguard", "Mythic+ Dungeon - Ruby Life Pools" },
+                        { 268235, "Vestment of the Awakening", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
                     },
                     [6] = {
                         { 159317, "Whirling Dervish Sash", "Mythic+ Dungeon - Temple of Sethraliss" },
                         { 268256, "Sash of the Forlorn Vessel", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
-                        { 251235, "Gravitic Girdle", "Mythic+ Dungeon - Voidscar Arena" },
+                        { 268227, "Unpossessed Skullsash", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
                     },
                     [7] = {
                         { 271527, "Enigmatic Dreamwatcher's Leggings", "Tier Set token" },
-                        { 251130, "Breeches of Deft Deals", "Mythic+ Dungeon - Murder Row" },
-                        { 250023, "Phloemwraps of the Luminous Bloom", "Tier Set token" },
+                        { 159329, "Leggings of the Galeforce Viper", "Mythic+ Dungeon - Temple of Sethraliss" },
+                        { 268225, "Coiled Hex Legguards", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
                     },
                     [8] = {
-                        { 251153, "Arctic Explorer's Legwraps", "Mythic+ Dungeon - Den of Nalorakk" },
+                        { 244569, "Silvermoon Agent's Sneakers", "Crafted" },
                         { 159304, "Goldfeather Boots", "Mythic+ Dungeon - Kings' Rest" },
-                        { 159327, "Sand-Shined Snakeskin Sandals", "Mythic+ Dungeon - Temple of Sethraliss" },
+                        { 268247, "Breakwater Boots", "Raid drop" },
                     },
                     [9] = {
-                        { 244576, "Silvermoon Agent's Deflectors", "Crafted" },
                         { 251135, "Fury-fletched Armlets", "Mythic+ Dungeon - Murder Row" },
+                        { 244576, "Silvermoon Agent's Deflectors", "Crafted" },
                         { 251183, "Rootwarden Wraps", "Mythic+ Dungeon - The Blinding Vale" },
                     },
                     [10] = {
                         { 271529, "Enigmatic Dreamwatcher's Gauntlets", "Tier Set token" },
-                        { 250025, "Arbortenders of the Luminous Bloom", "Tier Set token" },
                         { 159337, "Grips of Electrified Defense", "Mythic+ Dungeon - Temple of Sethraliss" },
+                        { 250025, "Arbortenders of the Luminous Bloom", "Tier Set token" },
                     },
                     [11] = {
                         { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
                         { 159459, "Ritual Binder's Ring", "Mythic+ Dungeon - Kings' Rest" },
-                        { 279010, "Ula'tek's Bind", "World Drop" },
+                        { 272150, "Ouroboric Signet", "World Drop" },
                     },
                     [13] = {
-                        { 250214, "Lightspire Core", "Mythic+ Dungeon - The Blinding Vale" },
                         { 270162, "Soulcoiler Ritual Vessel", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
+                        { 250214, "Lightspire Core", "Mythic+ Dungeon - The Blinding Vale" },
                         { 270167, "Wavecaller's Seastone", "Raid drop" },
                     },
                     [15] = {
                         { 251190, "Bloodthorn Burnous", "Mythic+ Dungeon - The Blinding Vale" },
                         { 268253, "Silken Voodoo Drape", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
-                        { 272230, "Pledgebearer's Pall", "World Drop" },
+                        { 159288, "Cloak of the Restless Tribes", "Mythic+ Dungeon - Kings' Rest" },
                     },
                     [16] = {
                         { 271092, "Jan'thrazet, the Soul Fang", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
+                        { 273778, "Polished Lightwood Channeler", "Mythic+ Dungeon - Altar of Fangs" },
                     },
                     [17] = {
                         { 245769, "Aln'hara Lantern", "Crafted" },
-                        { 251191, "Luminescent Sprout", "Mythic+ Dungeon - The Blinding Vale" },
                         { 268197, "Spine of the Hissing Abyss", "Raid drop - The Venomous Abyss - Boss 2 - Entombed Sentinels" },
+                        { 251191, "Luminescent Sprout", "Mythic+ Dungeon - The Blinding Vale" },
                     },
                 },
             },
@@ -1438,22 +1440,22 @@ ns.BiSData = {
                     [1] = {
                         { 271501, "Calamitous Echo's Magmashapers", "Tier Set token" },
                         { 239035, "Sethraliss' Fanged Helm", "Mythic+ Dungeon - Temple of Sethraliss" },
-                        { 271441, "Crushing Coiler Coif", "Raid drop - The Venomous Abyss" },
+                        { 268230, "Crown of the Eternal Fang", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
                     },
                     [2] = {
                         { 268265, "Aqirbane Reliquary", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
+                        { 268251, "Amulet of the Twin Fangs", "Raid drop - The Venomous Abyss - Boss 6 - The Twin Fangs" },
                         { 251234, "Graft of the Domanaar", "Mythic+ Dungeon - Voidscar Arena" },
-                        { 251142, "Pendant of Malefic Fury", "Mythic+ Dungeon - Murder Row" },
                     },
                     [3] = {
                         { 271499, "Calamitous Echo's Sundered Peaks", "Tier Set token" },
                         { 268231, "Soulslither Spaulders", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
-                        { 239049, "Spaulders of Prime Emperor", "Mythic+ Dungeon - Kings' Rest" },
+                        { 244580, "Farstrider's Brilliant Plumes", "Crafted" },
                     },
                     [5] = {
                         { 271504, "Searing Caldera of Calamity", "Raid drop - The Venomous Abyss" },
                         { 271876, "Awoken Dreadfang Cuirass", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 273789, "Chestguard of Corroded Scales", "Mythic+ Dungeon - Altar of Fangs" },
+                        { 268223, "Ophidian Fangmail", "Raid drop - The Venomous Abyss - Boss 6 - The Twin Fangs" },
                     },
                     [6] = {
                         { 268254, "Serpentine Mixing Belt", "Raid drop - The Venomous Abyss - Boss 4 - Vashnik the Malignant" },
@@ -1462,13 +1464,13 @@ ns.BiSData = {
                     },
                     [7] = {
                         { 271500, "Earthen Pillars of Calamity", "Raid drop - The Venomous Abyss" },
+                        { 244582, "Farstrider's Reinforced Faulds", "Crafted" },
                         { 159375, "Legguards of the Awakening Brood", "Mythic+ Dungeon - Temple of Sethraliss" },
-                        { 268237, "Cuisses of the Uncoiled Union", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
                     },
                     [8] = {
-                        { 159388, "Sabatons of Coruscating Energy", "Mythic+ Dungeon - Temple of Sethraliss" },
                         { 268233, "Ferocious Scaleboots", "Raid drop - The Venomous Abyss - Boss 5 - Sszorak" },
                         { 268258, "Boots of the Reckless Wayfarer", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
+                        { 159388, "Sabatons of Coruscating Energy", "Mythic+ Dungeon - Temple of Sethraliss" },
                     },
                     [9] = {
                         { 244584, "Farstrider's Plated Bracers", "Crafted" },
@@ -1477,8 +1479,8 @@ ns.BiSData = {
                     },
                     [10] = {
                         { 271502, "Calamitous Echo's Ebon Greathorns", "Tier Set token" },
+                        { 244583, "Farstrider's Sharpened Claws", "Crafted" },
                         { 268238, "Grips of Swirling Fury", "Raid drop" },
-                        { 193752, "Galerattle Gauntlets", "Mythic+ Dungeon - Ruby Life Pools" },
                     },
                     [11] = {
                         { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
@@ -1486,14 +1488,14 @@ ns.BiSData = {
                         { 268249, "Vile Alchemist's Band", "Raid drop - The Venomous Abyss - Boss 4 - Vashnik the Malignant" },
                     },
                     [13] = {
+                        { 270168, "Font of Venomous Rage", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                         { 250224, "Mindpiercer's Sigil", "Mythic+ Dungeon - Voidscar Arena" },
                         { 270161, "Fang of Umbral Malignance", "Raid drop - The Venomous Abyss - Boss 4 - Vashnik the Malignant" },
-                        { 270168, "Font of Venomous Rage", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                     },
                     [15] = {
                         { 251132, "Speakeasy Shroud", "Mythic+ Dungeon - Murder Row" },
-                        { 251190, "Bloodthorn Burnous", "Mythic+ Dungeon - The Blinding Vale" },
-                        { 193763, "Fireproof Drape", "Mythic+ Dungeon - Ruby Life Pools" },
+                        { 268253, "Silken Voodoo Drape", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
+                        { 239656, "Adherent's Silken Shroud", "Crafted" },
                     },
                     [16] = {
                         { 271092, "Jan'thrazet, the Soul Fang", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
@@ -1501,55 +1503,55 @@ ns.BiSData = {
                     },
                     [17] = {
                         { 245769, "Aln'hara Lantern", "Crafted" },
-                        { 273779, "Nocuous Focal Fang", "Mythic+ Dungeon - Altar of Fangs" },
                         { 268263, "Frostscale's Mystic Frond", "Raid drop" },
+                        { 268197, "Spine of the Hissing Abyss", "Raid drop - The Venomous Abyss - Boss 2 - Entombed Sentinels" },
                     },
                 },
                 mythicplus = {
                     [1] = {
                         { 271501, "Calamitous Echo's Magmashapers", "Tier Set token" },
-                        { 239035, "Sethraliss' Fanged Helm", "Mythic+ Dungeon - Temple of Sethraliss" },
                         { 193765, "Blazebound Lieutenant's Helm", "Mythic+ Dungeon - Ruby Life Pools" },
+                        { 239035, "Sethraliss' Fanged Helm", "Mythic+ Dungeon - Temple of Sethraliss" },
                     },
                     [2] = {
+                        { 268265, "Aqirbane Reliquary", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                         { 251234, "Graft of the Domanaar", "Mythic+ Dungeon - Voidscar Arena" },
                         { 268251, "Amulet of the Twin Fangs", "Raid drop - The Venomous Abyss - Boss 6 - The Twin Fangs" },
-                        { 268265, "Aqirbane Reliquary", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                     },
                     [3] = {
                         { 271499, "Calamitous Echo's Sundered Peaks", "Tier Set token" },
-                        { 249995, "Beacons of the Black Talon", "Tier Set token" },
-                        { 268231, "Soulslither Spaulders", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
+                        { 244580, "Farstrider's Brilliant Plumes", "Crafted" },
+                        { 251131, "Jangling Felpaulets", "Mythic+ Dungeon - Murder Row" },
                     },
                     [5] = {
                         { 271504, "Searing Caldera of Calamity", "World Drop" },
                         { 271876, "Awoken Dreadfang Cuirass", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 250000, "Frenzyward of the Black Talon", "Tier Set token" },
+                        { 273789, "Chestguard of Corroded Scales", "Mythic+ Dungeon - Altar of Fangs" },
                     },
                     [6] = {
                         { 268254, "Serpentine Mixing Belt", "Raid drop - The Venomous Abyss - Boss 4 - Vashnik the Malignant" },
-                        { 251155, "Tribal Defender's Cord", "Mythic+ Dungeon - Den of Nalorakk" },
                         { 244581, "Farstrider's Trophy Belt", "Crafted" },
+                        { 251155, "Tribal Defender's Cord", "Mythic+ Dungeon - Den of Nalorakk" },
                     },
                     [7] = {
                         { 271500, "Earthen Pillars of Calamity", "World Drop" },
                         { 268237, "Cuisses of the Uncoiled Union", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
-                        { 249996, "Greaves of the Black Talon", "Tier Set token" },
+                        { 159375, "Legguards of the Awakening Brood", "Mythic+ Dungeon - Temple of Sethraliss" },
                     },
                     [8] = {
+                        { 268233, "Ferocious Scaleboots", "Raid drop - The Venomous Abyss - Boss 5 - Sszorak" },
                         { 159388, "Sabatons of Coruscating Energy", "Mythic+ Dungeon - Temple of Sethraliss" },
                         { 268258, "Boots of the Reckless Wayfarer", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
-                        { 268233, "Ferocious Scaleboots", "Raid drop - The Venomous Abyss - Boss 5 - Sszorak" },
                     },
                     [9] = {
                         { 244584, "Farstrider's Plated Bracers", "Crafted" },
-                        { 159380, "Arc-Glass Bindings", "Mythic+ Dungeon - Temple of Sethraliss" },
                         { 268217, "Rising Tide Wristguards", "Raid drop" },
+                        { 159380, "Arc-Glass Bindings", "Mythic+ Dungeon - Temple of Sethraliss" },
                     },
                     [10] = {
                         { 271502, "Calamitous Echo's Ebon Greathorns", "Tier Set token" },
                         { 249998, "Enforcer's Grips of the Black Talon", "Tier Set token" },
-                        { 251165, "Pulverizing Pads", "Mythic+ Dungeon - The Blinding Vale" },
+                        { 268238, "Grips of Swirling Fury", "Raid drop" },
                     },
                     [11] = {
                         { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
@@ -1559,22 +1561,21 @@ ns.BiSData = {
                     [13] = {
                         { 250224, "Mindpiercer's Sigil", "Mythic+ Dungeon - Voidscar Arena" },
                         { 270161, "Fang of Umbral Malignance", "Raid drop - The Venomous Abyss - Boss 4 - Vashnik the Malignant" },
-                        { 249346, "Vaelgor's Final Stare", "Raid drop" },
+                        { 270167, "Wavecaller's Seastone", "Raid drop" },
                     },
                     [15] = {
                         { 251132, "Speakeasy Shroud", "Mythic+ Dungeon - Murder Row" },
                         { 251190, "Bloodthorn Burnous", "Mythic+ Dungeon - The Blinding Vale" },
-                        { 268253, "Silken Voodoo Drape", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
+                        { 159288, "Cloak of the Restless Tribes", "Mythic+ Dungeon - Kings' Rest" },
                     },
                     [16] = {
                         { 273778, "Polished Lightwood Channeler", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 273780, "Venom-Etched Crescent", "Mythic+ Dungeon - Altar of Fangs" },
                         { 271092, "Jan'thrazet, the Soul Fang", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                     },
                     [17] = {
                         { 245769, "Aln'hara Lantern", "Crafted" },
                         { 271681, "Perennial Frostbound Charm", "Mythic+ Dungeon - Den of Nalorakk" },
-                        { 273779, "Nocuous Focal Fang", "Mythic+ Dungeon - Altar of Fangs" },
+                        { 268263, "Frostscale's Mystic Frond", "Raid drop" },
                     },
                 },
             },
@@ -1598,7 +1599,7 @@ ns.BiSData = {
                     [5] = {
                         { 271504, "Searing Caldera of Calamity", "Raid drop - The Venomous Abyss" },
                         { 271876, "Awoken Dreadfang Cuirass", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 273789, "Chestguard of Corroded Scales", "Mythic+ Dungeon - Altar of Fangs" },
+                        { 251233, "Manipulator's Vest", "Mythic+ Dungeon - Voidscar Arena" },
                     },
                     [6] = {
                         { 268254, "Serpentine Mixing Belt", "Raid drop - The Venomous Abyss - Boss 4 - Vashnik the Malignant" },
@@ -1617,8 +1618,8 @@ ns.BiSData = {
                     },
                     [9] = {
                         { 244584, "Farstrider's Plated Bracers", "Crafted" },
-                        { 159380, "Arc-Glass Bindings", "Mythic+ Dungeon - Temple of Sethraliss" },
                         { 268217, "Rising Tide Wristguards", "Raid drop" },
+                        { 159380, "Arc-Glass Bindings", "Mythic+ Dungeon - Temple of Sethraliss" },
                     },
                     [10] = {
                         { 271502, "Calamitous Echo's Ebon Greathorns", "Tier Set token" },
@@ -1626,8 +1627,8 @@ ns.BiSData = {
                         { 193752, "Galerattle Gauntlets", "Mythic+ Dungeon - Ruby Life Pools" },
                     },
                     [11] = {
-                        { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
                         { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
+                        { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
                         { 158366, "Charged Sandstone Band", "Mythic+ Dungeon - Temple of Sethraliss" },
                     },
                     [13] = {
@@ -1638,7 +1639,7 @@ ns.BiSData = {
                     [15] = {
                         { 251132, "Speakeasy Shroud", "Mythic+ Dungeon - Murder Row" },
                         { 193763, "Fireproof Drape", "Mythic+ Dungeon - Ruby Life Pools" },
-                        { 251190, "Bloodthorn Burnous", "Mythic+ Dungeon - The Blinding Vale" },
+                        { 239656, "Adherent's Silken Shroud", "Crafted" },
                     },
                     [16] = {
                         { 271092, "Jan'thrazet, the Soul Fang", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
@@ -1654,17 +1655,17 @@ ns.BiSData = {
                     [1] = {
                         { 271501, "Calamitous Echo's Magmashapers", "Tier Set token" },
                         { 268230, "Crown of the Eternal Fang", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
-                        { 251158, "Nalorakk's Nightmare", "Mythic+ Dungeon - Den of Nalorakk" },
+                        { 193765, "Blazebound Lieutenant's Helm", "Mythic+ Dungeon - Ruby Life Pools" },
                     },
                     [2] = {
                         { 268265, "Aqirbane Reliquary", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 273781, "Strand of Warding Fangs", "Mythic+ Dungeon - Altar of Fangs" },
                         { 251234, "Graft of the Domanaar", "Mythic+ Dungeon - Voidscar Arena" },
+                        { 271638, "Bound Serpent's Jade Eye", "World Drop" },
                     },
                     [3] = {
                         { 271499, "Calamitous Echo's Sundered Peaks", "Tier Set token" },
-                        { 268231, "Soulslither Spaulders", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
-                        { 272252, "Galerider's Mantle", "World Drop" },
+                        { 239049, "Spaulders of Prime Emperor", "Mythic+ Dungeon - Kings' Rest" },
+                        { 251131, "Jangling Felpaulets", "Mythic+ Dungeon - Murder Row" },
                     },
                     [5] = {
                         { 271504, "Searing Caldera of Calamity", "World Drop" },
@@ -1673,23 +1674,23 @@ ns.BiSData = {
                     },
                     [6] = {
                         { 251155, "Tribal Defender's Cord", "Mythic+ Dungeon - Den of Nalorakk" },
-                        { 251228, "Behemoth Waistband", "Mythic+ Dungeon - Voidscar Arena" },
                         { 244581, "Farstrider's Trophy Belt", "Crafted" },
+                        { 251228, "Behemoth Waistband", "Mythic+ Dungeon - Voidscar Arena" },
                     },
                     [7] = {
                         { 271500, "Earthen Pillars of Calamity", "World Drop" },
+                        { 244582, "Farstrider's Reinforced Faulds", "Crafted" },
                         { 159375, "Legguards of the Awakening Brood", "Mythic+ Dungeon - Temple of Sethraliss" },
-                        { 251141, "Lithiel's Linked Leggings", "Mythic+ Dungeon - Murder Row" },
                     },
                     [8] = {
                         { 268258, "Boots of the Reckless Wayfarer", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
-                        { 159388, "Sabatons of Coruscating Energy", "Mythic+ Dungeon - Temple of Sethraliss" },
                         { 251125, "Felsoaked Soles", "Mythic+ Dungeon - Murder Row" },
+                        { 159388, "Sabatons of Coruscating Energy", "Mythic+ Dungeon - Temple of Sethraliss" },
                     },
                     [9] = {
                         { 244584, "Farstrider's Plated Bracers", "Crafted" },
                         { 268217, "Rising Tide Wristguards", "Raid drop" },
-                        { 159380, "Arc-Glass Bindings", "Mythic+ Dungeon - Temple of Sethraliss" },
+                        { 251200, "Saptorbane Guards", "Mythic+ Dungeon - The Blinding Vale" },
                     },
                     [10] = {
                         { 271502, "Calamitous Echo's Ebon Greathorns", "Tier Set token" },
@@ -1698,8 +1699,8 @@ ns.BiSData = {
                     },
                     [11] = {
                         { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
-                        { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
                         { 158366, "Charged Sandstone Band", "Mythic+ Dungeon - Temple of Sethraliss" },
+                        { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
                     },
                     [13] = {
                         { 273796, "Vile Vial of Volatile Venom", "Mythic+ Dungeon - Altar of Fangs" },
@@ -1709,7 +1710,7 @@ ns.BiSData = {
                     [15] = {
                         { 251132, "Speakeasy Shroud", "Mythic+ Dungeon - Murder Row" },
                         { 268253, "Silken Voodoo Drape", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
-                        { 193763, "Fireproof Drape", "Mythic+ Dungeon - Ruby Life Pools" },
+                        { 271496, "Fearsome Greatcloak of Calamity", "World Drop" },
                     },
                     [16] = {
                         { 271092, "Jan'thrazet, the Soul Fang", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
@@ -1724,18 +1725,18 @@ ns.BiSData = {
                 raid = {
                     [1] = {
                         { 271501, "Calamitous Echo's Magmashapers", "Tier Set token" },
-                        { 244579, "Farstrider's Unwavering Visage", "Crafted" },
                         { 268230, "Crown of the Eternal Fang", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
+                        { 244579, "Farstrider's Unwavering Visage", "Crafted" },
                     },
                     [2] = {
                         { 268265, "Aqirbane Reliquary", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                         { 251234, "Graft of the Domanaar", "Mythic+ Dungeon - Voidscar Arena" },
-                        { 273781, "Strand of Warding Fangs", "Mythic+ Dungeon - Altar of Fangs" },
+                        { 251142, "Pendant of Malefic Fury", "Mythic+ Dungeon - Murder Row" },
                     },
                     [3] = {
                         { 271499, "Calamitous Echo's Sundered Peaks", "Tier Set token" },
-                        { 239049, "Spaulders of Prime Emperor", "Mythic+ Dungeon - Kings' Rest" },
-                        { 251131, "Jangling Felpaulets", "Mythic+ Dungeon - Murder Row" },
+                        { 268231, "Soulslither Spaulders", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
+                        { 272252, "Galerider's Mantle", "Raid drop - The Venomous Abyss" },
                     },
                     [5] = {
                         { 271504, "Searing Caldera of Calamity", "Raid drop - The Venomous Abyss" },
@@ -1744,17 +1745,17 @@ ns.BiSData = {
                     },
                     [6] = {
                         { 268254, "Serpentine Mixing Belt", "Raid drop - The Venomous Abyss - Boss 4 - Vashnik the Malignant" },
+                        { 244581, "Farstrider's Trophy Belt", "Crafted" },
                         { 251228, "Behemoth Waistband", "Mythic+ Dungeon - Voidscar Arena" },
-                        { 251155, "Tribal Defender's Cord", "Mythic+ Dungeon - Den of Nalorakk" },
                     },
                     [7] = {
                         { 271500, "Earthen Pillars of Calamity", "Raid drop - The Venomous Abyss" },
                         { 244582, "Farstrider's Reinforced Faulds", "Crafted" },
-                        { 268237, "Cuisses of the Uncoiled Union", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
+                        { 159375, "Legguards of the Awakening Brood", "Mythic+ Dungeon - Temple of Sethraliss" },
                     },
                     [8] = {
-                        { 159388, "Sabatons of Coruscating Energy", "Mythic+ Dungeon - Temple of Sethraliss" },
                         { 268258, "Boots of the Reckless Wayfarer", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
+                        { 159388, "Sabatons of Coruscating Energy", "Mythic+ Dungeon - Temple of Sethraliss" },
                         { 268233, "Ferocious Scaleboots", "Raid drop - The Venomous Abyss - Boss 5 - Sszorak" },
                     },
                     [9] = {
@@ -1775,12 +1776,12 @@ ns.BiSData = {
                     [13] = {
                         { 270162, "Soulcoiler Ritual Vessel", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
                         { 270164, "Gebbo's Bottomless Bag", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
-                        { 250214, "Lightspire Core", "Mythic+ Dungeon - The Blinding Vale" },
+                        { 270167, "Wavecaller's Seastone", "Raid drop" },
                     },
                     [15] = {
                         { 251132, "Speakeasy Shroud", "Mythic+ Dungeon - Murder Row" },
+                        { 239656, "Adherent's Silken Shroud", "Crafted" },
                         { 251190, "Bloodthorn Burnous", "Mythic+ Dungeon - The Blinding Vale" },
-                        { 193763, "Fireproof Drape", "Mythic+ Dungeon - Ruby Life Pools" },
                     },
                     [16] = {
                         { 271092, "Jan'thrazet, the Soul Fang", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
@@ -1788,25 +1789,25 @@ ns.BiSData = {
                     },
                     [17] = {
                         { 245769, "Aln'hara Lantern", "Crafted" },
-                        { 273779, "Nocuous Focal Fang", "Mythic+ Dungeon - Altar of Fangs" },
+                        { 268263, "Frostscale's Mystic Frond", "Raid drop" },
                         { 268197, "Spine of the Hissing Abyss", "Raid drop - The Venomous Abyss - Boss 2 - Entombed Sentinels" },
                     },
                 },
                 mythicplus = {
                     [1] = {
                         { 271501, "Calamitous Echo's Magmashapers", "Tier Set token" },
+                        { 271441, "Crushing Coiler Coif", "World Drop" },
                         { 268230, "Crown of the Eternal Fang", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
-                        { 244579, "Farstrider's Unwavering Visage", "Crafted" },
                     },
                     [2] = {
                         { 268265, "Aqirbane Reliquary", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 273781, "Strand of Warding Fangs", "Mythic+ Dungeon - Altar of Fangs" },
                         { 251173, "Yoke of the Charging Bear", "Mythic+ Dungeon - Den of Nalorakk" },
+                        { 273781, "Strand of Warding Fangs", "Mythic+ Dungeon - Altar of Fangs" },
                     },
                     [3] = {
                         { 271499, "Calamitous Echo's Sundered Peaks", "Tier Set token" },
-                        { 244580, "Farstrider's Brilliant Plumes", "Crafted" },
                         { 239049, "Spaulders of Prime Emperor", "Mythic+ Dungeon - Kings' Rest" },
+                        { 244580, "Farstrider's Brilliant Plumes", "Crafted" },
                     },
                     [5] = {
                         { 271504, "Searing Caldera of Calamity", "World Drop" },
@@ -1814,9 +1815,9 @@ ns.BiSData = {
                         { 251233, "Manipulator's Vest", "Mythic+ Dungeon - Voidscar Arena" },
                     },
                     [6] = {
-                        { 251228, "Behemoth Waistband", "Mythic+ Dungeon - Voidscar Arena" },
                         { 159369, "Belt of the Consecrated Tomb", "Mythic+ Dungeon - Kings' Rest" },
                         { 268216, "Cursed Reliquary Cincture", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
+                        { 244581, "Farstrider's Trophy Belt", "Crafted" },
                     },
                     [7] = {
                         { 271500, "Earthen Pillars of Calamity", "World Drop" },
@@ -1824,9 +1825,9 @@ ns.BiSData = {
                         { 193759, "Egg Tender's Leggings", "Mythic+ Dungeon - Ruby Life Pools" },
                     },
                     [8] = {
-                        { 251125, "Felsoaked Soles", "Mythic+ Dungeon - Murder Row" },
+                        { 271440, "Greaves of the Noxious Depths", "World Drop" },
                         { 251145, "Forgotten Tribe Footguards", "Mythic+ Dungeon - Den of Nalorakk" },
-                        { 159388, "Sabatons of Coruscating Energy", "Mythic+ Dungeon - Temple of Sethraliss" },
+                        { 251125, "Felsoaked Soles", "Mythic+ Dungeon - Murder Row" },
                     },
                     [9] = {
                         { 244584, "Farstrider's Plated Bracers", "Crafted" },
@@ -1836,31 +1837,30 @@ ns.BiSData = {
                     [10] = {
                         { 271502, "Calamitous Echo's Ebon Greathorns", "Tier Set token" },
                         { 268238, "Grips of Swirling Fury", "Raid drop" },
-                        { 272249, "Galerider's Chain Clasps", "World Drop" },
+                        { 251152, "Season's Turn Gauntlets", "Mythic+ Dungeon - Den of Nalorakk" },
                     },
                     [11] = {
-                        { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
                         { 159459, "Ritual Binder's Ring", "Mythic+ Dungeon - Kings' Rest" },
+                        { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
                         { 251148, "Pilfered Precious Band", "Mythic+ Dungeon - Den of Nalorakk" },
                     },
                     [13] = {
                         { 270162, "Soulcoiler Ritual Vessel", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
                         { 270164, "Gebbo's Bottomless Bag", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
-                        { 250214, "Lightspire Core", "Mythic+ Dungeon - The Blinding Vale" },
+                        { 270167, "Wavecaller's Seastone", "Raid drop" },
                     },
                     [15] = {
-                        { 272230, "Pledgebearer's Pall", "World Drop" },
                         { 193763, "Fireproof Drape", "Mythic+ Dungeon - Ruby Life Pools" },
-                        { 251190, "Bloodthorn Burnous", "Mythic+ Dungeon - The Blinding Vale" },
+                        { 239656, "Adherent's Silken Shroud", "Crafted" },
+                        { 272230, "Pledgebearer's Pall", "World Drop" },
                     },
                     [16] = {
                         { 271092, "Jan'thrazet, the Soul Fang", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 268203, "Hexing Spiritrender", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
                     },
                     [17] = {
                         { 245769, "Aln'hara Lantern", "Crafted" },
+                        { 193766, "Kokia's Burnout Rod", "Mythic+ Dungeon - Ruby Life Pools" },
                         { 268263, "Frostscale's Mystic Frond", "Raid drop" },
-                        { 273779, "Nocuous Focal Fang", "Mythic+ Dungeon - Altar of Fangs" },
                     },
                 },
             },
@@ -1872,8 +1872,8 @@ ns.BiSData = {
                 raid = {
                     [1] = {
                         { 271492, "Skulking Viper's Weeping Fangs", "Tier Set token" },
+                        { 268230, "Crown of the Eternal Fang", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
                         { 239035, "Sethraliss' Fanged Helm", "Mythic+ Dungeon - Temple of Sethraliss" },
-                        { 251220, "Voidscarred Crown", "Mythic+ Dungeon - Voidscar Arena" },
                     },
                     [2] = {
                         { 268265, "Aqirbane Reliquary", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
@@ -1882,13 +1882,13 @@ ns.BiSData = {
                     },
                     [3] = {
                         { 271490, "Jaws of the Skulking Viper", "Tier Set token" },
-                        { 239049, "Spaulders of Prime Emperor", "Mythic+ Dungeon - Kings' Rest" },
+                        { 268231, "Soulslither Spaulders", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
                         { 251131, "Jangling Felpaulets", "Mythic+ Dungeon - Murder Row" },
                     },
                     [5] = {
                         { 271495, "Skulking Viper's Scuteplate", "Tier Set token" },
                         { 271876, "Awoken Dreadfang Cuirass", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 251233, "Manipulator's Vest", "Mythic+ Dungeon - Voidscar Arena" },
+                        { 239034, "Corrupted Hexxer's Vestments", "Mythic+ Dungeon - Temple of Sethraliss" },
                     },
                     [6] = {
                         { 244581, "Farstrider's Trophy Belt", "Crafted" },
@@ -1922,8 +1922,8 @@ ns.BiSData = {
                     },
                     [13] = {
                         { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 270165, "Keeper's Seething Core", "Raid drop - The Venomous Abyss - Boss 2 - Entombed Sentinels" },
                         { 270173, "Zul'jin's Guillotine Technique", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
+                        { 270165, "Keeper's Seething Core", "Raid drop - The Venomous Abyss - Boss 2 - Entombed Sentinels" },
                     },
                     [15] = {
                         { 251132, "Speakeasy Shroud", "Mythic+ Dungeon - Murder Row" },
@@ -1939,58 +1939,56 @@ ns.BiSData = {
                 mythicplus = {
                     [1] = {
                         { 271492, "Skulking Viper's Weeping Fangs", "Tier Set token" },
-                        { 268230, "Crown of the Eternal Fang", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
+                        { 271441, "Crushing Coiler Coif", "World Drop" },
                         { 193765, "Blazebound Lieutenant's Helm", "Mythic+ Dungeon - Ruby Life Pools" },
                     },
                     [2] = {
                         { 268265, "Aqirbane Reliquary", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                         { 251234, "Graft of the Domanaar", "Mythic+ Dungeon - Voidscar Arena" },
-                        { 272228, "Whispering Periapt", "World Drop" },
+                        { 271638, "Bound Serpent's Jade Eye", "World Drop" },
                     },
                     [3] = {
                         { 271490, "Jaws of the Skulking Viper", "Tier Set token" },
                         { 251131, "Jangling Felpaulets", "Mythic+ Dungeon - Murder Row" },
-                        { 272252, "Galerider's Mantle", "World Drop" },
+                        { 275511, "Preyhunter's Rugged Shoulderguards", "World Drop" },
                     },
                     [5] = {
                         { 271495, "Skulking Viper's Scuteplate", "Tier Set token" },
-                        { 251233, "Manipulator's Vest", "Mythic+ Dungeon - Voidscar Arena" },
                         { 271876, "Awoken Dreadfang Cuirass", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                     },
                     [6] = {
-                        { 244581, "Farstrider's Trophy Belt", "Crafted" },
                         { 251155, "Tribal Defender's Cord", "Mythic+ Dungeon - Den of Nalorakk" },
+                        { 244581, "Farstrider's Trophy Belt", "Crafted" },
                         { 268216, "Cursed Reliquary Cincture", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
                     },
                     [7] = {
                         { 271491, "Skulking Viper's Coiled Legwraps", "Tier Set token" },
                         { 244582, "Farstrider's Reinforced Faulds", "Crafted" },
-                        { 268237, "Cuisses of the Uncoiled Union", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
+                        { 159375, "Legguards of the Awakening Brood", "Mythic+ Dungeon - Temple of Sethraliss" },
                     },
                     [8] = {
+                        { 271440, "Greaves of the Noxious Depths", "World Drop" },
                         { 159388, "Sabatons of Coruscating Energy", "Mythic+ Dungeon - Temple of Sethraliss" },
                         { 271494, "Skulking Viper's Tracks", "Tier Set token" },
-                        { 271440, "Greaves of the Noxious Depths", "World Drop" },
                     },
                     [9] = {
                         { 244584, "Farstrider's Plated Bracers", "Crafted" },
                         { 244568, "Thalassian Competitor's Chain Cuffs", "World Drop" },
-                        { 273775, "Hydra Scale Wristguards", "Mythic+ Dungeon - Altar of Fangs" },
+                        { 268217, "Rising Tide Wristguards", "Raid drop" },
                     },
                     [10] = {
                         { 271493, "Skulking Viper's Hidepiercers", "Tier Set token" },
-                        { 193752, "Galerattle Gauntlets", "Mythic+ Dungeon - Ruby Life Pools" },
                         { 268238, "Grips of Swirling Fury", "Raid drop" },
                     },
                     [11] = {
+                        { 268249, "Vile Alchemist's Band", "Raid drop - The Venomous Abyss - Boss 4 - Vashnik the Malignant" },
                         { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
                         { 158366, "Charged Sandstone Band", "Mythic+ Dungeon - Temple of Sethraliss" },
-                        { 251194, "Lightwarden's Bind", "Mythic+ Dungeon - The Blinding Vale" },
                     },
                     [13] = {
                         { 270164, "Gebbo's Bottomless Bag", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
                         { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 273796, "Vile Vial of Volatile Venom", "Mythic+ Dungeon - Altar of Fangs" },
+                        { 250215, "Freightrunner's Flask", "Mythic+ Dungeon - Murder Row" },
                     },
                     [15] = {
                         { 251132, "Speakeasy Shroud", "Mythic+ Dungeon - Murder Row" },
@@ -1998,8 +1996,8 @@ ns.BiSData = {
                         { 159288, "Cloak of the Restless Tribes", "Mythic+ Dungeon - Kings' Rest" },
                     },
                     [16] = {
-                        { 265337, "Aln'hara Sprigshot", "Crafted" },
                         { 268207, "Caustic Repose Greatbow", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
+                        { 265337, "Aln'hara Sprigshot", "Crafted" },
                         { 268200, "Gebbo's Backup Blaster", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
                     },
                 },
@@ -2014,7 +2012,7 @@ ns.BiSData = {
                     [2] = {
                         { 268265, "Aqirbane Reliquary", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                         { 251234, "Graft of the Domanaar", "Mythic+ Dungeon - Voidscar Arena" },
-                        { 273781, "Strand of Warding Fangs", "Mythic+ Dungeon - Altar of Fangs" },
+                        { 271638, "Bound Serpent's Jade Eye", "Raid drop - The Venomous Abyss" },
                     },
                     [3] = {
                         { 271490, "Jaws of the Skulking Viper", "Tier Set token" },
@@ -2039,7 +2037,7 @@ ns.BiSData = {
                     [8] = {
                         { 268258, "Boots of the Reckless Wayfarer", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
                         { 159388, "Sabatons of Coruscating Energy", "Mythic+ Dungeon - Temple of Sethraliss" },
-                        { 251125, "Felsoaked Soles", "Mythic+ Dungeon - Murder Row" },
+                        { 271440, "Greaves of the Noxious Depths", "Raid drop - The Venomous Abyss" },
                     },
                     [9] = {
                         { 244584, "Farstrider's Plated Bracers", "Crafted" },
@@ -2049,12 +2047,12 @@ ns.BiSData = {
                     [10] = {
                         { 271493, "Skulking Viper's Hidepiercers", "Tier Set token" },
                         { 193752, "Galerattle Gauntlets", "Mythic+ Dungeon - Ruby Life Pools" },
-                        { 244583, "Farstrider's Sharpened Claws", "Crafted" },
+                        { 268238, "Grips of Swirling Fury", "Raid drop" },
                     },
                     [11] = {
                         { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
                         { 158366, "Charged Sandstone Band", "Mythic+ Dungeon - Temple of Sethraliss" },
-                        { 268249, "Vile Alchemist's Band", "Raid drop - The Venomous Abyss - Boss 4 - Vashnik the Malignant" },
+                        { 251148, "Pilfered Precious Band", "Mythic+ Dungeon - Den of Nalorakk" },
                     },
                     [13] = {
                         { 270168, "Font of Venomous Rage", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
@@ -2064,24 +2062,24 @@ ns.BiSData = {
                     [15] = {
                         { 251132, "Speakeasy Shroud", "Mythic+ Dungeon - Murder Row" },
                         { 268248, "Amani Summoning Shawl", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
-                        { 239656, "Adherent's Silken Shroud", "Crafted" },
+                        { 193763, "Fireproof Drape", "Mythic+ Dungeon - Ruby Life Pools" },
                     },
                     [16] = {
                         { 268207, "Caustic Repose Greatbow", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 265337, "Aln'hara Sprigshot", "Crafted" },
                         { 268200, "Gebbo's Backup Blaster", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
+                        { 265337, "Aln'hara Sprigshot", "Crafted" },
                     },
                 },
                 mythicplus = {
                     [1] = {
                         { 271492, "Skulking Viper's Weeping Fangs", "Tier Set token" },
                         { 272250, "Galerider's Gaze", "World Drop" },
-                        { 251220, "Voidscarred Crown", "Mythic+ Dungeon - Voidscar Arena" },
+                        { 268230, "Crown of the Eternal Fang", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
                     },
                     [2] = {
                         { 251234, "Graft of the Domanaar", "Mythic+ Dungeon - Voidscar Arena" },
                         { 268265, "Aqirbane Reliquary", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 268251, "Amulet of the Twin Fangs", "Raid drop - The Venomous Abyss - Boss 6 - The Twin Fangs" },
+                        { 273781, "Strand of Warding Fangs", "Mythic+ Dungeon - Altar of Fangs" },
                     },
                     [3] = {
                         { 271490, "Jaws of the Skulking Viper", "Tier Set token" },
@@ -2100,13 +2098,13 @@ ns.BiSData = {
                     },
                     [7] = {
                         { 271491, "Skulking Viper's Coiled Legwraps", "Tier Set token" },
-                        { 159375, "Legguards of the Awakening Brood", "Mythic+ Dungeon - Temple of Sethraliss" },
                         { 244582, "Farstrider's Reinforced Faulds", "Crafted" },
+                        { 159375, "Legguards of the Awakening Brood", "Mythic+ Dungeon - Temple of Sethraliss" },
                     },
                     [8] = {
                         { 159388, "Sabatons of Coruscating Energy", "Mythic+ Dungeon - Temple of Sethraliss" },
-                        { 268258, "Boots of the Reckless Wayfarer", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
                         { 251125, "Felsoaked Soles", "Mythic+ Dungeon - Murder Row" },
+                        { 268258, "Boots of the Reckless Wayfarer", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
                     },
                     [9] = {
                         { 244584, "Farstrider's Plated Bracers", "Crafted" },
@@ -2126,11 +2124,11 @@ ns.BiSData = {
                     [13] = {
                         { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                         { 270168, "Font of Venomous Rage", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 249806, "Radiant Plume", "Raid drop" },
+                        { 159617, "Lustrous Golden Plumage", "Mythic+ Dungeon - Kings' Rest" },
                     },
                     [15] = {
                         { 251132, "Speakeasy Shroud", "Mythic+ Dungeon - Murder Row" },
-                        { 159288, "Cloak of the Restless Tribes", "Mythic+ Dungeon - Kings' Rest" },
+                        { 268248, "Amani Summoning Shawl", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
                         { 193763, "Fireproof Drape", "Mythic+ Dungeon - Ruby Life Pools" },
                     },
                     [16] = {
@@ -2145,17 +2143,17 @@ ns.BiSData = {
                     [1] = {
                         { 271492, "Skulking Viper's Weeping Fangs", "Tier Set token" },
                         { 239035, "Sethraliss' Fanged Helm", "Mythic+ Dungeon - Temple of Sethraliss" },
-                        { 268230, "Crown of the Eternal Fang", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
+                        { 251220, "Voidscarred Crown", "Mythic+ Dungeon - Voidscar Arena" },
                     },
                     [2] = {
-                        { 251142, "Pendant of Malefic Fury", "Mythic+ Dungeon - Murder Row" },
                         { 268265, "Aqirbane Reliquary", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
+                        { 251142, "Pendant of Malefic Fury", "Mythic+ Dungeon - Murder Row" },
                         { 251234, "Graft of the Domanaar", "Mythic+ Dungeon - Voidscar Arena" },
                     },
                     [3] = {
                         { 271490, "Jaws of the Skulking Viper", "Tier Set token" },
                         { 268231, "Soulslither Spaulders", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
-                        { 251131, "Jangling Felpaulets", "Mythic+ Dungeon - Murder Row" },
+                        { 239049, "Spaulders of Prime Emperor", "Mythic+ Dungeon - Kings' Rest" },
                     },
                     [5] = {
                         { 271495, "Skulking Viper's Scuteplate", "Tier Set token" },
@@ -2164,8 +2162,8 @@ ns.BiSData = {
                     },
                     [6] = {
                         { 244581, "Farstrider's Trophy Belt", "Crafted" },
-                        { 251228, "Behemoth Waistband", "Mythic+ Dungeon - Voidscar Arena" },
                         { 268254, "Serpentine Mixing Belt", "Raid drop - The Venomous Abyss - Boss 4 - Vashnik the Malignant" },
+                        { 251228, "Behemoth Waistband", "Mythic+ Dungeon - Voidscar Arena" },
                     },
                     [7] = {
                         { 271491, "Skulking Viper's Coiled Legwraps", "Tier Set token" },
@@ -2184,8 +2182,8 @@ ns.BiSData = {
                     },
                     [10] = {
                         { 271493, "Skulking Viper's Hidepiercers", "Tier Set token" },
-                        { 268238, "Grips of Swirling Fury", "Raid drop" },
                         { 193752, "Galerattle Gauntlets", "Mythic+ Dungeon - Ruby Life Pools" },
+                        { 160213, "Sepulchral Construct's Gloves", "Mythic+ Dungeon - Kings' Rest" },
                     },
                     [11] = {
                         { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
@@ -2195,12 +2193,12 @@ ns.BiSData = {
                     [13] = {
                         { 270165, "Keeper's Seething Core", "Raid drop - The Venomous Abyss - Boss 2 - Entombed Sentinels" },
                         { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 250215, "Freightrunner's Flask", "Mythic+ Dungeon - Murder Row" },
+                        { 270173, "Zul'jin's Guillotine Technique", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
                     },
                     [15] = {
                         { 251132, "Speakeasy Shroud", "Mythic+ Dungeon - Murder Row" },
                         { 268253, "Silken Voodoo Drape", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
-                        { 193763, "Fireproof Drape", "Mythic+ Dungeon - Ruby Life Pools" },
+                        { 271487, "Shroud of the Skulking Viper", "Tier Set token" },
                     },
                     [16] = {
                         { 268215, "Abyssal Broodfiend's Bardiche", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
@@ -2221,13 +2219,13 @@ ns.BiSData = {
                     },
                     [3] = {
                         { 271490, "Jaws of the Skulking Viper", "Tier Set token" },
-                        { 249986, "Primal Sentry's Trophies", "Tier Set token" },
-                        { 268231, "Soulslither Spaulders", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
+                        { 239049, "Spaulders of Prime Emperor", "Mythic+ Dungeon - Kings' Rest" },
+                        { 251131, "Jangling Felpaulets", "Mythic+ Dungeon - Murder Row" },
                     },
                     [5] = {
                         { 271495, "Skulking Viper's Scuteplate", "Tier Set token" },
                         { 271876, "Awoken Dreadfang Cuirass", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 239046, "Loa-Blessed Chestguard", "Mythic+ Dungeon - Kings' Rest" },
+                        { 273789, "Chestguard of Corroded Scales", "Mythic+ Dungeon - Altar of Fangs" },
                     },
                     [6] = {
                         { 244581, "Farstrider's Trophy Belt", "Crafted" },
@@ -2236,43 +2234,43 @@ ns.BiSData = {
                     },
                     [7] = {
                         { 271491, "Skulking Viper's Coiled Legwraps", "Tier Set token" },
-                        { 244582, "Farstrider's Reinforced Faulds", "Crafted" },
                         { 159375, "Legguards of the Awakening Brood", "Mythic+ Dungeon - Temple of Sethraliss" },
+                        { 244582, "Farstrider's Reinforced Faulds", "Crafted" },
                     },
                     [8] = {
                         { 268233, "Ferocious Scaleboots", "Raid drop - The Venomous Abyss - Boss 5 - Sszorak" },
-                        { 159388, "Sabatons of Coruscating Energy", "Mythic+ Dungeon - Temple of Sethraliss" },
                         { 271494, "Skulking Viper's Tracks", "Tier Set token" },
+                        { 244577, "Farstrider's Razor Talons", "Crafted" },
                     },
                     [9] = {
                         { 244584, "Farstrider's Plated Bracers", "Crafted" },
-                        { 268217, "Rising Tide Wristguards", "Raid drop" },
                         { 159380, "Arc-Glass Bindings", "Mythic+ Dungeon - Temple of Sethraliss" },
+                        { 244568, "Thalassian Competitor's Chain Cuffs", "Drop" },
                     },
                     [10] = {
                         { 271493, "Skulking Viper's Hidepiercers", "Tier Set token" },
-                        { 249989, "Primal Sentry's Talonguards", "Tier Set token" },
-                        { 268238, "Grips of Swirling Fury", "Raid drop" },
+                        { 193752, "Galerattle Gauntlets", "Mythic+ Dungeon - Ruby Life Pools" },
+                        { 244583, "Farstrider's Sharpened Claws", "Crafted" },
                     },
                     [11] = {
-                        { 158366, "Charged Sandstone Band", "Mythic+ Dungeon - Temple of Sethraliss" },
                         { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
+                        { 158366, "Charged Sandstone Band", "Mythic+ Dungeon - Temple of Sethraliss" },
                         { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
                     },
                     [13] = {
-                        { 250214, "Lightspire Core", "Mythic+ Dungeon - The Blinding Vale" },
-                        { 250215, "Freightrunner's Flask", "Mythic+ Dungeon - Murder Row" },
                         { 270173, "Zul'jin's Guillotine Technique", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
+                        { 250215, "Freightrunner's Flask", "Mythic+ Dungeon - Murder Row" },
+                        { 270165, "Keeper's Seething Core", "Raid drop - The Venomous Abyss - Boss 2 - Entombed Sentinels" },
                     },
                     [15] = {
+                        { 271487, "Shroud of the Skulking Viper", "Tier Set token" },
                         { 251190, "Bloodthorn Burnous", "Mythic+ Dungeon - The Blinding Vale" },
                         { 268253, "Silken Voodoo Drape", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
-                        { 239656, "Adherent's Silken Shroud", "Crafted" },
                     },
                     [16] = {
                         { 268215, "Abyssal Broodfiend's Bardiche", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 268199, "Tidepiercer's Bubble Popper", "Raid drop" },
                         { 268213, "Maze-roa, Warlord's Fury", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
+                        { 268199, "Tidepiercer's Bubble Popper", "Raid drop" },
                     },
                 },
             },
@@ -2295,7 +2293,7 @@ ns.BiSData = {
                     [3] = {
                         { 271562, "Primal Leywarden's Manaflux", "Tier Set token" },
                         { 268241, "Ornaments of the Eternal Coil", "Raid drop - The Venomous Abyss - Boss 6 - The Twin Fangs" },
-                        { 251227, "Poisoner's Pauldrons", "Mythic+ Dungeon - Voidscar Arena" },
+                        { 239650, "Martyr's Mantle", "Crafted" },
                     },
                     [5] = {
                         { 271567, "Crest of the Primal Leywarden", "Tier Set token" },
@@ -2309,13 +2307,13 @@ ns.BiSData = {
                     },
                     [7] = {
                         { 271563, "Primal Leywarden's Tailored Legwraps", "Tier Set token" },
+                        { 239651, "Martyr's Leggings", "Crafted" },
                         { 268236, "Initiate's Sacrificial Tights", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
-                        { 273786, "Leggings of Entwined Serpents", "Mythic+ Dungeon - Altar of Fangs" },
                     },
                     [8] = {
-                        { 251219, "Riftworn Stompers", "Mythic+ Dungeon - Voidscar Arena" },
                         { 159243, "Sandals of Wise Voodoo", "Mythic+ Dungeon - Kings' Rest" },
-                        { 159259, "Sandswept Sandals", "Mythic+ Dungeon - Temple of Sethraliss" },
+                        { 271435, "Slippers of the Hissing Cult", "Raid drop - The Venomous Abyss" },
+                        { 251219, "Riftworn Stompers", "Mythic+ Dungeon - Voidscar Arena" },
                     },
                     [9] = {
                         { 239648, "Martyr's Bindings", "Crafted" },
@@ -2324,13 +2322,13 @@ ns.BiSData = {
                     },
                     [10] = {
                         { 271565, "Primal Leywarden's Manashapers", "Tier Set token" },
-                        { 251129, "Counterfeit Clutches", "Mythic+ Dungeon - Murder Row" },
-                        { 159247, "Handwraps of Oscillating Polarity", "Mythic+ Dungeon - Temple of Sethraliss" },
+                        { 268243, "Grasps of the Eternal Shadow", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
+                        { 239653, "Martyr's Gloves", "Crafted" },
                     },
                     [11] = {
                         { 251148, "Pilfered Precious Band", "Mythic+ Dungeon - Den of Nalorakk" },
+                        { 268266, "Alluring Bubbleband", "Raid drop" },
                         { 159459, "Ritual Binder's Ring", "Mythic+ Dungeon - Kings' Rest" },
-                        { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
                     },
                     [13] = {
                         { 250215, "Freightrunner's Flask", "Mythic+ Dungeon - Murder Row" },
@@ -2338,55 +2336,54 @@ ns.BiSData = {
                         { 270167, "Wavecaller's Seastone", "Raid drop" },
                     },
                     [15] = {
-                        { 251132, "Speakeasy Shroud", "Mythic+ Dungeon - Murder Row" },
                         { 193763, "Fireproof Drape", "Mythic+ Dungeon - Ruby Life Pools" },
-                        { 159288, "Cloak of the Restless Tribes", "Mythic+ Dungeon - Kings' Rest" },
+                        { 251132, "Speakeasy Shroud", "Mythic+ Dungeon - Murder Row" },
+                        { 268248, "Amani Summoning Shawl", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
                     },
                     [16] = {
-                        { 273778, "Polished Lightwood Channeler", "Mythic+ Dungeon - Altar of Fangs" },
                         { 271092, "Jan'thrazet, the Soul Fang", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
+                        { 273778, "Polished Lightwood Channeler", "Mythic+ Dungeon - Altar of Fangs" },
                     },
                     [17] = {
                         { 245769, "Aln'hara Lantern", "Crafted" },
                         { 268197, "Spine of the Hissing Abyss", "Raid drop - The Venomous Abyss - Boss 2 - Entombed Sentinels" },
-                        { 159667, "Vessel of Last Rites", "Mythic+ Dungeon - Kings' Rest" },
+                        { 268263, "Frostscale's Mystic Frond", "Raid drop" },
                     },
                 },
                 mythicplus = {
                     [1] = {
                         { 271564, "Crown of the Primal Leywarden", "Tier Set token" },
-                        { 271874, "Venomkeeper's Horrific Cowl", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                         { 268242, "Errant Scrollsage's Hood", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
+                        { 271874, "Venomkeeper's Horrific Cowl", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                     },
                     [2] = {
                         { 268265, "Aqirbane Reliquary", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                         { 273781, "Strand of Warding Fangs", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 251173, "Yoke of the Charging Bear", "Mythic+ Dungeon - Den of Nalorakk" },
+                        { 271638, "Bound Serpent's Jade Eye", "World Drop" },
                     },
                     [3] = {
                         { 271562, "Primal Leywarden's Manaflux", "Tier Set token" },
                         { 271434, "Venom Rite Mantle", "World Drop" },
-                        { 239031, "Brood Cleanser's Amice", "Mythic+ Dungeon - Temple of Sethraliss" },
                     },
                     [5] = {
                         { 271567, "Crest of the Primal Leywarden", "Tier Set token" },
                         { 239655, "Martyr's Vestments", "Crafted" },
-                        { 251139, "Summoner's Searing Shirt", "Mythic+ Dungeon - Murder Row" },
+                        { 273785, "Primordial Robe of Rites", "Mythic+ Dungeon - Altar of Fangs" },
                     },
                     [6] = {
-                        { 251222, "Ethereal Netherwrap", "Mythic+ Dungeon - Voidscar Arena" },
                         { 268232, "Cincture of the Abyssal Grotto", "Raid drop" },
                         { 268257, "Caustic Chain-Wrapped Sash", "Raid drop - The Venomous Abyss - Boss 5 - Sszorak" },
+                        { 251222, "Ethereal Netherwrap", "Mythic+ Dungeon - Voidscar Arena" },
                     },
                     [7] = {
                         { 271563, "Primal Leywarden's Tailored Legwraps", "Tier Set token" },
-                        { 268236, "Initiate's Sacrificial Tights", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
                         { 251160, "Forest Dream Leg-guards", "Mythic+ Dungeon - Den of Nalorakk" },
+                        { 268236, "Initiate's Sacrificial Tights", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
                     },
                     [8] = {
                         { 271435, "Slippers of the Hissing Cult", "World Drop" },
                         { 159243, "Sandals of Wise Voodoo", "Mythic+ Dungeon - Kings' Rest" },
-                        { 159259, "Sandswept Sandals", "Mythic+ Dungeon - Temple of Sethraliss" },
+                        { 268255, "Cackling Soultreads", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
                     },
                     [9] = {
                         { 239648, "Martyr's Bindings", "Crafted" },
@@ -2401,7 +2398,7 @@ ns.BiSData = {
                     [11] = {
                         { 251148, "Pilfered Precious Band", "Mythic+ Dungeon - Den of Nalorakk" },
                         { 159459, "Ritual Binder's Ring", "Mythic+ Dungeon - Kings' Rest" },
-                        { 268266, "Alluring Bubbleband", "Raid drop" },
+                        { 268252, "Apex Brute's Claw Ring", "Raid drop - The Venomous Abyss - Boss 5 - Sszorak" },
                     },
                     [13] = {
                         { 250215, "Freightrunner's Flask", "Mythic+ Dungeon - Murder Row" },
@@ -2411,7 +2408,7 @@ ns.BiSData = {
                     [15] = {
                         { 193763, "Fireproof Drape", "Mythic+ Dungeon - Ruby Life Pools" },
                         { 268248, "Amani Summoning Shawl", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
-                        { 271559, "Spellcloak of the Primal Leywarden", "World Drop" },
+                        { 271559, "Spellcloak of the Primal Leywarden", "Tier Set token" },
                     },
                     [16] = {
                         { 271092, "Jan'thrazet, the Soul Fang", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
@@ -2427,7 +2424,7 @@ ns.BiSData = {
                     [1] = {
                         { 271564, "Crown of the Primal Leywarden", "Tier Set token" },
                         { 271874, "Venomkeeper's Horrific Cowl", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 268242, "Errant Scrollsage's Hood", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
+                        { 251232, "Overseer's Diadem", "Mythic+ Dungeon - Voidscar Arena" },
                     },
                     [2] = {
                         { 268265, "Aqirbane Reliquary", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
@@ -2437,20 +2434,22 @@ ns.BiSData = {
                     [3] = {
                         { 271562, "Primal Leywarden's Manaflux", "Tier Set token" },
                         { 268241, "Ornaments of the Eternal Coil", "Raid drop - The Venomous Abyss - Boss 6 - The Twin Fangs" },
+                        { 239650, "Martyr's Mantle", "Crafted" },
                     },
                     [5] = {
                         { 271567, "Crest of the Primal Leywarden", "Tier Set token" },
-                        { 251139, "Summoner's Searing Shirt", "Mythic+ Dungeon - Murder Row" },
+                        { 273785, "Primordial Robe of Rites", "Mythic+ Dungeon - Altar of Fangs" },
                         { 239655, "Martyr's Vestments", "Crafted" },
                     },
                     [6] = {
                         { 268257, "Caustic Chain-Wrapped Sash", "Raid drop - The Venomous Abyss - Boss 5 - Sszorak" },
                         { 193691, "Sky Saddle Cord", "Mythic+ Dungeon - Ruby Life Pools" },
-                        { 251185, "Lightblossom Cinch", "Mythic+ Dungeon - The Blinding Vale" },
+                        { 239649, "Martyr's Waistwrap", "Crafted" },
                     },
                     [7] = {
                         { 271563, "Primal Leywarden's Tailored Legwraps", "Tier Set token" },
                         { 268236, "Initiate's Sacrificial Tights", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
+                        { 239651, "Martyr's Leggings", "Crafted" },
                     },
                     [8] = {
                         { 268255, "Cackling Soultreads", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
@@ -2460,55 +2459,57 @@ ns.BiSData = {
                     [9] = {
                         { 239648, "Martyr's Bindings", "Crafted" },
                         { 251127, "Nibbling Armbands", "Mythic+ Dungeon - Murder Row" },
-                        { 268228, "Venom-Singed Cuffs", "Raid drop - The Venomous Abyss - Boss 2 - Entombed Sentinels" },
+                        { 159263, "Bindings of the Slithering Current", "Mythic+ Dungeon - Temple of Sethraliss" },
                     },
                     [10] = {
                         { 271565, "Primal Leywarden's Manashapers", "Tier Set token" },
                         { 251129, "Counterfeit Clutches", "Mythic+ Dungeon - Murder Row" },
-                        { 273773, "Handwraps of Blasphemous Rites", "Mythic+ Dungeon - Altar of Fangs" },
+                        { 268243, "Grasps of the Eternal Shadow", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
                     },
                     [11] = {
-                        { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
                         { 159459, "Ritual Binder's Ring", "Mythic+ Dungeon - Kings' Rest" },
+                        { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
                         { 268266, "Alluring Bubbleband", "Raid drop" },
                     },
                     [13] = {
                         { 273796, "Vile Vial of Volatile Venom", "Mythic+ Dungeon - Altar of Fangs" },
                         { 270164, "Gebbo's Bottomless Bag", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
-                        { 270168, "Font of Venomous Rage", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
+                        { 270167, "Wavecaller's Seastone", "Raid drop" },
                     },
                     [15] = {
                         { 251190, "Bloodthorn Burnous", "Mythic+ Dungeon - The Blinding Vale" },
-                        { 251132, "Speakeasy Shroud", "Mythic+ Dungeon - Murder Row" },
+                        { 159288, "Cloak of the Restless Tribes", "Mythic+ Dungeon - Kings' Rest" },
                         { 268253, "Silken Voodoo Drape", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
                     },
                     [16] = {
-                        { 268203, "Hexing Spiritrender", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
+                        { 271092, "Jan'thrazet, the Soul Fang", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                         { 273778, "Polished Lightwood Channeler", "Mythic+ Dungeon - Altar of Fangs" },
                     },
                     [17] = {
                         { 245769, "Aln'hara Lantern", "Crafted" },
+                        { 268197, "Spine of the Hissing Abyss", "Raid drop - The Venomous Abyss - Boss 2 - Entombed Sentinels" },
+                        { 159667, "Vessel of Last Rites", "Mythic+ Dungeon - Kings' Rest" },
                     },
                 },
                 mythicplus = {
                     [1] = {
                         { 271564, "Crown of the Primal Leywarden", "Tier Set token" },
                         { 271874, "Venomkeeper's Horrific Cowl", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 251232, "Overseer's Diadem", "Mythic+ Dungeon - Voidscar Arena" },
+                        { 239047, "Headdress of the First Empire", "Mythic+ Dungeon - Kings' Rest" },
                     },
                     [2] = {
                         { 251142, "Pendant of Malefic Fury", "Mythic+ Dungeon - Murder Row" },
-                        { 251173, "Yoke of the Charging Bear", "Mythic+ Dungeon - Den of Nalorakk" },
-                        { 271638, "Bound Serpent's Jade Eye", "World Drop" },
+                        { 268251, "Amulet of the Twin Fangs", "Raid drop - The Venomous Abyss - Boss 6 - The Twin Fangs" },
+                        { 272228, "Whispering Periapt", "World Drop" },
                     },
                     [3] = {
                         { 271562, "Primal Leywarden's Manaflux", "Tier Set token" },
-                        { 251227, "Poisoner's Pauldrons", "Mythic+ Dungeon - Voidscar Arena" },
                         { 239031, "Brood Cleanser's Amice", "Mythic+ Dungeon - Temple of Sethraliss" },
+                        { 268241, "Ornaments of the Eternal Coil", "Raid drop - The Venomous Abyss - Boss 6 - The Twin Fangs" },
                     },
                     [5] = {
                         { 271567, "Crest of the Primal Leywarden", "Tier Set token" },
-                        { 273785, "Primordial Robe of Rites", "Mythic+ Dungeon - Altar of Fangs" },
+                        { 239655, "Martyr's Vestments", "Crafted" },
                         { 251139, "Summoner's Searing Shirt", "Mythic+ Dungeon - Murder Row" },
                     },
                     [6] = {
@@ -2518,47 +2519,47 @@ ns.BiSData = {
                     },
                     [7] = {
                         { 271563, "Primal Leywarden's Tailored Legwraps", "Tier Set token" },
-                        { 273786, "Leggings of Entwined Serpents", "Mythic+ Dungeon - Altar of Fangs" },
+                        { 275502, "Preyhunter's Refined Tights", "World Drop" },
                         { 268236, "Initiate's Sacrificial Tights", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
                     },
                     [8] = {
                         { 159243, "Sandals of Wise Voodoo", "Mythic+ Dungeon - Kings' Rest" },
                         { 251137, "Tempestuous Sandals", "Mythic+ Dungeon - Murder Row" },
-                        { 251219, "Riftworn Stompers", "Mythic+ Dungeon - Voidscar Arena" },
+                        { 268255, "Cackling Soultreads", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
                     },
                     [9] = {
                         { 239648, "Martyr's Bindings", "Crafted" },
+                        { 155945, "Shackles of the Odalisque", "World Drop" },
                         { 159263, "Bindings of the Slithering Current", "Mythic+ Dungeon - Temple of Sethraliss" },
-                        { 251154, "Winter's Embrace Bracers", "Mythic+ Dungeon - Den of Nalorakk" },
                     },
                     [10] = {
                         { 271565, "Primal Leywarden's Manashapers", "Tier Set token" },
-                        { 250061, "Voidbreaker's Gloves", "Tier Set token" },
+                        { 239653, "Martyr's Gloves", "Crafted" },
                         { 251129, "Counterfeit Clutches", "Mythic+ Dungeon - Murder Row" },
                     },
                     [11] = {
-                        { 159459, "Ritual Binder's Ring", "Mythic+ Dungeon - Kings' Rest" },
                         { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
+                        { 159459, "Ritual Binder's Ring", "Mythic+ Dungeon - Kings' Rest" },
                         { 268266, "Alluring Bubbleband", "Raid drop" },
                     },
                     [13] = {
                         { 273796, "Vile Vial of Volatile Venom", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 250144, "Emberwing Feather", "World Drop" },
+                        { 270164, "Gebbo's Bottomless Bag", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
                         { 270167, "Wavecaller's Seastone", "Raid drop" },
                     },
                     [15] = {
-                        { 251190, "Bloodthorn Burnous", "Mythic+ Dungeon - The Blinding Vale" },
                         { 159288, "Cloak of the Restless Tribes", "Mythic+ Dungeon - Kings' Rest" },
+                        { 251190, "Bloodthorn Burnous", "Mythic+ Dungeon - The Blinding Vale" },
                         { 239656, "Adherent's Silken Shroud", "Crafted" },
                     },
                     [16] = {
+                        { 271092, "Jan'thrazet, the Soul Fang", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                         { 273778, "Polished Lightwood Channeler", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 159137, "Gilded Serpent's Tooth", "Mythic+ Dungeon - Kings' Rest" },
                     },
                     [17] = {
                         { 245769, "Aln'hara Lantern", "Crafted" },
-                        { 159667, "Vessel of Last Rites", "Mythic+ Dungeon - Kings' Rest" },
                         { 251191, "Luminescent Sprout", "Mythic+ Dungeon - The Blinding Vale" },
+                        { 268263, "Frostscale's Mystic Frond", "Raid drop" },
                     },
                 },
             },
@@ -2576,12 +2577,12 @@ ns.BiSData = {
                     },
                     [3] = {
                         { 271562, "Primal Leywarden's Manaflux", "Tier Set token" },
-                        { 239031, "Brood Cleanser's Amice", "Mythic+ Dungeon - Temple of Sethraliss" },
                         { 239045, "Mantle of Ceremonial Ascension", "Mythic+ Dungeon - Kings' Rest" },
+                        { 239031, "Brood Cleanser's Amice", "Mythic+ Dungeon - Temple of Sethraliss" },
                     },
                     [5] = {
                         { 271567, "Crest of the Primal Leywarden", "Tier Set token" },
-                        { 251139, "Summoner's Searing Shirt", "Mythic+ Dungeon - Murder Row" },
+                        { 268221, "Tidebound Sorcereress's Robes", "Raid drop" },
                         { 239032, "Robes of the Reborn Serpent", "Mythic+ Dungeon - Temple of Sethraliss" },
                     },
                     [6] = {
@@ -2592,11 +2593,11 @@ ns.BiSData = {
                     [7] = {
                         { 271563, "Primal Leywarden's Tailored Legwraps", "Tier Set token" },
                         { 193750, "Wind Soarer's Breeches", "Mythic+ Dungeon - Ruby Life Pools" },
-                        { 273786, "Leggings of Entwined Serpents", "Mythic+ Dungeon - Altar of Fangs" },
+                        { 268236, "Initiate's Sacrificial Tights", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
                     },
                     [8] = {
-                        { 251137, "Tempestuous Sandals", "Mythic+ Dungeon - Murder Row" },
                         { 268218, "Nek'zali's Spiritwalkers", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
+                        { 251137, "Tempestuous Sandals", "Mythic+ Dungeon - Murder Row" },
                         { 159259, "Sandswept Sandals", "Mythic+ Dungeon - Temple of Sethraliss" },
                     },
                     [9] = {
@@ -2612,17 +2613,17 @@ ns.BiSData = {
                     [11] = {
                         { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
                         { 158366, "Charged Sandstone Band", "Mythic+ Dungeon - Temple of Sethraliss" },
-                        { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
+                        { 268252, "Apex Brute's Claw Ring", "Raid drop - The Venomous Abyss - Boss 5 - Sszorak" },
                     },
                     [13] = {
                         { 250215, "Freightrunner's Flask", "Mythic+ Dungeon - Murder Row" },
                         { 270164, "Gebbo's Bottomless Bag", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
-                        { 250224, "Mindpiercer's Sigil", "Mythic+ Dungeon - Voidscar Arena" },
+                        { 270167, "Wavecaller's Seastone", "Raid drop" },
                     },
                     [15] = {
                         { 251132, "Speakeasy Shroud", "Mythic+ Dungeon - Murder Row" },
                         { 193763, "Fireproof Drape", "Mythic+ Dungeon - Ruby Life Pools" },
-                        { 251190, "Bloodthorn Burnous", "Mythic+ Dungeon - The Blinding Vale" },
+                        { 239656, "Adherent's Silken Shroud", "Crafted" },
                     },
                     [16] = {
                         { 271092, "Jan'thrazet, the Soul Fang", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
@@ -2630,25 +2631,25 @@ ns.BiSData = {
                     },
                     [17] = {
                         { 245769, "Aln'hara Lantern", "Crafted" },
-                        { 273779, "Nocuous Focal Fang", "Mythic+ Dungeon - Altar of Fangs" },
                         { 268197, "Spine of the Hissing Abyss", "Raid drop - The Venomous Abyss - Boss 2 - Entombed Sentinels" },
+                        { 268263, "Frostscale's Mystic Frond", "Raid drop" },
                     },
                 },
                 mythicplus = {
                     [1] = {
                         { 271564, "Crown of the Primal Leywarden", "Tier Set token" },
+                        { 271874, "Venomkeeper's Horrific Cowl", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                         { 272234, "Pyrewalker's Miter", "World Drop" },
-                        { 250060, "Voidbreaker's Veil", "Tier Set token" },
                     },
                     [2] = {
-                        { 251234, "Graft of the Domanaar", "Mythic+ Dungeon - Voidscar Arena" },
                         { 268265, "Aqirbane Reliquary", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
+                        { 251234, "Graft of the Domanaar", "Mythic+ Dungeon - Voidscar Arena" },
                         { 273781, "Strand of Warding Fangs", "Mythic+ Dungeon - Altar of Fangs" },
                     },
                     [3] = {
                         { 271562, "Primal Leywarden's Manaflux", "Tier Set token" },
                         { 239031, "Brood Cleanser's Amice", "Mythic+ Dungeon - Temple of Sethraliss" },
-                        { 251227, "Poisoner's Pauldrons", "Mythic+ Dungeon - Voidscar Arena" },
+                        { 239045, "Mantle of Ceremonial Ascension", "Mythic+ Dungeon - Kings' Rest" },
                     },
                     [5] = {
                         { 271567, "Crest of the Primal Leywarden", "Tier Set token" },
@@ -2658,12 +2659,12 @@ ns.BiSData = {
                     [6] = {
                         { 239649, "Martyr's Waistwrap", "Crafted" },
                         { 251185, "Lightblossom Cinch", "Mythic+ Dungeon - The Blinding Vale" },
-                        { 251222, "Ethereal Netherwrap", "Mythic+ Dungeon - Voidscar Arena" },
+                        { 193691, "Sky Saddle Cord", "Mythic+ Dungeon - Ruby Life Pools" },
                     },
                     [7] = {
                         { 271563, "Primal Leywarden's Tailored Legwraps", "Tier Set token" },
                         { 159234, "Down-Lined Breeches", "Mythic+ Dungeon - Kings' Rest" },
-                        { 273786, "Leggings of Entwined Serpents", "Mythic+ Dungeon - Altar of Fangs" },
+                        { 268236, "Initiate's Sacrificial Tights", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
                     },
                     [8] = {
                         { 251219, "Riftworn Stompers", "Mythic+ Dungeon - Voidscar Arena" },
@@ -2672,8 +2673,8 @@ ns.BiSData = {
                     },
                     [9] = {
                         { 239648, "Martyr's Bindings", "Crafted" },
-                        { 251154, "Winter's Embrace Bracers", "Mythic+ Dungeon - Den of Nalorakk" },
                         { 268228, "Venom-Singed Cuffs", "Raid drop - The Venomous Abyss - Boss 2 - Entombed Sentinels" },
+                        { 251154, "Winter's Embrace Bracers", "Mythic+ Dungeon - Den of Nalorakk" },
                     },
                     [10] = {
                         { 271565, "Primal Leywarden's Manashapers", "Tier Set token" },
@@ -2682,13 +2683,13 @@ ns.BiSData = {
                     },
                     [11] = {
                         { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
-                        { 158366, "Charged Sandstone Band", "Mythic+ Dungeon - Temple of Sethraliss" },
                         { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
+                        { 158366, "Charged Sandstone Band", "Mythic+ Dungeon - Temple of Sethraliss" },
                     },
                     [13] = {
                         { 250215, "Freightrunner's Flask", "Mythic+ Dungeon - Murder Row" },
                         { 270164, "Gebbo's Bottomless Bag", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
-                        { 250224, "Mindpiercer's Sigil", "Mythic+ Dungeon - Voidscar Arena" },
+                        { 270167, "Wavecaller's Seastone", "Raid drop" },
                     },
                     [15] = {
                         { 251132, "Speakeasy Shroud", "Mythic+ Dungeon - Murder Row" },
@@ -2697,12 +2698,12 @@ ns.BiSData = {
                     },
                     [16] = {
                         { 273778, "Polished Lightwood Channeler", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 237843, "Magister's Mana Sword", "Crafted" },
+                        { 271092, "Jan'thrazet, the Soul Fang", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                     },
                     [17] = {
                         { 245769, "Aln'hara Lantern", "Crafted" },
                         { 273779, "Nocuous Focal Fang", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 268263, "Frostscale's Mystic Frond", "Raid drop" },
+                        { 251191, "Luminescent Sprout", "Mythic+ Dungeon - The Blinding Vale" },
                     },
                 },
             },
@@ -2715,7 +2716,7 @@ ns.BiSData = {
                     [1] = {
                         { 271519, "Monkey King's Unyielding Visage", "Tier Set token" },
                         { 271875, "Gaze of the Coiled Watcher", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 193751, "Crown of Roaring Storms", "Mythic+ Dungeon - Ruby Life Pools" },
+                        { 268219, "Shadow Hunter's Warmask", "Raid drop - The Venomous Abyss - Boss 2 - Entombed Sentinels" },
                     },
                     [2] = {
                         { 268265, "Aqirbane Reliquary", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
@@ -2740,12 +2741,12 @@ ns.BiSData = {
                     [7] = {
                         { 271518, "Pantaloons of the Monkey King", "Tier Set token" },
                         { 251130, "Breeches of Deft Deals", "Mythic+ Dungeon - Murder Row" },
-                        { 159329, "Leggings of the Galeforce Viper", "Mythic+ Dungeon - Temple of Sethraliss" },
+                        { 251198, "Lightspore Leggings", "Mythic+ Dungeon - The Blinding Vale" },
                     },
                     [8] = {
                         { 244569, "Silvermoon Agent's Sneakers", "Crafted" },
-                        { 159304, "Goldfeather Boots", "Mythic+ Dungeon - Kings' Rest" },
                         { 159327, "Sand-Shined Snakeskin Sandals", "Mythic+ Dungeon - Temple of Sethraliss" },
+                        { 159304, "Goldfeather Boots", "Mythic+ Dungeon - Kings' Rest" },
                     },
                     [9] = {
                         { 244576, "Silvermoon Agent's Deflectors", "Crafted" },
@@ -2754,8 +2755,8 @@ ns.BiSData = {
                     },
                     [10] = {
                         { 271520, "Monkey King's Fighting Fists", "Tier Set token" },
-                        { 159312, "Desiccator's Blessed Gloves", "Mythic+ Dungeon - Kings' Rest" },
                         { 193758, "Subjugator's Chilling Grips", "Mythic+ Dungeon - Ruby Life Pools" },
+                        { 159312, "Desiccator's Blessed Gloves", "Mythic+ Dungeon - Kings' Rest" },
                     },
                     [11] = {
                         { 251513, "Loa Worshiper's Band", "Crafted" },
@@ -2763,8 +2764,8 @@ ns.BiSData = {
                         { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
                     },
                     [13] = {
-                        { 250245, "Tumor of the Swarm", "Mythic+ Dungeon - Voidscar Arena" },
                         { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
+                        { 250245, "Tumor of the Swarm", "Mythic+ Dungeon - Voidscar Arena" },
                         { 270168, "Font of Venomous Rage", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                     },
                     [15] = {
@@ -2774,15 +2775,15 @@ ns.BiSData = {
                     },
                     [16] = {
                         { 268215, "Abyssal Broodfiend's Bardiche", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 245771, "Aln'hara Pikestaff", "Crafted" },
                         { 268199, "Tidepiercer's Bubble Popper", "Raid drop" },
+                        { 237847, "Blood Knight's Impetus", "Crafted" },
                     },
                 },
                 mythicplus = {
                     [1] = {
                         { 271519, "Monkey King's Unyielding Visage", "Tier Set token" },
+                        { 193751, "Crown of Roaring Storms", "Mythic+ Dungeon - Ruby Life Pools" },
                         { 271438, "Temple Delver's Mystic Helm", "World Drop" },
-                        { 239033, "Hood of the Slithering Loa", "Mythic+ Dungeon - Temple of Sethraliss" },
                     },
                     [2] = {
                         { 251234, "Graft of the Domanaar", "Mythic+ Dungeon - Voidscar Arena" },
@@ -2796,12 +2797,11 @@ ns.BiSData = {
                     [5] = {
                         { 271522, "Battle Gi of the Monkey King", "Tier Set token" },
                         { 239048, "Vest of Reverent Adoration", "Mythic+ Dungeon - Kings' Rest" },
-                        { 193764, "Invader's Firestorm Chestguard", "Mythic+ Dungeon - Ruby Life Pools" },
                     },
                     [6] = {
                         { 251189, "Rootwalker Harness", "Mythic+ Dungeon - The Blinding Vale" },
                         { 268227, "Unpossessed Skullsash", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
-                        { 268286, "Sash of the Putrid Giant", "Raid drop" },
+                        { 271436, "Slitherscale Girdle", "World Drop" },
                     },
                     [7] = {
                         { 271518, "Pantaloons of the Monkey King", "Tier Set token" },
@@ -2809,19 +2809,19 @@ ns.BiSData = {
                         { 159329, "Leggings of the Galeforce Viper", "Mythic+ Dungeon - Temple of Sethraliss" },
                     },
                     [8] = {
-                        { 159327, "Sand-Shined Snakeskin Sandals", "Mythic+ Dungeon - Temple of Sethraliss" },
                         { 159304, "Goldfeather Boots", "Mythic+ Dungeon - Kings' Rest" },
+                        { 159327, "Sand-Shined Snakeskin Sandals", "Mythic+ Dungeon - Temple of Sethraliss" },
                         { 244569, "Silvermoon Agent's Sneakers", "Crafted" },
                     },
                     [9] = {
                         { 159300, "Kula's Butchering Wristwraps", "Mythic+ Dungeon - Kings' Rest" },
                         { 251183, "Rootwarden Wraps", "Mythic+ Dungeon - The Blinding Vale" },
-                        { 251135, "Fury-fletched Armlets", "Mythic+ Dungeon - Murder Row" },
+                        { 244576, "Silvermoon Agent's Deflectors", "Crafted" },
                     },
                     [10] = {
                         { 271520, "Monkey King's Fighting Fists", "Tier Set token" },
                         { 193758, "Subjugator's Chilling Grips", "Mythic+ Dungeon - Ruby Life Pools" },
-                        { 159337, "Grips of Electrified Defense", "Mythic+ Dungeon - Temple of Sethraliss" },
+                        { 159312, "Desiccator's Blessed Gloves", "Mythic+ Dungeon - Kings' Rest" },
                     },
                     [11] = {
                         { 251513, "Loa Worshiper's Band", "Crafted" },
@@ -2831,12 +2831,12 @@ ns.BiSData = {
                     [13] = {
                         { 250245, "Tumor of the Swarm", "Mythic+ Dungeon - Voidscar Arena" },
                         { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 250215, "Freightrunner's Flask", "Mythic+ Dungeon - Murder Row" },
+                        { 270164, "Gebbo's Bottomless Bag", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
                     },
                     [15] = {
                         { 159288, "Cloak of the Restless Tribes", "Mythic+ Dungeon - Kings' Rest" },
                         { 251132, "Speakeasy Shroud", "Mythic+ Dungeon - Murder Row" },
-                        { 272226, "Miststalker's Shroud", "World Drop" },
+                        { 268248, "Amani Summoning Shawl", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
                     },
                     [16] = {
                         { 237847, "Blood Knight's Impetus", "Crafted" },
@@ -2854,22 +2854,23 @@ ns.BiSData = {
                     },
                     [2] = {
                         { 268265, "Aqirbane Reliquary", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 251173, "Yoke of the Charging Bear", "Mythic+ Dungeon - Den of Nalorakk" },
                         { 273781, "Strand of Warding Fangs", "Mythic+ Dungeon - Altar of Fangs" },
+                        { 251173, "Yoke of the Charging Bear", "Mythic+ Dungeon - Den of Nalorakk" },
                     },
                     [3] = {
                         { 271517, "Tassels of the Monkey King", "Tier Set token" },
                         { 251223, "Somber Spaulders", "Mythic+ Dungeon - Voidscar Arena" },
-                        { 251146, "Scavenger's Spaulders", "Mythic+ Dungeon - Den of Nalorakk" },
+                        { 273774, "Snakeskin Spaulders", "Mythic+ Dungeon - Altar of Fangs" },
                     },
                     [5] = {
                         { 271522, "Battle Gi of the Monkey King", "Tier Set token" },
                         { 251226, "Hide of Pestilence", "Mythic+ Dungeon - Voidscar Arena" },
+                        { 268235, "Vestment of the Awakening", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
                     },
                     [6] = {
-                        { 159301, "Primal Dinomancer's Belt", "Mythic+ Dungeon - Kings' Rest" },
                         { 244573, "Silvermoon Agent's Utility Belt", "Crafted" },
-                        { 268256, "Sash of the Forlorn Vessel", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
+                        { 159301, "Primal Dinomancer's Belt", "Mythic+ Dungeon - Kings' Rest" },
+                        { 271436, "Slitherscale Girdle", "Raid drop - The Venomous Abyss" },
                     },
                     [7] = {
                         { 271518, "Pantaloons of the Monkey King", "Tier Set token" },
@@ -2878,17 +2879,18 @@ ns.BiSData = {
                     },
                     [8] = {
                         { 251153, "Arctic Explorer's Legwraps", "Mythic+ Dungeon - Den of Nalorakk" },
-                        { 268261, "Bespittled Slitherslippers", "Raid drop - The Venomous Abyss - Boss 6 - The Twin Fangs" },
                         { 268247, "Breakwater Boots", "Raid drop" },
+                        { 268261, "Bespittled Slitherslippers", "Raid drop - The Venomous Abyss - Boss 6 - The Twin Fangs" },
                     },
                     [9] = {
-                        { 268240, "Restless Spirit Shackles", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
                         { 244576, "Silvermoon Agent's Deflectors", "Crafted" },
+                        { 268240, "Restless Spirit Shackles", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
                         { 251135, "Fury-fletched Armlets", "Mythic+ Dungeon - Murder Row" },
                     },
                     [10] = {
                         { 271520, "Monkey King's Fighting Fists", "Tier Set token" },
                         { 251124, "Gauntlets of Fevered Defense", "Mythic+ Dungeon - Murder Row" },
+                        { 193758, "Subjugator's Chilling Grips", "Mythic+ Dungeon - Ruby Life Pools" },
                     },
                     [11] = {
                         { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
@@ -2907,6 +2909,7 @@ ns.BiSData = {
                     },
                     [16] = {
                         { 245770, "Aln'hara Cane", "Crafted" },
+                        { 251123, "Nibbles' Training Rod", "Mythic+ Dungeon - Murder Row" },
                         { 268205, "Venomancer's Winged Channeler", "Raid drop - The Venomous Abyss - Boss 4 - Vashnik the Malignant" },
                     },
                 },
@@ -2918,32 +2921,32 @@ ns.BiSData = {
                     },
                     [2] = {
                         { 268265, "Aqirbane Reliquary", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 251173, "Yoke of the Charging Bear", "Mythic+ Dungeon - Den of Nalorakk" },
                         { 273781, "Strand of Warding Fangs", "Mythic+ Dungeon - Altar of Fangs" },
+                        { 251173, "Yoke of the Charging Bear", "Mythic+ Dungeon - Den of Nalorakk" },
                     },
                     [3] = {
                         { 271517, "Tassels of the Monkey King", "Tier Set token" },
                         { 251223, "Somber Spaulders", "Mythic+ Dungeon - Voidscar Arena" },
-                        { 250013, "Aurastones of Ra-den's Chosen", "Tier Set token" },
+                        { 268246, "Frothing Venom Spaulders", "Raid drop - The Venomous Abyss - Boss 4 - Vashnik the Malignant" },
                     },
                     [5] = {
                         { 271522, "Battle Gi of the Monkey King", "Tier Set token" },
                         { 251226, "Hide of Pestilence", "Mythic+ Dungeon - Voidscar Arena" },
-                        { 244570, "Silvermoon Agent's Coat", "Crafted" },
+                        { 268235, "Vestment of the Awakening", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
                     },
                     [6] = {
                         { 159301, "Primal Dinomancer's Belt", "Mythic+ Dungeon - Kings' Rest" },
-                        { 244573, "Silvermoon Agent's Utility Belt", "Crafted" },
                         { 268227, "Unpossessed Skullsash", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
+                        { 271436, "Slitherscale Girdle", "World Drop" },
                     },
                     [7] = {
                         { 271518, "Pantaloons of the Monkey King", "Tier Set token" },
                         { 251130, "Breeches of Deft Deals", "Mythic+ Dungeon - Murder Row" },
-                        { 244574, "Silvermoon Agent's Leggings", "Crafted" },
+                        { 272243, "Miststalker's Cuisses", "World Drop" },
                     },
                     [8] = {
-                        { 251153, "Arctic Explorer's Legwraps", "Mythic+ Dungeon - Den of Nalorakk" },
                         { 244569, "Silvermoon Agent's Sneakers", "Crafted" },
+                        { 268247, "Breakwater Boots", "Raid drop" },
                         { 159327, "Sand-Shined Snakeskin Sandals", "Mythic+ Dungeon - Temple of Sethraliss" },
                     },
                     [9] = {
@@ -2954,26 +2957,26 @@ ns.BiSData = {
                     [10] = {
                         { 271520, "Monkey King's Fighting Fists", "Tier Set token" },
                         { 251124, "Gauntlets of Fevered Defense", "Mythic+ Dungeon - Murder Row" },
-                        { 159337, "Grips of Electrified Defense", "Mythic+ Dungeon - Temple of Sethraliss" },
+                        { 159312, "Desiccator's Blessed Gloves", "Mythic+ Dungeon - Kings' Rest" },
                     },
                     [11] = {
-                        { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
                         { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
-                        { 159459, "Ritual Binder's Ring", "Mythic+ Dungeon - Kings' Rest" },
+                        { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
+                        { 162544, "Jade Ophidian Band", "Mythic+ Dungeon - Temple of Sethraliss" },
                     },
                     [13] = {
-                        { 249808, "Litany of Lightblind Wrath", "Raid drop" },
                         { 270162, "Soulcoiler Ritual Vessel", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
                         { 270167, "Wavecaller's Seastone", "Raid drop" },
+                        { 249808, "Litany of Lightblind Wrath", "Raid drop" },
                     },
                     [15] = {
-                        { 193763, "Fireproof Drape", "Mythic+ Dungeon - Ruby Life Pools" },
                         { 251190, "Bloodthorn Burnous", "Mythic+ Dungeon - The Blinding Vale" },
-                        { 268253, "Silken Voodoo Drape", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
+                        { 193763, "Fireproof Drape", "Mythic+ Dungeon - Ruby Life Pools" },
+                        { 268248, "Amani Summoning Shawl", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
                     },
                     [16] = {
                         { 245770, "Aln'hara Cane", "Crafted" },
-                        { 251156, "Fallen Speaker's Staff", "Mythic+ Dungeon - Den of Nalorakk" },
+                        { 268205, "Venomancer's Winged Channeler", "Raid drop - The Venomous Abyss - Boss 4 - Vashnik the Malignant" },
                         { 251123, "Nibbles' Training Rod", "Mythic+ Dungeon - Murder Row" },
                     },
                 },
@@ -2983,12 +2986,12 @@ ns.BiSData = {
                     [1] = {
                         { 271519, "Monkey King's Unyielding Visage", "Tier Set token" },
                         { 271875, "Gaze of the Coiled Watcher", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 273791, "Spare Speaker's Hood", "Mythic+ Dungeon - Altar of Fangs" },
+                        { 271438, "Temple Delver's Mystic Helm", "Raid drop - The Venomous Abyss" },
                     },
                     [2] = {
                         { 268265, "Aqirbane Reliquary", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                         { 251142, "Pendant of Malefic Fury", "Mythic+ Dungeon - Murder Row" },
-                        { 273781, "Strand of Warding Fangs", "Mythic+ Dungeon - Altar of Fangs" },
+                        { 251234, "Graft of the Domanaar", "Mythic+ Dungeon - Voidscar Arena" },
                     },
                     [3] = {
                         { 271517, "Tassels of the Monkey King", "Tier Set token" },
@@ -2997,8 +3000,8 @@ ns.BiSData = {
                     },
                     [5] = {
                         { 271522, "Battle Gi of the Monkey King", "Tier Set token" },
+                        { 244570, "Silvermoon Agent's Coat", "Crafted" },
                         { 268235, "Vestment of the Awakening", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
-                        { 251159, "War Trial Vestments", "Mythic+ Dungeon - Den of Nalorakk" },
                     },
                     [6] = {
                         { 268256, "Sash of the Forlorn Vessel", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
@@ -3012,8 +3015,8 @@ ns.BiSData = {
                     },
                     [8] = {
                         { 244569, "Silvermoon Agent's Sneakers", "Crafted" },
-                        { 251153, "Arctic Explorer's Legwraps", "Mythic+ Dungeon - Den of Nalorakk" },
                         { 159327, "Sand-Shined Snakeskin Sandals", "Mythic+ Dungeon - Temple of Sethraliss" },
+                        { 251153, "Arctic Explorer's Legwraps", "Mythic+ Dungeon - Den of Nalorakk" },
                     },
                     [9] = {
                         { 244576, "Silvermoon Agent's Deflectors", "Crafted" },
@@ -3022,27 +3025,27 @@ ns.BiSData = {
                     },
                     [10] = {
                         { 271520, "Monkey King's Fighting Fists", "Tier Set token" },
-                        { 251124, "Gauntlets of Fevered Defense", "Mythic+ Dungeon - Murder Row" },
                         { 268234, "Ruthless Slaughtergrips", "Raid drop - The Venomous Abyss - Boss 5 - Sszorak" },
+                        { 251124, "Gauntlets of Fevered Defense", "Mythic+ Dungeon - Murder Row" },
                     },
                     [11] = {
                         { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
                         { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
-                        { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
+                        { 158366, "Charged Sandstone Band", "Mythic+ Dungeon - Temple of Sethraliss" },
                     },
                     [13] = {
                         { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                         { 270173, "Zul'jin's Guillotine Technique", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
-                        { 250215, "Freightrunner's Flask", "Mythic+ Dungeon - Murder Row" },
+                        { 270165, "Keeper's Seething Core", "Raid drop - The Venomous Abyss - Boss 2 - Entombed Sentinels" },
                     },
                     [15] = {
                         { 251132, "Speakeasy Shroud", "Mythic+ Dungeon - Murder Row" },
                         { 251190, "Bloodthorn Burnous", "Mythic+ Dungeon - The Blinding Vale" },
-                        { 193763, "Fireproof Drape", "Mythic+ Dungeon - Ruby Life Pools" },
+                        { 239656, "Adherent's Silken Shroud", "Crafted" },
                     },
                     [16] = {
                         { 268215, "Abyssal Broodfiend's Bardiche", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 245771, "Aln'hara Pikestaff", "Crafted" },
+                        { 268199, "Tidepiercer's Bubble Popper", "Raid drop" },
                         { 237847, "Blood Knight's Impetus", "Crafted" },
                     },
                 },
@@ -3050,7 +3053,7 @@ ns.BiSData = {
                     [1] = {
                         { 271519, "Monkey King's Unyielding Visage", "Tier Set token" },
                         { 271875, "Gaze of the Coiled Watcher", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 193751, "Crown of Roaring Storms", "Mythic+ Dungeon - Ruby Life Pools" },
+                        { 268219, "Shadow Hunter's Warmask", "Raid drop - The Venomous Abyss - Boss 2 - Entombed Sentinels" },
                     },
                     [2] = {
                         { 268265, "Aqirbane Reliquary", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
@@ -3059,23 +3062,23 @@ ns.BiSData = {
                     },
                     [3] = {
                         { 271517, "Tassels of the Monkey King", "Tier Set token" },
-                        { 251223, "Somber Spaulders", "Mythic+ Dungeon - Voidscar Arena" },
                         { 268246, "Frothing Venom Spaulders", "Raid drop - The Venomous Abyss - Boss 4 - Vashnik the Malignant" },
+                        { 251223, "Somber Spaulders", "Mythic+ Dungeon - Voidscar Arena" },
                     },
                     [5] = {
                         { 271522, "Battle Gi of the Monkey King", "Tier Set token" },
-                        { 268235, "Vestment of the Awakening", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
                         { 193764, "Invader's Firestorm Chestguard", "Mythic+ Dungeon - Ruby Life Pools" },
+                        { 244570, "Silvermoon Agent's Coat", "Crafted" },
                     },
                     [6] = {
+                        { 268227, "Unpossessed Skullsash", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
                         { 268256, "Sash of the Forlorn Vessel", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
                         { 159317, "Whirling Dervish Sash", "Mythic+ Dungeon - Temple of Sethraliss" },
-                        { 268227, "Unpossessed Skullsash", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
                     },
                     [7] = {
                         { 271518, "Pantaloons of the Monkey King", "Tier Set token" },
                         { 268225, "Coiled Hex Legguards", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
-                        { 159329, "Leggings of the Galeforce Viper", "Mythic+ Dungeon - Temple of Sethraliss" },
+                        { 251130, "Breeches of Deft Deals", "Mythic+ Dungeon - Murder Row" },
                     },
                     [8] = {
                         { 244569, "Silvermoon Agent's Sneakers", "Crafted" },
@@ -3099,18 +3102,18 @@ ns.BiSData = {
                     },
                     [13] = {
                         { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 250228, "Resonant Bellowstone", "Mythic+ Dungeon - Murder Row" },
                         { 270173, "Zul'jin's Guillotine Technique", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
+                        { 270165, "Keeper's Seething Core", "Raid drop - The Venomous Abyss - Boss 2 - Entombed Sentinels" },
                     },
                     [15] = {
                         { 251190, "Bloodthorn Burnous", "Mythic+ Dungeon - The Blinding Vale" },
                         { 251132, "Speakeasy Shroud", "Mythic+ Dungeon - Murder Row" },
-                        { 193763, "Fireproof Drape", "Mythic+ Dungeon - Ruby Life Pools" },
+                        { 239656, "Adherent's Silken Shroud", "Crafted" },
                     },
                     [16] = {
                         { 268215, "Abyssal Broodfiend's Bardiche", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 237847, "Blood Knight's Impetus", "Crafted" },
                         { 245771, "Aln'hara Pikestaff", "Crafted" },
+                        { 237847, "Blood Knight's Impetus", "Crafted" },
                     },
                 },
             },
@@ -3123,7 +3126,7 @@ ns.BiSData = {
                     [1] = {
                         { 271465, "Warhelm of the Consecrated Flame", "Tier Set token" },
                         { 237832, "Spellbreaker's Cover", "Crafted" },
-                        { 251229, "Visor of the Predator", "Mythic+ Dungeon - Voidscar Arena" },
+                        { 251126, "Greathelm of Temptation", "Mythic+ Dungeon - Murder Row" },
                     },
                     [2] = {
                         { 268265, "Aqirbane Reliquary", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
@@ -3140,8 +3143,8 @@ ns.BiSData = {
                     },
                     [6] = {
                         { 159418, "Girdle of Pestilent Purification", "Mythic+ Dungeon - Kings' Rest" },
-                        { 159442, "Sand-Scoured Greatbelt", "Mythic+ Dungeon - Temple of Sethraliss" },
                         { 268259, "Girdle of Toxic Regret", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
+                        { 237830, "Spellbreaker's Girdle", "Crafted" },
                     },
                     [7] = {
                         { 271464, "Greaves of the Consecrated Flame", "Tier Set token" },
@@ -3150,12 +3153,12 @@ ns.BiSData = {
                     },
                     [8] = {
                         { 268260, "Scaled Fiend's Warboots", "Raid drop - The Venomous Abyss - Boss 4 - Vashnik the Malignant" },
-                        { 273777, "Poison-Proof Stompers", "Mythic+ Dungeon - Altar of Fangs" },
+                        { 237828, "Spellbreaker's March", "Crafted" },
                         { 268245, "Entombed Cultist's Sabatons", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
                     },
                     [9] = {
-                        { 268239, "Shellbound Bracers", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
                         { 237834, "Spellbreaker's Bracers", "Crafted" },
+                        { 268239, "Shellbound Bracers", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
                         { 251133, "Overseer's Vambraces", "Mythic+ Dungeon - Murder Row" },
                     },
                     [10] = {
@@ -3173,8 +3176,8 @@ ns.BiSData = {
                         { 250214, "Lightspire Core", "Mythic+ Dungeon - The Blinding Vale" },
                     },
                     [15] = {
-                        { 251132, "Speakeasy Shroud", "Mythic+ Dungeon - Murder Row" },
                         { 251190, "Bloodthorn Burnous", "Mythic+ Dungeon - The Blinding Vale" },
+                        { 251132, "Speakeasy Shroud", "Mythic+ Dungeon - Murder Row" },
                         { 193763, "Fireproof Drape", "Mythic+ Dungeon - Ruby Life Pools" },
                     },
                     [16] = {
@@ -3191,42 +3194,42 @@ ns.BiSData = {
                     [1] = {
                         { 271465, "Warhelm of the Consecrated Flame", "Tier Set token" },
                         { 239050, "Helm of the Raptor King", "Mythic+ Dungeon - Kings' Rest" },
-                        { 251229, "Visor of the Predator", "Mythic+ Dungeon - Voidscar Arena" },
+                        { 268229, "Skullguard of the Risen Sacrifice", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
                     },
                     [2] = {
                         { 268265, "Aqirbane Reliquary", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                         { 251173, "Yoke of the Charging Bear", "Mythic+ Dungeon - Den of Nalorakk" },
-                        { 273781, "Strand of Warding Fangs", "Mythic+ Dungeon - Altar of Fangs" },
+                        { 271638, "Bound Serpent's Jade Eye", "World Drop" },
                     },
                     [3] = {
                         { 271463, "Pauldrons of the Consecrated Flame", "Tier Set token" },
                         { 271444, "Pauldrons of the Forgotten Sacrifice", "World Drop" },
-                        { 251138, "Cinderfury Shoulderguards", "Mythic+ Dungeon - Murder Row" },
+                        { 268226, "Swelling Sea Spaulders", "Raid drop" },
                     },
                     [5] = {
                         { 271468, "Bulwark of the Consecrated Flame", "Tier Set token" },
-                        { 251193, "Taproot Ribs", "Mythic+ Dungeon - The Blinding Vale" },
                         { 237829, "Spellbreaker's Shelter", "Crafted" },
+                        { 273787, "Aged Interwoven Scaleplate", "Mythic+ Dungeon - Altar of Fangs" },
                     },
                     [6] = {
                         { 271445, "Fanged Brute's Greatbelt", "World Drop" },
+                        { 237830, "Spellbreaker's Girdle", "Crafted" },
                         { 268244, "Forgotten Grotto Girdle", "Raid drop" },
-                        { 159418, "Girdle of Pestilent Purification", "Mythic+ Dungeon - Kings' Rest" },
                     },
                     [7] = {
                         { 271464, "Greaves of the Consecrated Flame", "Tier Set token" },
                         { 271878, "Chausses of Unbound Rancor", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 273776, "Ancient General's Obsidian Pillars", "Mythic+ Dungeon - Altar of Fangs" },
+                        { 159435, "Legplates of Charged Duality", "Mythic+ Dungeon - Temple of Sethraliss" },
                     },
                     [8] = {
-                        { 273777, "Poison-Proof Stompers", "Mythic+ Dungeon - Altar of Fangs" },
                         { 237828, "Spellbreaker's March", "Crafted" },
                         { 268245, "Entombed Cultist's Sabatons", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
+                        { 273777, "Poison-Proof Stompers", "Mythic+ Dungeon - Altar of Fangs" },
                     },
                     [9] = {
                         { 237834, "Spellbreaker's Bracers", "Crafted" },
-                        { 251133, "Overseer's Vambraces", "Mythic+ Dungeon - Murder Row" },
                         { 159409, "Embalmer's Steadying Bracers", "Mythic+ Dungeon - Kings' Rest" },
+                        { 251133, "Overseer's Vambraces", "Mythic+ Dungeon - Murder Row" },
                     },
                     [10] = {
                         { 271466, "Gauntlets of the Consecrated Flame", "Tier Set token" },
@@ -3235,8 +3238,8 @@ ns.BiSData = {
                     },
                     [11] = {
                         { 159459, "Ritual Binder's Ring", "Mythic+ Dungeon - Kings' Rest" },
-                        { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
                         { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
+                        { 251148, "Pilfered Precious Band", "Mythic+ Dungeon - Den of Nalorakk" },
                     },
                     [13] = {
                         { 270162, "Soulcoiler Ritual Vessel", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
@@ -3245,17 +3248,17 @@ ns.BiSData = {
                     },
                     [15] = {
                         { 193763, "Fireproof Drape", "Mythic+ Dungeon - Ruby Life Pools" },
+                        { 239656, "Adherent's Silken Shroud", "Crafted" },
                         { 268248, "Amani Summoning Shawl", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
-                        { 251190, "Bloodthorn Burnous", "Mythic+ Dungeon - The Blinding Vale" },
                     },
                     [16] = {
                         { 237843, "Magister's Mana Sword", "Crafted" },
-                        { 273780, "Venom-Etched Crescent", "Mythic+ Dungeon - Altar of Fangs" },
                         { 268210, "Malevolent Spiritcudgel", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
+                        { 158369, "Galvanized Stormcrusher", "Mythic+ Dungeon - Temple of Sethraliss" },
                     },
                     [17] = {
-                        { 237831, "Spellbreaker's Rebuke", "Crafted" },
                         { 268196, "Venom-Slashed Scuteward", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
+                        { 268262, "Bubblefin Splash Guard", "Raid drop" },
                         { 159664, "Bulwark of Brimming Potential", "Mythic+ Dungeon - Temple of Sethraliss" },
                     },
                 },
@@ -3264,12 +3267,12 @@ ns.BiSData = {
                 raid = {
                     [1] = {
                         { 271465, "Warhelm of the Consecrated Flame", "Tier Set token" },
-                        { 251229, "Visor of the Predator", "Mythic+ Dungeon - Voidscar Arena" },
                         { 268229, "Skullguard of the Risen Sacrifice", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
+                        { 251229, "Visor of the Predator", "Mythic+ Dungeon - Voidscar Arena" },
                     },
                     [2] = {
-                        { 273781, "Strand of Warding Fangs", "Mythic+ Dungeon - Altar of Fangs" },
                         { 268265, "Aqirbane Reliquary", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
+                        { 273781, "Strand of Warding Fangs", "Mythic+ Dungeon - Altar of Fangs" },
                         { 251173, "Yoke of the Charging Bear", "Mythic+ Dungeon - Den of Nalorakk" },
                     },
                     [3] = {
@@ -3294,28 +3297,28 @@ ns.BiSData = {
                     },
                     [8] = {
                         { 237828, "Spellbreaker's March", "Crafted" },
-                        { 273777, "Poison-Proof Stompers", "Mythic+ Dungeon - Altar of Fangs" },
                         { 268245, "Entombed Cultist's Sabatons", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
+                        { 273777, "Poison-Proof Stompers", "Mythic+ Dungeon - Altar of Fangs" },
                     },
                     [9] = {
                         { 237834, "Spellbreaker's Bracers", "Crafted" },
+                        { 268239, "Shellbound Bracers", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
                         { 251133, "Overseer's Vambraces", "Mythic+ Dungeon - Murder Row" },
-                        { 159409, "Embalmer's Steadying Bracers", "Mythic+ Dungeon - Kings' Rest" },
                     },
                     [10] = {
                         { 271466, "Gauntlets of the Consecrated Flame", "Tier Set token" },
+                        { 268220, "Scaleplate Strangulators", "Raid drop - The Venomous Abyss - Boss 6 - The Twin Fangs" },
                         { 251221, "Despondent's Gauntlets", "Mythic+ Dungeon - Voidscar Arena" },
-                        { 251214, "Bonds of the Hash'ura", "Mythic+ Dungeon - Den of Nalorakk" },
                     },
                     [11] = {
                         { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
                         { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
-                        { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
+                        { 159459, "Ritual Binder's Ring", "Mythic+ Dungeon - Kings' Rest" },
                     },
                     [13] = {
-                        { 250245, "Tumor of the Swarm", "Mythic+ Dungeon - Voidscar Arena" },
                         { 270173, "Zul'jin's Guillotine Technique", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
-                        { 273796, "Vile Vial of Volatile Venom", "Mythic+ Dungeon - Altar of Fangs" },
+                        { 250245, "Tumor of the Swarm", "Mythic+ Dungeon - Voidscar Arena" },
+                        { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                     },
                     [15] = {
                         { 193763, "Fireproof Drape", "Mythic+ Dungeon - Ruby Life Pools" },
@@ -3337,62 +3340,62 @@ ns.BiSData = {
                     [1] = {
                         { 271465, "Warhelm of the Consecrated Flame", "Tier Set token" },
                         { 251229, "Visor of the Predator", "Mythic+ Dungeon - Voidscar Arena" },
-                        { 239050, "Helm of the Raptor King", "Mythic+ Dungeon - Kings' Rest" },
+                        { 268229, "Skullguard of the Risen Sacrifice", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
                     },
                     [2] = {
                         { 273781, "Strand of Warding Fangs", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 251173, "Yoke of the Charging Bear", "Mythic+ Dungeon - Den of Nalorakk" },
                         { 268265, "Aqirbane Reliquary", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
+                        { 251173, "Yoke of the Charging Bear", "Mythic+ Dungeon - Den of Nalorakk" },
                     },
                     [3] = {
                         { 271463, "Pauldrons of the Consecrated Flame", "Tier Set token" },
                         { 251138, "Cinderfury Shoulderguards", "Mythic+ Dungeon - Murder Row" },
-                        { 272260, "Pledgebearer's Pauldrons", "World Drop" },
+                        { 239037, "C'thraxxi Binders Pauldrons", "Mythic+ Dungeon - Temple of Sethraliss" },
                     },
                     [5] = {
                         { 271468, "Bulwark of the Consecrated Flame", "Tier Set token" },
+                        { 237829, "Spellbreaker's Shelter", "Crafted" },
                         { 239036, "Desert Guardian's Breastplate", "Mythic+ Dungeon - Temple of Sethraliss" },
-                        { 273787, "Aged Interwoven Scaleplate", "Mythic+ Dungeon - Altar of Fangs" },
                     },
                     [6] = {
                         { 237830, "Spellbreaker's Girdle", "Crafted" },
                         { 268259, "Girdle of Toxic Regret", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
-                        { 251144, "Autumn's Boon Belt", "Mythic+ Dungeon - Den of Nalorakk" },
+                        { 268244, "Forgotten Grotto Girdle", "Raid drop" },
                     },
                     [7] = {
                         { 271464, "Greaves of the Consecrated Flame", "Tier Set token" },
                         { 251182, "Bedrock Breeches", "Mythic+ Dungeon - The Blinding Vale" },
-                        { 159435, "Legplates of Charged Duality", "Mythic+ Dungeon - Temple of Sethraliss" },
+                        { 271878, "Chausses of Unbound Rancor", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                     },
                     [8] = {
-                        { 273777, "Poison-Proof Stompers", "Mythic+ Dungeon - Altar of Fangs" },
                         { 237828, "Spellbreaker's March", "Crafted" },
+                        { 273777, "Poison-Proof Stompers", "Mythic+ Dungeon - Altar of Fangs" },
                         { 159412, "Auric Puddle Stompers", "Mythic+ Dungeon - Kings' Rest" },
                     },
                     [9] = {
                         { 237834, "Spellbreaker's Bracers", "Crafted" },
-                        { 251133, "Overseer's Vambraces", "Mythic+ Dungeon - Murder Row" },
                         { 159409, "Embalmer's Steadying Bracers", "Mythic+ Dungeon - Kings' Rest" },
+                        { 159425, "Shard-Tipped Vambraces", "Mythic+ Dungeon - Temple of Sethraliss" },
                     },
                     [10] = {
                         { 271466, "Gauntlets of the Consecrated Flame", "Tier Set token" },
-                        { 159413, "Gauntlets of the Avian Sentinel", "Mythic+ Dungeon - Kings' Rest" },
-                        { 251197, "Thornspike Gauntlets", "Mythic+ Dungeon - The Blinding Vale" },
+                        { 251214, "Bonds of the Hash'ura", "Mythic+ Dungeon - Den of Nalorakk" },
+                        { 268220, "Scaleplate Strangulators", "Raid drop - The Venomous Abyss - Boss 6 - The Twin Fangs" },
                     },
                     [11] = {
                         { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
                         { 251148, "Pilfered Precious Band", "Mythic+ Dungeon - Den of Nalorakk" },
-                        { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
+                        { 159459, "Ritual Binder's Ring", "Mythic+ Dungeon - Kings' Rest" },
                     },
                     [13] = {
                         { 273796, "Vile Vial of Volatile Venom", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 250228, "Resonant Bellowstone", "Mythic+ Dungeon - Murder Row" },
-                        { 250245, "Tumor of the Swarm", "Mythic+ Dungeon - Voidscar Arena" },
+                        { 270165, "Keeper's Seething Core", "Raid drop - The Venomous Abyss - Boss 2 - Entombed Sentinels" },
+                        { 270173, "Zul'jin's Guillotine Technique", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
                     },
                     [15] = {
                         { 193763, "Fireproof Drape", "Mythic+ Dungeon - Ruby Life Pools" },
-                        { 251190, "Bloodthorn Burnous", "Mythic+ Dungeon - The Blinding Vale" },
                         { 239656, "Adherent's Silken Shroud", "Crafted" },
+                        { 268253, "Silken Voodoo Drape", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
                     },
                     [16] = {
                         { 237839, "Spellbreaker's Blade", "Crafted" },
@@ -3411,7 +3414,7 @@ ns.BiSData = {
                     [1] = {
                         { 271465, "Warhelm of the Consecrated Flame", "Tier Set token" },
                         { 251126, "Greathelm of Temptation", "Mythic+ Dungeon - Murder Row" },
-                        { 268229, "Skullguard of the Risen Sacrifice", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
+                        { 251229, "Visor of the Predator", "Mythic+ Dungeon - Voidscar Arena" },
                     },
                     [2] = {
                         { 268265, "Aqirbane Reliquary", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
@@ -3431,27 +3434,27 @@ ns.BiSData = {
                     [6] = {
                         { 268259, "Girdle of Toxic Regret", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
                         { 159418, "Girdle of Pestilent Purification", "Mythic+ Dungeon - Kings' Rest" },
-                        { 251144, "Autumn's Boon Belt", "Mythic+ Dungeon - Den of Nalorakk" },
+                        { 271445, "Fanged Brute's Greatbelt", "Raid drop - The Venomous Abyss" },
                     },
                     [7] = {
                         { 271464, "Greaves of the Consecrated Flame", "Tier Set token" },
                         { 271878, "Chausses of Unbound Rancor", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 273776, "Ancient General's Obsidian Pillars", "Mythic+ Dungeon - Altar of Fangs" },
+                        { 268224, "Venom Warden's Greaves", "Raid drop - The Venomous Abyss - Boss 2 - Entombed Sentinels" },
                     },
                     [8] = {
                         { 268260, "Scaled Fiend's Warboots", "Raid drop - The Venomous Abyss - Boss 4 - Vashnik the Malignant" },
                         { 268245, "Entombed Cultist's Sabatons", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
-                        { 273777, "Poison-Proof Stompers", "Mythic+ Dungeon - Altar of Fangs" },
+                        { 237828, "Spellbreaker's March", "Crafted" },
                     },
                     [9] = {
                         { 237834, "Spellbreaker's Bracers", "Crafted" },
-                        { 251133, "Overseer's Vambraces", "Mythic+ Dungeon - Murder Row" },
                         { 268239, "Shellbound Bracers", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
+                        { 251133, "Overseer's Vambraces", "Mythic+ Dungeon - Murder Row" },
                     },
                     [10] = {
                         { 271466, "Gauntlets of the Consecrated Flame", "Tier Set token" },
-                        { 251214, "Bonds of the Hash'ura", "Mythic+ Dungeon - Den of Nalorakk" },
                         { 159413, "Gauntlets of the Avian Sentinel", "Mythic+ Dungeon - Kings' Rest" },
+                        { 251214, "Bonds of the Hash'ura", "Mythic+ Dungeon - Den of Nalorakk" },
                     },
                     [11] = {
                         { 251513, "Loa Worshiper's Band", "Crafted" },
@@ -3464,9 +3467,9 @@ ns.BiSData = {
                         { 273796, "Vile Vial of Volatile Venom", "Mythic+ Dungeon - Altar of Fangs" },
                     },
                     [15] = {
+                        { 268253, "Silken Voodoo Drape", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
                         { 251132, "Speakeasy Shroud", "Mythic+ Dungeon - Murder Row" },
                         { 251190, "Bloodthorn Burnous", "Mythic+ Dungeon - The Blinding Vale" },
-                        { 268253, "Silken Voodoo Drape", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
                     },
                     [16] = {
                         { 268213, "Maze-roa, Warlord's Fury", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
@@ -3477,7 +3480,7 @@ ns.BiSData = {
                 mythicplus = {
                     [1] = {
                         { 271465, "Warhelm of the Consecrated Flame", "Tier Set token" },
-                        { 251126, "Greathelm of Temptation", "Mythic+ Dungeon - Murder Row" },
+                        { 237832, "Spellbreaker's Cover", "Crafted" },
                         { 251229, "Visor of the Predator", "Mythic+ Dungeon - Voidscar Arena" },
                     },
                     [2] = {
@@ -3487,28 +3490,28 @@ ns.BiSData = {
                     },
                     [3] = {
                         { 271463, "Pauldrons of the Consecrated Flame", "Tier Set token" },
-                        { 251138, "Cinderfury Shoulderguards", "Mythic+ Dungeon - Murder Row" },
+                        { 271444, "Pauldrons of the Forgotten Sacrifice", "World Drop" },
                         { 239051, "Pauldrons of the Great Unifier", "Mythic+ Dungeon - Kings' Rest" },
                     },
                     [5] = {
                         { 271468, "Bulwark of the Consecrated Flame", "Tier Set token" },
-                        { 193753, "Breastplate of Soaring Terror", "Mythic+ Dungeon - Ruby Life Pools" },
                         { 251151, "Sentinel Challenger's Prize", "Mythic+ Dungeon - Den of Nalorakk" },
+                        { 193753, "Breastplate of Soaring Terror", "Mythic+ Dungeon - Ruby Life Pools" },
                     },
                     [6] = {
-                        { 268259, "Girdle of Toxic Regret", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
-                        { 159418, "Girdle of Pestilent Purification", "Mythic+ Dungeon - Kings' Rest" },
                         { 271445, "Fanged Brute's Greatbelt", "World Drop" },
+                        { 268259, "Girdle of Toxic Regret", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
+                        { 271462, "Waistguard of the Consecrated Flame", "World Drop" },
                     },
                     [7] = {
                         { 271464, "Greaves of the Consecrated Flame", "Tier Set token" },
                         { 271878, "Chausses of Unbound Rancor", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 268224, "Venom Warden's Greaves", "Raid drop - The Venomous Abyss - Boss 2 - Entombed Sentinels" },
+                        { 251182, "Bedrock Breeches", "Mythic+ Dungeon - The Blinding Vale" },
                     },
                     [8] = {
                         { 268260, "Scaled Fiend's Warboots", "Raid drop - The Venomous Abyss - Boss 4 - Vashnik the Malignant" },
-                        { 268245, "Entombed Cultist's Sabatons", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
-                        { 271467, "Greatboots of the Consecrated Flame", "World Drop" },
+                        { 271467, "Greatboots of the Consecrated Flame", "Tier Set token" },
+                        { 237828, "Spellbreaker's March", "Crafted" },
                     },
                     [9] = {
                         { 237834, "Spellbreaker's Bracers", "Crafted" },
@@ -3517,28 +3520,28 @@ ns.BiSData = {
                     },
                     [10] = {
                         { 271466, "Gauntlets of the Consecrated Flame", "Tier Set token" },
-                        { 251214, "Bonds of the Hash'ura", "Mythic+ Dungeon - Den of Nalorakk" },
-                        { 268220, "Scaleplate Strangulators", "Raid drop - The Venomous Abyss - Boss 6 - The Twin Fangs" },
+                        { 237836, "Spellbreaker's Resolve", "Crafted" },
+                        { 159413, "Gauntlets of the Avian Sentinel", "Mythic+ Dungeon - Kings' Rest" },
                     },
                     [11] = {
                         { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
-                        { 251513, "Loa Worshiper's Band", "Crafted" },
                         { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
+                        { 251513, "Loa Worshiper's Band", "Crafted" },
                     },
                     [13] = {
                         { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                         { 270173, "Zul'jin's Guillotine Technique", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
-                        { 270602, "Venomous Gladiator's Badge of Ferocity", "World Drop" },
+                        { 270165, "Keeper's Seething Core", "Raid drop - The Venomous Abyss - Boss 2 - Entombed Sentinels" },
                     },
                     [15] = {
+                        { 268253, "Silken Voodoo Drape", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
                         { 251132, "Speakeasy Shroud", "Mythic+ Dungeon - Murder Row" },
                         { 251190, "Bloodthorn Burnous", "Mythic+ Dungeon - The Blinding Vale" },
-                        { 268253, "Silken Voodoo Drape", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
                     },
                     [16] = {
                         { 237846, "Blood Knight's Warblade", "Crafted" },
                         { 268213, "Maze-roa, Warlord's Fury", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
-                        { 237848, "Blood Knight's Mercy", "Crafted" },
+                        { 268214, "Malignant Toothed Edge", "Raid drop - The Venomous Abyss - Boss 4 - Vashnik the Malignant" },
                     },
                 },
             },
@@ -3555,8 +3558,8 @@ ns.BiSData = {
                     },
                     [2] = {
                         { 268265, "Aqirbane Reliquary", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 251173, "Yoke of the Charging Bear", "Mythic+ Dungeon - Den of Nalorakk" },
                         { 273781, "Strand of Warding Fangs", "Mythic+ Dungeon - Altar of Fangs" },
+                        { 268250, "Sentinel's Vitriolic Chain", "Raid drop - The Venomous Abyss - Boss 2 - Entombed Sentinels" },
                     },
                     [3] = {
                         { 271553, "Cosmic Penitent's Echoing Screams", "Tier Set token" },
@@ -3571,16 +3574,16 @@ ns.BiSData = {
                     [6] = {
                         { 268257, "Caustic Chain-Wrapped Sash", "Raid drop - The Venomous Abyss - Boss 5 - Sszorak" },
                         { 251222, "Ethereal Netherwrap", "Mythic+ Dungeon - Voidscar Arena" },
-                        { 193691, "Sky Saddle Cord", "Mythic+ Dungeon - Ruby Life Pools" },
+                        { 239649, "Martyr's Waistwrap", "Crafted" },
                     },
                     [7] = {
                         { 271554, "Enveloping Legwraps of the Cosmic Penitent", "Tier Set token" },
-                        { 251160, "Forest Dream Leg-guards", "Mythic+ Dungeon - Den of Nalorakk" },
+                        { 239651, "Martyr's Leggings", "Crafted" },
                         { 273786, "Leggings of Entwined Serpents", "Mythic+ Dungeon - Altar of Fangs" },
                     },
                     [8] = {
-                        { 251219, "Riftworn Stompers", "Mythic+ Dungeon - Voidscar Arena" },
                         { 268255, "Cackling Soultreads", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
+                        { 251219, "Riftworn Stompers", "Mythic+ Dungeon - Voidscar Arena" },
                         { 251137, "Tempestuous Sandals", "Mythic+ Dungeon - Murder Row" },
                     },
                     [9] = {
@@ -3596,26 +3599,25 @@ ns.BiSData = {
                     [11] = {
                         { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
                         { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 159459, "Ritual Binder's Ring", "Mythic+ Dungeon - Kings' Rest" },
+                        { 268266, "Alluring Bubbleband", "Raid drop" },
                     },
                     [13] = {
-                        { 270169, "Hex Lord's Dooming Idol", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
                         { 270167, "Wavecaller's Seastone", "Raid drop" },
+                        { 270169, "Hex Lord's Dooming Idol", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
                         { 270162, "Soulcoiler Ritual Vessel", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
                     },
                     [15] = {
                         { 251190, "Bloodthorn Burnous", "Mythic+ Dungeon - The Blinding Vale" },
                         { 193763, "Fireproof Drape", "Mythic+ Dungeon - Ruby Life Pools" },
-                        { 251132, "Speakeasy Shroud", "Mythic+ Dungeon - Murder Row" },
+                        { 159288, "Cloak of the Restless Tribes", "Mythic+ Dungeon - Kings' Rest" },
                     },
                     [16] = {
                         { 271092, "Jan'thrazet, the Soul Fang", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 273778, "Polished Lightwood Channeler", "Mythic+ Dungeon - Altar of Fangs" },
                         { 237838, "Magister's Ritual Knife", "Crafted" },
                     },
                     [17] = {
                         { 245769, "Aln'hara Lantern", "Crafted" },
-                        { 273779, "Nocuous Focal Fang", "Mythic+ Dungeon - Altar of Fangs" },
+                        { 268197, "Spine of the Hissing Abyss", "Raid drop - The Venomous Abyss - Boss 2 - Entombed Sentinels" },
                         { 271681, "Perennial Frostbound Charm", "Mythic+ Dungeon - Den of Nalorakk" },
                     },
                 },
@@ -3623,12 +3625,12 @@ ns.BiSData = {
                     [1] = {
                         { 271555, "Cosmic Penitent's Truesight", "Tier Set token" },
                         { 271874, "Venomkeeper's Horrific Cowl", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 239047, "Headdress of the First Empire", "Mythic+ Dungeon - Kings' Rest" },
+                        { 251232, "Overseer's Diadem", "Mythic+ Dungeon - Voidscar Arena" },
                     },
                     [2] = {
                         { 268265, "Aqirbane Reliquary", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                         { 251173, "Yoke of the Charging Bear", "Mythic+ Dungeon - Den of Nalorakk" },
-                        { 251142, "Pendant of Malefic Fury", "Mythic+ Dungeon - Murder Row" },
+                        { 273781, "Strand of Warding Fangs", "Mythic+ Dungeon - Altar of Fangs" },
                     },
                     [3] = {
                         { 271553, "Cosmic Penitent's Echoing Screams", "Tier Set token" },
@@ -3637,13 +3639,13 @@ ns.BiSData = {
                     },
                     [5] = {
                         { 271558, "Cosmic Penitent's Eclipsing Robes", "Tier Set token" },
-                        { 251147, "Hoarded Harvest Wrap", "Mythic+ Dungeon - Den of Nalorakk" },
-                        { 239655, "Martyr's Vestments", "Crafted" },
+                        { 251139, "Summoner's Searing Shirt", "Mythic+ Dungeon - Murder Row" },
+                        { 272231, "Pyrewalker's Doublet", "Drop" },
                     },
                     [6] = {
                         { 239649, "Martyr's Waistwrap", "Crafted" },
                         { 251185, "Lightblossom Cinch", "Mythic+ Dungeon - The Blinding Vale" },
-                        { 251222, "Ethereal Netherwrap", "Mythic+ Dungeon - Voidscar Arena" },
+                        { 193691, "Sky Saddle Cord", "Mythic+ Dungeon - Ruby Life Pools" },
                     },
                     [7] = {
                         { 271554, "Enveloping Legwraps of the Cosmic Penitent", "Tier Set token" },
@@ -3653,31 +3655,31 @@ ns.BiSData = {
                     [8] = {
                         { 251137, "Tempestuous Sandals", "Mythic+ Dungeon - Murder Row" },
                         { 159259, "Sandswept Sandals", "Mythic+ Dungeon - Temple of Sethraliss" },
-                        { 251219, "Riftworn Stompers", "Mythic+ Dungeon - Voidscar Arena" },
+                        { 268218, "Nek'zali's Spiritwalkers", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
                     },
                     [9] = {
                         { 239648, "Martyr's Bindings", "Crafted" },
                         { 251127, "Nibbling Armbands", "Mythic+ Dungeon - Murder Row" },
-                        { 251154, "Winter's Embrace Bracers", "Mythic+ Dungeon - Den of Nalorakk" },
+                        { 268228, "Venom-Singed Cuffs", "Raid drop - The Venomous Abyss - Boss 2 - Entombed Sentinels" },
                     },
                     [10] = {
                         { 271556, "Cosmic Penitent's Celestial Grips", "Tier Set token" },
-                        { 273773, "Handwraps of Blasphemous Rites", "Mythic+ Dungeon - Altar of Fangs" },
                         { 239653, "Martyr's Gloves", "Crafted" },
+                        { 273773, "Handwraps of Blasphemous Rites", "Mythic+ Dungeon - Altar of Fangs" },
                     },
                     [11] = {
-                        { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
                         { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
+                        { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
                         { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
                     },
                     [13] = {
                         { 270162, "Soulcoiler Ritual Vessel", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
-                        { 250214, "Lightspire Core", "Mythic+ Dungeon - The Blinding Vale" },
+                        { 270164, "Gebbo's Bottomless Bag", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
                         { 270167, "Wavecaller's Seastone", "Raid drop" },
                     },
                     [15] = {
-                        { 251190, "Bloodthorn Burnous", "Mythic+ Dungeon - The Blinding Vale" },
                         { 251132, "Speakeasy Shroud", "Mythic+ Dungeon - Murder Row" },
+                        { 251190, "Bloodthorn Burnous", "Mythic+ Dungeon - The Blinding Vale" },
                         { 193763, "Fireproof Drape", "Mythic+ Dungeon - Ruby Life Pools" },
                     },
                     [16] = {
@@ -3687,7 +3689,7 @@ ns.BiSData = {
                     [17] = {
                         { 245769, "Aln'hara Lantern", "Crafted" },
                         { 251191, "Luminescent Sprout", "Mythic+ Dungeon - The Blinding Vale" },
-                        { 271681, "Perennial Frostbound Charm", "Mythic+ Dungeon - Den of Nalorakk" },
+                        { 268263, "Frostscale's Mystic Frond", "Raid drop" },
                     },
                 },
             },
@@ -3705,22 +3707,22 @@ ns.BiSData = {
                     },
                     [3] = {
                         { 271553, "Cosmic Penitent's Echoing Screams", "Tier Set token" },
+                        { 271434, "Venom Rite Mantle", "Raid drop - The Venomous Abyss" },
                         { 239650, "Martyr's Mantle", "Crafted" },
-                        { 239031, "Brood Cleanser's Amice", "Mythic+ Dungeon - Temple of Sethraliss" },
                     },
                     [5] = {
                         { 271558, "Cosmic Penitent's Eclipsing Robes", "Tier Set token" },
                         { 268221, "Tidebound Sorcereress's Robes", "Raid drop" },
-                        { 239032, "Robes of the Reborn Serpent", "Mythic+ Dungeon - Temple of Sethraliss" },
+                        { 239655, "Martyr's Vestments", "Crafted" },
                     },
                     [6] = {
                         { 239649, "Martyr's Waistwrap", "Crafted" },
-                        { 251222, "Ethereal Netherwrap", "Mythic+ Dungeon - Voidscar Arena" },
                         { 268232, "Cincture of the Abyssal Grotto", "Raid drop" },
+                        { 251222, "Ethereal Netherwrap", "Mythic+ Dungeon - Voidscar Arena" },
                     },
                     [7] = {
                         { 271554, "Enveloping Legwraps of the Cosmic Penitent", "Tier Set token" },
-                        { 273786, "Leggings of Entwined Serpents", "Mythic+ Dungeon - Altar of Fangs" },
+                        { 239651, "Martyr's Leggings", "Crafted" },
                         { 268236, "Initiate's Sacrificial Tights", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
                     },
                     [8] = {
@@ -3736,7 +3738,7 @@ ns.BiSData = {
                     [10] = {
                         { 271556, "Cosmic Penitent's Celestial Grips", "Tier Set token" },
                         { 273773, "Handwraps of Blasphemous Rites", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 251129, "Counterfeit Clutches", "Mythic+ Dungeon - Murder Row" },
+                        { 159247, "Handwraps of Oscillating Polarity", "Mythic+ Dungeon - Temple of Sethraliss" },
                     },
                     [11] = {
                         { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
@@ -3750,17 +3752,17 @@ ns.BiSData = {
                     },
                     [15] = {
                         { 251132, "Speakeasy Shroud", "Mythic+ Dungeon - Murder Row" },
-                        { 251190, "Bloodthorn Burnous", "Mythic+ Dungeon - The Blinding Vale" },
                         { 193763, "Fireproof Drape", "Mythic+ Dungeon - Ruby Life Pools" },
+                        { 268248, "Amani Summoning Shawl", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
                     },
                     [16] = {
                         { 271092, "Jan'thrazet, the Soul Fang", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 237838, "Magister's Ritual Knife", "Crafted" },
+                        { 268210, "Malevolent Spiritcudgel", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
                     },
                     [17] = {
                         { 245769, "Aln'hara Lantern", "Crafted" },
                         { 268263, "Frostscale's Mystic Frond", "Raid drop" },
-                        { 271681, "Perennial Frostbound Charm", "Mythic+ Dungeon - Den of Nalorakk" },
+                        { 268197, "Spine of the Hissing Abyss", "Raid drop - The Venomous Abyss - Boss 2 - Entombed Sentinels" },
                     },
                 },
                 mythicplus = {
@@ -3771,13 +3773,13 @@ ns.BiSData = {
                     },
                     [2] = {
                         { 268265, "Aqirbane Reliquary", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 251173, "Yoke of the Charging Bear", "Mythic+ Dungeon - Den of Nalorakk" },
                         { 273781, "Strand of Warding Fangs", "Mythic+ Dungeon - Altar of Fangs" },
+                        { 251173, "Yoke of the Charging Bear", "Mythic+ Dungeon - Den of Nalorakk" },
                     },
                     [3] = {
                         { 271553, "Cosmic Penitent's Echoing Screams", "Tier Set token" },
                         { 239650, "Martyr's Mantle", "Crafted" },
-                        { 251227, "Poisoner's Pauldrons", "Mythic+ Dungeon - Voidscar Arena" },
+                        { 239045, "Mantle of Ceremonial Ascension", "Mythic+ Dungeon - Kings' Rest" },
                     },
                     [5] = {
                         { 271558, "Cosmic Penitent's Eclipsing Robes", "Tier Set token" },
@@ -3791,42 +3793,42 @@ ns.BiSData = {
                     },
                     [7] = {
                         { 271554, "Enveloping Legwraps of the Cosmic Penitent", "Tier Set token" },
-                        { 273786, "Leggings of Entwined Serpents", "Mythic+ Dungeon - Altar of Fangs" },
                         { 268236, "Initiate's Sacrificial Tights", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
+                        { 251160, "Forest Dream Leg-guards", "Mythic+ Dungeon - Den of Nalorakk" },
                     },
                     [8] = {
-                        { 251219, "Riftworn Stompers", "Mythic+ Dungeon - Voidscar Arena" },
                         { 251137, "Tempestuous Sandals", "Mythic+ Dungeon - Murder Row" },
-                        { 159259, "Sandswept Sandals", "Mythic+ Dungeon - Temple of Sethraliss" },
+                        { 268218, "Nek'zali's Spiritwalkers", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
+                        { 251219, "Riftworn Stompers", "Mythic+ Dungeon - Voidscar Arena" },
                     },
                     [9] = {
                         { 239648, "Martyr's Bindings", "Crafted" },
+                        { 268228, "Venom-Singed Cuffs", "Raid drop - The Venomous Abyss - Boss 2 - Entombed Sentinels" },
                         { 251127, "Nibbling Armbands", "Mythic+ Dungeon - Murder Row" },
-                        { 251154, "Winter's Embrace Bracers", "Mythic+ Dungeon - Den of Nalorakk" },
                     },
                     [10] = {
                         { 271556, "Cosmic Penitent's Celestial Grips", "Tier Set token" },
-                        { 273773, "Handwraps of Blasphemous Rites", "Mythic+ Dungeon - Altar of Fangs" },
                         { 159247, "Handwraps of Oscillating Polarity", "Mythic+ Dungeon - Temple of Sethraliss" },
+                        { 268243, "Grasps of the Eternal Shadow", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
                     },
                     [11] = {
                         { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 158366, "Charged Sandstone Band", "Mythic+ Dungeon - Temple of Sethraliss" },
                         { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
+                        { 159459, "Ritual Binder's Ring", "Mythic+ Dungeon - Kings' Rest" },
                     },
                     [13] = {
                         { 270162, "Soulcoiler Ritual Vessel", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
-                        { 270164, "Gebbo's Bottomless Bag", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
                         { 270167, "Wavecaller's Seastone", "Raid drop" },
+                        { 270164, "Gebbo's Bottomless Bag", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
                     },
                     [15] = {
-                        { 251132, "Speakeasy Shroud", "Mythic+ Dungeon - Murder Row" },
                         { 251190, "Bloodthorn Burnous", "Mythic+ Dungeon - The Blinding Vale" },
                         { 159288, "Cloak of the Restless Tribes", "Mythic+ Dungeon - Kings' Rest" },
+                        { 251132, "Speakeasy Shroud", "Mythic+ Dungeon - Murder Row" },
                     },
                     [16] = {
                         { 271092, "Jan'thrazet, the Soul Fang", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 273778, "Polished Lightwood Channeler", "Mythic+ Dungeon - Altar of Fangs" },
+                        { 272270, "Bonedust Pestle", "World Drop" },
                     },
                     [17] = {
                         { 245769, "Aln'hara Lantern", "Crafted" },
@@ -3845,32 +3847,32 @@ ns.BiSData = {
                     [2] = {
                         { 268265, "Aqirbane Reliquary", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                         { 251142, "Pendant of Malefic Fury", "Mythic+ Dungeon - Murder Row" },
-                        { 251234, "Graft of the Domanaar", "Mythic+ Dungeon - Voidscar Arena" },
+                        { 273781, "Strand of Warding Fangs", "Mythic+ Dungeon - Altar of Fangs" },
                     },
                     [3] = {
                         { 271553, "Cosmic Penitent's Echoing Screams", "Tier Set token" },
                         { 239045, "Mantle of Ceremonial Ascension", "Mythic+ Dungeon - Kings' Rest" },
-                        { 239031, "Brood Cleanser's Amice", "Mythic+ Dungeon - Temple of Sethraliss" },
+                        { 251227, "Poisoner's Pauldrons", "Mythic+ Dungeon - Voidscar Arena" },
                     },
                     [5] = {
                         { 271558, "Cosmic Penitent's Eclipsing Robes", "Tier Set token" },
+                        { 268221, "Tidebound Sorcereress's Robes", "Raid drop" },
                         { 251139, "Summoner's Searing Shirt", "Mythic+ Dungeon - Murder Row" },
-                        { 273785, "Primordial Robe of Rites", "Mythic+ Dungeon - Altar of Fangs" },
                     },
                     [6] = {
                         { 239649, "Martyr's Waistwrap", "Crafted" },
                         { 268257, "Caustic Chain-Wrapped Sash", "Raid drop - The Venomous Abyss - Boss 5 - Sszorak" },
-                        { 251222, "Ethereal Netherwrap", "Mythic+ Dungeon - Voidscar Arena" },
+                        { 193691, "Sky Saddle Cord", "Mythic+ Dungeon - Ruby Life Pools" },
                     },
                     [7] = {
                         { 271554, "Enveloping Legwraps of the Cosmic Penitent", "Tier Set token" },
                         { 239651, "Martyr's Leggings", "Crafted" },
-                        { 193750, "Wind Soarer's Breeches", "Mythic+ Dungeon - Ruby Life Pools" },
+                        { 159234, "Down-Lined Breeches", "Mythic+ Dungeon - Kings' Rest" },
                     },
                     [8] = {
                         { 251137, "Tempestuous Sandals", "Mythic+ Dungeon - Murder Row" },
-                        { 268255, "Cackling Soultreads", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
                         { 268218, "Nek'zali's Spiritwalkers", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
+                        { 268255, "Cackling Soultreads", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
                     },
                     [9] = {
                         { 239648, "Martyr's Bindings", "Crafted" },
@@ -3890,12 +3892,12 @@ ns.BiSData = {
                     [13] = {
                         { 250215, "Freightrunner's Flask", "Mythic+ Dungeon - Murder Row" },
                         { 270167, "Wavecaller's Seastone", "Raid drop" },
-                        { 273796, "Vile Vial of Volatile Venom", "Mythic+ Dungeon - Altar of Fangs" },
+                        { 270164, "Gebbo's Bottomless Bag", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
                     },
                     [15] = {
                         { 251132, "Speakeasy Shroud", "Mythic+ Dungeon - Murder Row" },
                         { 251190, "Bloodthorn Burnous", "Mythic+ Dungeon - The Blinding Vale" },
-                        { 193763, "Fireproof Drape", "Mythic+ Dungeon - Ruby Life Pools" },
+                        { 268253, "Silken Voodoo Drape", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
                     },
                     [16] = {
                         { 271092, "Jan'thrazet, the Soul Fang", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
@@ -3904,14 +3906,14 @@ ns.BiSData = {
                     [17] = {
                         { 245769, "Aln'hara Lantern", "Crafted" },
                         { 268197, "Spine of the Hissing Abyss", "Raid drop - The Venomous Abyss - Boss 2 - Entombed Sentinels" },
-                        { 273779, "Nocuous Focal Fang", "Mythic+ Dungeon - Altar of Fangs" },
+                        { 268263, "Frostscale's Mystic Frond", "Raid drop" },
                     },
                 },
                 mythicplus = {
                     [1] = {
                         { 271555, "Cosmic Penitent's Truesight", "Tier Set token" },
                         { 271874, "Venomkeeper's Horrific Cowl", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 251232, "Overseer's Diadem", "Mythic+ Dungeon - Voidscar Arena" },
+                        { 251199, "Worldroot Canopy", "Mythic+ Dungeon - The Blinding Vale" },
                     },
                     [2] = {
                         { 268265, "Aqirbane Reliquary", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
@@ -3921,12 +3923,12 @@ ns.BiSData = {
                     [3] = {
                         { 271553, "Cosmic Penitent's Echoing Screams", "Tier Set token" },
                         { 239031, "Brood Cleanser's Amice", "Mythic+ Dungeon - Temple of Sethraliss" },
-                        { 271434, "Venom Rite Mantle", "World Drop" },
+                        { 239045, "Mantle of Ceremonial Ascension", "Mythic+ Dungeon - Kings' Rest" },
                     },
                     [5] = {
                         { 271558, "Cosmic Penitent's Eclipsing Robes", "Tier Set token" },
                         { 273785, "Primordial Robe of Rites", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 251139, "Summoner's Searing Shirt", "Mythic+ Dungeon - Murder Row" },
+                        { 239655, "Martyr's Vestments", "Crafted" },
                     },
                     [6] = {
                         { 239649, "Martyr's Waistwrap", "Crafted" },
@@ -3945,23 +3947,23 @@ ns.BiSData = {
                     },
                     [9] = {
                         { 239648, "Martyr's Bindings", "Crafted" },
-                        { 251127, "Nibbling Armbands", "Mythic+ Dungeon - Murder Row" },
                         { 268228, "Venom-Singed Cuffs", "Raid drop - The Venomous Abyss - Boss 2 - Entombed Sentinels" },
+                        { 251127, "Nibbling Armbands", "Mythic+ Dungeon - Murder Row" },
                     },
                     [10] = {
                         { 271556, "Cosmic Penitent's Celestial Grips", "Tier Set token" },
-                        { 159247, "Handwraps of Oscillating Polarity", "Mythic+ Dungeon - Temple of Sethraliss" },
                         { 251129, "Counterfeit Clutches", "Mythic+ Dungeon - Murder Row" },
+                        { 159247, "Handwraps of Oscillating Polarity", "Mythic+ Dungeon - Temple of Sethraliss" },
                     },
                     [11] = {
-                        { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
                         { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
+                        { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
                         { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
                     },
                     [13] = {
                         { 250215, "Freightrunner's Flask", "Mythic+ Dungeon - Murder Row" },
+                        { 270167, "Wavecaller's Seastone", "Raid drop" },
                         { 273796, "Vile Vial of Volatile Venom", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 270164, "Gebbo's Bottomless Bag", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
                     },
                     [15] = {
                         { 251132, "Speakeasy Shroud", "Mythic+ Dungeon - Murder Row" },
@@ -3969,13 +3971,13 @@ ns.BiSData = {
                         { 193763, "Fireproof Drape", "Mythic+ Dungeon - Ruby Life Pools" },
                     },
                     [16] = {
-                        { 273778, "Polished Lightwood Channeler", "Mythic+ Dungeon - Altar of Fangs" },
                         { 271092, "Jan'thrazet, the Soul Fang", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
+                        { 273778, "Polished Lightwood Channeler", "Mythic+ Dungeon - Altar of Fangs" },
                     },
                     [17] = {
                         { 245769, "Aln'hara Lantern", "Crafted" },
                         { 268197, "Spine of the Hissing Abyss", "Raid drop - The Venomous Abyss - Boss 2 - Entombed Sentinels" },
-                        { 271681, "Perennial Frostbound Charm", "Mythic+ Dungeon - Den of Nalorakk" },
+                        { 268263, "Frostscale's Mystic Frond", "Raid drop" },
                     },
                 },
             },
@@ -4013,12 +4015,12 @@ ns.BiSData = {
                     [7] = {
                         { 271509, "Chosen Bloodslayer's Reinforced Pants", "Tier Set token" },
                         { 251130, "Breeches of Deft Deals", "Mythic+ Dungeon - Murder Row" },
-                        { 268225, "Coiled Hex Legguards", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
+                        { 244574, "Silvermoon Agent's Leggings", "Crafted" },
                     },
                     [8] = {
                         { 251153, "Arctic Explorer's Legwraps", "Mythic+ Dungeon - Den of Nalorakk" },
-                        { 159327, "Sand-Shined Snakeskin Sandals", "Mythic+ Dungeon - Temple of Sethraliss" },
                         { 268261, "Bespittled Slitherslippers", "Raid drop - The Venomous Abyss - Boss 6 - The Twin Fangs" },
+                        { 159327, "Sand-Shined Snakeskin Sandals", "Mythic+ Dungeon - Temple of Sethraliss" },
                     },
                     [9] = {
                         { 244576, "Silvermoon Agent's Deflectors", "Crafted" },
@@ -4033,7 +4035,7 @@ ns.BiSData = {
                     [11] = {
                         { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
                         { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
-                        { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
+                        { 158366, "Charged Sandstone Band", "Mythic+ Dungeon - Temple of Sethraliss" },
                     },
                     [13] = {
                         { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
@@ -4052,8 +4054,8 @@ ns.BiSData = {
                     },
                     [17] = {
                         { 275070, "Sharpened Lightwood Slasher", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 271093, "Zatha'tek, Breath of Corruption", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                         { 237837, "Farstrider's Mercy", "Crafted" },
+                        { 271093, "Zatha'tek, Breath of Corruption", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                     },
                 },
                 mythicplus = {
@@ -4069,27 +4071,27 @@ ns.BiSData = {
                     },
                     [3] = {
                         { 271508, "Chosen Bloodslayer's Voodoo Guards", "Tier Set token" },
-                        { 251223, "Somber Spaulders", "Mythic+ Dungeon - Voidscar Arena" },
+                        { 268246, "Frothing Venom Spaulders", "Raid drop - The Venomous Abyss - Boss 4 - Vashnik the Malignant" },
                         { 273774, "Snakeskin Spaulders", "Mythic+ Dungeon - Altar of Fangs" },
                     },
                     [5] = {
                         { 271513, "Chosen Bloodslayer's Banded Poncho", "Tier Set token" },
-                        { 239048, "Vest of Reverent Adoration", "Mythic+ Dungeon - Kings' Rest" },
-                        { 251159, "War Trial Vestments", "Mythic+ Dungeon - Den of Nalorakk" },
+                        { 244570, "Silvermoon Agent's Coat", "Crafted" },
+                        { 272239, "Miststalker's Brigandine", "World Drop" },
                     },
                     [6] = {
-                        { 159301, "Primal Dinomancer's Belt", "Mythic+ Dungeon - Kings' Rest" },
+                        { 271436, "Slitherscale Girdle", "World Drop" },
                         { 268227, "Unpossessed Skullsash", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
-                        { 268256, "Sash of the Forlorn Vessel", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
+                        { 159301, "Primal Dinomancer's Belt", "Mythic+ Dungeon - Kings' Rest" },
                     },
                     [7] = {
                         { 271509, "Chosen Bloodslayer's Reinforced Pants", "Tier Set token" },
+                        { 268225, "Coiled Hex Legguards", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
                         { 251130, "Breeches of Deft Deals", "Mythic+ Dungeon - Murder Row" },
-                        { 244574, "Silvermoon Agent's Leggings", "Crafted" },
                     },
                     [8] = {
-                        { 251153, "Arctic Explorer's Legwraps", "Mythic+ Dungeon - Den of Nalorakk" },
                         { 159327, "Sand-Shined Snakeskin Sandals", "Mythic+ Dungeon - Temple of Sethraliss" },
+                        { 251153, "Arctic Explorer's Legwraps", "Mythic+ Dungeon - Den of Nalorakk" },
                         { 268261, "Bespittled Slitherslippers", "Raid drop - The Venomous Abyss - Boss 6 - The Twin Fangs" },
                     },
                     [9] = {
@@ -4100,7 +4102,7 @@ ns.BiSData = {
                     [10] = {
                         { 271511, "Chosen Bloodslayer's Fanged Grips", "Tier Set token" },
                         { 159312, "Desiccator's Blessed Gloves", "Mythic+ Dungeon - Kings' Rest" },
-                        { 251124, "Gauntlets of Fevered Defense", "Mythic+ Dungeon - Murder Row" },
+                        { 244575, "Silvermoon Agent's Handwraps", "Crafted" },
                     },
                     [11] = {
                         { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
@@ -4110,7 +4112,7 @@ ns.BiSData = {
                     [13] = {
                         { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                         { 270165, "Keeper's Seething Core", "Raid drop - The Venomous Abyss - Boss 2 - Entombed Sentinels" },
-                        { 270168, "Font of Venomous Rage", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
+                        { 270164, "Gebbo's Bottomless Bag", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
                     },
                     [15] = {
                         { 193763, "Fireproof Drape", "Mythic+ Dungeon - Ruby Life Pools" },
@@ -4124,8 +4126,8 @@ ns.BiSData = {
                     },
                     [17] = {
                         { 275070, "Sharpened Lightwood Slasher", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 271093, "Zatha'tek, Breath of Corruption", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                         { 237837, "Farstrider's Mercy", "Crafted" },
+                        { 271093, "Zatha'tek, Breath of Corruption", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                     },
                 },
             },
@@ -4134,7 +4136,7 @@ ns.BiSData = {
                     [1] = {
                         { 271510, "Chosen Bloodslayer's Spirit Shroud", "Tier Set token" },
                         { 271875, "Gaze of the Coiled Watcher", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 193751, "Crown of Roaring Storms", "Mythic+ Dungeon - Ruby Life Pools" },
+                        { 273791, "Spare Speaker's Hood", "Mythic+ Dungeon - Altar of Fangs" },
                     },
                     [2] = {
                         { 273781, "Strand of Warding Fangs", "Mythic+ Dungeon - Altar of Fangs" },
@@ -4143,8 +4145,8 @@ ns.BiSData = {
                     },
                     [3] = {
                         { 271508, "Chosen Bloodslayer's Voodoo Guards", "Tier Set token" },
-                        { 251223, "Somber Spaulders", "Mythic+ Dungeon - Voidscar Arena" },
                         { 273774, "Snakeskin Spaulders", "Mythic+ Dungeon - Altar of Fangs" },
+                        { 251223, "Somber Spaulders", "Mythic+ Dungeon - Voidscar Arena" },
                     },
                     [5] = {
                         { 271513, "Chosen Bloodslayer's Banded Poncho", "Tier Set token" },
@@ -4158,8 +4160,8 @@ ns.BiSData = {
                     },
                     [7] = {
                         { 271509, "Chosen Bloodslayer's Reinforced Pants", "Tier Set token" },
-                        { 251130, "Breeches of Deft Deals", "Mythic+ Dungeon - Murder Row" },
                         { 159313, "Breeches of the Sacred Hall", "Mythic+ Dungeon - Kings' Rest" },
+                        { 251130, "Breeches of Deft Deals", "Mythic+ Dungeon - Murder Row" },
                     },
                     [8] = {
                         { 244569, "Silvermoon Agent's Sneakers", "Crafted" },
@@ -4179,21 +4181,21 @@ ns.BiSData = {
                     [11] = {
                         { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
                         { 251148, "Pilfered Precious Band", "Mythic+ Dungeon - Den of Nalorakk" },
-                        { 159459, "Ritual Binder's Ring", "Mythic+ Dungeon - Kings' Rest" },
+                        { 268252, "Apex Brute's Claw Ring", "Raid drop - The Venomous Abyss - Boss 5 - Sszorak" },
                     },
                     [13] = {
                         { 270173, "Zul'jin's Guillotine Technique", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
                         { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 159617, "Lustrous Golden Plumage", "Mythic+ Dungeon - Kings' Rest" },
+                        { 270165, "Keeper's Seething Core", "Raid drop - The Venomous Abyss - Boss 2 - Entombed Sentinels" },
                     },
                     [15] = {
                         { 193763, "Fireproof Drape", "Mythic+ Dungeon - Ruby Life Pools" },
                         { 268248, "Amani Summoning Shawl", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
-                        { 251190, "Bloodthorn Burnous", "Mythic+ Dungeon - The Blinding Vale" },
+                        { 239656, "Adherent's Silken Shroud", "Crafted" },
                     },
                     [16] = {
-                        { 237839, "Spellbreaker's Blade", "Crafted" },
                         { 268209, "Aman'muso, Warlord's Vengeance", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
+                        { 237839, "Spellbreaker's Blade", "Crafted" },
                         { 270930, "Tomb-Creeper's Claw", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
                     },
                     [17] = {
@@ -4205,18 +4207,18 @@ ns.BiSData = {
                 mythicplus = {
                     [1] = {
                         { 271510, "Chosen Bloodslayer's Spirit Shroud", "Tier Set token" },
-                        { 271438, "Temple Delver's Mystic Helm", "World Drop" },
                         { 271875, "Gaze of the Coiled Watcher", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
+                        { 271438, "Temple Delver's Mystic Helm", "World Drop" },
                     },
                     [2] = {
-                        { 273781, "Strand of Warding Fangs", "Mythic+ Dungeon - Altar of Fangs" },
                         { 268265, "Aqirbane Reliquary", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
+                        { 273781, "Strand of Warding Fangs", "Mythic+ Dungeon - Altar of Fangs" },
                         { 251173, "Yoke of the Charging Bear", "Mythic+ Dungeon - Den of Nalorakk" },
                     },
                     [3] = {
                         { 271508, "Chosen Bloodslayer's Voodoo Guards", "Tier Set token" },
                         { 273774, "Snakeskin Spaulders", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 268246, "Frothing Venom Spaulders", "Raid drop - The Venomous Abyss - Boss 4 - Vashnik the Malignant" },
+                        { 251223, "Somber Spaulders", "Mythic+ Dungeon - Voidscar Arena" },
                     },
                     [5] = {
                         { 271513, "Chosen Bloodslayer's Banded Poncho", "Tier Set token" },
@@ -4226,12 +4228,12 @@ ns.BiSData = {
                     [6] = {
                         { 244573, "Silvermoon Agent's Utility Belt", "Crafted" },
                         { 251189, "Rootwalker Harness", "Mythic+ Dungeon - The Blinding Vale" },
-                        { 159301, "Primal Dinomancer's Belt", "Mythic+ Dungeon - Kings' Rest" },
+                        { 271436, "Slitherscale Girdle", "World Drop" },
                     },
                     [7] = {
                         { 271509, "Chosen Bloodslayer's Reinforced Pants", "Tier Set token" },
-                        { 159313, "Breeches of the Sacred Hall", "Mythic+ Dungeon - Kings' Rest" },
-                        { 250005, "Blade Holsters of the Grim Jest", "Tier Set token" },
+                        { 244574, "Silvermoon Agent's Leggings", "Crafted" },
+                        { 155942, "Proto-Hide Leggings", "World Drop" },
                     },
                     [8] = {
                         { 244569, "Silvermoon Agent's Sneakers", "Crafted" },
@@ -4246,12 +4248,12 @@ ns.BiSData = {
                     [10] = {
                         { 271511, "Chosen Bloodslayer's Fanged Grips", "Tier Set token" },
                         { 244575, "Silvermoon Agent's Handwraps", "Crafted" },
-                        { 193758, "Subjugator's Chilling Grips", "Mythic+ Dungeon - Ruby Life Pools" },
+                        { 251124, "Gauntlets of Fevered Defense", "Mythic+ Dungeon - Murder Row" },
                     },
                     [11] = {
                         { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
                         { 251148, "Pilfered Precious Band", "Mythic+ Dungeon - Den of Nalorakk" },
-                        { 159459, "Ritual Binder's Ring", "Mythic+ Dungeon - Kings' Rest" },
+                        { 268252, "Apex Brute's Claw Ring", "Raid drop - The Venomous Abyss - Boss 5 - Sszorak" },
                     },
                     [13] = {
                         { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
@@ -4266,7 +4268,7 @@ ns.BiSData = {
                     [16] = {
                         { 237839, "Spellbreaker's Blade", "Crafted" },
                         { 268209, "Aman'muso, Warlord's Vengeance", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
-                        { 270930, "Tomb-Creeper's Claw", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
+                        { 237841, "Spellbreaker's Ultimatum", "Crafted" },
                     },
                     [17] = {
                         { 275070, "Sharpened Lightwood Slasher", "Mythic+ Dungeon - Altar of Fangs" },
@@ -4294,23 +4296,23 @@ ns.BiSData = {
                     },
                     [5] = {
                         { 271513, "Chosen Bloodslayer's Banded Poncho", "Tier Set token" },
+                        { 268235, "Vestment of the Awakening", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
                         { 251159, "War Trial Vestments", "Mythic+ Dungeon - Den of Nalorakk" },
-                        { 251226, "Hide of Pestilence", "Mythic+ Dungeon - Voidscar Arena" },
                     },
                     [6] = {
-                        { 251235, "Gravitic Girdle", "Mythic+ Dungeon - Voidscar Arena" },
                         { 268256, "Sash of the Forlorn Vessel", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
+                        { 251235, "Gravitic Girdle", "Mythic+ Dungeon - Voidscar Arena" },
                         { 159317, "Whirling Dervish Sash", "Mythic+ Dungeon - Temple of Sethraliss" },
                     },
                     [7] = {
                         { 271509, "Chosen Bloodslayer's Reinforced Pants", "Tier Set token" },
                         { 159329, "Leggings of the Galeforce Viper", "Mythic+ Dungeon - Temple of Sethraliss" },
-                        { 244574, "Silvermoon Agent's Leggings", "Crafted" },
+                        { 251198, "Lightspore Leggings", "Mythic+ Dungeon - The Blinding Vale" },
                     },
                     [8] = {
                         { 159304, "Goldfeather Boots", "Mythic+ Dungeon - Kings' Rest" },
-                        { 251153, "Arctic Explorer's Legwraps", "Mythic+ Dungeon - Den of Nalorakk" },
-                        { 159327, "Sand-Shined Snakeskin Sandals", "Mythic+ Dungeon - Temple of Sethraliss" },
+                        { 244569, "Silvermoon Agent's Sneakers", "Crafted" },
+                        { 268247, "Breakwater Boots", "Raid drop" },
                     },
                     [9] = {
                         { 244576, "Silvermoon Agent's Deflectors", "Crafted" },
@@ -4329,8 +4331,8 @@ ns.BiSData = {
                     },
                     [13] = {
                         { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 270173, "Zul'jin's Guillotine Technique", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
                         { 270165, "Keeper's Seething Core", "Raid drop - The Venomous Abyss - Boss 2 - Entombed Sentinels" },
+                        { 270173, "Zul'jin's Guillotine Technique", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
                     },
                     [15] = {
                         { 251190, "Bloodthorn Burnous", "Mythic+ Dungeon - The Blinding Vale" },
@@ -4355,8 +4357,8 @@ ns.BiSData = {
                         { 268219, "Shadow Hunter's Warmask", "Raid drop - The Venomous Abyss - Boss 2 - Entombed Sentinels" },
                     },
                     [2] = {
-                        { 251142, "Pendant of Malefic Fury", "Mythic+ Dungeon - Murder Row" },
                         { 268265, "Aqirbane Reliquary", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
+                        { 251142, "Pendant of Malefic Fury", "Mythic+ Dungeon - Murder Row" },
                         { 268251, "Amulet of the Twin Fangs", "Raid drop - The Venomous Abyss - Boss 6 - The Twin Fangs" },
                     },
                     [3] = {
@@ -4367,37 +4369,37 @@ ns.BiSData = {
                     [5] = {
                         { 271513, "Chosen Bloodslayer's Banded Poncho", "Tier Set token" },
                         { 251226, "Hide of Pestilence", "Mythic+ Dungeon - Voidscar Arena" },
-                        { 239048, "Vest of Reverent Adoration", "Mythic+ Dungeon - Kings' Rest" },
+                        { 251159, "War Trial Vestments", "Mythic+ Dungeon - Den of Nalorakk" },
                     },
                     [6] = {
                         { 268256, "Sash of the Forlorn Vessel", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
+                        { 271436, "Slitherscale Girdle", "World Drop" },
                         { 159317, "Whirling Dervish Sash", "Mythic+ Dungeon - Temple of Sethraliss" },
-                        { 159301, "Primal Dinomancer's Belt", "Mythic+ Dungeon - Kings' Rest" },
                     },
                     [7] = {
                         { 271509, "Chosen Bloodslayer's Reinforced Pants", "Tier Set token" },
                         { 159329, "Leggings of the Galeforce Viper", "Mythic+ Dungeon - Temple of Sethraliss" },
-                        { 268225, "Coiled Hex Legguards", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
+                        { 272243, "Miststalker's Cuisses", "Drop" },
                     },
                     [8] = {
                         { 159327, "Sand-Shined Snakeskin Sandals", "Mythic+ Dungeon - Temple of Sethraliss" },
-                        { 251153, "Arctic Explorer's Legwraps", "Mythic+ Dungeon - Den of Nalorakk" },
+                        { 268261, "Bespittled Slitherslippers", "Raid drop - The Venomous Abyss - Boss 6 - The Twin Fangs" },
                         { 159304, "Goldfeather Boots", "Mythic+ Dungeon - Kings' Rest" },
                     },
                     [9] = {
                         { 244576, "Silvermoon Agent's Deflectors", "Crafted" },
                         { 268240, "Restless Spirit Shackles", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
-                        { 251135, "Fury-fletched Armlets", "Mythic+ Dungeon - Murder Row" },
+                        { 251183, "Rootwarden Wraps", "Mythic+ Dungeon - The Blinding Vale" },
                     },
                     [10] = {
                         { 271511, "Chosen Bloodslayer's Fanged Grips", "Tier Set token" },
                         { 159337, "Grips of Electrified Defense", "Mythic+ Dungeon - Temple of Sethraliss" },
-                        { 251124, "Gauntlets of Fevered Defense", "Mythic+ Dungeon - Murder Row" },
+                        { 159312, "Desiccator's Blessed Gloves", "Mythic+ Dungeon - Kings' Rest" },
                     },
                     [11] = {
                         { 251194, "Lightwarden's Bind", "Mythic+ Dungeon - The Blinding Vale" },
-                        { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
-                        { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
+                        { 268249, "Vile Alchemist's Band", "Raid drop - The Venomous Abyss - Boss 4 - Vashnik the Malignant" },
+                        { 162544, "Jade Ophidian Band", "Mythic+ Dungeon - Temple of Sethraliss" },
                     },
                     [13] = {
                         { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
@@ -4406,17 +4408,18 @@ ns.BiSData = {
                     },
                     [15] = {
                         { 251132, "Speakeasy Shroud", "Mythic+ Dungeon - Murder Row" },
-                        { 251190, "Bloodthorn Burnous", "Mythic+ Dungeon - The Blinding Vale" },
+                        { 159288, "Cloak of the Restless Tribes", "Mythic+ Dungeon - Kings' Rest" },
                         { 268253, "Silken Voodoo Drape", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
                     },
                     [16] = {
                         { 237837, "Farstrider's Mercy", "Crafted" },
                         { 271093, "Zatha'tek, Breath of Corruption", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
+                        { 268264, "Ravenous Feaster's Fang", "Raid drop - The Venomous Abyss - Boss 6 - The Twin Fangs" },
                     },
                     [17] = {
                         { 275070, "Sharpened Lightwood Slasher", "Mythic+ Dungeon - Altar of Fangs" },
+                        { 237837, "Farstrider's Mercy", "Crafted" },
                         { 271093, "Zatha'tek, Breath of Corruption", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 251180, "Thornblade", "Mythic+ Dungeon - The Blinding Vale" },
                     },
                 },
             },
@@ -4429,12 +4432,12 @@ ns.BiSData = {
                     [1] = {
                         { 271483, "Serpent Crown of the Ophidian Oracle", "Tier Set token" },
                         { 268230, "Crown of the Eternal Fang", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
-                        { 251220, "Voidscarred Crown", "Mythic+ Dungeon - Voidscar Arena" },
+                        { 271441, "Crushing Coiler Coif", "Raid drop - The Venomous Abyss" },
                     },
                     [2] = {
                         { 268265, "Aqirbane Reliquary", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 273781, "Strand of Warding Fangs", "Mythic+ Dungeon - Altar of Fangs" },
                         { 251234, "Graft of the Domanaar", "Mythic+ Dungeon - Voidscar Arena" },
+                        { 273781, "Strand of Warding Fangs", "Mythic+ Dungeon - Altar of Fangs" },
                     },
                     [3] = {
                         { 271481, "Hissing Mantle of the Ophidian Oracle", "Tier Set token" },
@@ -4457,9 +4460,9 @@ ns.BiSData = {
                         { 159375, "Legguards of the Awakening Brood", "Mythic+ Dungeon - Temple of Sethraliss" },
                     },
                     [8] = {
-                        { 159388, "Sabatons of Coruscating Energy", "Mythic+ Dungeon - Temple of Sethraliss" },
-                        { 268258, "Boots of the Reckless Wayfarer", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
                         { 244577, "Farstrider's Razor Talons", "Crafted" },
+                        { 268258, "Boots of the Reckless Wayfarer", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
+                        { 159388, "Sabatons of Coruscating Energy", "Mythic+ Dungeon - Temple of Sethraliss" },
                     },
                     [9] = {
                         { 244584, "Farstrider's Plated Bracers", "Crafted" },
@@ -4499,37 +4502,37 @@ ns.BiSData = {
                 mythicplus = {
                     [1] = {
                         { 271483, "Serpent Crown of the Ophidian Oracle", "Tier Set token" },
+                        { 271441, "Crushing Coiler Coif", "World Drop" },
                         { 193765, "Blazebound Lieutenant's Helm", "Mythic+ Dungeon - Ruby Life Pools" },
-                        { 239035, "Sethraliss' Fanged Helm", "Mythic+ Dungeon - Temple of Sethraliss" },
                     },
                     [2] = {
                         { 268265, "Aqirbane Reliquary", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                         { 273781, "Strand of Warding Fangs", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 251234, "Graft of the Domanaar", "Mythic+ Dungeon - Voidscar Arena" },
+                        { 271638, "Bound Serpent's Jade Eye", "World Drop" },
                     },
                     [3] = {
                         { 271481, "Hissing Mantle of the Ophidian Oracle", "Tier Set token" },
-                        { 251184, "Ironroot Collar", "Mythic+ Dungeon - The Blinding Vale" },
-                        { 251131, "Jangling Felpaulets", "Mythic+ Dungeon - Murder Row" },
+                        { 268231, "Soulslither Spaulders", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
+                        { 272252, "Galerider's Mantle", "Drop" },
                     },
                     [5] = {
                         { 271486, "Fanged Raiment of the Ophidian Oracle", "Tier Set token" },
                         { 271876, "Awoken Dreadfang Cuirass", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 273789, "Chestguard of Corroded Scales", "Mythic+ Dungeon - Altar of Fangs" },
+                        { 251233, "Manipulator's Vest", "Mythic+ Dungeon - Voidscar Arena" },
                     },
                     [6] = {
                         { 268254, "Serpentine Mixing Belt", "Raid drop - The Venomous Abyss - Boss 4 - Vashnik the Malignant" },
-                        { 251155, "Tribal Defender's Cord", "Mythic+ Dungeon - Den of Nalorakk" },
+                        { 271480, "Venomous Belt of the Ophidian Oracle", "Tier Set token" },
                         { 251228, "Behemoth Waistband", "Mythic+ Dungeon - Voidscar Arena" },
                     },
                     [7] = {
                         { 271482, "Leggings of the Ophidian Oracle", "Tier Set token" },
-                        { 244582, "Farstrider's Reinforced Faulds", "Crafted" },
+                        { 268237, "Cuisses of the Uncoiled Union", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
                         { 159375, "Legguards of the Awakening Brood", "Mythic+ Dungeon - Temple of Sethraliss" },
                     },
                     [8] = {
-                        { 268258, "Boots of the Reckless Wayfarer", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
                         { 271440, "Greaves of the Noxious Depths", "World Drop" },
+                        { 268258, "Boots of the Reckless Wayfarer", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
                         { 244577, "Farstrider's Razor Talons", "Crafted" },
                     },
                     [9] = {
@@ -4539,23 +4542,23 @@ ns.BiSData = {
                     },
                     [10] = {
                         { 271484, "Hexing Grips of the Ophidian Oracle", "Tier Set token" },
+                        { 193752, "Galerattle Gauntlets", "Mythic+ Dungeon - Ruby Life Pools" },
                         { 268238, "Grips of Swirling Fury", "Raid drop" },
-                        { 251152, "Season's Turn Gauntlets", "Mythic+ Dungeon - Den of Nalorakk" },
                     },
                     [11] = {
-                        { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
                         { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
+                        { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
                         { 158366, "Charged Sandstone Band", "Mythic+ Dungeon - Temple of Sethraliss" },
                     },
                     [13] = {
-                        { 273796, "Vile Vial of Volatile Venom", "Mythic+ Dungeon - Altar of Fangs" },
                         { 270164, "Gebbo's Bottomless Bag", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
-                        { 250214, "Lightspire Core", "Mythic+ Dungeon - The Blinding Vale" },
+                        { 273796, "Vile Vial of Volatile Venom", "Mythic+ Dungeon - Altar of Fangs" },
+                        { 250215, "Freightrunner's Flask", "Mythic+ Dungeon - Murder Row" },
                     },
                     [15] = {
                         { 251132, "Speakeasy Shroud", "Mythic+ Dungeon - Murder Row" },
-                        { 251190, "Bloodthorn Burnous", "Mythic+ Dungeon - The Blinding Vale" },
                         { 239656, "Adherent's Silken Shroud", "Crafted" },
+                        { 268253, "Silken Voodoo Drape", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
                     },
                     [16] = {
                         { 245770, "Aln'hara Cane", "Crafted" },
@@ -4572,7 +4575,7 @@ ns.BiSData = {
                     [2] = {
                         { 268265, "Aqirbane Reliquary", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                         { 251142, "Pendant of Malefic Fury", "Mythic+ Dungeon - Murder Row" },
-                        { 273781, "Strand of Warding Fangs", "Mythic+ Dungeon - Altar of Fangs" },
+                        { 251234, "Graft of the Domanaar", "Mythic+ Dungeon - Voidscar Arena" },
                     },
                     [3] = {
                         { 271481, "Hissing Mantle of the Ophidian Oracle", "Tier Set token" },
@@ -4585,8 +4588,8 @@ ns.BiSData = {
                         { 251233, "Manipulator's Vest", "Mythic+ Dungeon - Voidscar Arena" },
                     },
                     [6] = {
-                        { 251228, "Behemoth Waistband", "Mythic+ Dungeon - Voidscar Arena" },
                         { 268254, "Serpentine Mixing Belt", "Raid drop - The Venomous Abyss - Boss 4 - Vashnik the Malignant" },
+                        { 251228, "Behemoth Waistband", "Mythic+ Dungeon - Voidscar Arena" },
                         { 251155, "Tribal Defender's Cord", "Mythic+ Dungeon - Den of Nalorakk" },
                     },
                     [7] = {
@@ -4595,8 +4598,8 @@ ns.BiSData = {
                         { 159375, "Legguards of the Awakening Brood", "Mythic+ Dungeon - Temple of Sethraliss" },
                     },
                     [8] = {
-                        { 268233, "Ferocious Scaleboots", "Raid drop - The Venomous Abyss - Boss 5 - Sszorak" },
                         { 159388, "Sabatons of Coruscating Energy", "Mythic+ Dungeon - Temple of Sethraliss" },
+                        { 268233, "Ferocious Scaleboots", "Raid drop - The Venomous Abyss - Boss 5 - Sszorak" },
                         { 268258, "Boots of the Reckless Wayfarer", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
                     },
                     [9] = {
@@ -4606,8 +4609,8 @@ ns.BiSData = {
                     },
                     [10] = {
                         { 271484, "Hexing Grips of the Ophidian Oracle", "Tier Set token" },
-                        { 193752, "Galerattle Gauntlets", "Mythic+ Dungeon - Ruby Life Pools" },
                         { 268238, "Grips of Swirling Fury", "Raid drop" },
+                        { 244583, "Farstrider's Sharpened Claws", "Crafted" },
                     },
                     [11] = {
                         { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
@@ -4616,17 +4619,17 @@ ns.BiSData = {
                     },
                     [13] = {
                         { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 273796, "Vile Vial of Volatile Venom", "Mythic+ Dungeon - Altar of Fangs" },
                         { 270173, "Zul'jin's Guillotine Technique", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
+                        { 273796, "Vile Vial of Volatile Venom", "Mythic+ Dungeon - Altar of Fangs" },
                     },
                     [15] = {
                         { 251132, "Speakeasy Shroud", "Mythic+ Dungeon - Murder Row" },
-                        { 251190, "Bloodthorn Burnous", "Mythic+ Dungeon - The Blinding Vale" },
                         { 268253, "Silken Voodoo Drape", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
+                        { 251190, "Bloodthorn Burnous", "Mythic+ Dungeon - The Blinding Vale" },
                     },
                     [16] = {
-                        { 237850, "Farstrider's Chopper", "Crafted" },
                         { 268209, "Aman'muso, Warlord's Vengeance", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
+                        { 237850, "Farstrider's Chopper", "Crafted" },
                         { 270930, "Tomb-Creeper's Claw", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
                     },
                     [17] = {
@@ -4638,13 +4641,13 @@ ns.BiSData = {
                 mythicplus = {
                     [1] = {
                         { 271483, "Serpent Crown of the Ophidian Oracle", "Tier Set token" },
+                        { 268230, "Crown of the Eternal Fang", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
                         { 244579, "Farstrider's Unwavering Visage", "Crafted" },
-                        { 271441, "Crushing Coiler Coif", "Drop" },
                     },
                     [2] = {
                         { 268265, "Aqirbane Reliquary", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 251142, "Pendant of Malefic Fury", "Mythic+ Dungeon - Murder Row" },
                         { 251234, "Graft of the Domanaar", "Mythic+ Dungeon - Voidscar Arena" },
+                        { 251142, "Pendant of Malefic Fury", "Mythic+ Dungeon - Murder Row" },
                     },
                     [3] = {
                         { 271481, "Hissing Mantle of the Ophidian Oracle", "Tier Set token" },
@@ -4654,17 +4657,17 @@ ns.BiSData = {
                     [5] = {
                         { 271486, "Fanged Raiment of the Ophidian Oracle", "Tier Set token" },
                         { 271876, "Awoken Dreadfang Cuirass", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 244578, "Farstrider's Scouting Vest", "Crafted" },
+                        { 251233, "Manipulator's Vest", "Mythic+ Dungeon - Voidscar Arena" },
                     },
                     [6] = {
-                        { 251228, "Behemoth Waistband", "Mythic+ Dungeon - Voidscar Arena" },
                         { 268254, "Serpentine Mixing Belt", "Raid drop - The Venomous Abyss - Boss 4 - Vashnik the Malignant" },
+                        { 251228, "Behemoth Waistband", "Mythic+ Dungeon - Voidscar Arena" },
                         { 271480, "Venomous Belt of the Ophidian Oracle", "Tier Set token" },
                     },
                     [7] = {
                         { 271482, "Leggings of the Ophidian Oracle", "Tier Set token" },
                         { 268237, "Cuisses of the Uncoiled Union", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
-                        { 193759, "Egg Tender's Leggings", "Mythic+ Dungeon - Ruby Life Pools" },
+                        { 159375, "Legguards of the Awakening Brood", "Mythic+ Dungeon - Temple of Sethraliss" },
                     },
                     [8] = {
                         { 268233, "Ferocious Scaleboots", "Raid drop - The Venomous Abyss - Boss 5 - Sszorak" },
@@ -4674,37 +4677,37 @@ ns.BiSData = {
                     [9] = {
                         { 244584, "Farstrider's Plated Bracers", "Crafted" },
                         { 251200, "Saptorbane Guards", "Mythic+ Dungeon - The Blinding Vale" },
-                        { 159380, "Arc-Glass Bindings", "Mythic+ Dungeon - Temple of Sethraliss" },
+                        { 271479, "Wristbands of the Ophidian Oracle", "World Drop" },
                     },
                     [10] = {
                         { 271484, "Hexing Grips of the Ophidian Oracle", "Tier Set token" },
+                        { 193752, "Galerattle Gauntlets", "Mythic+ Dungeon - Ruby Life Pools" },
                         { 272249, "Galerider's Chain Clasps", "World Drop" },
-                        { 160213, "Sepulchral Construct's Gloves", "Mythic+ Dungeon - Kings' Rest" },
                     },
                     [11] = {
                         { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
-                        { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
                         { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
+                        { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
                     },
                     [13] = {
-                        { 273796, "Vile Vial of Volatile Venom", "Mythic+ Dungeon - Altar of Fangs" },
                         { 270173, "Zul'jin's Guillotine Technique", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
                         { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
+                        { 273796, "Vile Vial of Volatile Venom", "Mythic+ Dungeon - Altar of Fangs" },
                     },
                     [15] = {
-                        { 251190, "Bloodthorn Burnous", "Mythic+ Dungeon - The Blinding Vale" },
                         { 271478, "Ritual Drape of the Ophidian Oracle", "Tier Set token" },
-                        { 268253, "Silken Voodoo Drape", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
+                        { 251190, "Bloodthorn Burnous", "Mythic+ Dungeon - The Blinding Vale" },
+                        { 251132, "Speakeasy Shroud", "Mythic+ Dungeon - Murder Row" },
                     },
                     [16] = {
-                        { 237850, "Farstrider's Chopper", "Crafted" },
                         { 268209, "Aman'muso, Warlord's Vengeance", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
-                        { 237845, "Bloomforged Claw", "World Drop" },
+                        { 237850, "Farstrider's Chopper", "Crafted" },
+                        { 270930, "Tomb-Creeper's Claw", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
                     },
                     [17] = {
                         { 237850, "Farstrider's Chopper", "Crafted" },
                         { 251224, "Hulking Handaxe", "Mythic+ Dungeon - Voidscar Arena" },
-                        { 268206, "Slithering Savage's Gavel", "Raid drop - The Venomous Abyss - Boss 5 - Sszorak" },
+                        { 237845, "Bloomforged Claw", "World Drop" },
                     },
                 },
             },
@@ -4713,7 +4716,7 @@ ns.BiSData = {
                     [1] = {
                         { 271483, "Serpent Crown of the Ophidian Oracle", "Tier Set token" },
                         { 268230, "Crown of the Eternal Fang", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
-                        { 239035, "Sethraliss' Fanged Helm", "Mythic+ Dungeon - Temple of Sethraliss" },
+                        { 244579, "Farstrider's Unwavering Visage", "Crafted" },
                     },
                     [2] = {
                         { 268265, "Aqirbane Reliquary", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
@@ -4728,12 +4731,12 @@ ns.BiSData = {
                     [5] = {
                         { 271486, "Fanged Raiment of the Ophidian Oracle", "Tier Set token" },
                         { 271876, "Awoken Dreadfang Cuirass", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 251233, "Manipulator's Vest", "Mythic+ Dungeon - Voidscar Arena" },
+                        { 239046, "Loa-Blessed Chestguard", "Mythic+ Dungeon - Kings' Rest" },
                     },
                     [6] = {
                         { 268216, "Cursed Reliquary Cincture", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
-                        { 251155, "Tribal Defender's Cord", "Mythic+ Dungeon - Den of Nalorakk" },
                         { 244581, "Farstrider's Trophy Belt", "Crafted" },
+                        { 251155, "Tribal Defender's Cord", "Mythic+ Dungeon - Den of Nalorakk" },
                     },
                     [7] = {
                         { 271482, "Leggings of the Ophidian Oracle", "Tier Set token" },
@@ -4758,34 +4761,33 @@ ns.BiSData = {
                     [11] = {
                         { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
                         { 251148, "Pilfered Precious Band", "Mythic+ Dungeon - Den of Nalorakk" },
-                        { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
+                        { 268252, "Apex Brute's Claw Ring", "Raid drop - The Venomous Abyss - Boss 5 - Sszorak" },
                     },
                     [13] = {
                         { 270162, "Soulcoiler Ritual Vessel", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
                         { 270164, "Gebbo's Bottomless Bag", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
-                        { 250215, "Freightrunner's Flask", "Mythic+ Dungeon - Murder Row" },
+                        { 270167, "Wavecaller's Seastone", "Raid drop" },
                     },
                     [15] = {
                         { 268248, "Amani Summoning Shawl", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
-                        { 251132, "Speakeasy Shroud", "Mythic+ Dungeon - Murder Row" },
                         { 193763, "Fireproof Drape", "Mythic+ Dungeon - Ruby Life Pools" },
+                        { 251132, "Speakeasy Shroud", "Mythic+ Dungeon - Murder Row" },
                     },
                     [16] = {
                         { 271092, "Jan'thrazet, the Soul Fang", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                         { 268210, "Malevolent Spiritcudgel", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
-                        { 273778, "Polished Lightwood Channeler", "Mythic+ Dungeon - Altar of Fangs" },
                     },
                     [17] = {
                         { 237831, "Spellbreaker's Rebuke", "Crafted" },
                         { 268196, "Venom-Slashed Scuteward", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
-                        { 268262, "Bubblefin Splash Guard", "Raid drop" },
+                        { 159664, "Bulwark of Brimming Potential", "Mythic+ Dungeon - Temple of Sethraliss" },
                     },
                 },
                 mythicplus = {
                     [1] = {
                         { 271483, "Serpent Crown of the Ophidian Oracle", "Tier Set token" },
-                        { 251158, "Nalorakk's Nightmare", "Mythic+ Dungeon - Den of Nalorakk" },
-                        { 268230, "Crown of the Eternal Fang", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
+                        { 244579, "Farstrider's Unwavering Visage", "Crafted" },
+                        { 239035, "Sethraliss' Fanged Helm", "Mythic+ Dungeon - Temple of Sethraliss" },
                     },
                     [2] = {
                         { 268265, "Aqirbane Reliquary", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
@@ -4794,38 +4796,36 @@ ns.BiSData = {
                     },
                     [3] = {
                         { 271481, "Hissing Mantle of the Ophidian Oracle", "Tier Set token" },
-                        { 251131, "Jangling Felpaulets", "Mythic+ Dungeon - Murder Row" },
                         { 244580, "Farstrider's Brilliant Plumes", "Crafted" },
+                        { 251184, "Ironroot Collar", "Mythic+ Dungeon - The Blinding Vale" },
                     },
                     [5] = {
                         { 271486, "Fanged Raiment of the Ophidian Oracle", "Tier Set token" },
-                        { 273789, "Chestguard of Corroded Scales", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 271876, "Awoken Dreadfang Cuirass", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                     },
                     [6] = {
                         { 268216, "Cursed Reliquary Cincture", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
+                        { 251155, "Tribal Defender's Cord", "Mythic+ Dungeon - Den of Nalorakk" },
                         { 159369, "Belt of the Consecrated Tomb", "Mythic+ Dungeon - Kings' Rest" },
-                        { 244581, "Farstrider's Trophy Belt", "Crafted" },
                     },
                     [7] = {
                         { 271482, "Leggings of the Ophidian Oracle", "Tier Set token" },
                         { 159375, "Legguards of the Awakening Brood", "Mythic+ Dungeon - Temple of Sethraliss" },
-                        { 244582, "Farstrider's Reinforced Faulds", "Crafted" },
+                        { 268237, "Cuisses of the Uncoiled Union", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
                     },
                     [8] = {
-                        { 251125, "Felsoaked Soles", "Mythic+ Dungeon - Murder Row" },
                         { 271440, "Greaves of the Noxious Depths", "World Drop" },
+                        { 251125, "Felsoaked Soles", "Mythic+ Dungeon - Murder Row" },
                         { 244577, "Farstrider's Razor Talons", "Crafted" },
                     },
                     [9] = {
                         { 244584, "Farstrider's Plated Bracers", "Crafted" },
                         { 159380, "Arc-Glass Bindings", "Mythic+ Dungeon - Temple of Sethraliss" },
-                        { 251200, "Saptorbane Guards", "Mythic+ Dungeon - The Blinding Vale" },
+                        { 155964, "Wristguards of the Firetender", "World Drop" },
                     },
                     [10] = {
                         { 271484, "Hexing Grips of the Ophidian Oracle", "Tier Set token" },
                         { 251165, "Pulverizing Pads", "Mythic+ Dungeon - The Blinding Vale" },
-                        { 244583, "Farstrider's Sharpened Claws", "Crafted" },
+                        { 268238, "Grips of Swirling Fury", "Raid drop" },
                     },
                     [11] = {
                         { 251148, "Pilfered Precious Band", "Mythic+ Dungeon - Den of Nalorakk" },
@@ -4835,16 +4835,16 @@ ns.BiSData = {
                     [13] = {
                         { 270162, "Soulcoiler Ritual Vessel", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
                         { 250255, "Unstable Felheart Crystal", "Mythic+ Dungeon - Murder Row" },
-                        { 248583, "Drum of Renewed Bonds", "World Drop" },
+                        { 270164, "Gebbo's Bottomless Bag", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
                     },
                     [15] = {
-                        { 193763, "Fireproof Drape", "Mythic+ Dungeon - Ruby Life Pools" },
                         { 268248, "Amani Summoning Shawl", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
-                        { 251132, "Speakeasy Shroud", "Mythic+ Dungeon - Murder Row" },
+                        { 193763, "Fireproof Drape", "Mythic+ Dungeon - Ruby Life Pools" },
+                        { 239656, "Adherent's Silken Shroud", "Crafted" },
                     },
                     [16] = {
                         { 271092, "Jan'thrazet, the Soul Fang", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 251225, "Fang of Contagion", "Mythic+ Dungeon - Voidscar Arena" },
+                        { 268203, "Hexing Spiritrender", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
                     },
                     [17] = {
                         { 237831, "Spellbreaker's Rebuke", "Crafted" },
@@ -4876,13 +4876,13 @@ ns.BiSData = {
                     },
                     [5] = {
                         { 271549, "Damned Necrolyte's Rattling Robes", "Tier Set token" },
-                        { 273785, "Primordial Robe of Rites", "Mythic+ Dungeon - Altar of Fangs" },
                         { 251139, "Summoner's Searing Shirt", "Mythic+ Dungeon - Murder Row" },
+                        { 239655, "Martyr's Vestments", "Crafted" },
                     },
                     [6] = {
                         { 251222, "Ethereal Netherwrap", "Mythic+ Dungeon - Voidscar Arena" },
-                        { 239649, "Martyr's Waistwrap", "Crafted" },
                         { 268257, "Caustic Chain-Wrapped Sash", "Raid drop - The Venomous Abyss - Boss 5 - Sszorak" },
+                        { 239649, "Martyr's Waistwrap", "Crafted" },
                     },
                     [7] = {
                         { 271545, "Damned Necrolyte's Leg Bindings", "Tier Set token" },
@@ -4906,17 +4906,17 @@ ns.BiSData = {
                     },
                     [11] = {
                         { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
                         { 268252, "Apex Brute's Claw Ring", "Raid drop - The Venomous Abyss - Boss 5 - Sszorak" },
+                        { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
                     },
                     [13] = {
                         { 273796, "Vile Vial of Volatile Venom", "Mythic+ Dungeon - Altar of Fangs" },
                         { 270164, "Gebbo's Bottomless Bag", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
-                        { 250224, "Mindpiercer's Sigil", "Mythic+ Dungeon - Voidscar Arena" },
+                        { 270167, "Wavecaller's Seastone", "Raid drop" },
                     },
                     [15] = {
-                        { 251132, "Speakeasy Shroud", "Mythic+ Dungeon - Murder Row" },
                         { 193763, "Fireproof Drape", "Mythic+ Dungeon - Ruby Life Pools" },
+                        { 251132, "Speakeasy Shroud", "Mythic+ Dungeon - Murder Row" },
                         { 251190, "Bloodthorn Burnous", "Mythic+ Dungeon - The Blinding Vale" },
                     },
                     [16] = {
@@ -4926,19 +4926,19 @@ ns.BiSData = {
                     [17] = {
                         { 245769, "Aln'hara Lantern", "Crafted" },
                         { 273779, "Nocuous Focal Fang", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 271681, "Perennial Frostbound Charm", "Mythic+ Dungeon - Den of Nalorakk" },
+                        { 268263, "Frostscale's Mystic Frond", "Raid drop" },
                     },
                 },
                 mythicplus = {
                     [1] = {
                         { 271546, "Skull of the Damned Necrolyte", "Tier Set token" },
-                        { 251232, "Overseer's Diadem", "Mythic+ Dungeon - Voidscar Arena" },
+                        { 271874, "Venomkeeper's Horrific Cowl", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                         { 251199, "Worldroot Canopy", "Mythic+ Dungeon - The Blinding Vale" },
                     },
                     [2] = {
                         { 268265, "Aqirbane Reliquary", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 273781, "Strand of Warding Fangs", "Mythic+ Dungeon - Altar of Fangs" },
                         { 251173, "Yoke of the Charging Bear", "Mythic+ Dungeon - Den of Nalorakk" },
+                        { 273781, "Strand of Warding Fangs", "Mythic+ Dungeon - Altar of Fangs" },
                     },
                     [3] = {
                         { 271544, "Spires of the Damned Necrolyte", "Tier Set token" },
@@ -4947,8 +4947,8 @@ ns.BiSData = {
                     },
                     [5] = {
                         { 271549, "Damned Necrolyte's Rattling Robes", "Tier Set token" },
-                        { 273785, "Primordial Robe of Rites", "Mythic+ Dungeon - Altar of Fangs" },
                         { 251139, "Summoner's Searing Shirt", "Mythic+ Dungeon - Murder Row" },
+                        { 239032, "Robes of the Reborn Serpent", "Mythic+ Dungeon - Temple of Sethraliss" },
                     },
                     [6] = {
                         { 239649, "Martyr's Waistwrap", "Crafted" },
@@ -4957,8 +4957,8 @@ ns.BiSData = {
                     },
                     [7] = {
                         { 271545, "Damned Necrolyte's Leg Bindings", "Tier Set token" },
-                        { 251160, "Forest Dream Leg-guards", "Mythic+ Dungeon - Den of Nalorakk" },
                         { 273786, "Leggings of Entwined Serpents", "Mythic+ Dungeon - Altar of Fangs" },
+                        { 251160, "Forest Dream Leg-guards", "Mythic+ Dungeon - Den of Nalorakk" },
                     },
                     [8] = {
                         { 251219, "Riftworn Stompers", "Mythic+ Dungeon - Voidscar Arena" },
@@ -4968,7 +4968,7 @@ ns.BiSData = {
                     [9] = {
                         { 239648, "Martyr's Bindings", "Crafted" },
                         { 251127, "Nibbling Armbands", "Mythic+ Dungeon - Murder Row" },
-                        { 251154, "Winter's Embrace Bracers", "Mythic+ Dungeon - Den of Nalorakk" },
+                        { 268228, "Venom-Singed Cuffs", "Raid drop - The Venomous Abyss - Boss 2 - Entombed Sentinels" },
                     },
                     [10] = {
                         { 271547, "Damned Necrolyte's Charred Grasps", "Tier Set token" },
@@ -4982,13 +4982,13 @@ ns.BiSData = {
                     },
                     [13] = {
                         { 273796, "Vile Vial of Volatile Venom", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 250224, "Mindpiercer's Sigil", "Mythic+ Dungeon - Voidscar Arena" },
                         { 270164, "Gebbo's Bottomless Bag", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
+                        { 270167, "Wavecaller's Seastone", "Raid drop" },
                     },
                     [15] = {
                         { 193763, "Fireproof Drape", "Mythic+ Dungeon - Ruby Life Pools" },
-                        { 275525, "Preyhunter's Polished Cloak", "World Drop" },
                         { 268248, "Amani Summoning Shawl", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
+                        { 251132, "Speakeasy Shroud", "Mythic+ Dungeon - Murder Row" },
                     },
                     [16] = {
                         { 273778, "Polished Lightwood Channeler", "Mythic+ Dungeon - Altar of Fangs" },
@@ -5016,22 +5016,22 @@ ns.BiSData = {
                     [3] = {
                         { 271544, "Spires of the Damned Necrolyte", "Tier Set token" },
                         { 239031, "Brood Cleanser's Amice", "Mythic+ Dungeon - Temple of Sethraliss" },
-                        { 268241, "Ornaments of the Eternal Coil", "Raid drop - The Venomous Abyss - Boss 6 - The Twin Fangs" },
+                        { 271434, "Venom Rite Mantle", "Raid drop - The Venomous Abyss" },
                     },
                     [5] = {
                         { 271549, "Damned Necrolyte's Rattling Robes", "Tier Set token" },
-                        { 268221, "Tidebound Sorcereress's Robes", "Raid drop" },
                         { 239655, "Martyr's Vestments", "Crafted" },
+                        { 268221, "Tidebound Sorcereress's Robes", "Raid drop" },
                     },
                     [6] = {
                         { 239649, "Martyr's Waistwrap", "Crafted" },
-                        { 251222, "Ethereal Netherwrap", "Mythic+ Dungeon - Voidscar Arena" },
                         { 268257, "Caustic Chain-Wrapped Sash", "Raid drop - The Venomous Abyss - Boss 5 - Sszorak" },
+                        { 251222, "Ethereal Netherwrap", "Mythic+ Dungeon - Voidscar Arena" },
                     },
                     [7] = {
                         { 271545, "Damned Necrolyte's Leg Bindings", "Tier Set token" },
-                        { 273786, "Leggings of Entwined Serpents", "Mythic+ Dungeon - Altar of Fangs" },
                         { 239651, "Martyr's Leggings", "Crafted" },
+                        { 273786, "Leggings of Entwined Serpents", "Mythic+ Dungeon - Altar of Fangs" },
                     },
                     [8] = {
                         { 268218, "Nek'zali's Spiritwalkers", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
@@ -5045,8 +5045,8 @@ ns.BiSData = {
                     },
                     [10] = {
                         { 271547, "Damned Necrolyte's Charred Grasps", "Tier Set token" },
-                        { 273773, "Handwraps of Blasphemous Rites", "Mythic+ Dungeon - Altar of Fangs" },
                         { 268243, "Grasps of the Eternal Shadow", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
+                        { 273773, "Handwraps of Blasphemous Rites", "Mythic+ Dungeon - Altar of Fangs" },
                     },
                     [11] = {
                         { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
@@ -5056,12 +5056,12 @@ ns.BiSData = {
                     [13] = {
                         { 273796, "Vile Vial of Volatile Venom", "Mythic+ Dungeon - Altar of Fangs" },
                         { 270164, "Gebbo's Bottomless Bag", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
-                        { 250215, "Freightrunner's Flask", "Mythic+ Dungeon - Murder Row" },
+                        { 270167, "Wavecaller's Seastone", "Raid drop" },
                     },
                     [15] = {
                         { 251132, "Speakeasy Shroud", "Mythic+ Dungeon - Murder Row" },
                         { 193763, "Fireproof Drape", "Mythic+ Dungeon - Ruby Life Pools" },
-                        { 251190, "Bloodthorn Burnous", "Mythic+ Dungeon - The Blinding Vale" },
+                        { 239656, "Adherent's Silken Shroud", "Crafted" },
                     },
                     [16] = {
                         { 271092, "Jan'thrazet, the Soul Fang", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
@@ -5070,14 +5070,85 @@ ns.BiSData = {
                     [17] = {
                         { 245769, "Aln'hara Lantern", "Crafted" },
                         { 273779, "Nocuous Focal Fang", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 268263, "Frostscale's Mystic Frond", "Raid drop" },
+                        { 268197, "Spine of the Hissing Abyss", "Raid drop - The Venomous Abyss - Boss 2 - Entombed Sentinels" },
                     },
                 },
                 mythicplus = {
                     [1] = {
                         { 271546, "Skull of the Damned Necrolyte", "Tier Set token" },
-                        { 251199, "Worldroot Canopy", "Mythic+ Dungeon - The Blinding Vale" },
                         { 271874, "Venomkeeper's Horrific Cowl", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
+                        { 251199, "Worldroot Canopy", "Mythic+ Dungeon - The Blinding Vale" },
+                    },
+                    [2] = {
+                        { 268265, "Aqirbane Reliquary", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
+                        { 273781, "Strand of Warding Fangs", "Mythic+ Dungeon - Altar of Fangs" },
+                        { 271638, "Bound Serpent's Jade Eye", "World Drop" },
+                    },
+                    [3] = {
+                        { 271544, "Spires of the Damned Necrolyte", "Tier Set token" },
+                        { 271434, "Venom Rite Mantle", "World Drop" },
+                        { 239650, "Martyr's Mantle", "Crafted" },
+                    },
+                    [5] = {
+                        { 271549, "Damned Necrolyte's Rattling Robes", "Tier Set token" },
+                        { 239655, "Martyr's Vestments", "Crafted" },
+                        { 239032, "Robes of the Reborn Serpent", "Mythic+ Dungeon - Temple of Sethraliss" },
+                    },
+                    [6] = {
+                        { 268232, "Cincture of the Abyssal Grotto", "Raid drop" },
+                        { 251185, "Lightblossom Cinch", "Mythic+ Dungeon - The Blinding Vale" },
+                        { 251222, "Ethereal Netherwrap", "Mythic+ Dungeon - Voidscar Arena" },
+                    },
+                    [7] = {
+                        { 271545, "Damned Necrolyte's Leg Bindings", "Tier Set token" },
+                        { 251160, "Forest Dream Leg-guards", "Mythic+ Dungeon - Den of Nalorakk" },
+                        { 239651, "Martyr's Leggings", "Crafted" },
+                    },
+                    [8] = {
+                        { 271435, "Slippers of the Hissing Cult", "World Drop" },
+                        { 251137, "Tempestuous Sandals", "Mythic+ Dungeon - Murder Row" },
+                        { 268218, "Nek'zali's Spiritwalkers", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
+                    },
+                    [9] = {
+                        { 239648, "Martyr's Bindings", "Crafted" },
+                        { 268228, "Venom-Singed Cuffs", "Raid drop - The Venomous Abyss - Boss 2 - Entombed Sentinels" },
+                        { 251154, "Winter's Embrace Bracers", "Mythic+ Dungeon - Den of Nalorakk" },
+                    },
+                    [10] = {
+                        { 271547, "Damned Necrolyte's Charred Grasps", "Tier Set token" },
+                        { 273773, "Handwraps of Blasphemous Rites", "Mythic+ Dungeon - Altar of Fangs" },
+                    },
+                    [11] = {
+                        { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
+                        { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
+                        { 268252, "Apex Brute's Claw Ring", "Raid drop - The Venomous Abyss - Boss 5 - Sszorak" },
+                    },
+                    [13] = {
+                        { 273796, "Vile Vial of Volatile Venom", "Mythic+ Dungeon - Altar of Fangs" },
+                        { 270164, "Gebbo's Bottomless Bag", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
+                        { 270167, "Wavecaller's Seastone", "Raid drop" },
+                    },
+                    [15] = {
+                        { 239656, "Adherent's Silken Shroud", "Crafted" },
+                        { 251132, "Speakeasy Shroud", "Mythic+ Dungeon - Murder Row" },
+                        { 193763, "Fireproof Drape", "Mythic+ Dungeon - Ruby Life Pools" },
+                    },
+                    [16] = {
+                        { 271092, "Jan'thrazet, the Soul Fang", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
+                    },
+                    [17] = {
+                        { 245769, "Aln'hara Lantern", "Crafted" },
+                        { 268263, "Frostscale's Mystic Frond", "Raid drop" },
+                        { 273779, "Nocuous Focal Fang", "Mythic+ Dungeon - Altar of Fangs" },
+                    },
+                },
+            },
+            ["destruction"] = {
+                raid = {
+                    [1] = {
+                        { 271546, "Skull of the Damned Necrolyte", "Tier Set token" },
+                        { 271874, "Venomkeeper's Horrific Cowl", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
+                        { 268242, "Errant Scrollsage's Hood", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
                     },
                     [2] = {
                         { 268265, "Aqirbane Reliquary", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
@@ -5087,27 +5158,27 @@ ns.BiSData = {
                     [3] = {
                         { 271544, "Spires of the Damned Necrolyte", "Tier Set token" },
                         { 239031, "Brood Cleanser's Amice", "Mythic+ Dungeon - Temple of Sethraliss" },
-                        { 271434, "Venom Rite Mantle", "World Drop" },
+                        { 271434, "Venom Rite Mantle", "Raid drop - The Venomous Abyss" },
                     },
                     [5] = {
                         { 271549, "Damned Necrolyte's Rattling Robes", "Tier Set token" },
+                        { 239655, "Martyr's Vestments", "Crafted" },
                         { 273785, "Primordial Robe of Rites", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 251139, "Summoner's Searing Shirt", "Mythic+ Dungeon - Murder Row" },
                     },
                     [6] = {
-                        { 251222, "Ethereal Netherwrap", "Mythic+ Dungeon - Voidscar Arena" },
+                        { 268257, "Caustic Chain-Wrapped Sash", "Raid drop - The Venomous Abyss - Boss 5 - Sszorak" },
                         { 239649, "Martyr's Waistwrap", "Crafted" },
-                        { 251185, "Lightblossom Cinch", "Mythic+ Dungeon - The Blinding Vale" },
+                        { 193691, "Sky Saddle Cord", "Mythic+ Dungeon - Ruby Life Pools" },
                     },
                     [7] = {
                         { 271545, "Damned Necrolyte's Leg Bindings", "Tier Set token" },
-                        { 239651, "Martyr's Leggings", "Crafted" },
-                        { 251160, "Forest Dream Leg-guards", "Mythic+ Dungeon - Den of Nalorakk" },
+                        { 193750, "Wind Soarer's Breeches", "Mythic+ Dungeon - Ruby Life Pools" },
+                        { 273786, "Leggings of Entwined Serpents", "Mythic+ Dungeon - Altar of Fangs" },
                     },
                     [8] = {
+                        { 268218, "Nek'zali's Spiritwalkers", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
                         { 251137, "Tempestuous Sandals", "Mythic+ Dungeon - Murder Row" },
-                        { 251219, "Riftworn Stompers", "Mythic+ Dungeon - Voidscar Arena" },
-                        { 271435, "Slippers of the Hissing Cult", "World Drop" },
+                        { 159259, "Sandswept Sandals", "Mythic+ Dungeon - Temple of Sethraliss" },
                     },
                     [9] = {
                         { 239648, "Martyr's Bindings", "Crafted" },
@@ -5122,79 +5193,7 @@ ns.BiSData = {
                     [11] = {
                         { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
                         { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 158366, "Charged Sandstone Band", "Mythic+ Dungeon - Temple of Sethraliss" },
-                    },
-                    [13] = {
-                        { 273796, "Vile Vial of Volatile Venom", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 270164, "Gebbo's Bottomless Bag", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
-                        { 250215, "Freightrunner's Flask", "Mythic+ Dungeon - Murder Row" },
-                    },
-                    [15] = {
-                        { 193763, "Fireproof Drape", "Mythic+ Dungeon - Ruby Life Pools" },
-                        { 239656, "Adherent's Silken Shroud", "Crafted" },
-                        { 251132, "Speakeasy Shroud", "Mythic+ Dungeon - Murder Row" },
-                    },
-                    [16] = {
-                        { 268203, "Hexing Spiritrender", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
-                        { 273778, "Polished Lightwood Channeler", "Mythic+ Dungeon - Altar of Fangs" },
-                    },
-                    [17] = {
-                        { 245769, "Aln'hara Lantern", "Crafted" },
-                        { 268263, "Frostscale's Mystic Frond", "Raid drop" },
-                    },
-                },
-            },
-            ["destruction"] = {
-                raid = {
-                    [1] = {
-                        { 271546, "Skull of the Damned Necrolyte", "Tier Set token" },
-                        { 271874, "Venomkeeper's Horrific Cowl", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 251232, "Overseer's Diadem", "Mythic+ Dungeon - Voidscar Arena" },
-                    },
-                    [2] = {
-                        { 268265, "Aqirbane Reliquary", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 251142, "Pendant of Malefic Fury", "Mythic+ Dungeon - Murder Row" },
-                        { 251234, "Graft of the Domanaar", "Mythic+ Dungeon - Voidscar Arena" },
-                    },
-                    [3] = {
-                        { 271544, "Spires of the Damned Necrolyte", "Tier Set token" },
-                        { 239031, "Brood Cleanser's Amice", "Mythic+ Dungeon - Temple of Sethraliss" },
-                        { 268241, "Ornaments of the Eternal Coil", "Raid drop - The Venomous Abyss - Boss 6 - The Twin Fangs" },
-                    },
-                    [5] = {
-                        { 271549, "Damned Necrolyte's Rattling Robes", "Tier Set token" },
-                        { 268221, "Tidebound Sorcereress's Robes", "Raid drop" },
-                        { 251139, "Summoner's Searing Shirt", "Mythic+ Dungeon - Murder Row" },
-                    },
-                    [6] = {
-                        { 239649, "Martyr's Waistwrap", "Crafted" },
-                        { 268257, "Caustic Chain-Wrapped Sash", "Raid drop - The Venomous Abyss - Boss 5 - Sszorak" },
-                        { 251222, "Ethereal Netherwrap", "Mythic+ Dungeon - Voidscar Arena" },
-                    },
-                    [7] = {
-                        { 271545, "Damned Necrolyte's Leg Bindings", "Tier Set token" },
-                        { 193750, "Wind Soarer's Breeches", "Mythic+ Dungeon - Ruby Life Pools" },
-                        { 273786, "Leggings of Entwined Serpents", "Mythic+ Dungeon - Altar of Fangs" },
-                    },
-                    [8] = {
-                        { 251137, "Tempestuous Sandals", "Mythic+ Dungeon - Murder Row" },
-                        { 268218, "Nek'zali's Spiritwalkers", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
-                        { 251219, "Riftworn Stompers", "Mythic+ Dungeon - Voidscar Arena" },
-                    },
-                    [9] = {
-                        { 239648, "Martyr's Bindings", "Crafted" },
-                        { 251127, "Nibbling Armbands", "Mythic+ Dungeon - Murder Row" },
-                        { 268228, "Venom-Singed Cuffs", "Raid drop - The Venomous Abyss - Boss 2 - Entombed Sentinels" },
-                    },
-                    [10] = {
-                        { 271547, "Damned Necrolyte's Charred Grasps", "Tier Set token" },
-                        { 251129, "Counterfeit Clutches", "Mythic+ Dungeon - Murder Row" },
-                        { 273773, "Handwraps of Blasphemous Rites", "Mythic+ Dungeon - Altar of Fangs" },
-                    },
-                    [11] = {
-                        { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
-                        { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
+                        { 268252, "Apex Brute's Claw Ring", "Raid drop - The Venomous Abyss - Boss 5 - Sszorak" },
                     },
                     [13] = {
                         { 250215, "Freightrunner's Flask", "Mythic+ Dungeon - Murder Row" },
@@ -5207,24 +5206,24 @@ ns.BiSData = {
                         { 193763, "Fireproof Drape", "Mythic+ Dungeon - Ruby Life Pools" },
                     },
                     [16] = {
-                        { 273778, "Polished Lightwood Channeler", "Mythic+ Dungeon - Altar of Fangs" },
                         { 271092, "Jan'thrazet, the Soul Fang", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
+                        { 273778, "Polished Lightwood Channeler", "Mythic+ Dungeon - Altar of Fangs" },
                     },
                     [17] = {
                         { 245769, "Aln'hara Lantern", "Crafted" },
                         { 268197, "Spine of the Hissing Abyss", "Raid drop - The Venomous Abyss - Boss 2 - Entombed Sentinels" },
-                        { 273779, "Nocuous Focal Fang", "Mythic+ Dungeon - Altar of Fangs" },
+                        { 268263, "Frostscale's Mystic Frond", "Raid drop" },
                     },
                 },
                 mythicplus = {
                     [1] = {
                         { 271546, "Skull of the Damned Necrolyte", "Tier Set token" },
                         { 271874, "Venomkeeper's Horrific Cowl", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 251232, "Overseer's Diadem", "Mythic+ Dungeon - Voidscar Arena" },
+                        { 251199, "Worldroot Canopy", "Mythic+ Dungeon - The Blinding Vale" },
                     },
                     [2] = {
-                        { 273781, "Strand of Warding Fangs", "Mythic+ Dungeon - Altar of Fangs" },
                         { 268265, "Aqirbane Reliquary", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
+                        { 273781, "Strand of Warding Fangs", "Mythic+ Dungeon - Altar of Fangs" },
                         { 251234, "Graft of the Domanaar", "Mythic+ Dungeon - Voidscar Arena" },
                     },
                     [3] = {
@@ -5234,13 +5233,13 @@ ns.BiSData = {
                     },
                     [5] = {
                         { 271549, "Damned Necrolyte's Rattling Robes", "Tier Set token" },
-                        { 251147, "Hoarded Harvest Wrap", "Mythic+ Dungeon - Den of Nalorakk" },
+                        { 268221, "Tidebound Sorcereress's Robes", "Raid drop" },
                         { 273785, "Primordial Robe of Rites", "Mythic+ Dungeon - Altar of Fangs" },
                     },
                     [6] = {
                         { 239649, "Martyr's Waistwrap", "Crafted" },
                         { 251222, "Ethereal Netherwrap", "Mythic+ Dungeon - Voidscar Arena" },
-                        { 193691, "Sky Saddle Cord", "Mythic+ Dungeon - Ruby Life Pools" },
+                        { 271543, "Damned Necrolyte's Clanging Cinch", "World Drop" },
                     },
                     [7] = {
                         { 271545, "Damned Necrolyte's Leg Bindings", "Tier Set token" },
@@ -5250,17 +5249,17 @@ ns.BiSData = {
                     [8] = {
                         { 251137, "Tempestuous Sandals", "Mythic+ Dungeon - Murder Row" },
                         { 251219, "Riftworn Stompers", "Mythic+ Dungeon - Voidscar Arena" },
-                        { 159259, "Sandswept Sandals", "Mythic+ Dungeon - Temple of Sethraliss" },
+                        { 268218, "Nek'zali's Spiritwalkers", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
                     },
                     [9] = {
                         { 239648, "Martyr's Bindings", "Crafted" },
+                        { 156168, "Grasps of Reason", "World Drop" },
                         { 251127, "Nibbling Armbands", "Mythic+ Dungeon - Murder Row" },
-                        { 251154, "Winter's Embrace Bracers", "Mythic+ Dungeon - Den of Nalorakk" },
                     },
                     [10] = {
                         { 271547, "Damned Necrolyte's Charred Grasps", "Tier Set token" },
-                        { 273773, "Handwraps of Blasphemous Rites", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 250043, "Abyssal Immolator's Grasps", "Tier Set token" },
+                        { 268243, "Grasps of the Eternal Shadow", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
+                        { 256980, "Deepvine Grips", "World Drop" },
                     },
                     [11] = {
                         { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
@@ -5273,17 +5272,18 @@ ns.BiSData = {
                         { 250224, "Mindpiercer's Sigil", "Mythic+ Dungeon - Voidscar Arena" },
                     },
                     [15] = {
-                        { 251190, "Bloodthorn Burnous", "Mythic+ Dungeon - The Blinding Vale" },
+                        { 159288, "Cloak of the Restless Tribes", "Mythic+ Dungeon - Kings' Rest" },
+                        { 251132, "Speakeasy Shroud", "Mythic+ Dungeon - Murder Row" },
                         { 239656, "Adherent's Silken Shroud", "Crafted" },
-                        { 193763, "Fireproof Drape", "Mythic+ Dungeon - Ruby Life Pools" },
                     },
                     [16] = {
                         { 273778, "Polished Lightwood Channeler", "Mythic+ Dungeon - Altar of Fangs" },
+                        { 271092, "Jan'thrazet, the Soul Fang", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                     },
                     [17] = {
                         { 245769, "Aln'hara Lantern", "Crafted" },
                         { 251191, "Luminescent Sprout", "Mythic+ Dungeon - The Blinding Vale" },
-                        { 273779, "Nocuous Focal Fang", "Mythic+ Dungeon - Altar of Fangs" },
+                        { 268263, "Frostscale's Mystic Frond", "Raid drop" },
                     },
                 },
             },
@@ -5295,8 +5295,8 @@ ns.BiSData = {
                 raid = {
                     [1] = {
                         { 271456, "Tempered Horns of the Jade Warlord", "Tier Set token" },
-                        { 237832, "Spellbreaker's Cover", "Crafted" },
                         { 268229, "Skullguard of the Risen Sacrifice", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
+                        { 237832, "Spellbreaker's Cover", "Crafted" },
                     },
                     [2] = {
                         { 268265, "Aqirbane Reliquary", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
@@ -5306,7 +5306,7 @@ ns.BiSData = {
                     [3] = {
                         { 271454, "Raging Pauldrons of the Jade Warlord", "Tier Set token" },
                         { 237835, "Spellbreaker's Mantle", "Crafted" },
-                        { 239037, "C'thraxxi Binders Pauldrons", "Mythic+ Dungeon - Temple of Sethraliss" },
+                        { 268226, "Swelling Sea Spaulders", "Raid drop" },
                     },
                     [5] = {
                         { 271459, "Cuirass of the Jade Warlord", "Tier Set token" },
@@ -5335,8 +5335,8 @@ ns.BiSData = {
                     },
                     [10] = {
                         { 271457, "Jeweled Gauntlets of the Jade Warlord", "Tier Set token" },
-                        { 251214, "Bonds of the Hash'ura", "Mythic+ Dungeon - Den of Nalorakk" },
                         { 237836, "Spellbreaker's Resolve", "Crafted" },
+                        { 251214, "Bonds of the Hash'ura", "Mythic+ Dungeon - Den of Nalorakk" },
                     },
                     [11] = {
                         { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
@@ -5349,9 +5349,9 @@ ns.BiSData = {
                         { 270165, "Keeper's Seething Core", "Raid drop - The Venomous Abyss - Boss 2 - Entombed Sentinels" },
                     },
                     [15] = {
+                        { 268253, "Silken Voodoo Drape", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
                         { 193763, "Fireproof Drape", "Mythic+ Dungeon - Ruby Life Pools" },
                         { 251132, "Speakeasy Shroud", "Mythic+ Dungeon - Murder Row" },
-                        { 268253, "Silken Voodoo Drape", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
                     },
                     [16] = {
                         { 268213, "Maze-roa, Warlord's Fury", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
@@ -5363,7 +5363,7 @@ ns.BiSData = {
                     [1] = {
                         { 271456, "Tempered Horns of the Jade Warlord", "Tier Set token" },
                         { 251229, "Visor of the Predator", "Mythic+ Dungeon - Voidscar Arena" },
-                        { 268229, "Skullguard of the Risen Sacrifice", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
+                        { 251126, "Greathelm of Temptation", "Mythic+ Dungeon - Murder Row" },
                     },
                     [2] = {
                         { 268265, "Aqirbane Reliquary", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
@@ -5372,18 +5372,18 @@ ns.BiSData = {
                     },
                     [3] = {
                         { 271454, "Raging Pauldrons of the Jade Warlord", "Tier Set token" },
-                        { 237835, "Spellbreaker's Mantle", "Crafted" },
-                        { 268226, "Swelling Sea Spaulders", "Raid drop" },
+                        { 271444, "Pauldrons of the Forgotten Sacrifice", "World Drop" },
+                        { 239037, "C'thraxxi Binders Pauldrons", "Mythic+ Dungeon - Temple of Sethraliss" },
                     },
                     [5] = {
                         { 271459, "Cuirass of the Jade Warlord", "Tier Set token" },
-                        { 237829, "Spellbreaker's Shelter", "Crafted" },
                         { 268222, "Reckless Spirit Breastplate", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
+                        { 237829, "Spellbreaker's Shelter", "Crafted" },
                     },
                     [6] = {
-                        { 268259, "Girdle of Toxic Regret", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
                         { 271445, "Fanged Brute's Greatbelt", "World Drop" },
-                        { 159418, "Girdle of Pestilent Purification", "Mythic+ Dungeon - Kings' Rest" },
+                        { 268259, "Girdle of Toxic Regret", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
+                        { 271453, "Greatbelt of the Jade Warlord", "World Drop" },
                     },
                     [7] = {
                         { 271455, "Greaves of the Jade Warlord", "Tier Set token" },
@@ -5393,17 +5393,17 @@ ns.BiSData = {
                     [8] = {
                         { 237828, "Spellbreaker's March", "Crafted" },
                         { 268245, "Entombed Cultist's Sabatons", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
-                        { 272256, "Pledgebearer's Sabatons", "World Drop" },
+                        { 271458, "Vicious Kickers of the Jade Warlord", "World Drop" },
                     },
                     [9] = {
                         { 237834, "Spellbreaker's Bracers", "Crafted" },
                         { 268239, "Shellbound Bracers", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
-                        { 159409, "Embalmer's Steadying Bracers", "Mythic+ Dungeon - Kings' Rest" },
+                        { 251133, "Overseer's Vambraces", "Mythic+ Dungeon - Murder Row" },
                     },
                     [10] = {
                         { 271457, "Jeweled Gauntlets of the Jade Warlord", "Tier Set token" },
                         { 237836, "Spellbreaker's Resolve", "Crafted" },
-                        { 159413, "Gauntlets of the Avian Sentinel", "Mythic+ Dungeon - Kings' Rest" },
+                        { 268220, "Scaleplate Strangulators", "Raid drop - The Venomous Abyss - Boss 6 - The Twin Fangs" },
                     },
                     [11] = {
                         { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
@@ -5412,18 +5412,18 @@ ns.BiSData = {
                     },
                     [13] = {
                         { 270165, "Keeper's Seething Core", "Raid drop - The Venomous Abyss - Boss 2 - Entombed Sentinels" },
+                        { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                         { 270164, "Gebbo's Bottomless Bag", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
-                        { 270173, "Zul'jin's Guillotine Technique", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
                     },
                     [15] = {
                         { 268253, "Silken Voodoo Drape", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
-                        { 193763, "Fireproof Drape", "Mythic+ Dungeon - Ruby Life Pools" },
                         { 251132, "Speakeasy Shroud", "Mythic+ Dungeon - Murder Row" },
+                        { 251190, "Bloodthorn Burnous", "Mythic+ Dungeon - The Blinding Vale" },
                     },
                     [16] = {
                         { 237846, "Blood Knight's Warblade", "Crafted" },
                         { 268213, "Maze-roa, Warlord's Fury", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
-                        { 268198, "Caustic Keeper-Crusher", "Raid drop - The Venomous Abyss - Boss 2 - Entombed Sentinels" },
+                        { 268214, "Malignant Toothed Edge", "Raid drop - The Venomous Abyss - Boss 4 - Vashnik the Malignant" },
                     },
                 },
             },
@@ -5431,13 +5431,13 @@ ns.BiSData = {
                 raid = {
                     [1] = {
                         { 271456, "Tempered Horns of the Jade Warlord", "Tier Set token" },
-                        { 251229, "Visor of the Predator", "Mythic+ Dungeon - Voidscar Arena" },
                         { 268229, "Skullguard of the Risen Sacrifice", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
+                        { 251229, "Visor of the Predator", "Mythic+ Dungeon - Voidscar Arena" },
                     },
                     [2] = {
-                        { 251142, "Pendant of Malefic Fury", "Mythic+ Dungeon - Murder Row" },
                         { 268265, "Aqirbane Reliquary", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 251234, "Graft of the Domanaar", "Mythic+ Dungeon - Voidscar Arena" },
+                        { 251142, "Pendant of Malefic Fury", "Mythic+ Dungeon - Murder Row" },
+                        { 251173, "Yoke of the Charging Bear", "Mythic+ Dungeon - Den of Nalorakk" },
                     },
                     [3] = {
                         { 271454, "Raging Pauldrons of the Jade Warlord", "Tier Set token" },
@@ -5457,7 +5457,7 @@ ns.BiSData = {
                     [7] = {
                         { 271455, "Greaves of the Jade Warlord", "Tier Set token" },
                         { 271878, "Chausses of Unbound Rancor", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 273776, "Ancient General's Obsidian Pillars", "Mythic+ Dungeon - Altar of Fangs" },
+                        { 268224, "Venom Warden's Greaves", "Raid drop - The Venomous Abyss - Boss 2 - Entombed Sentinels" },
                     },
                     [8] = {
                         { 237828, "Spellbreaker's March", "Crafted" },
@@ -5477,7 +5477,7 @@ ns.BiSData = {
                     [11] = {
                         { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
                         { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 251136, "Signet of Snarling Servitude", "Mythic+ Dungeon - Murder Row" },
+                        { 268249, "Vile Alchemist's Band", "Raid drop - The Venomous Abyss - Boss 4 - Vashnik the Malignant" },
                     },
                     [13] = {
                         { 270173, "Zul'jin's Guillotine Technique", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
@@ -5490,9 +5490,9 @@ ns.BiSData = {
                         { 193763, "Fireproof Drape", "Mythic+ Dungeon - Ruby Life Pools" },
                     },
                     [16] = {
-                        { 237846, "Blood Knight's Warblade", "Crafted" },
                         { 268213, "Maze-roa, Warlord's Fury", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
-                        { 251134, "Xathuux's Cleave", "Mythic+ Dungeon - Murder Row" },
+                        { 237846, "Blood Knight's Warblade", "Crafted" },
+                        { 268214, "Malignant Toothed Edge", "Raid drop - The Venomous Abyss - Boss 4 - Vashnik the Malignant" },
                     },
                 },
                 mythicplus = {
@@ -5508,8 +5508,8 @@ ns.BiSData = {
                     },
                     [3] = {
                         { 271454, "Raging Pauldrons of the Jade Warlord", "Tier Set token" },
-                        { 251138, "Cinderfury Shoulderguards", "Mythic+ Dungeon - Murder Row" },
-                        { 271444, "Pauldrons of the Forgotten Sacrifice", "Drop" },
+                        { 237835, "Spellbreaker's Mantle", "Crafted" },
+                        { 239051, "Pauldrons of the Great Unifier", "Mythic+ Dungeon - Kings' Rest" },
                     },
                     [5] = {
                         { 271459, "Cuirass of the Jade Warlord", "Tier Set token" },
@@ -5517,9 +5517,9 @@ ns.BiSData = {
                         { 268222, "Reckless Spirit Breastplate", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
                     },
                     [6] = {
-                        { 159442, "Sand-Scoured Greatbelt", "Mythic+ Dungeon - Temple of Sethraliss" },
-                        { 159418, "Girdle of Pestilent Purification", "Mythic+ Dungeon - Kings' Rest" },
                         { 268259, "Girdle of Toxic Regret", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
+                        { 159442, "Sand-Scoured Greatbelt", "Mythic+ Dungeon - Temple of Sethraliss" },
+                        { 251144, "Autumn's Boon Belt", "Mythic+ Dungeon - Den of Nalorakk" },
                     },
                     [7] = {
                         { 271455, "Greaves of the Jade Warlord", "Tier Set token" },
@@ -5528,18 +5528,18 @@ ns.BiSData = {
                     },
                     [8] = {
                         { 237828, "Spellbreaker's March", "Crafted" },
-                        { 273777, "Poison-Proof Stompers", "Mythic+ Dungeon - Altar of Fangs" },
                         { 268260, "Scaled Fiend's Warboots", "Raid drop - The Venomous Abyss - Boss 4 - Vashnik the Malignant" },
+                        { 193728, "Scaleguard's Stalwart Greatboots", "Mythic+ Dungeon - Ruby Life Pools" },
                     },
                     [9] = {
                         { 237834, "Spellbreaker's Bracers", "Crafted" },
+                        { 268239, "Shellbound Bracers", "Raid drop - The Venomous Abyss - Boss 3 - The Lost Explorers" },
                         { 159425, "Shard-Tipped Vambraces", "Mythic+ Dungeon - Temple of Sethraliss" },
-                        { 159409, "Embalmer's Steadying Bracers", "Mythic+ Dungeon - Kings' Rest" },
                     },
                     [10] = {
                         { 271457, "Jeweled Gauntlets of the Jade Warlord", "Tier Set token" },
+                        { 251221, "Despondent's Gauntlets", "Mythic+ Dungeon - Voidscar Arena" },
                         { 159413, "Gauntlets of the Avian Sentinel", "Mythic+ Dungeon - Kings' Rest" },
-                        { 251197, "Thornspike Gauntlets", "Mythic+ Dungeon - The Blinding Vale" },
                     },
                     [11] = {
                         { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
@@ -5548,8 +5548,8 @@ ns.BiSData = {
                     },
                     [13] = {
                         { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
-                        { 270165, "Keeper's Seething Core", "Raid drop - The Venomous Abyss - Boss 2 - Entombed Sentinels" },
                         { 270173, "Zul'jin's Guillotine Technique", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
+                        { 270165, "Keeper's Seething Core", "Raid drop - The Venomous Abyss - Boss 2 - Entombed Sentinels" },
                     },
                     [15] = {
                         { 251190, "Bloodthorn Burnous", "Mythic+ Dungeon - The Blinding Vale" },
@@ -5571,9 +5571,9 @@ ns.BiSData = {
                         { 268229, "Skullguard of the Risen Sacrifice", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
                     },
                     [2] = {
+                        { 268265, "Aqirbane Reliquary", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                         { 273781, "Strand of Warding Fangs", "Mythic+ Dungeon - Altar of Fangs" },
                         { 251173, "Yoke of the Charging Bear", "Mythic+ Dungeon - Den of Nalorakk" },
-                        { 268265, "Aqirbane Reliquary", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                     },
                     [3] = {
                         { 271454, "Raging Pauldrons of the Jade Warlord", "Tier Set token" },
@@ -5587,8 +5587,8 @@ ns.BiSData = {
                     },
                     [6] = {
                         { 268259, "Girdle of Toxic Regret", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
-                        { 159418, "Girdle of Pestilent Purification", "Mythic+ Dungeon - Kings' Rest" },
                         { 268244, "Forgotten Grotto Girdle", "Raid drop" },
+                        { 159418, "Girdle of Pestilent Purification", "Mythic+ Dungeon - Kings' Rest" },
                     },
                     [7] = {
                         { 271455, "Greaves of the Jade Warlord", "Tier Set token" },
@@ -5597,8 +5597,8 @@ ns.BiSData = {
                     },
                     [8] = {
                         { 237828, "Spellbreaker's March", "Crafted" },
-                        { 273777, "Poison-Proof Stompers", "Mythic+ Dungeon - Altar of Fangs" },
                         { 268245, "Entombed Cultist's Sabatons", "Raid drop - The Venomous Abyss - Boss 1 - Nek'zali the Soulcoiler" },
+                        { 273777, "Poison-Proof Stompers", "Mythic+ Dungeon - Altar of Fangs" },
                     },
                     [9] = {
                         { 237834, "Spellbreaker's Bracers", "Crafted" },
@@ -5608,7 +5608,7 @@ ns.BiSData = {
                     [10] = {
                         { 271457, "Jeweled Gauntlets of the Jade Warlord", "Tier Set token" },
                         { 251214, "Bonds of the Hash'ura", "Mythic+ Dungeon - Den of Nalorakk" },
-                        { 251221, "Despondent's Gauntlets", "Mythic+ Dungeon - Voidscar Arena" },
+                        { 251197, "Thornspike Gauntlets", "Mythic+ Dungeon - The Blinding Vale" },
                     },
                     [11] = {
                         { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
@@ -5639,38 +5639,38 @@ ns.BiSData = {
                 mythicplus = {
                     [1] = {
                         { 271456, "Tempered Horns of the Jade Warlord", "Tier Set token" },
-                        { 237832, "Spellbreaker's Cover", "Crafted" },
-                        { 251126, "Greathelm of Temptation", "Mythic+ Dungeon - Murder Row" },
+                        { 239050, "Helm of the Raptor King", "Mythic+ Dungeon - Kings' Rest" },
+                        { 251229, "Visor of the Predator", "Mythic+ Dungeon - Voidscar Arena" },
                     },
                     [2] = {
+                        { 268265, "Aqirbane Reliquary", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                         { 251173, "Yoke of the Charging Bear", "Mythic+ Dungeon - Den of Nalorakk" },
                         { 251142, "Pendant of Malefic Fury", "Mythic+ Dungeon - Murder Row" },
-                        { 268265, "Aqirbane Reliquary", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                     },
                     [3] = {
                         { 271454, "Raging Pauldrons of the Jade Warlord", "Tier Set token" },
-                        { 239037, "C'thraxxi Binders Pauldrons", "Mythic+ Dungeon - Temple of Sethraliss" },
                         { 237835, "Spellbreaker's Mantle", "Crafted" },
+                        { 239037, "C'thraxxi Binders Pauldrons", "Mythic+ Dungeon - Temple of Sethraliss" },
                     },
                     [5] = {
                         { 271459, "Cuirass of the Jade Warlord", "Tier Set token" },
-                        { 251151, "Sentinel Challenger's Prize", "Mythic+ Dungeon - Den of Nalorakk" },
+                        { 251193, "Taproot Ribs", "Mythic+ Dungeon - The Blinding Vale" },
                         { 193753, "Breastplate of Soaring Terror", "Mythic+ Dungeon - Ruby Life Pools" },
                     },
                     [6] = {
                         { 159418, "Girdle of Pestilent Purification", "Mythic+ Dungeon - Kings' Rest" },
+                        { 268244, "Forgotten Grotto Girdle", "Raid drop" },
                         { 268259, "Girdle of Toxic Regret", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
-                        { 251144, "Autumn's Boon Belt", "Mythic+ Dungeon - Den of Nalorakk" },
                     },
                     [7] = {
                         { 271455, "Greaves of the Jade Warlord", "Tier Set token" },
+                        { 271878, "Chausses of Unbound Rancor", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                         { 273776, "Ancient General's Obsidian Pillars", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 159435, "Legplates of Charged Duality", "Mythic+ Dungeon - Temple of Sethraliss" },
                     },
                     [8] = {
                         { 237828, "Spellbreaker's March", "Crafted" },
                         { 273777, "Poison-Proof Stompers", "Mythic+ Dungeon - Altar of Fangs" },
-                        { 171512, "Iron-Spring Jumpers", "World Drop" },
+                        { 193728, "Scaleguard's Stalwart Greatboots", "Mythic+ Dungeon - Ruby Life Pools" },
                     },
                     [9] = {
                         { 237834, "Spellbreaker's Bracers", "Crafted" },
@@ -5679,28 +5679,28 @@ ns.BiSData = {
                     },
                     [10] = {
                         { 271457, "Jeweled Gauntlets of the Jade Warlord", "Tier Set token" },
-                        { 159413, "Gauntlets of the Avian Sentinel", "Mythic+ Dungeon - Kings' Rest" },
                         { 251214, "Bonds of the Hash'ura", "Mythic+ Dungeon - Den of Nalorakk" },
+                        { 159413, "Gauntlets of the Avian Sentinel", "Mythic+ Dungeon - Kings' Rest" },
                     },
                     [11] = {
-                        { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
                         { 159459, "Ritual Binder's Ring", "Mythic+ Dungeon - Kings' Rest" },
                         { 252258, "Sickening Signet of Atroxus", "Mythic+ Dungeon - Voidscar Arena" },
+                        { 273792, "Band of the Amani Warlord", "Mythic+ Dungeon - Altar of Fangs" },
                     },
                     [13] = {
-                        { 250245, "Tumor of the Swarm", "Mythic+ Dungeon - Voidscar Arena" },
-                        { 273796, "Vile Vial of Volatile Venom", "Mythic+ Dungeon - Altar of Fangs" },
+                        { 270175, "Voracious Heart of Ula'tek", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                         { 250228, "Resonant Bellowstone", "Mythic+ Dungeon - Murder Row" },
+                        { 270165, "Keeper's Seething Core", "Raid drop - The Venomous Abyss - Boss 2 - Entombed Sentinels" },
                     },
                     [15] = {
                         { 193763, "Fireproof Drape", "Mythic+ Dungeon - Ruby Life Pools" },
+                        { 268253, "Silken Voodoo Drape", "Raid drop - The Venomous Abyss - Boss 7 - The Coiled Altar" },
                         { 251190, "Bloodthorn Burnous", "Mythic+ Dungeon - The Blinding Vale" },
-                        { 251132, "Speakeasy Shroud", "Mythic+ Dungeon - Murder Row" },
                     },
                     [16] = {
                         { 268202, "Jaw of the Shackled Goddess", "Raid drop - The Venomous Abyss - Boss 8 - Ula'tek" },
                         { 237839, "Spellbreaker's Blade", "Crafted" },
-                        { 251218, "Taz'Rah's Cosmic Edge", "Mythic+ Dungeon - Voidscar Arena" },
+                        { 158373, "Resonating Crystal Scimitar", "Mythic+ Dungeon - Temple of Sethraliss" },
                     },
                     [17] = {
                         { 237831, "Spellbreaker's Rebuke", "Crafted" },

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Added a native-style vendor reputation bar beside Buyback, with current standing and hover progress. It follows the vendor window and supports standard, friendship, and Renown reputations.
+- Upgrade-path suffixes now use a font two points smaller than the item level and the same light-blue color as the SB binding label.
+- Added an enabled-by-default "Show upgrade path with item level" toggle under Items > Display, with automatic overlay refresh when changed.
+- Item-level overlays now include the upgrade path's initial (for example, `295-C` for Champion) on equipped, inspected, bag, bank, and Warband bank gear. Items without a named upgrade path keep their plain item level.
 - Removed the visible delay when collapsing or expanding the quest tracker by synchronizing background visibility each frame, without queuing a layout refresh.
 - Fixed the quest tracker's built-in background remaining visible when minimized to only the restore button. Its previous opacity returns when expanded or when the option is disabled.
 - Fixed equipped gems missing on the first character-sheet opening when socket or gem metadata is uncached. Known gem IDs now preserve occupied sockets, and individual gem-load callbacks refresh the open sheet after data arrives, with bounded requests and combat deferral.

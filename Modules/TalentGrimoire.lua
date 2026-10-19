@@ -1633,11 +1633,12 @@ local function ReadLoadoutHeader(importStream)
     local serializationVersion = importStream:ExtractValue(BIT_WIDTH_HEADER_VERSION)
     local specID = importStream:ExtractValue(BIT_WIDTH_SPEC_ID)
 
-    for _ = 1, 16 do
-        importStream:ExtractValue(8)
+    local treeHash = {}
+    for index = 1, 16 do
+        treeHash[index] = importStream:ExtractValue(8)
     end
 
-    return true, serializationVersion, specID
+    return true, serializationVersion, specID, treeHash
 end
 
 local function GetSortedTreeNodes(treeID)
@@ -1755,7 +1756,7 @@ local function ParseTalentImportString(importString, treeID, configID)
         return nil, "Could not decode this talent string."
     end
 
-    local headerValid, serializationVersion, specID = ReadLoadoutHeader(importStream)
+    local headerValid, serializationVersion, specID, treeHash = ReadLoadoutHeader(importStream)
 
     if not headerValid then
         return nil, "This talent string is not valid."
@@ -1773,6 +1774,28 @@ local function ParseTalentImportString(importString, treeID, configID)
 
     if currentSpecID and specID ~= currentSpecID then
         return nil, string.format("This build is for spec ID %d, but your active spec is %d.", specID, currentSpecID)
+    end
+
+    local hasTreeHash = false
+    for index = 1, 16 do
+        if treeHash[index] ~= 0 then hasTreeHash = true; break end
+    end
+
+    -- Match Blizzard's importer: third-party builds may use an all-zero hash,
+    -- but a nonempty hash must match before decoding nodes against this tree.
+    if hasTreeHash then
+        if type(C_Traits.GetTreeHash) ~= "function" then
+            return nil, "Could not validate the current talent tree. Try again after opening Talents."
+        end
+        local hashOK, currentHash = pcall(C_Traits.GetTreeHash, treeID)
+        if not hashOK or type(currentHash) ~= "table" or #currentHash ~= 16 then
+            return nil, "Could not validate the current talent tree. Try again after opening Talents."
+        end
+        for index = 1, 16 do
+            if treeHash[index] ~= currentHash[index] then
+                return nil, "This build uses a different talent tree. Refresh the recommendation data or re-export the build."
+            end
+        end
     end
 
     local contentOk, loadoutContent = pcall(ReadLoadoutContent, importStream, treeID)
@@ -2530,6 +2553,17 @@ function ns:ApplyTalentImportString(importString, buildLabel, isContinuation)
 
     if not specID then
         return FailTalentApply("Could not determine your active specialization.")
+    end
+
+    -- Reject incompatible imports before creating, loading, or rolling back a
+    -- saved loadout. Parse again below against the prepared destination config.
+    local preflightTreeID = GetConfigTreeID(activeConfigID)
+    if not preflightTreeID then
+        return FailTalentApply("Could not determine your active talent tree.")
+    end
+    local preflightEntries, preflightError = ParseTalentImportString(importString, preflightTreeID, activeConfigID)
+    if not preflightEntries then
+        return FailTalentApply(preflightError)
     end
 
     local zoidsConfigID = GetStoredConfigID(specID)

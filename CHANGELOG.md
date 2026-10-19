@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Updated Retail interface metadata for Midnight 12.1.5 (`120105`) and reviewed API references against build 70448.
+- Fixed damage-meter drilldowns selecting a different group member by class or an ambiguous short name when source identifiers are unavailable. Restricted identities now leave the breakdown unavailable; readable identifiers and unambiguous legacy name matches still work.
+- Fixed profession Knowledge tracking omitting the second primary profession when the first profession slot is empty.
+- Added Blizzard-compatible talent-tree hash validation before creating or switching loadouts, preventing outdated hashed imports from being decoded against a changed tree. Empty third-party hashes remain supported.
 - Added a native-style vendor reputation bar beside Buyback, with current standing and hover progress. It follows the vendor window and supports standard, friendship, and Renown reputations.
 - Upgrade-path suffixes now use a font two points smaller than the item level and the same light-blue color as the SB binding label.
 - Added an enabled-by-default "Show upgrade path with item level" toggle under Items > Display, with automatic overlay refresh when changed.

@@ -479,7 +479,9 @@ local function GetOwnedProfessionInfo()
         return owned
     end
 
-    for _, professionIndex in ipairs({ profession1, profession2 }) do
+    local professionIndices = { profession1, profession2 }
+    for slot = 1, 2 do
+        local professionIndex = SafeNumber(professionIndices[slot])
         if professionIndex then
             local infoOK, name, icon, skillLevel, maxSkillLevel, _, _, skillLineID, skillModifier, _, _, professionName = pcall(GetProfessionInfo, professionIndex)
             skillLineID = infoOK and SafeNumber(skillLineID) or nil

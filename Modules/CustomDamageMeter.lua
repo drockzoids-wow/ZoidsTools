@@ -1399,11 +1399,8 @@ local function GetGroupSourceGUID(source)
     if not source or not UnitGUID then return nil end
 
     local sourceName = source.name
-    if not IsSecret(sourceName) and sourceName ~= nil then sourceName = tostring(sourceName) else sourceName = nil end
-    local sourceClass = not IsSecret(source.classFilename) and type(source.classFilename) == "string"
-        and source.classFilename or nil
-    local classMatchGUID
-    local classMatches = 0
+    if IsSecret(sourceName) or type(sourceName) ~= "string" or sourceName == "" then return nil end
+    local matchedGUID
     local units = {}
 
     if IsInRaid and IsInRaid() then
@@ -1435,19 +1432,18 @@ local function GetGroupSourceGUID(source)
                 if sourceName and not IsSecret(unitName) and unitName ~= nil and not IsSecret(realm) then
                     unitName = tostring(unitName)
                     local fullName = realm and realm ~= "" and (unitName .. "-" .. tostring(realm)) or unitName
-                    if sourceName == unitName or sourceName == fullName then return guid end
-                end
-
-                local classOK, _, classFilename = pcall(UnitClass, unit)
-                if classOK and sourceClass and not IsSecret(classFilename) and classFilename == sourceClass then
-                    classMatches = classMatches + 1
-                    classMatchGUID = guid
+                    if sourceName == unitName or sourceName == fullName then
+                        -- A short name can belong to multiple realms. Class alone
+                        -- also cannot identify a source from a previous group.
+                        if matchedGUID and matchedGUID ~= guid then return nil end
+                        matchedGUID = guid
+                    end
                 end
             end
         end
     end
 
-    return classMatches == 1 and classMatchGUID or nil
+    return matchedGUID
 end
 
 local function GetSourceDetails(frame, source)
@@ -1463,6 +1459,9 @@ local function GetSourceDetails(frame, source)
     local sourceCreatureID = not IsSecret(rawCreatureID) and rawCreatureID ~= nil and rawCreatureID or nil
     local isLocalPlayer = not IsSecret(source.isLocalPlayer) and source.isLocalPlayer == true
     if sourceGUID == nil and sourceCreatureID == nil then
+        -- A restricted identifier is unavailable, not a missing legacy field.
+        -- Do not substitute a guessed group member for another player's source.
+        if not isLocalPlayer and (IsSecret(rawGUID) or IsSecret(rawCreatureID)) then return nil end
         if isLocalPlayer and UnitGUID then
             sourceGUID = UnitGUID("player")
         else

@@ -890,14 +890,6 @@ function ns:GetActionButtonRangeTintEnabled()
     return IsRangeTintEnabled()
 end
 
-function ns:RefreshActionButtonRangeTint()
-    ScheduleRefresh()
-end
-
-function ns:RefreshKeybindText()
-    ScheduleRefresh()
-end
-
 function ns:InitializeKeybindText()
     EnsureCombatDB()
     InstallHooks()

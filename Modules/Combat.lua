@@ -12,11 +12,11 @@ end
 
 local function SetCVarValue(name, value)
     if C_CVar and type(C_CVar.SetCVar) == "function" then
-        local ok = pcall(C_CVar.SetCVar, name, value)
-        return ok == true
+        local ok, success = pcall(C_CVar.SetCVar, name, value)
+        return ok and success ~= false
     elseif type(SetCVar) == "function" then
-        local ok = pcall(SetCVar, name, value)
-        return ok == true
+        local ok, success = pcall(SetCVar, name, value)
+        return ok and success ~= false
     end
 
     return false

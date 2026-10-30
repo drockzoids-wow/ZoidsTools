@@ -1193,11 +1193,6 @@ function ns:SetProfessionWeeklyTrackerLocked(value)
     RefreshAll()
 end
 
-function ns:IsProfessionWeeklyTrackerMinimized()
-    local db = EnsureDB()
-    return db and db.tracker.minimized == true
-end
-
 function ns:SetProfessionWeeklyTrackerMinimized(value)
     local db = EnsureDB()
     if not db then return end

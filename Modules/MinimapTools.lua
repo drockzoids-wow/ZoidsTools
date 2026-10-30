@@ -402,15 +402,6 @@ local function GetAddonCompartmentButton()
     return _G.AddonCompartmentFrame or (MinimapCluster and MinimapCluster.AddonCompartmentFrame)
 end
 
-local function GetMailFrame()
-    local cluster = _G.MinimapCluster
-    local indicator = cluster and cluster.IndicatorFrame
-
-    return (indicator and indicator.MailFrame)
-        or _G.MiniMapMailFrame
-        or (cluster and (cluster.MailFrame or cluster.MailButton))
-end
-
 local function AddUniqueWidget(list, seen, frame)
     if frame and not seen[frame] then
         seen[frame] = true
@@ -908,14 +899,6 @@ PositionMailFrame = function()
         mailFrame:SetPoint("TOPLEFT", Minimap, "TOPLEFT", 5, -5)
         mailFrame:SetFrameLevel((Minimap:GetFrameLevel() or 0) + 14)
         mailPositioningActive = false
-    end
-end
-
-local function AnchorHeaderRightWidget(frame, rightAnchor, bar)
-    if rightAnchor == bar then
-        frame:SetPoint("RIGHT", bar, "RIGHT", -6, 0)
-    else
-        frame:SetPoint("RIGHT", rightAnchor, "LEFT", -4, 0)
     end
 end
 

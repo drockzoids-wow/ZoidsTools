@@ -35,6 +35,7 @@ local function GetStore(create)
     local key = CharacterKey()
     if create and type(stores[key]) ~= "table" then stores[key] = { lines = {} } end
     local store = stores[key]
+    if type(store) ~= "table" then return nil end
     if create and type(store.lines) ~= "table" then store.lines = {} end
     if type(store) == "table" and (tonumber(store.captureVersion) or 0) < 4 then
         -- Older versions listened to global channel events and could retain

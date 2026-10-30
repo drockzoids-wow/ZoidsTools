@@ -185,10 +185,6 @@ function ns:SetAutoConfirmOption(key, value)
     db[key] = value == true
 end
 
-function ns:GetAutoConfirmHandledDialogs()
-    return BUTTON_ONLY_OPTIONS, TYPED_DELETE_OPTIONS
-end
-
 function ns:InitializeAutoConfirm()
     if hooked then return end
     hooked = true

@@ -1339,7 +1339,6 @@ local function RefreshMeterWindow(windowIndex)
     frame:Show()
 end
 
-
 RefreshMeter = function()
     RefreshMeterWindow(1)
     local secondDB = GetDB(2) or {}
@@ -1807,10 +1806,6 @@ function ns:SetCustomDamageMeterSecondWindowEnabled(value)
     if ns.UI and ns.UI.RefreshVisiblePage then ns.UI.RefreshVisiblePage() end
 end
 
-function ns:GetCustomDamageMeterSessionType(windowIndex)
-    return GetSessionType(windowIndex)
-end
-
 function ns:SetCustomDamageMeterSessionType(value, windowIndex)
     windowIndex = windowIndex == 2 and 2 or 1
     local db = GetDB(windowIndex)
@@ -1823,10 +1818,6 @@ function ns:SetCustomDamageMeterSessionType(value, windowIndex)
         UpdateSessionButton(meterFrames[windowIndex])
     end
     ScheduleRefresh(true)
-end
-
-function ns:GetCustomDamageMeterType(windowIndex)
-    return GetMeterType(windowIndex)
 end
 
 function ns:SetCustomDamageMeterType(value, windowIndex)

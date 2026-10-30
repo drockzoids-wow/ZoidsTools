@@ -1958,13 +1958,6 @@ function ns:SetInstanceLockoutPanelEnabled(value)
     SyncPanelVisibility()
 end
 
-function ns:RefreshInstanceLockouts()
-    if not catalogReady then
-        RebuildCurrentExpansionCatalog()
-    end
-    RequestLockoutData()
-end
-
 function ns:GetCurrentExpansionLockoutSnapshot()
     if not catalogReady then
         RebuildCurrentExpansionCatalog()

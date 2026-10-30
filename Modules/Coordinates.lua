@@ -408,23 +408,6 @@ function ns:IsCoordinatesWidgetShown()
     return db and db.enabled == true
 end
 
-function ns:SetCoordinatesWidgetScale(value)
-    local db = EnsureDB()
-
-    if not db then
-        return
-    end
-
-    db.scale = ClampScale(value)
-    RefreshCoordinates()
-end
-
-function ns:GetCoordinatesWidgetScale()
-    local db = EnsureDB()
-
-    return ClampScale(db and db.scale)
-end
-
 function ns:ResetCoordinatesWidgetPosition()
     ResetPosition()
 end

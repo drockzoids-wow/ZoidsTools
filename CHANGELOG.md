@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- Reviewed addon API, event, enum, TOC, and binding references against Retail 12.1.5 build 70575. Interface metadata remains `120105`.
+- Updated bundled LibDBIcon to stable v12.1.2 (library minor 57), including current minimap and addon-compartment support.
+- Removed unreachable stat-row overlays and objective-tracker resizing/font code, unused namespace helpers, and the orphaned chat-layout profile implementation. Existing saved layout data is preserved; the active stat-goal panel and tracker appearance controls remain available.
+- Fixed a queued stat-goal refresh running after combat starts, and explicitly reject secret stat ratings before numeric conversion.
+- Fixed key-down setting changes reporting success when Blizzard rejects the CVar update.
+- Hardened startup migrations and saved chat history reads against malformed saved data without resetting valid settings.
 - Updated Retail interface metadata for Midnight 12.1.5 (`120105`) and reviewed API references against build 70448.
 - Fixed damage-meter drilldowns selecting a different group member by class or an ambiguous short name when source identifiers are unavailable. Restricted identities now leave the breakdown unavailable; readable identifiers and unambiguous legacy name matches still work.
 - Fixed profession Knowledge tracking omitting the second primary profession when the first profession slot is empty.

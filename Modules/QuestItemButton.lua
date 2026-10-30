@@ -718,10 +718,6 @@ function ns:ToggleQuestItemButtonMoveMode()
     return moveMode
 end
 
-function ns:RefreshQuestItemButton()
-    ScheduleRefresh(0)
-end
-
 function ns:InitializeQuestItemButton()
     EnsureDB()
     CreateButton()

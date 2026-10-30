@@ -900,23 +900,6 @@ function ns:ApplyDamageMeterProfile(key, silent, options)
     return true
 end
 
-function ns:ApplyActiveDamageMeterProfile(silent, options)
-    local db = EnsureDB()
-
-    if not db then
-        return false
-    end
-
-    if not db.activeProfile then return false end
-    local profile = GetProfile(db.activeProfile)
-
-    if not ProfileHasSavedLayout(profile) then
-        return false
-    end
-
-    return ns:ApplyDamageMeterProfile(db.activeProfile, silent, options)
-end
-
 function ns:ApplyLastDamageMeterProfile(silent, options)
     local key = GetLastAppliedProfileKey()
     if not key then return false end
@@ -927,10 +910,6 @@ function ns:ApplyLastDamageMeterProfile(silent, options)
     end
 
     return ns:ApplyDamageMeterProfile(key, silent, options)
-end
-
-function ns:ShowSecondBlizzardDamageMeterWindow()
-    return false, "Use Blizzard's damage meter cog menu to create the second window. ZoidsTools only saves positions."
 end
 
 function ns:GetBlizzardDamageMeterWindowSummary(index)

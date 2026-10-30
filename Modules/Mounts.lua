@@ -1791,15 +1791,6 @@ function ns:GetPreferredMountName()
     return db and db.preferredMount or nil
 end
 
-function ns:SetPreferredMountName(name)
-    local db = EnsureDB()
-
-    if db then
-        db.preferredMount = name ~= "" and name or nil
-        UpdateSmartButton()
-    end
-end
-
 function ns:GetPreferredServiceMount(serviceType)
     local db = EnsureDB()
     return db and db.preferredServiceMounts and db.preferredServiceMounts[serviceType] or nil
@@ -1904,40 +1895,6 @@ function ns:ClearMountRecentHistory()
     end
 end
 
-function ns:GetCollectedMountSearch(query, limit)
-    EnsureMountJournalLoaded()
-
-    local mounts = {}
-    query = NormalizeMountName(query)
-    limit = limit or 5
-
-    if query == "" or not C_MountJournal or not C_MountJournal.GetMountIDs then
-        return mounts
-    end
-
-    for _, mountID in ipairs(C_MountJournal.GetMountIDs()) do
-        local details = GetMountDetails(mountID)
-        local name = details and details.name
-
-        if details and name and details.isCollected and IsMountAllowedForCharacter(details) and string.find(NormalizeMountName(name), query, 1, true) then
-            mounts[#mounts + 1] = {
-                id = details.mountID,
-                name = name,
-            }
-        end
-    end
-
-    table.sort(mounts, function(a, b)
-        return a.name < b.name
-    end)
-
-    while #mounts > limit do
-        table.remove(mounts)
-    end
-
-    return mounts
-end
-
 function ns:GetMountServiceOptions(serviceType)
     EnsureMountJournalLoaded()
 
@@ -1990,27 +1947,6 @@ function ns:GetMountServiceOptions(serviceType)
     end)
 
     return options
-end
-
-function ns:GetMountStatusText()
-    local db = EnsureDB()
-    local recentCount = db and db.recentMounts and #db.recentMounts or 0
-    local pools = BuildRandomMountPools()
-    local activePool, activePoolName = GetPreferredRandomPool(pools)
-    local poolStatus
-
-    if db and db.preferredMount and db.preferredMount ~= "" then
-        poolStatus = "Active: Preferred mount"
-    else
-        poolStatus = "Active: " .. tostring(activePoolName or "Unavailable")
-            .. " pool (" .. tostring(activePool and #activePool or 0) .. ")"
-    end
-
-    return poolStatus
-        .. "\nPools: Ground " .. tostring(#pools.ground)
-        .. " | Flying " .. tostring(#pools.flying)
-        .. " | Water " .. tostring(#pools.water)
-        .. " | Recent " .. tostring(recentCount)
 end
 
 function API.SummonMount(mountID)
@@ -2070,11 +2006,6 @@ function API.MatchTargetMount()
     Print("Matching target mount: " .. tostring(match.mountName or match.mountID) .. ".")
     UpdateTargetMatchButton()
     return true
-end
-
-function ns:RefreshMountButtons()
-    UpdateSmartButton()
-    UpdateTargetMatchButton()
 end
 
 function ns:InitializeMounts()

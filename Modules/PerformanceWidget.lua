@@ -25,10 +25,6 @@ local function SafeCall(method, object, ...)
     return pcall(method, object, ...)
 end
 
-local function IsCombatLocked()
-    return InCombatLockdown and InCombatLockdown()
-end
-
 local function EnsureDB()
     if not ns.db then
         return nil
@@ -400,12 +396,6 @@ function ns:SetPerformanceWidgetShown(value)
     RefreshWidget()
 end
 
-function ns:IsPerformanceWidgetShown()
-    local db = EnsureDB()
-
-    return db and db.displayMode ~= "disabled"
-end
-
 function ns:SetPerformanceWidgetDisplayMode(value)
     local db = EnsureDB()
 
@@ -452,10 +442,6 @@ end
 
 function ns:IsPerformanceWidgetLocked()
     return IsLocked()
-end
-
-function ns:RefreshPerformanceWidget()
-    RefreshWidget()
 end
 
 function ns:InitializePerformanceWidget()

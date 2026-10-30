@@ -18,7 +18,6 @@ Core.lua
 Modules\Diagnostics.lua
 Modules\ChatEnhancements.lua
 Modules\ChatHistory.lua
-Modules\ChatProfiles.lua
 Modules\MovableWindows.lua
 Modules\FastLoot.lua
 Modules\VendorAutomation.lua

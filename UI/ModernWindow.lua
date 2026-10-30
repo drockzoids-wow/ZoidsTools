@@ -32,7 +32,7 @@ local pages = {
     mounts = { key = "mounts", label = "Mounts", icon = "R", page = "mounts", sectionKey = "mounts", description = "Smart mount pools, class utilities, target matching, and rotation history." },
     loot = { key = "loot", label = "Loot", icon = "L", page = "loot", sectionKey = "automation", description = "Fast loot, safe sweep behavior, selling, repair, and vendor tools." },
     quests = { key = "quests", label = "Quests", icon = "Q", page = "quests", sectionKey = "automation", description = "Quest automation, filters, and smart quest item button." },
-    tracker = { key = "tracker", label = "Tracker", icon = "T", page = "quests", sectionKey = "automation", description = "Objective tracker sizing, background, borders, text, and minimize behavior." },
+    tracker = { key = "tracker", label = "Tracker", icon = "T", page = "quests", sectionKey = "automation", description = "Objective tracker background, borders, mouseover controls, and minimize behavior." },
     dialogs = { key = "dialogs", label = "Dialogs", icon = "D", page = "dialogs", sectionKey = "automation", description = "Auto-confirm selected Blizzard dialog prompts." },
 }
 

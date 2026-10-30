@@ -1,57 +1,20 @@
 local _, ns = ...
 
 local TRACKER_NAME = "ObjectiveTrackerFrame"
-local MIN_WIDTH = 220
-local MAX_WIDTH = 420
-local MIN_SCALE = 0.70
-local MAX_SCALE = 1.30
-local MIN_TEXT_SCALE = 0.80
-local MAX_TEXT_SCALE = 1.30
-local MODULE_LEFT_PADDING = 8
-local TRACKER_LEFT_EXTENSION = -24
 local TRACKER_RIGHT_EXTENSION = 8
-local TRACKER_TOP_EXTENSION = 3
-local TRACKER_BOTTOM_PADDING = 6
-local EDIT_MODE_SELECTION_X_OFFSET = 10
-local MODULE_HEADER_BUTTON_INSET = 18
 
 local tracker
 local skin
-local originalWidth
-local originalScale
-local originalFonts = setmetatable({}, { __mode = "k" })
-local originalModuleWidths = setmetatable({}, { __mode = "k" })
-local originalElementWidths = setmetatable({}, { __mode = "k" })
-local originalModuleMargins = setmetatable({}, { __mode = "k" })
-local originalModuleHeaderButtonPoints = setmetatable({}, { __mode = "k" })
-local adjustedModuleHeaderButtons = setmetatable({}, { __mode = "k" })
-local appliedTextScale
-local appliedTextEnabled
-local appliedTextOutline
-local appliedTrackerScale
-local appliedTrackerWidth
-local textScaleRefreshGeneration = 0
 local refreshPending = false
 local layoutRefreshRequested = true
-local fontRefreshRequested = true
-local deferredForCombat = false
 local applyingLayout = false
 local initialized = false
 local appearanceWatcher
-local appearanceWasEnabled = false
-local preAppearanceWidth
-local preAppearanceScale
-local previousSavedScale
-local originalBottomModulePadding
-local originalNineSliceTopLeft
-local originalNineSliceTopRight
 local originalHeaderBackgroundAlpha
 local originalHeaderTextAlpha
 local minimizedBackdropAlpha
 local knownCollapsed
 local lastHeaderControlsAlpha
-local originalSelectionPoints
-local selectionShiftApplied = false
 local ScheduleRefresh
 
 local function Clamp(value, minimum, maximum)
@@ -89,10 +52,6 @@ end
 
 local function FindTracker()
     tracker = tracker or _G[TRACKER_NAME]
-    if tracker and not originalWidth then
-        originalWidth = tracker.GetWidth and tracker:GetWidth() or 280
-        originalScale = tracker.GetScale and tracker:GetScale() or 1
-    end
     return tracker
 end
 
@@ -133,348 +92,6 @@ local function ApplySkinBounds(appearance, frame, fitToContent)
         -- Keep the customized horizontal extensions while allowing users who
         -- disable fitting to retain Blizzard's full tracker-height backdrop.
         appearance:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", TRACKER_RIGHT_EXTENSION, 0)
-    end
-end
-
-local function CaptureAnchor(frame, targetPoint)
-    if not frame or not frame.GetNumPoints then return nil end
-    for index = 1, frame:GetNumPoints() do
-        local point, relativeTo, relativePoint, offsetX, offsetY = frame:GetPoint(index)
-        if point == targetPoint then
-            return {
-                point = point,
-                relativeTo = relativeTo,
-                relativePoint = relativePoint,
-                offsetX = offsetX,
-                offsetY = offsetY,
-            }
-        end
-    end
-    return nil
-end
-
-local function RestoreAnchor(frame, anchor)
-    if not frame or not anchor then return end
-    frame:SetPoint(
-        anchor.point,
-        anchor.relativeTo,
-        anchor.relativePoint,
-        anchor.offsetX,
-        anchor.offsetY
-    )
-end
-
-local function CapturePoints(frame)
-    if not frame or not frame.GetNumPoints then return nil end
-    local points = {}
-    for index = 1, frame:GetNumPoints() do
-        local point, relativeTo, relativePoint, offsetX, offsetY = frame:GetPoint(index)
-        points[#points + 1] = {
-            point = point,
-            relativeTo = relativeTo,
-            relativePoint = relativePoint,
-            offsetX = offsetX or 0,
-            offsetY = offsetY or 0,
-        }
-    end
-    return #points > 0 and points or nil
-end
-
-local function SetPoints(frame, points, offsetX)
-    if not frame or not points then return end
-    frame:ClearAllPoints()
-    for _, anchor in ipairs(points) do
-        frame:SetPoint(
-            anchor.point,
-            anchor.relativeTo,
-            anchor.relativePoint,
-            anchor.offsetX + (offsetX or 0),
-            anchor.offsetY
-        )
-    end
-end
-
-local function ApplyEditModeSelectionBounds(frame, enabled, force)
-    local selection = frame and frame.Selection
-    if not selection then return end
-
-    if not originalSelectionPoints then
-        originalSelectionPoints = CapturePoints(selection)
-    end
-    if not originalSelectionPoints then return end
-
-    if enabled then
-        if selectionShiftApplied and not force then return end
-        SetPoints(selection, originalSelectionPoints, EDIT_MODE_SELECTION_X_OFFSET)
-        selectionShiftApplied = true
-    elseif selectionShiftApplied then
-        SetPoints(selection, originalSelectionPoints, 0)
-        selectionShiftApplied = false
-    end
-end
-
-local function ApplyTrackerBackgroundBounds(frame, enabled)
-    if not frame then return end
-
-    if originalBottomModulePadding == nil then
-        originalBottomModulePadding = tonumber(frame.bottomModulePadding) or 10
-    end
-
-    local nineSlice = frame.NineSlice
-    if nineSlice then
-        originalNineSliceTopLeft = originalNineSliceTopLeft or CaptureAnchor(nineSlice, "TOPLEFT")
-        originalNineSliceTopRight = originalNineSliceTopRight or CaptureAnchor(nineSlice, "TOPRIGHT")
-
-        if enabled then
-            nineSlice:SetPoint("TOPLEFT", frame, "TOPLEFT", TRACKER_LEFT_EXTENSION, TRACKER_TOP_EXTENSION)
-            nineSlice:SetPoint("TOPRIGHT", frame, "TOPRIGHT", TRACKER_RIGHT_EXTENSION, TRACKER_TOP_EXTENSION)
-        else
-            RestoreAnchor(nineSlice, originalNineSliceTopLeft)
-            RestoreAnchor(nineSlice, originalNineSliceTopRight)
-        end
-    end
-
-    frame.bottomModulePadding = enabled and TRACKER_BOTTOM_PADDING or originalBottomModulePadding
-end
-
-local function VisitFontStrings(root, callback, visited)
-    if not root or not callback then return end
-    visited = visited or {}
-    if visited[root] then return end
-    visited[root] = true
-
-    if root.GetRegions then
-        for _, region in ipairs({ root:GetRegions() }) do
-            if region and region.GetObjectType and region:GetObjectType() == "FontString" then
-                callback(region)
-            end
-        end
-    end
-
-    if root.GetChildren then
-        for _, child in ipairs({ root:GetChildren() }) do
-            VisitFontStrings(child, callback, visited)
-        end
-    end
-end
-
-local function AddOutlineFlag(flags)
-    flags = flags or ""
-    if flags:find("OUTLINE", 1, true) then return flags end
-    return flags == "" and "OUTLINE" or (flags .. ",OUTLINE")
-end
-
-local function ApplyTextScale(enabled, scale, outlineText, force)
-    local frame = FindTracker()
-    if not frame then return end
-    if not force
-        and appliedTextEnabled == enabled
-        and appliedTextScale == scale
-        and appliedTextOutline == outlineText then
-        return
-    end
-
-    appliedTextEnabled = enabled
-    appliedTextScale = scale
-    appliedTextOutline = outlineText
-
-    VisitFontStrings(frame, function(fontString)
-        local original = originalFonts[fontString]
-        if not original and fontString.GetFont then
-            local path, size, flags = fontString:GetFont()
-            if path and size then
-                original = { path = path, size = size, flags = flags }
-                originalFonts[fontString] = original
-            end
-        end
-
-        if original and fontString.SetFont then
-            local size = enabled and (original.size * scale) or original.size
-            local flags = original.flags
-            if enabled and outlineText then
-                flags = AddOutlineFlag(flags)
-            end
-
-            local currentPath, currentSize, currentFlags = fontString:GetFont()
-            local sameSize = type(currentSize) == "number"
-                and math.abs(currentSize - size) < 0.01
-            if currentPath ~= original.path
-                or not sameSize
-                or (currentFlags or "") ~= (flags or "") then
-                pcall(fontString.SetFont, fontString, original.path, size, flags)
-            end
-        end
-    end)
-
-    -- Never initiate Blizzard's objective-tracker layout from addon execution.
-    -- In 12.1 a scenario layout can inspect secret aura data; calling MarkDirty
-    -- here taints that protected aura query. Blizzard's own tracker events will
-    -- perform the required layout pass after these cosmetic font changes.
-end
-
-local function ApplyModuleWidths(frame, enabled, width)
-    if not frame then return end
-
-    local function AdjustModuleHeaderButtons(header)
-        if not header then return end
-
-        local buttons = {}
-        local seen = {}
-        local function AddButton(button)
-            if not button or seen[button] or not button.GetObjectType
-                or button:GetObjectType() ~= "Button" then
-                return
-            end
-            seen[button] = true
-            buttons[#buttons + 1] = button
-        end
-
-        AddButton(header.MinimizeButton)
-        AddButton(header.CollapseButton)
-        AddButton(header.Button)
-        if header.GetChildren then
-            for _, child in ipairs({ header:GetChildren() }) do
-                AddButton(child)
-            end
-        end
-
-        for _, button in ipairs(buttons) do
-            local points = originalModuleHeaderButtonPoints[button]
-            if not points then
-                points = CapturePoints(button)
-                originalModuleHeaderButtonPoints[button] = points
-            end
-
-            if points and enabled and not adjustedModuleHeaderButtons[button] then
-                local hasRightAnchor = false
-                for _, anchor in ipairs(points) do
-                    local point = tostring(anchor.point or "")
-                    local relativePoint = tostring(anchor.relativePoint or "")
-                    if point:find("RIGHT", 1, true)
-                        or relativePoint:find("RIGHT", 1, true) then
-                        hasRightAnchor = true
-                        break
-                    end
-                end
-
-                if hasRightAnchor and button.ClearAllPoints and button.SetPoint then
-                    button:ClearAllPoints()
-                    for _, anchor in ipairs(points) do
-                        local offsetX = anchor.offsetX or 0
-                        local point = tostring(anchor.point or "")
-                        local relativePoint = tostring(anchor.relativePoint or "")
-                        if point:find("RIGHT", 1, true)
-                            or relativePoint:find("RIGHT", 1, true) then
-                            offsetX = offsetX - MODULE_HEADER_BUTTON_INSET
-                        end
-                        button:SetPoint(
-                            anchor.point,
-                            anchor.relativeTo,
-                            anchor.relativePoint,
-                            offsetX,
-                            anchor.offsetY or 0
-                        )
-                    end
-                    adjustedModuleHeaderButtons[button] = true
-                end
-            elseif points and not enabled and adjustedModuleHeaderButtons[button] then
-                SetPoints(button, points, 0)
-                adjustedModuleHeaderButtons[button] = nil
-            end
-        end
-    end
-
-    local function ResizeElement(element, targetWidth)
-        if not element or not element.GetWidth or not element.SetWidth then return end
-        if originalElementWidths[element] == nil then
-            originalElementWidths[element] = element:GetWidth()
-        end
-        pcall(element.SetWidth, element, enabled and targetWidth or originalElementWidths[element])
-    end
-
-    local function ResizeHeader(header, targetWidth, adjustModuleButtons)
-        if not header then return end
-
-        if originalElementWidths[header] == nil and header.GetWidth then
-            originalElementWidths[header] = header:GetWidth()
-        end
-        local originalHeaderWidth = originalElementWidths[header] or targetWidth
-        ResizeElement(header, targetWidth)
-
-        -- These regions have their own fixed template sizes and do not inherit
-        -- the Header frame's new width.  Preserve their original right-side
-        -- spacing while allowing the visible header treatment to expand.
-        if header.Background then
-            ResizeElement(header.Background, targetWidth)
-        end
-        if header.Text and header.Text.GetWidth then
-            if originalElementWidths[header.Text] == nil then
-                originalElementWidths[header.Text] = header.Text:GetWidth()
-            end
-            local originalTextWidth = originalElementWidths[header.Text] or targetWidth
-            local rightSideSpacing = math.max(0, originalHeaderWidth - originalTextWidth)
-            ResizeElement(header.Text, math.max(1, targetWidth - rightSideSpacing))
-        end
-
-        if adjustModuleButtons then
-            AdjustModuleHeaderButtons(header)
-        end
-    end
-
-    local function ResizeModule(module)
-        if not module or not module.GetWidth or not module.SetWidth then return end
-
-        if originalModuleWidths[module] == nil then
-            originalModuleWidths[module] = module:GetWidth()
-        end
-        if originalModuleMargins[module] == nil then
-            originalModuleMargins[module] = tonumber(module.leftMargin) or 0
-        end
-
-        local originalMargin = originalModuleMargins[module] or 0
-        module.leftMargin = enabled and (originalMargin + MODULE_LEFT_PADDING) or originalMargin
-
-        local targetWidth = originalModuleWidths[module]
-        if enabled then
-            -- Blizzard anchors each objective module from its own left margin,
-            -- but leaves the module at its template's fixed width.  Subtracting
-            -- that margin keeps the module's right edge flush with the resized
-            -- container instead of extending beyond it.
-            targetWidth = math.max(1, width - (tonumber(module.leftMargin) or 0))
-        end
-
-        pcall(module.SetWidth, module, targetWidth)
-
-        local headerWidth = targetWidth
-        local header = module.Header
-        if enabled and header and header.GetNumPoints then
-            -- Scenario/Dungeon modules move their header 20 px right inside a
-            -- parent that Blizzard also widens by 20 px. Subtract that native
-            -- header offset so its visible right edge matches ordinary modules
-            -- such as Campaign and Quests instead of extending past them.
-            for pointIndex = 1, header:GetNumPoints() do
-                local point, relativeTo, relativePoint, offsetX = header:GetPoint(pointIndex)
-                local anchoredToModule = relativeTo == module or relativeTo == nil
-                local leftAnchored = tostring(point or ""):find("LEFT", 1, true)
-                    and tostring(relativePoint or ""):find("LEFT", 1, true)
-                if anchoredToModule and leftAnchored and (tonumber(offsetX) or 0) > 0 then
-                    headerWidth = math.max(1, targetWidth - offsetX)
-                    break
-                end
-            end
-        end
-
-        ResizeHeader(header, headerWidth, true)
-    end
-
-    ResizeHeader(frame.Header, width, false)
-
-    if frame.ForEachModule then
-        pcall(frame.ForEachModule, frame, ResizeModule)
-    elseif type(frame.modules) == "table" then
-        for _, module in ipairs(frame.modules) do
-            ResizeModule(module)
-        end
     end
 end
 
@@ -628,7 +245,6 @@ local function ApplyAppearance()
     -- deferred layout; when that layout originates in addon execution, the
     -- scenario module cannot inspect secret aura data in 12.1. Keep all
     -- decoration on the independent UIParent-owned skin below.
-    fontRefreshRequested = false
 
     local minimizeOnly = ApplyMinimizedHeaderStyle(db, frame)
     local appearance = CreateSkin()
@@ -658,9 +274,8 @@ end
 
 ApplyAppearance = ns:WrapDiagnosticFunction("ObjectiveTracker.Refresh", ApplyAppearance)
 
-ScheduleRefresh = function(delay, refreshLayout, refreshFonts)
+ScheduleRefresh = function(delay, refreshLayout)
     if refreshLayout then layoutRefreshRequested = true end
-    if refreshFonts then fontRefreshRequested = true end
     if refreshPending then return end
     refreshPending = true
     if C_Timer and C_Timer.After then
@@ -696,10 +311,6 @@ function ns:SetObjectiveTrackerAppearanceOption(key, value)
     return SetOption(key, value)
 end
 
-function ns:RefreshObjectiveTrackerAppearance()
-    ScheduleRefresh(0, true, true)
-end
-
 function ns:InitializeObjectiveTrackerAppearance()
     if initialized then return end
     initialized = true
@@ -720,8 +331,8 @@ function ns:InitializeObjectiveTrackerAppearance()
         pcall(events.RegisterEvent, events, eventName)
     end
     events:SetScript("OnEvent", function()
-        ScheduleRefresh(0, true, true)
+        ScheduleRefresh(0, true)
     end)
 
-    ScheduleRefresh(0, true, true)
+    ScheduleRefresh(0, true)
 end

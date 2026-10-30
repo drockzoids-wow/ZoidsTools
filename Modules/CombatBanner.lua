@@ -388,16 +388,6 @@ local function StartCombatEndedAlert()
     end
 end
 
-function ns:ResetCombatBannerPosition()
-    ResetBannerPosition(CreateBannerFrame())
-end
-
-function ns:RefreshCombatBanner()
-    CreateBannerFrame()
-    UpdateBannerInteractivity()
-    UpdateBannerVisibility()
-end
-
 function ns:InitializeCombatBanner()
     EnsureDB()
     CreateBannerFrame()

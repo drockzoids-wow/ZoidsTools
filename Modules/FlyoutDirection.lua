@@ -375,10 +375,6 @@ function ns:SetSkillFlyoutOverrideDirection(flyoutID, direction)
     return self:SetSkillFlyoutOverrideDirections({ flyoutID }, direction)
 end
 
-function ns:RefreshSkillFlyoutDirections()
-    QueueRefresh()
-end
-
 function ns:InitializeFlyoutDirections()
     EnsureDB()
 

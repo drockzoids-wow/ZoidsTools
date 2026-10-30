@@ -744,11 +744,6 @@ function ns:SetBuffWarningsEnabled(value)
     end
 end
 
-function ns:RefreshBuffWarnings()
-    CreateWarningFrame()
-    ScheduleCheck(0.1)
-end
-
 function ns:InitializeBuffWarnings()
     EnsureDB()
     CreateWarningFrame()

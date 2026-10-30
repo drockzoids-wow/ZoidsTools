@@ -153,11 +153,6 @@ local defaults = {
         historyLimit = 250,
         historyRestore = true,
         historyByCharacter = {},
-        layoutProfiles = {
-            profiles = {},
-            nextProfileID = 1,
-            selected = nil,
-        },
         editBoxPosition = "bottom",
         styledEditBox = true,
         editBoxFont = "default",
@@ -418,11 +413,11 @@ local function RunMigrations(db)
     local version = tonumber(db and db.migrationVersion) or 0
 
     if version < 1 then
-        if db.performance and db.performance.displayMode == nil and db.performance.enabled ~= nil then
+        if type(db.performance) == "table" and db.performance.displayMode == nil and db.performance.enabled ~= nil then
             db.performance.displayMode = db.performance.enabled and "both" or "disabled"
         end
 
-        if db.ui and db.ui.minimap then
+        if type(db.ui) == "table" and type(db.ui.minimap) == "table" then
             if db.ui.minimap.show == nil and db.ui.minimap.hide ~= nil then
                 db.ui.minimap.show = db.ui.minimap.hide ~= true
             end
@@ -431,14 +426,14 @@ local function RunMigrations(db)
     end
 
     if version < 2 then
-        db.customDamageMeter = db.customDamageMeter or {}
+        db.customDamageMeter = type(db.customDamageMeter) == "table" and db.customDamageMeter or {}
         if db.customDamageMeter.textScale == nil or db.customDamageMeter.textScale == 1 then
             db.customDamageMeter.textScale = 1.2
         end
     end
 
     if version < 3 then
-        db.customDamageMeter = db.customDamageMeter or {}
+        db.customDamageMeter = type(db.customDamageMeter) == "table" and db.customDamageMeter or {}
         local oldScale = tonumber(db.customDamageMeter.textScale) or 1.2
         db.customDamageMeter.textScale = math.max(0.8, math.min(1.5, oldScale / 1.2))
     end
@@ -909,7 +904,6 @@ local moduleInitializers = {
     "InitializeDiagnostics",
     "InitializeChatEnhancements",
     "InitializeChatHistory",
-    "InitializeChatProfiles",
     "InitializeMovableWindows",
     "InitializeFastLoot",
     "InitializeVendorAutomation",
@@ -971,7 +965,7 @@ end
 eventFrame:SetScript("OnEvent", function(_, event, addonName)
     if event == "ADDON_LOADED" and addonName == ADDON_NAME then
         eventFrame:UnregisterEvent("ADDON_LOADED")
-        ZoidsToolsDB = ZoidsToolsDB or {}
+        ZoidsToolsDB = type(ZoidsToolsDB) == "table" and ZoidsToolsDB or {}
         RunMigrations(ZoidsToolsDB)
         CopyDefaults(defaults, ZoidsToolsDB)
         ns.db = ZoidsToolsDB

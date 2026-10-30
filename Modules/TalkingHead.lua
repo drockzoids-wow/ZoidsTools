@@ -345,12 +345,6 @@ function ns:ToggleSubtleTalkingHeadMoveMode()
     return moveMode
 end
 
-function ns:ResetSubtleTalkingHeadPosition()
-    local db = EnsureDB()
-    if db then db.position = nil end
-    if subtitleFrame then RestorePosition(subtitleFrame) end
-end
-
 function ns:InitializeSubtleTalkingHead()
     EnsureDB()
     CreateSubtitleFrame()

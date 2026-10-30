@@ -947,10 +947,6 @@ function ns:GetConsumableMacroStatus()
     return lastStatus.health or "", lastStatus.mana or ""
 end
 
-function ns:GetConsumableMacroNames()
-    return HEALTH_MACRO_NAME, MANA_MACRO_NAME
-end
-
 function ns:RefreshConsumableMacros(quiet)
     ScheduleMacroUpdate(0.05, quiet ~= true)
 end

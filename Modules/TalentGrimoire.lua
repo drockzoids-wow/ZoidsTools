@@ -83,7 +83,6 @@ local function LogTalentApplyDiagnostic(message, ...)
     end
 end
 
-
 function ns:SetTalentApplyDiagnostics(enabled)
     talentApplyDiagnostics.enabled = enabled == true
 
@@ -4672,10 +4671,6 @@ function ns:GetTalentGrimoireContentType()
     return db and db.contentType or "mythicplus"
 end
 
-function ns:GetTalentGrimoireProvider()
-    return GetProviderKey()
-end
-
 function ns:SetTalentGrimoireProvider(value)
     local db = EnsureDB()
     if not db then return end
@@ -4714,10 +4709,6 @@ function ns:SetTalentGrimoireContentType(value)
     end
 end
 
-function ns:GetTalentGrimoireMode()
-    return GetModeKey(ns:GetTalentGrimoireContentType())
-end
-
 function ns:SetTalentGrimoireMode(value)
     SetModeKey(ns:GetTalentGrimoireContentType(), value)
     QueueRefresh(0)
@@ -4725,10 +4716,6 @@ function ns:SetTalentGrimoireMode(value)
     if ns.UI and ns.UI.RefreshVisiblePage then
         ns.UI.RefreshVisiblePage()
     end
-end
-
-function ns:GetTalentGrimoireTarget()
-    return GetTargetKey(ns:GetTalentGrimoireContentType())
 end
 
 function ns:SetTalentGrimoireTarget(value)

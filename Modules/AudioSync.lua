@@ -91,10 +91,6 @@ function ns:SetAudioSyncEnabled(value)
     UpdateEventRegistration()
 end
 
-function ns:SyncAudioDevice()
-    ScheduleAudioSync(0)
-end
-
 function ns:InitializeAudioSync()
     EnsureDB()
 

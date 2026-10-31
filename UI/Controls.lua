@@ -5,6 +5,13 @@ ns.UI = ns.UI or {}
 local UI = ns.UI
 local Theme = UI.Theme
 local controlCounter = 0
+local dropdownControls = setmetatable({}, { __mode = "k" })
+
+function UI.CloseDropdownMenus(except)
+    for control in pairs(dropdownControls) do
+        if control ~= except then control:CloseMenu() end
+    end
+end
 
 UI.SearchEntries = UI.SearchEntries or {}
 
@@ -12,6 +19,7 @@ function UI.SetControlEnabled(control, enabled)
     if not control then return end
 
     enabled = enabled == true
+    if not enabled and control.CloseMenu then control:CloseMenu() end
     control:SetAlpha(enabled and 1 or 0.42)
 
     if enabled and control.Enable then
@@ -55,6 +63,7 @@ UI.Layout = UI.Layout or {
 
 function UI.CreateCheckbox(parent, label, tooltip, getter, setter)
     local checkbox = CreateFrame("CheckButton", nil, parent)
+    checkbox.ZTCheckboxControl = true
     checkbox:SetSize(30, 20)
     checkbox.tooltip = tooltip
 
@@ -209,7 +218,9 @@ function UI.CreateButton(parent, text, width, height)
     button.rightCap:SetAlpha(0)
 
     button.text = button:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    button.text:SetPoint("CENTER")
+    button.text:SetPoint("LEFT", button, "LEFT", 10, 0)
+    button.text:SetPoint("RIGHT", button, "RIGHT", -10, 0)
+    button.text:SetJustifyH("CENTER")
     button.text:SetText(text)
 
     if button.text.SetWordWrap then
@@ -532,6 +543,7 @@ function UI.CreateDropdown(parent, label, tooltip, options, getter, setter, widt
             control.menu:Hide()
             control.button.arrow:SetText("v")
         else
+            UI.CloseDropdownMenus(control)
             control:Refresh()
             PositionMenu()
             control.menu:Show()
@@ -551,6 +563,9 @@ function UI.CreateDropdown(parent, label, tooltip, options, getter, setter, widt
         control.menu:Hide()
         control.button.arrow:SetText("v")
     end
+
+    control.CloseMenu = CloseMenu
+    dropdownControls[control] = true
 
     control:HookScript("OnHide", CloseMenu)
     if parent and parent.HookScript then
@@ -808,6 +823,7 @@ function UI.CreateMultiSelectDropdown(parent, label, tooltip, options, width)
             control.menu:Hide()
             control.button.arrow:SetText("v")
         else
+            UI.CloseDropdownMenus(control)
             control:Refresh()
             PositionMenu()
             control.menu:Show()
@@ -827,6 +843,9 @@ function UI.CreateMultiSelectDropdown(parent, label, tooltip, options, width)
         control.menu:Hide()
         control.button.arrow:SetText("v")
     end
+
+    control.CloseMenu = CloseMenu
+    dropdownControls[control] = true
 
     control:HookScript("OnHide", CloseMenu)
     if parent and parent.HookScript then

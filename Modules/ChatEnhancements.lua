@@ -818,6 +818,7 @@ local function CreateCopyWindow()
     frame.outputViewport:SetBackdropColor(0.004, 0.006, 0.010, 0.86)
 
     frame.scroll = CreateFrame("ScrollFrame", nil, frame.outputViewport, "UIPanelScrollFrameTemplate")
+    frame.scroll:SetClipsChildren(true)
     frame.scroll:SetPoint("TOPLEFT", 8, -8)
     frame.scroll:SetPoint("BOTTOMRIGHT", -26, 8)
 

@@ -3879,6 +3879,7 @@ local function CreateRotationPopup()
     end)
 
     popup.scroll = CreateFrame("ScrollFrame", "ZoidsToolsTalentRotationScrollFrame", popup, "UIPanelScrollFrameTemplate")
+    popup.scroll:SetClipsChildren(true)
     popup.scroll:SetPoint("TOPLEFT", popup.sectionDropdown, "BOTTOMLEFT", 2, -10)
     popup.scroll:SetPoint("BOTTOMRIGHT", popup, "BOTTOMRIGHT", -30, 42)
 

@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Fixed settings content extending below the window across all standard pages, including Items and Interface. Pages now share a clipped scroll area, scrollbar, mouse-wheel navigation, and search-result scrolling; cards expand for wrapped text and longer status messages.
+- Fixed overflowing Talents buttons and Unit Frames columns, wrapped Overview rows, and resized Weekly profession columns and dropdowns. Chat search now opens the matching internal tab. Mailbox options have separate rows, and the window uses Retail toolkit branding.
+- Fixed dropdowns being clipped by scrolling settings pages or remaining open after scrolling or disabling their control. Added explicit clipping to chat-copy, diagnostic-report, talent-rotation, and Warband inventory scroll areas.
 - Reviewed addon API, event, enum, TOC, and binding references against Retail 12.1.5 build 70575. Interface metadata remains `120105`.
 - Updated bundled LibDBIcon to stable v12.1.2 (library minor 57), including current minimap and addon-compartment support.
 - Removed unreachable stat-row overlays and objective-tracker resizing/font code, unused namespace helpers, and the orphaned chat-layout profile implementation. Existing saved layout data is preserved; the active stat-goal panel and tracker appearance controls remain available.

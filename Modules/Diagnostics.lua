@@ -405,6 +405,7 @@ local function CreateReportWindow()
     instruction:SetText("The report is selected for copying. Press Ctrl+C, then paste it into the Codex task.")
 
     local scroll = CreateFrame("ScrollFrame", nil, window, "UIPanelScrollFrameTemplate")
+    scroll:SetClipsChildren(true)
     scroll:SetPoint("TOPLEFT", window, "TOPLEFT", 18, -56)
     scroll:SetPoint("BOTTOMRIGHT", window, "BOTTOMRIGHT", -34, 18)
 

@@ -217,13 +217,13 @@ local function CreateAreaRow(parent, title, description, pageKey)
     row.accent:SetColorTexture(0.96, 0.72, 0.20, 0.78)
 
     row.title = row:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    row.title:SetPoint("LEFT", row, "LEFT", 20, 8)
+    row.title:SetPoint("TOPLEFT", row, "TOPLEFT", 20, -7)
     row.title:SetTextColor(1, 0.82, 0.18)
     row.title:SetText(title)
 
     row.description = row:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-    row.description:SetPoint("LEFT", row, "LEFT", 20, -9)
-    row.description:SetPoint("RIGHT", row, "RIGHT", -90, -9)
+    row.description:SetPoint("TOPLEFT", row, "TOPLEFT", 20, -25)
+    row.description:SetPoint("TOPRIGHT", row, "TOPRIGHT", -90, -25)
     row.description:SetJustifyH("LEFT")
     row.description:SetTextColor(0.76, 0.78, 0.76)
     row.description:SetText(description)
@@ -255,6 +255,8 @@ end
 local function CreateSectionCard(parent, title, width, height)
     local card = CreateFrame("Frame", nil, parent, "BackdropTemplate")
     card:SetSize(width, height)
+    card.ZTSectionCard = true
+    card.ZTMinimumHeight = height
     ApplyBackdrop(card, 0.46)
 
     card.title = card:CreateFontString(nil, "OVERLAY", "GameFontNormal")
@@ -301,6 +303,8 @@ local searchHighlightToken = 0
 
 local function HighlightSearchControl(frame, control)
     if not frame or not control then return end
+    local page = frame.modernPages and frame.modernPages[frame.pageKey]
+    if page and page.RevealControl then page:RevealControl(control) end
     if not frame.searchHighlight then
         local highlight = CreateFrame("Frame", nil, frame, "BackdropTemplate")
         highlight:SetFrameStrata("DIALOG")
@@ -325,6 +329,140 @@ local function HighlightSearchControl(frame, control)
     end
 end
 
+local function CreateSettingsPage(parent)
+    local page = CreateFrame("Frame", nil, parent)
+    page:SetAllPoints()
+    page:Hide()
+    local scroll = CreateFrame("ScrollFrame", nil, page, "ScrollFrameTemplate")
+    scroll:SetPoint("TOPLEFT", page, "TOPLEFT", 0, 0)
+    scroll:SetPoint("BOTTOMRIGHT", page, "BOTTOMRIGHT", -28, 0)
+    scroll:SetClipsChildren(true)
+    scroll:EnableMouseWheel(true)
+    local content = CreateFrame("Frame", nil, scroll)
+    content:SetSize(762, 1)
+    scroll:SetScrollChild(content)
+    page.scroll, page.content = scroll, content
+
+    local function TopAnchoredToCard(region, card, depth)
+        if not region or not region.GetPoint or depth > 12 then return false end
+        local _, relative, relativePoint = region:GetPoint(1)
+        if relative == card then return relativePoint and relativePoint:find("TOP", 1, true) ~= nil end
+        return relative and TopAnchoredToCard(relative, card, depth + 1) or false
+    end
+
+    function page:LayoutSettings()
+        if self.layoutActive then return end
+        self.layoutActive = true
+        local width = math.max(1, scroll:GetWidth())
+        content:SetWidth(width)
+        if self.BeforeLayout then self:BeforeLayout(width) end
+        local factor = width / 762
+        local cards = {}
+        for _, card in ipairs({ content:GetChildren() }) do
+            if card.ZTSectionCard then
+                cards[#cards + 1] = card
+                if not card.ZTLayoutWidth then
+                    card.ZTLayoutWidth = card:GetWidth()
+                    card.ZTLayoutPoints = {}
+                    for index = 1, card:GetNumPoints() do
+                        card.ZTLayoutPoints[index] = { card:GetPoint(index) }
+                    end
+                end
+                card:SetWidth(card.ZTLayoutWidth * factor)
+                card:ClearAllPoints()
+                for _, point in ipairs(card.ZTLayoutPoints) do
+                    card:SetPoint(point[1], point[2], point[3], point[4] * factor, point[5])
+                end
+            end
+        end
+
+        local bottom = content:GetTop()
+        for _, card in ipairs(cards) do
+            local children = { card:GetChildren() }
+            for _, child in ipairs(children) do
+                if TopAnchoredToCard(child, card, 0) and child:GetLeft() then
+                    child.ZTLayoutWidth = child.ZTLayoutWidth or child:GetWidth()
+                    local available = math.max(1, card:GetRight() - child:GetLeft() - 18)
+                    child:SetWidth(math.min(child.ZTLayoutWidth, available))
+                    if child.button then child.button:SetWidth(child:GetWidth()) end
+                end
+                if child.ZTCheckboxControl and child.Text then
+                    local right = card:GetRight() - 16
+                    for _, neighbor in ipairs(children) do
+                        if neighbor ~= child and neighbor:GetLeft() and child:GetTop() and neighbor:GetTop()
+                            and math.abs(neighbor:GetTop() - child:GetTop()) < 2 and neighbor:GetLeft() > child:GetRight() then
+                            right = math.min(right, neighbor:GetLeft() - 8)
+                        end
+                    end
+                    local available = math.max(30, right - child:GetRight() - 7)
+                    child.Text:SetWidth(available)
+                    child.Text:SetWordWrap(true)
+                    child:SetHeight(math.max(20, child.Text:GetStringHeight() + 4))
+                    child:SetHitRectInsets(0, -(available + 7), 0, 0)
+                end
+            end
+            for _, region in ipairs({ card:GetRegions() }) do
+                if region ~= card.title and region:GetObjectType() == "FontString" and TopAnchoredToCard(region, card, 0) then
+                    local available = math.max(1, card:GetRight() - region:GetLeft() - 18)
+                    region:SetWidth(available)
+                    region:SetWordWrap(true)
+                end
+            end
+            -- Only top-anchored content contributes to the card's natural height.
+            -- Bottom-anchored decoration must not grow its own parent on each refresh.
+            local required = card.ZTMinimumHeight
+            local measured = {}
+            for _, child in ipairs(children) do measured[#measured + 1] = child end
+            for _, region in ipairs({ card:GetRegions() }) do measured[#measured + 1] = region end
+            for _, region in ipairs(measured) do
+                if region:IsShown() and TopAnchoredToCard(region, card, 0) and region:GetBottom() then
+                    required = math.max(required, card:GetTop() - region:GetBottom() + 18)
+                end
+            end
+            card:SetHeight(required)
+            if card:IsShown() then bottom = math.min(bottom, card:GetBottom()) end
+        end
+        for _, child in ipairs({ content:GetChildren() }) do
+            if not child.ZTSectionCard and child:IsShown() and TopAnchoredToCard(child, content, 0) and child:GetBottom() then
+                bottom = math.min(bottom, child:GetBottom())
+            end
+        end
+        for _, region in ipairs({ content:GetRegions() }) do
+            if region:IsShown() and TopAnchoredToCard(region, content, 0) and region:GetBottom() then
+                bottom = math.min(bottom, region:GetBottom())
+            end
+        end
+        content:SetHeight(math.max(1, content:GetTop() - bottom + 16))
+        local range = math.max(0, scroll:GetVerticalScrollRange())
+        if scroll:GetVerticalScroll() > range then scroll:SetVerticalScroll(range) end
+        self.layoutActive = false
+    end
+
+    function page:RevealControl(control)
+        if self.PrepareSearchControl then self:PrepareSearchControl(control) end
+        local ancestor = control
+        while ancestor and ancestor ~= content do ancestor = ancestor:GetParent() end
+        if ancestor ~= content then return end
+        local top, bottom = control:GetTop(), control:GetBottom()
+        local viewTop, viewBottom = scroll:GetTop(), scroll:GetBottom()
+        if not top or not bottom or not viewTop or not viewBottom then return end
+        local offset = scroll:GetVerticalScroll()
+        if top > viewTop - 8 then offset = offset - (top - viewTop + 8)
+        elseif bottom < viewBottom + 8 then offset = offset + (viewBottom + 8 - bottom) end
+        scroll:SetVerticalScroll(math.max(0, math.min(scroll:GetVerticalScrollRange(), offset)))
+    end
+
+    scroll:SetScript("OnSizeChanged", function() page:LayoutSettings() end)
+    scroll:SetScript("OnMouseWheel", function(self, delta)
+        self:SetVerticalScroll(math.max(0, math.min(self:GetVerticalScrollRange(), self:GetVerticalScroll() - delta * 48)))
+        if ns.UI and ns.UI.CloseDropdownMenus then ns.UI.CloseDropdownMenus() end
+    end)
+    scroll:HookScript("OnVerticalScroll", function()
+        if ns.UI and ns.UI.CloseDropdownMenus then ns.UI.CloseDropdownMenus() end
+    end)
+    return page, content
+end
+
 local function CreateModernPage(parent, key, creator)
     local previous = ns.UI and ns.UI.BuildingPageKey
     local searchStart = ns.UI and ns.UI.SearchEntries and #ns.UI.SearchEntries or 0
@@ -339,6 +477,13 @@ local function CreateModernPage(parent, key, creator)
     end
     if page then
         page.ZTPageKey = key
+        if page.LayoutSettings then
+            local refresh = page.Refresh
+            page.Refresh = function(self)
+                if refresh then refresh(self) end
+                self:LayoutSettings()
+            end
+        end
     end
     if ns.UI and ns.UI.SearchEntries then
         for index = searchStart + 1, #ns.UI.SearchEntries do
@@ -776,9 +921,7 @@ local function CreateProfessionWeeklyPage(parent)
     page:SetAllPoints()
     page:Hide()
 
-    -- Scroll the complete page rather than confining scrolling to the short
-    -- profession-row viewport at the bottom. The extra breathing room lets
-    -- the profession header move naturally toward the middle of the page.
+    -- Keep tracker controls and profession rows in the same clipped viewport.
     page.scroll = CreateFrame("ScrollFrame", nil, page)
     page.scroll:SetAllPoints()
     page.scroll:SetClipsChildren(true)
@@ -959,14 +1102,16 @@ local function CreateProfessionWeeklyPage(parent)
     page.header:SetSize(760, 24)
     ApplyBackdrop(page.header, 0.56)
 
+    page.header.labels = {}
     local columnX = 10
-    for _, column in ipairs(PROFESSION_WEEKLY_COLUMNS) do
+    for index, column in ipairs(PROFESSION_WEEKLY_COLUMNS) do
         local label = page.header:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
         label:SetPoint("LEFT", page.header, "LEFT", columnX, 0)
         label:SetWidth(column.width)
         label:SetJustifyH(column.align)
         label:SetTextColor(0.68, 0.69, 0.72)
         label:SetText(column.label)
+        page.header.labels[index] = label
         columnX = columnX + column.width
     end
 
@@ -1094,17 +1239,49 @@ local function CreateProfessionWeeklyPage(parent)
 
     local function RefreshScrollGeometry()
         local width = tonumber(page.scroll:GetWidth()) or 0
-        local viewportHeight = tonumber(page.scroll:GetHeight()) or 0
         width = width >= 100 and width or 760
-        viewportHeight = viewportHeight >= 100 and viewportHeight or 400
         local professionCount = math.max(1, tonumber(page.visibleProfessionCount) or 0)
         local naturalHeight = 340 + (professionCount * 61)
 
         page.content:SetWidth(width)
-        page.content:SetHeight(math.max(naturalHeight, viewportHeight + 132))
+        page.content:SetHeight(naturalHeight)
         summary:SetWidth(width)
         trackerCard:SetWidth(width)
         page.header:SetWidth(width)
+        local selectorWidth = math.max(1, width / 2 - 36)
+        local selectorX = width / 2 + 12
+        for index, selector in ipairs({ weeklySelector, professionGoalSelector }) do
+            selector:ClearAllPoints()
+            selector:SetPoint("TOPLEFT", trackerCard, "TOPLEFT", selectorX, index == 1 and -40 or -103)
+            selector:SetWidth(selectorWidth)
+            if selector.button then selector.button:SetWidth(selectorWidth) end
+        end
+        trackerCard.note:ClearAllPoints()
+        trackerCard.note:SetPoint("TOPLEFT", trackerCard, "TOPLEFT", selectorX, -166)
+        trackerCard.note:SetWidth(selectorWidth)
+        local total = 0
+        for _, column in ipairs(PROFESSION_WEEKLY_COLUMNS) do total = total + column.width end
+        local scale = math.min(1, (width - 20) / total)
+        local x = 10
+        for index, column in ipairs(PROFESSION_WEEKLY_COLUMNS) do
+            local columnWidth = column.width * scale
+            local label = page.header.labels[index]
+            label:ClearAllPoints()
+            label:SetPoint("LEFT", page.header, "LEFT", x, 0)
+            label:SetWidth(columnWidth)
+            for _, row in ipairs(page.rows) do
+                if index == 1 then
+                    row.name:SetWidth(math.max(1, columnWidth - 48))
+                    row.detail:SetWidth(math.max(1, columnWidth - 48))
+                else
+                    local value = row.values[column.key]
+                    value:ClearAllPoints()
+                    value:SetPoint("CENTER", row, "LEFT", x + columnWidth / 2, 0)
+                    value:SetWidth(math.max(1, columnWidth - 4))
+                end
+            end
+            x = x + columnWidth
+        end
         for _, row in ipairs(page.rows) do
             row:SetWidth(width)
         end
@@ -1207,14 +1384,12 @@ local function CreateProfessionWeeklyPage(parent)
 end
 
 local function CreateMinimapPage(parent)
-    local page = CreateFrame("Frame", nil, parent)
-    page:SetAllPoints()
-    page:Hide()
+    local page, content = CreateSettingsPage(parent)
 
     local cardW = 374
 
-    local minimapCard = CreateSectionCard(page, "Minimap", cardW, 248)
-    minimapCard:SetPoint("TOPLEFT", page, "TOPLEFT", 0, 0)
+    local minimapCard = CreateSectionCard(content, "Minimap", cardW, 248)
+    minimapCard:SetPoint("TOPLEFT", content, "TOPLEFT", 0, 0)
 
     local showMinimap = ns.UI.CreateCheckbox(
         minimapCard,
@@ -1300,15 +1475,13 @@ local function CreateMinimapPage(parent)
 end
 
 local function CreateInterfacePage(parent)
-    local page = CreateFrame("Frame", nil, parent)
-    page:SetAllPoints()
-    page:Hide()
+    local page, content = CreateSettingsPage(parent)
 
     local cardW = 374
     local rightX = cardW + 14
 
-    local widgetsCard = CreateSectionCard(page, "Widgets", cardW, 237)
-    widgetsCard:SetPoint("TOPLEFT", page, "TOPLEFT", rightX, 0)
+    local widgetsCard = CreateSectionCard(content, "Widgets", cardW, 252)
+    widgetsCard:SetPoint("TOPLEFT", content, "TOPLEFT", rightX, 0)
 
     local performanceDisplay = ns.UI.CreateDropdown(
         widgetsCard,
@@ -1367,7 +1540,7 @@ local function CreateInterfacePage(parent)
         end
     end)
 
-    local queueCard = CreateSectionCard(page, "Queue Alerts", cardW, 158)
+    local queueCard = CreateSectionCard(content, "Queue Alerts", cardW, 158)
     queueCard:SetPoint("TOPLEFT", widgetsCard, "BOTTOMLEFT", 0, -10)
 
     local queueSound = ns.UI.CreateCheckbox(
@@ -1406,7 +1579,7 @@ local function CreateInterfacePage(parent)
     )
     PlaceBelow(safeDungeonQueue, safeQueue)
 
-    local diagnosticsCard = CreateSectionCard(page, "Activity Recorder", cardW, 132)
+    local diagnosticsCard = CreateSectionCard(content, "Activity Recorder", cardW, 132)
     diagnosticsCard:SetPoint("TOPLEFT", queueCard, "BOTTOMLEFT", 0, -10)
 
     local diagnosticsStatus = diagnosticsCard:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
@@ -1448,8 +1621,8 @@ local function CreateInterfacePage(parent)
         )
     end
 
-    local qualityCard = CreateSectionCard(page, "Quality of Life", cardW, 224)
-    qualityCard:SetPoint("TOPLEFT", page, "TOPLEFT", 0, 0)
+    local qualityCard = CreateSectionCard(content, "Quality of Life", cardW, 248)
+    qualityCard:SetPoint("TOPLEFT", content, "TOPLEFT", 0, 0)
 
     local inviteBanner = ns.UI.CreateCheckbox(
         qualityCard,
@@ -1512,9 +1685,9 @@ local function CreateInterfacePage(parent)
         function() return ns.IsMailLastRecipientEnabled and ns:IsMailLastRecipientEnabled() end,
         function(value) if ns.SetMailLastRecipientEnabled then ns:SetMailLastRecipientEnabled(value) end end
     )
-    rememberMailRecipient:SetPoint("TOPLEFT", mailRolodex, "TOPLEFT", 170, 0)
+    PlaceBelow(rememberMailRecipient, mailRolodex)
 
-    local talkingHeadCard = CreateSectionCard(page, "Talking Head", cardW, 190)
+    local talkingHeadCard = CreateSectionCard(content, "Talking Head", cardW, 190)
     talkingHeadCard:SetPoint("TOPLEFT", qualityCard, "BOTTOMLEFT", 0, -10)
 
     local subtleTalkingHead = ns.UI.CreateCheckbox(
@@ -1635,16 +1808,16 @@ local function CreateInterfacePage(parent)
         end
     end
 
-    page:SetScript("OnShow", function(self) self:Refresh() end)
+    page:SetScript("OnShow", function(self)
+        self:Refresh()
+    end)
 
     return page
 end
 
 local function CreateChatPage(parent)
     local UI = ns.UI
-    local page = CreateFrame("Frame", nil, parent)
-    page:SetAllPoints()
-    page:Hide()
+    local page, content = CreateSettingsPage(parent)
 
     local function Get(key, fallback)
         local value = ns.db and ns.db.chat and ns.db.chat[key]
@@ -1664,14 +1837,14 @@ local function CreateChatPage(parent)
     local leftX = 0
     local rightX = cardW + 14
 
-    local generalTab = CreateButton(page, "General", 126, 27)
-    generalTab:SetPoint("TOPLEFT", page, "TOPLEFT", 0, 0)
+    local generalTab = CreateButton(content, "General", 126, 27)
+    generalTab:SetPoint("TOPLEFT", content, "TOPLEFT", 0, 0)
 
-    local historyTab = CreateButton(page, "History & Input", 150, 27)
+    local historyTab = CreateButton(content, "History & Input", 150, 27)
     historyTab:SetPoint("LEFT", generalTab, "RIGHT", 10, 0)
 
-    local essentialsCard = CreateSectionCard(page, "Essentials", cardW, 208)
-    essentialsCard:SetPoint("TOPLEFT", page, "TOPLEFT", leftX, -42)
+    local essentialsCard = CreateSectionCard(content, "Essentials", cardW, 208)
+    essentialsCard:SetPoint("TOPLEFT", content, "TOPLEFT", leftX, -42)
 
     local enabled = UI.CreateCheckbox(
         essentialsCard,
@@ -1717,7 +1890,7 @@ local function CreateChatPage(parent)
         end
     end)
 
-    local awarenessCard = CreateSectionCard(page, "Message Awareness", cardW, 138)
+    local awarenessCard = CreateSectionCard(content, "Message Awareness", cardW, 138)
     awarenessCard:SetPoint("TOPLEFT", essentialsCard, "BOTTOMLEFT", 0, -10)
 
     local newMessageIndicator = UI.CreateCheckbox(
@@ -1747,8 +1920,8 @@ local function CreateChatPage(parent)
     )
     PlaceBelow(mentionSound, mentionHighlight)
 
-    local appearanceCard = CreateSectionCard(page, "Appearance", cardW, 208)
-    appearanceCard:SetPoint("TOPLEFT", page, "TOPLEFT", rightX, -42)
+    local appearanceCard = CreateSectionCard(content, "Appearance", cardW, 208)
+    appearanceCard:SetPoint("TOPLEFT", content, "TOPLEFT", rightX, -42)
 
     local mouseoverControls = UI.CreateCheckbox(
         appearanceCard,
@@ -1791,7 +1964,7 @@ local function CreateChatPage(parent)
     )
     backgroundOpacity:SetPoint("TOPLEFT", backgroundMouseover, "BOTTOMLEFT", 10, -16)
 
-    local textCard = CreateSectionCard(page, "Text and Fading", cardW, 208)
+    local textCard = CreateSectionCard(content, "Text and Fading", cardW, 208)
     textCard:SetPoint("TOPLEFT", appearanceCard, "BOTTOMLEFT", 0, -10)
 
     local customFont = UI.CreateCheckbox(
@@ -1849,8 +2022,8 @@ local function CreateChatPage(parent)
     )
     fadeDelay:SetPoint("TOPLEFT", disableFading, "BOTTOMLEFT", 10, -16)
 
-    local historyCard = CreateSectionCard(page, "Saved History", cardW, 230)
-    historyCard:SetPoint("TOPLEFT", page, "TOPLEFT", leftX, -42)
+    local historyCard = CreateSectionCard(content, "Saved History", cardW, 230)
+    historyCard:SetPoint("TOPLEFT", content, "TOPLEFT", leftX, -42)
 
     local historyEnabled = UI.CreateCheckbox(
         historyCard,
@@ -1898,8 +2071,8 @@ local function CreateChatPage(parent)
         end
     end)
 
-    local inputCard = CreateSectionCard(page, "Typing Box", cardW, 350)
-    inputCard:SetPoint("TOPLEFT", page, "TOPLEFT", rightX, -42)
+    local inputCard = CreateSectionCard(content, "Typing Box", cardW, 350)
+    inputCard:SetPoint("TOPLEFT", content, "TOPLEFT", rightX, -42)
 
     local styledEditBox = UI.CreateCheckbox(
         inputCard,
@@ -2004,6 +2177,21 @@ local function CreateChatPage(parent)
         SetControlsShown(historyControls, activePanel == "history")
         SetButtonSelected(generalTab, activePanel == "general")
         SetButtonSelected(historyTab, activePanel == "history")
+        page:LayoutSettings()
+    end
+
+    function page:PrepareSearchControl(control)
+        local ancestor = control
+        while ancestor and ancestor ~= content do
+            if ancestor == historyCard or ancestor == inputCard then
+                ShowPanel("history")
+                return
+            elseif ancestor == essentialsCard or ancestor == awarenessCard or ancestor == appearanceCard or ancestor == textCard then
+                ShowPanel("general")
+                return
+            end
+            ancestor = ancestor:GetParent()
+        end
     end
 
     generalTab:SetScript("OnClick", function() ShowPanel("general") end)
@@ -2083,9 +2271,7 @@ end
 
 local function CreateMountsPage(parent)
     local UI = ns.UI
-    local page = CreateFrame("Frame", nil, parent)
-    page:SetAllPoints()
-    page:Hide()
+    local page, content = CreateSettingsPage(parent)
 
     local cardW = 374
     local leftX = 0
@@ -2100,8 +2286,8 @@ local function CreateMountsPage(parent)
         end
     end
 
-    local smartCard = CreateSectionCard(page, "Smart Mount", cardW, 390)
-    smartCard:SetPoint("TOPLEFT", page, "TOPLEFT", leftX, 0)
+    local smartCard = CreateSectionCard(content, "Smart Mount", cardW, 390)
+    smartCard:SetPoint("TOPLEFT", content, "TOPLEFT", leftX, 0)
 
     local enabled = UI.CreateCheckbox(
         smartCard,
@@ -2206,8 +2392,8 @@ local function CreateMountsPage(parent)
     )
     classOptions:SetPoint("TOPLEFT", excludeService, "BOTTOMLEFT", 0, -18)
 
-    local serviceCard = CreateSectionCard(page, "Service Mounts", cardW, 390)
-    serviceCard:SetPoint("TOPLEFT", page, "TOPLEFT", rightX, 0)
+    local serviceCard = CreateSectionCard(content, "Service Mounts", cardW, 390)
+    serviceCard:SetPoint("TOPLEFT", content, "TOPLEFT", rightX, 0)
 
     local repairOptions = function() return ns.GetMountServiceOptions and ns:GetMountServiceOptions("repair") or {} end
     local repair = UI.CreateDropdown(
@@ -2346,15 +2532,13 @@ StaticPopupDialogs[WINDOWS_RESET_POPUP_KEY] = StaticPopupDialogs[WINDOWS_RESET_P
 
 local function CreateTooltipsPage(parent)
     local UI = ns.UI
-    local page = CreateFrame("Frame", nil, parent)
-    page:SetAllPoints()
-    page:Hide()
+    local page, content = CreateSettingsPage(parent)
 
     local cardW = 374
     local rightX = cardW + 14
 
-    local appearance = CreateSectionCard(page, "Appearance", cardW, 150)
-    appearance:SetPoint("TOPLEFT", page, "TOPLEFT", 0, 0)
+    local appearance = CreateSectionCard(content, "Appearance", cardW, 150)
+    appearance:SetPoint("TOPLEFT", content, "TOPLEFT", 0, 0)
 
     local classColoredNames = UI.CreateCheckbox(
         appearance,
@@ -2365,8 +2549,8 @@ local function CreateTooltipsPage(parent)
     )
     PlaceFirst(classColoredNames, appearance)
 
-    local playerDetails = CreateSectionCard(page, "Player Details", cardW, 150)
-    playerDetails:SetPoint("TOPLEFT", page, "TOPLEFT", rightX, 0)
+    local playerDetails = CreateSectionCard(content, "Player Details", cardW, 150)
+    playerDetails:SetPoint("TOPLEFT", content, "TOPLEFT", rightX, 0)
 
     local mythicRating = UI.CreateCheckbox(
         playerDetails,
@@ -2399,16 +2583,14 @@ end
 
 local function CreateWindowsPage(parent)
     local UI = ns.UI
-    local page = CreateFrame("Frame", nil, parent)
-    page:SetAllPoints()
-    page:Hide()
+    local page, content = CreateSettingsPage(parent)
 
     local cardW = 374
     local leftX = 0
     local rightX = cardW + 14
 
-    local movement = CreateSectionCard(page, "Movement", cardW, 260)
-    movement:SetPoint("TOPLEFT", page, "TOPLEFT", leftX, 0)
+    local movement = CreateSectionCard(content, "Movement", cardW, 260)
+    movement:SetPoint("TOPLEFT", content, "TOPLEFT", leftX, 0)
 
     local windowsEnabled = UI.CreateCheckbox(
         movement,
@@ -2477,8 +2659,8 @@ local function CreateWindowsPage(parent)
     )
     PlaceBelow(scaleEnabled, savePositions)
 
-    local actions = CreateSectionCard(page, "Actions", cardW, 190)
-    actions:SetPoint("TOPLEFT", page, "TOPLEFT", rightX, 0)
+    local actions = CreateSectionCard(content, "Actions", cardW, 190)
+    actions:SetPoint("TOPLEFT", content, "TOPLEFT", rightX, 0)
 
     local refreshButton = CreateButton(actions, "Refresh", 108, 27)
     PlaceFirst(refreshButton, actions)
@@ -2549,9 +2731,7 @@ end
 
 local function CreateItemsPage(parent)
     local UI = ns.UI
-    local page = CreateFrame("Frame", nil, parent)
-    page:SetAllPoints()
-    page:Hide()
+    local page, content = CreateSettingsPage(parent)
 
     local dropdownWidth = 300
     local cardW = 374
@@ -2577,8 +2757,8 @@ local function CreateItemsPage(parent)
         }
     end
 
-    local general = CreateSectionCard(page, "General", cardW, 240)
-    general:SetPoint("TOPLEFT", page, "TOPLEFT", leftX, 0)
+    local general = CreateSectionCard(content, "General", cardW, 240)
+    general:SetPoint("TOPLEFT", content, "TOPLEFT", leftX, 0)
 
     local enabled = UI.CreateCheckbox(
         general,
@@ -2655,8 +2835,8 @@ local function CreateItemsPage(parent)
     )
     bisContext:SetPoint("TOPLEFT", bisEnabled, "BOTTOMLEFT", 0, -16)
 
-    local display = CreateSectionCard(page, "Display", cardW, 210)
-    display:SetPoint("TOPLEFT", page, "TOPLEFT", rightX, 0)
+    local display = CreateSectionCard(content, "Display", cardW, 210)
+    display:SetPoint("TOPLEFT", content, "TOPLEFT", rightX, 0)
 
     local characterOptions = UI.CreateMultiSelectDropdown(
         display,
@@ -2699,7 +2879,7 @@ local function CreateItemsPage(parent)
     )
     upgradePath:SetPoint("TOPLEFT", bagBankOptions, "BOTTOMLEFT", 0, -16)
 
-    local style = CreateSectionCard(page, "Style", cardW, 164)
+    local style = CreateSectionCard(content, "Style", cardW, 164)
     style:SetPoint("TOPLEFT", general, "BOTTOMLEFT", 0, -14)
 
     local fontSize = UI.CreateSlider(
@@ -2733,7 +2913,7 @@ local function CreateItemsPage(parent)
         end
     end)
 
-    local statusCard = CreateSectionCard(page, "Generated Data Status", cardW, 240)
+    local statusCard = CreateSectionCard(content, "Generated Data Status", cardW, 240)
     statusCard:SetPoint("TOPLEFT", display, "BOTTOMLEFT", 0, -14)
 
     local status = statusCard:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
@@ -2783,16 +2963,14 @@ end
 
 local function CreateProfessionsPage(parent)
     local UI = ns.UI
-    local page = CreateFrame("Frame", nil, parent)
-    page:SetAllPoints()
-    page:Hide()
+    local page, content = CreateSettingsPage(parent)
 
     local cardW = 374
     local leftX = 0
     local rightX = cardW + 14
 
-    local main = CreateSectionCard(page, "Profession Action", cardW, 190)
-    main:SetPoint("TOPLEFT", page, "TOPLEFT", leftX, 0)
+    local main = CreateSectionCard(content, "Profession Action", cardW, 190)
+    main:SetPoint("TOPLEFT", content, "TOPLEFT", leftX, 0)
 
     local enabled = UI.CreateCheckbox(
         main,
@@ -2834,8 +3012,8 @@ local function CreateProfessionsPage(parent)
     )
     activation:SetPoint("TOPLEFT", enabled, "BOTTOMLEFT", 0, -16)
 
-    local actions = CreateSectionCard(page, "Actions", cardW, 190)
-    actions:SetPoint("TOPLEFT", page, "TOPLEFT", rightX, 0)
+    local actions = CreateSectionCard(content, "Actions", cardW, 190)
+    actions:SetPoint("TOPLEFT", content, "TOPLEFT", rightX, 0)
 
     local disenchant = UI.CreateCheckbox(
         actions,
@@ -2873,7 +3051,7 @@ local function CreateProfessionsPage(parent)
     )
     PlaceBelow(open, prospect)
 
-    local statusCard = CreateSectionCard(page, "Status", (cardW * 2) + 14, 120)
+    local statusCard = CreateSectionCard(content, "Status", (cardW * 2) + 14, 120)
     statusCard:SetPoint("TOPLEFT", main, "BOTTOMLEFT", 0, -14)
 
     local status = statusCard:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
@@ -2913,16 +3091,14 @@ end
 
 local function CreateTalentsPage(parent)
     local UI = ns.UI
-    local page = CreateFrame("Frame", nil, parent)
-    page:SetAllPoints()
-    page:Hide()
+    local page, content = CreateSettingsPage(parent)
 
     local cardW = 374
     local leftX = 0
     local rightX = cardW + 14
 
-    local main = CreateSectionCard(page, "Talent Panel", cardW, 170)
-    main:SetPoint("TOPLEFT", page, "TOPLEFT", leftX, 0)
+    local main = CreateSectionCard(content, "Talent Panel", cardW, 170)
+    main:SetPoint("TOPLEFT", content, "TOPLEFT", leftX, 0)
 
     local enabled = UI.CreateCheckbox(
         main,
@@ -2947,10 +3123,10 @@ local function CreateTalentsPage(parent)
     status:SetJustifyH("LEFT")
     status:SetTextColor(0.78, 0.78, 0.72)
 
-    local selection = CreateSectionCard(page, "Selection", cardW, 170)
-    selection:SetPoint("TOPLEFT", page, "TOPLEFT", rightX, 0)
+    local selection = CreateSectionCard(content, "Selection", cardW, 170)
+    selection:SetPoint("TOPLEFT", content, "TOPLEFT", rightX, 0)
 
-    local contentButton = CreateButton(selection, "Content", 160, 27)
+    local contentButton = CreateButton(selection, "Content", 150, 27)
     PlaceFirst(contentButton, selection)
     contentButton:SetScript("OnClick", function()
         if ns.CycleTalentGrimoireContent then
@@ -2962,7 +3138,7 @@ local function CreateTalentsPage(parent)
         end
     end)
 
-    local targetButton = CreateButton(selection, "Target", 180, 27)
+    local targetButton = CreateButton(selection, "Target", 160, 27)
     targetButton:SetPoint("LEFT", contentButton, "RIGHT", 10, 0)
     targetButton:SetScript("OnClick", function()
         if ns.CycleTalentGrimoireTarget then
@@ -2974,7 +3150,7 @@ local function CreateTalentsPage(parent)
         end
     end)
 
-    local modeButton = CreateButton(selection, "Mode", 160, 27)
+    local modeButton = CreateButton(selection, "Mode", 150, 27)
     modeButton:SetPoint("TOPLEFT", contentButton, "BOTTOMLEFT", 0, -12)
     modeButton:SetScript("OnClick", function()
         if ns.CycleTalentGrimoireMode then
@@ -2986,7 +3162,7 @@ local function CreateTalentsPage(parent)
         end
     end)
 
-    local refreshButton = CreateButton(selection, "Refresh Panel", 180, 27)
+    local refreshButton = CreateButton(selection, "Refresh Panel", 160, 27)
     refreshButton:SetPoint("LEFT", modeButton, "RIGHT", 10, 0)
     refreshButton:SetScript("OnClick", function()
         if ns.RefreshTalentGrimoire then
@@ -2998,7 +3174,7 @@ local function CreateTalentsPage(parent)
         end
     end)
 
-    local help = CreateSectionCard(page, "How It Works", (cardW * 2) + 14, 135)
+    local help = CreateSectionCard(content, "How It Works", (cardW * 2) + 14, 135)
     help:SetPoint("TOPLEFT", main, "BOTTOMLEFT", 0, -14)
 
     local helpText = help:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
@@ -3114,16 +3290,14 @@ end
 
 local function CreateMetersPage(parent)
     local UI = ns.UI
-    local page = CreateFrame("Frame", nil, parent)
-    page:SetAllPoints()
-    page:Hide()
+    local page, content = CreateSettingsPage(parent)
 
     local cardW = 374
     local leftX = 0
     local rightX = cardW + 14
 
-    local custom = CreateSectionCard(page, "ZoidsTools Damage Meter", cardW, 330)
-    custom:SetPoint("TOPLEFT", page, "TOPLEFT", leftX, 0)
+    local custom = CreateSectionCard(content, "ZoidsTools Damage Meter", cardW, 330)
+    custom:SetPoint("TOPLEFT", content, "TOPLEFT", leftX, 0)
 
     local customEnabled = UI.CreateCheckbox(
         custom,
@@ -3204,7 +3378,7 @@ local function CreateMetersPage(parent)
     customStatus:SetTextColor(0.78, 0.78, 0.72)
 
     local previewButton = CreateButton(custom, "Preview / Move", 132, 27)
-    previewButton:SetPoint("BOTTOMLEFT", custom, "BOTTOMLEFT", 18, 16)
+    previewButton:SetPoint("TOPLEFT", customStatus, "BOTTOMLEFT", -10, -14)
     previewButton:SetScript("OnClick", function()
         if ns.ToggleCustomDamageMeterMoveMode then
             ns:ToggleCustomDamageMeterMoveMode()
@@ -3220,8 +3394,8 @@ local function CreateMetersPage(parent)
         end
     end)
 
-    local profiles = CreateSectionCard(page, "Profiles", cardW, 250)
-    profiles:SetPoint("TOPLEFT", page, "TOPLEFT", rightX, 0)
+    local profiles = CreateSectionCard(content, "Profiles", cardW, 250)
+    profiles:SetPoint("TOPLEFT", content, "TOPLEFT", rightX, 0)
 
     local status = profiles:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
     status:SetPoint("TOPLEFT", profiles, "TOPLEFT", 18, -42)
@@ -3292,7 +3466,7 @@ local function CreateMetersPage(parent)
     profileStatus:SetJustifyH("LEFT")
     profileStatus:SetTextColor(0.78, 0.78, 0.72)
 
-    local windows = CreateSectionCard(page, "Blizzard Windows", cardW, 150)
+    local windows = CreateSectionCard(content, "Blizzard Windows", cardW, 150)
     windows:SetPoint("TOPLEFT", profiles, "BOTTOMLEFT", 0, -14)
 
     local currentWindow1 = windows:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
@@ -3358,16 +3532,14 @@ end
 
 local function CreateCombatPage(parent)
     local UI = ns.UI
-    local page = CreateFrame("Frame", nil, parent)
-    page:SetAllPoints()
-    page:Hide()
+    local page, content = CreateSettingsPage(parent)
 
     local cardW = 374
     local leftX = 0
     local rightX = cardW + 14
 
-    local input = CreateSectionCard(page, "Input and Alerts", cardW, 224)
-    input:SetPoint("TOPLEFT", page, "TOPLEFT", leftX, 0)
+    local input = CreateSectionCard(content, "Input and Alerts", cardW, 224)
+    input:SetPoint("TOPLEFT", content, "TOPLEFT", leftX, 0)
 
     local castOnKeyDown = UI.CreateCheckbox(
         input,
@@ -3430,12 +3602,12 @@ local function CreateCombatPage(parent)
     PlaceBelow(combatBannerLocked, combatBannerPersistent)
 
     local status = input:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
-    status:SetPoint("BOTTOMLEFT", input, "BOTTOMLEFT", 18, 14)
+    status:SetPoint("TOPLEFT", combatBannerLocked, "BOTTOMLEFT", 0, -12)
     status:SetWidth(cardW - 36)
     status:SetJustifyH("LEFT")
     status:SetTextColor(0.78, 0.78, 0.72)
 
-    local flyouts = CreateSectionCard(page, "Skill Flyouts", cardW, 184)
+    local flyouts = CreateSectionCard(content, "Skill Flyouts", cardW, 184)
     flyouts:SetPoint("TOPLEFT", input, "BOTTOMLEFT", 0, -10)
 
     local defaultFlyoutDirection = UI.CreateDropdown(
@@ -3599,13 +3771,13 @@ local function CreateCombatPage(parent)
     selectedFlyoutDirection:SetPoint("TOPLEFT", flyoutSelector, "TOPRIGHT", 12, 0)
 
     local flyoutNote = flyouts:CreateFontString(nil, "ARTWORK", "GameFontDisableSmall")
-    flyoutNote:SetPoint("BOTTOMLEFT", flyouts, "BOTTOMLEFT", 18, 10)
+    flyoutNote:SetPoint("TOPLEFT", flyoutSelector, "BOTTOMLEFT", 0, -12)
     flyoutNote:SetPoint("RIGHT", flyouts, "RIGHT", -18, 0)
     flyoutNote:SetJustifyH("LEFT")
     flyoutNote:SetText("Select one or more flyouts; changes apply outside combat and remain active during combat.")
 
-    local keybinds = CreateSectionCard(page, "Action Keybind Text", cardW, 390)
-    keybinds:SetPoint("TOPLEFT", page, "TOPLEFT", rightX, 0)
+    local keybinds = CreateSectionCard(content, "Action Keybind Text", cardW, 390)
+    keybinds:SetPoint("TOPLEFT", content, "TOPLEFT", rightX, 0)
 
     local keybindTextEnabled = UI.CreateCheckbox(
         keybinds,
@@ -3760,22 +3932,21 @@ end
 
 local function CreateUnitFramesPage(parent)
     local UI = ns.UI
-    local page = CreateFrame("Frame", nil, parent)
-    page:SetAllPoints()
-    page:Hide()
+    local page, content = CreateSettingsPage(parent)
 
     local controls = {}
     local castbarDependencies = {}
-    local cardW = 246
+    local cardW = 244
     local gap = 14
     local frameColumns = {
         { key = "player", label = "Player" },
         { key = "target", label = "Target" },
         { key = "focus", label = "Focus" },
     }
+    local frameCards = {}
 
-    local health = CreateSectionCard(page, "Health Bars", (cardW * 3) + (gap * 2), 90)
-    health:SetPoint("TOPLEFT", page, "TOPLEFT", 0, 0)
+    local health = CreateSectionCard(content, "Health Bars", (cardW * 3) + (gap * 2), 90)
+    health:SetPoint("TOPLEFT", content, "TOPLEFT", 0, 0)
 
     local classColorHealth = UI.CreateCheckbox(
         health,
@@ -3788,7 +3959,8 @@ local function CreateUnitFramesPage(parent)
     controls[#controls + 1] = classColorHealth
 
     for index, info in ipairs(frameColumns) do
-        local card = CreateSectionCard(page, info.label, cardW, 330)
+        local card = CreateSectionCard(content, info.label, cardW, 330)
+        frameCards[index] = card
         card:SetPoint("TOPLEFT", health, "BOTTOMLEFT", (index - 1) * (cardW + gap), -14)
 
         local resizeCastbar = UI.CreateCheckbox(
@@ -3866,8 +4038,8 @@ local function CreateUnitFramesPage(parent)
         end
     end
 
-    local refreshButton = CreateButton(page, "Refresh Unit Frames", 160, 27)
-    refreshButton:SetPoint("BOTTOMLEFT", page, "BOTTOMLEFT", 0, 0)
+    local refreshButton = CreateButton(content, "Refresh Unit Frames", 160, 27)
+    refreshButton:SetPoint("TOPLEFT", frameCards[1], "BOTTOMLEFT", 0, -14)
     refreshButton:SetScript("OnClick", function()
         if ns.RefreshUnitFrames then ns:RefreshUnitFrames() end
         if page.Refresh then page:Refresh() end
@@ -3896,16 +4068,14 @@ end
 
 local function CreateMacrosPage(parent)
     local UI = ns.UI
-    local page = CreateFrame("Frame", nil, parent)
-    page:SetAllPoints()
-    page:Hide()
+    local page, content = CreateSettingsPage(parent)
 
     local cardW = 374
     local leftX = 0
     local rightX = cardW + 14
 
-    local health = CreateSectionCard(page, "Health Macro", cardW, 150)
-    health:SetPoint("TOPLEFT", page, "TOPLEFT", leftX, 0)
+    local health = CreateSectionCard(content, "Health Macro", cardW, 150)
+    health:SetPoint("TOPLEFT", content, "TOPLEFT", leftX, 0)
 
     local healthEnabled = UI.CreateCheckbox(
         health,
@@ -3937,7 +4107,7 @@ local function CreateMacrosPage(parent)
     )
     PlaceBelow(healthCombat, healthRecuperate)
 
-    local mana = CreateSectionCard(page, "Mana Macro", cardW, 120)
+    local mana = CreateSectionCard(content, "Mana Macro", cardW, 120)
     mana:SetPoint("TOPLEFT", health, "BOTTOMLEFT", 0, -14)
 
     local manaEnabled = UI.CreateCheckbox(
@@ -3961,8 +4131,8 @@ local function CreateMacrosPage(parent)
     )
     PlaceBelow(manaCombat, manaEnabled)
 
-    local hearth = CreateSectionCard(page, "Random Hearthstone", cardW, 180)
-    hearth:SetPoint("TOPLEFT", page, "TOPLEFT", rightX, 0)
+    local hearth = CreateSectionCard(content, "Random Hearthstone", cardW, 180)
+    hearth:SetPoint("TOPLEFT", content, "TOPLEFT", rightX, 0)
 
     local hearthstoneEnabled = UI.CreateCheckbox(
         hearth,
@@ -3990,7 +4160,7 @@ local function CreateMacrosPage(parent)
     hearthstoneStatus:SetJustifyH("LEFT")
     hearthstoneStatus:SetTextColor(0.78, 0.78, 0.72)
 
-    local actions = CreateSectionCard(page, "Actions", cardW, 170)
+    local actions = CreateSectionCard(content, "Actions", cardW, 170)
     actions:SetPoint("TOPLEFT", hearth, "BOTTOMLEFT", 0, -14)
 
     local refreshButton = CreateButton(actions, "Refresh Macros", 140, 27)
@@ -4048,16 +4218,14 @@ end
 
 local function CreateLootPage(parent)
     local UI = ns.UI
-    local page = CreateFrame("Frame", nil, parent)
-    page:SetAllPoints()
-    page:Hide()
+    local page, content = CreateSettingsPage(parent)
 
     local cardW = 374
     local leftX = 0
     local rightX = cardW + 14
 
-    local behavior = CreateSectionCard(page, "Behavior", cardW, 170)
-    behavior:SetPoint("TOPLEFT", page, "TOPLEFT", leftX, 0)
+    local behavior = CreateSectionCard(content, "Behavior", cardW, 170)
+    behavior:SetPoint("TOPLEFT", content, "TOPLEFT", leftX, 0)
 
     local fastLoot = UI.CreateCheckbox(
         behavior,
@@ -4086,8 +4254,8 @@ local function CreateLootPage(parent)
     status:SetJustifyH("LEFT")
     status:SetTextColor(0.78, 0.78, 0.72)
 
-    local vendor = CreateSectionCard(page, "Vendor", cardW, 240)
-    vendor:SetPoint("TOPLEFT", page, "TOPLEFT", rightX, 0)
+    local vendor = CreateSectionCard(content, "Vendor", cardW, 240)
+    vendor:SetPoint("TOPLEFT", content, "TOPLEFT", rightX, 0)
 
     local autoSellGrey = UI.CreateCheckbox(
         vendor,
@@ -4159,16 +4327,14 @@ end
 
 local function CreateQuestsPage(parent)
     local UI = ns.UI
-    local page = CreateFrame("Frame", nil, parent)
-    page:SetAllPoints()
-    page:Hide()
+    local page, content = CreateSettingsPage(parent)
 
     local cardW = 374
     local leftX = 0
     local rightX = cardW + 14
 
-    local automation = CreateSectionCard(page, "Automation", cardW, 245)
-    automation:SetPoint("TOPLEFT", page, "TOPLEFT", leftX, 0)
+    local automation = CreateSectionCard(content, "Automation", cardW, 245)
+    automation:SetPoint("TOPLEFT", content, "TOPLEFT", leftX, 0)
 
     local autoAccept = UI.CreateCheckbox(
         automation,
@@ -4222,7 +4388,7 @@ local function CreateQuestsPage(parent)
     )
     pauseModifier:SetPoint("TOPLEFT", autoGossip, "BOTTOMLEFT", 0, -14)
 
-    local filters = CreateSectionCard(page, "Filters", cardW, 150)
+    local filters = CreateSectionCard(content, "Filters", cardW, 150)
     filters:SetPoint("TOPLEFT", automation, "BOTTOMLEFT", 0, -14)
 
     local skipDaily = UI.CreateCheckbox(
@@ -4250,8 +4416,8 @@ local function CreateQuestsPage(parent)
     filterNote:SetTextColor(0.78, 0.78, 0.72)
     filterNote:SetText("Multiple-choice quest rewards are never selected automatically.")
 
-    local questItem = CreateSectionCard(page, "Quest Item Button", cardW, 160)
-    questItem:SetPoint("TOPLEFT", page, "TOPLEFT", rightX, 0)
+    local questItem = CreateSectionCard(content, "Quest Item Button", cardW, 160)
+    questItem:SetPoint("TOPLEFT", content, "TOPLEFT", rightX, 0)
 
     local questItemButton = UI.CreateCheckbox(
         questItem,
@@ -4307,16 +4473,14 @@ end
 
 local function CreateTrackerPage(parent)
     local UI = ns.UI
-    local page = CreateFrame("Frame", nil, parent)
-    page:SetAllPoints()
-    page:Hide()
+    local page, content = CreateSettingsPage(parent)
 
     local cardW = 374
     local leftX = 0
     local rightX = cardW + 14
 
-    local sizing = CreateSectionCard(page, "Tracker", cardW, 130)
-    sizing:SetPoint("TOPLEFT", page, "TOPLEFT", leftX, 0)
+    local sizing = CreateSectionCard(content, "Tracker", cardW, 130)
+    sizing:SetPoint("TOPLEFT", content, "TOPLEFT", leftX, 0)
 
     local trackerAppearanceEnabled = UI.CreateCheckbox(
         sizing,
@@ -4339,8 +4503,8 @@ local function CreateTrackerPage(parent)
     )
     PlaceBelow(trackerFitHeight, trackerAppearanceEnabled)
 
-    local appearance = CreateSectionCard(page, "Appearance", cardW, 255)
-    appearance:SetPoint("TOPLEFT", page, "TOPLEFT", rightX, 0)
+    local appearance = CreateSectionCard(content, "Appearance", cardW, 255)
+    appearance:SetPoint("TOPLEFT", content, "TOPLEFT", rightX, 0)
 
     local trackerBackgroundOpacity = UI.CreateSlider(
         appearance,
@@ -4393,7 +4557,7 @@ local function CreateTrackerPage(parent)
     )
     PlaceBelow(trackerMinimizeToButton, trackerMouseoverControls)
 
-    local note = CreateSectionCard(page, "Note", cardW, 120)
+    local note = CreateSectionCard(content, "Note", cardW, 120)
     note:SetPoint("TOPLEFT", appearance, "BOTTOMLEFT", 0, -14)
 
     local noteText = note:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
@@ -4428,16 +4592,14 @@ end
 
 local function CreateDialogsPage(parent)
     local UI = ns.UI
-    local page = CreateFrame("Frame", nil, parent)
-    page:SetAllPoints()
-    page:Hide()
+    local page, content = CreateSettingsPage(parent)
 
     local cardW = 374
     local leftX = 0
     local rightX = cardW + 14
 
-    local main = CreateSectionCard(page, "Auto Confirm", cardW, 278)
-    main:SetPoint("TOPLEFT", page, "TOPLEFT", leftX, 0)
+    local main = CreateSectionCard(content, "Auto Confirm", cardW, 278)
+    main:SetPoint("TOPLEFT", content, "TOPLEFT", leftX, 0)
 
     local enabled = UI.CreateCheckbox(
         main,
@@ -4494,8 +4656,8 @@ local function CreateDialogsPage(parent)
     note:SetTextColor(0.90, 0.72, 0.34)
     note:SetText("This is intentionally opt-in. Only checked dialog families are touched.")
 
-    local modification = CreateSectionCard(page, "Item Changes", cardW, 220)
-    modification:SetPoint("TOPLEFT", page, "TOPLEFT", rightX, 0)
+    local modification = CreateSectionCard(content, "Item Changes", cardW, 220)
+    modification:SetPoint("TOPLEFT", content, "TOPLEFT", rightX, 0)
 
     local replaceEnchant = UI.CreateCheckbox(
         modification,
@@ -4524,7 +4686,7 @@ local function CreateDialogsPage(parent)
     )
     PlaceBelow(merchantTradeTimers, replaceSockets)
 
-    local purchases = CreateSectionCard(page, "Purchases", cardW, 166)
+    local purchases = CreateSectionCard(content, "Purchases", cardW, 166)
     purchases:SetPoint("TOPLEFT", modification, "BOTTOMLEFT", 0, -14)
 
     local tokenPurchases = UI.CreateCheckbox(
@@ -4853,7 +5015,7 @@ local function CreateModernWindow()
     frame:Hide()
     table.insert(UISpecialFrames, "ZoidsToolsModernWindow")
 
-    frame.TitleText:SetText("ZoidsTools Next")
+    frame.TitleText:SetText("ZoidsTools")
     frame.TitleText:SetTextColor(1, 0.82, 0)
 
     frame.sidebar = CreateFrame("Frame", nil, frame, "BackdropTemplate")
@@ -4870,7 +5032,7 @@ local function CreateModernWindow()
 
     frame.brandSub = frame.sidebar:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
     frame.brandSub:SetPoint("TOPLEFT", frame.brand, "BOTTOMLEFT", 1, -5)
-    frame.brandSub:SetText("Experimental UI")
+    frame.brandSub:SetText("Retail toolkit")
 
     frame.content = CreateFrame("Frame", nil, frame, "BackdropTemplate")
     frame.content:SetPoint("TOPLEFT", frame.sidebar, "TOPRIGHT", 14, 0)
@@ -4896,7 +5058,7 @@ local function CreateModernWindow()
 
     frame.pageDescription = frame.top:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
     frame.pageDescription:SetPoint("TOPLEFT", frame.pageTitle, "BOTTOMLEFT", 0, -6)
-    frame.pageDescription:SetPoint("RIGHT", frame.top, "RIGHT", -220, 0)
+    frame.pageDescription:SetPoint("RIGHT", frame.top, "RIGHT", -238, 0)
     frame.pageDescription:SetJustifyH("LEFT")
     frame.pageDescription:SetTextColor(0.84, 0.82, 0.74)
 
@@ -4957,8 +5119,8 @@ local function CreateModernWindow()
         end
     end
 
-    frame.overview = CreateFrame("Frame", nil, frame.pageHost)
-    frame.overview:SetAllPoints()
+    local overviewContent
+    frame.overview, overviewContent = CreateSettingsPage(frame.pageHost)
     frame.overview.ZTPageKey = "overview"
     frame.modernPages = {}
     frame.modernPageSearchEntries = {}
@@ -4990,41 +5152,41 @@ local function CreateModernWindow()
     end
 
     frame.statusTiles = {
-        CreateStatusTile(frame.overview, "Diagnostics", function()
+        CreateStatusTile(overviewContent, "Diagnostics", function()
             local active = ns.IsDiagnosticsActive and ns:IsDiagnosticsActive()
             return active and "Running" or "Ready", active
         end),
-        CreateStatusTile(frame.overview, "Damage Meter", function()
+        CreateStatusTile(overviewContent, "Damage Meter", function()
             local enabled = ns.GetCustomDamageMeterEnabled and ns:GetCustomDamageMeterEnabled()
             return enabled and "ZoidsTools" or "Blizzard/default", enabled
         end),
-        CreateStatusTile(frame.overview, "Smart Mounts", function()
+        CreateStatusTile(overviewContent, "Smart Mounts", function()
             local enabled = ReadDB({ "mounts", "enabled" }, false) == true
             return enabled and "Enabled" or "Disabled", enabled
         end),
-        CreateStatusTile(frame.overview, "Quest Tracker", function()
+        CreateStatusTile(overviewContent, "Quest Tracker", function()
             local enabled = ReadDB({ "quests", "trackerAppearance", "enabled" }, false) == true
             return enabled and "Customized" or "Blizzard style", enabled
         end),
     }
 
-    frame.statusTiles[1]:SetPoint("TOPLEFT", frame.overview, "TOPLEFT", 0, 0)
+    frame.statusTiles[1]:SetPoint("TOPLEFT", overviewContent, "TOPLEFT", 0, 0)
     for index = 2, #frame.statusTiles do
         frame.statusTiles[index]:SetPoint("LEFT", frame.statusTiles[index - 1], "RIGHT", 10, 0)
     end
 
-    frame.quickTitle = frame.overview:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    frame.quickTitle = overviewContent:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     frame.quickTitle:SetPoint("TOPLEFT", frame.statusTiles[1], "BOTTOMLEFT", 0, -22)
     frame.quickTitle:SetTextColor(1, 0.82, 0.18)
     frame.quickTitle:SetText("Feature Areas")
 
     frame.areaRows = {
-        CreateAreaRow(frame.overview, "Warband Weekly", "Mythic+, Great Vault, keystones, and current-expansion saves across your characters.", "warband"),
-        CreateAreaRow(frame.overview, "Weekly Goals", "Great Vault, Sparks, popular weekly activities, and Midnight profession Knowledge.", "professionweekly"),
-        CreateAreaRow(frame.overview, "Core", "Minimap, player tooltips, window movement, audio sync, and Talking Head.", "minimap"),
-        CreateAreaRow(frame.overview, "Character", "Items, stat goals, talents, and recommendations.", "items"),
-        CreateAreaRow(frame.overview, "Combat", "Meters, keybind text, range tint, missing buffs, unit frames, and macros.", "meters"),
-        CreateAreaRow(frame.overview, "Automation", "Fast loot, vendor tools, quest automation, tracker styling, and quest item button.", "loot"),
+        CreateAreaRow(overviewContent, "Warband Weekly", "Mythic+, Great Vault, keystones, and current-expansion saves across your characters.", "warband"),
+        CreateAreaRow(overviewContent, "Weekly Goals", "Great Vault, Sparks, popular weekly activities, and Midnight profession Knowledge.", "professionweekly"),
+        CreateAreaRow(overviewContent, "Core", "Minimap, player tooltips, window movement, audio sync, and Talking Head.", "minimap"),
+        CreateAreaRow(overviewContent, "Character", "Items, stat goals, talents, and recommendations.", "items"),
+        CreateAreaRow(overviewContent, "Combat", "Meters, keybind text, range tint, missing buffs, unit frames, and macros.", "meters"),
+        CreateAreaRow(overviewContent, "Automation", "Fast loot, vendor tools, quest automation, tracker styling, and quest item button.", "loot"),
     }
 
     frame.areaRows[1]:SetPoint("TOPLEFT", frame.quickTitle, "BOTTOMLEFT", 0, -10)
@@ -5032,12 +5194,21 @@ local function CreateModernWindow()
         frame.areaRows[index]:SetPoint("TOPLEFT", frame.areaRows[index - 1], "BOTTOMLEFT", 0, -9)
     end
 
-    frame.note = frame.overview:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    frame.note = overviewContent:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
     frame.note:SetPoint("TOPLEFT", frame.areaRows[#frame.areaRows], "BOTTOMLEFT", 0, -18)
     frame.note:SetWidth(760)
     frame.note:SetJustifyH("LEFT")
     frame.note:SetTextColor(0.72, 0.74, 0.72)
     frame.note:SetText("ZoidsTools settings are organized into focused areas. Use the sidebar, page tabs, or search to jump straight to what you need.")
+
+    function frame.overview:BeforeLayout(width)
+        for _, tile in ipairs(frame.statusTiles) do tile:SetWidth((width - 30) / 4) end
+        for _, row in ipairs(frame.areaRows) do
+            row:SetWidth(width)
+            row:SetHeight(math.max(ROW_HEIGHT, 33 + row.description:GetStringHeight()))
+        end
+        frame.note:SetWidth(width)
+    end
 
     frame.placeholder = CreateFrame("Frame", nil, frame.pageHost, "BackdropTemplate")
     frame.placeholder:SetAllPoints()
@@ -5135,6 +5306,7 @@ function ShowPage(pageKey)
         for _, tile in ipairs(frame.statusTiles) do
             tile:Refresh()
         end
+        frame.overview:LayoutSettings()
     elseif frame.modernPages[info.key] then
         frame.overview:Hide()
         frame.placeholder:Hide()
@@ -5156,6 +5328,7 @@ function UI2.RefreshVisiblePage()
         page:Refresh()
     elseif frame.pageKey == "overview" then
         for _, tile in ipairs(frame.statusTiles or {}) do tile:Refresh() end
+        if frame.overview and frame.overview.LayoutSettings then frame.overview:LayoutSettings() end
     end
 end
 
